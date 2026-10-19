@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "consentNeeded": false,
+  "stepOutEnabled": true,
+  "openAway": {
+    "id": "01K8WP9AWAY200000000000000",
+    "workDate": "2026-10-19",
+    "source": "roll_call",
+    "reason": null,
+    "markedByName": "Urmi",
+    "staffNote": null,
+    "startTs": 1792382520000,
+    "endTs": null,
+    "awayMin": 0,
+    "state": "open"
+  }
+}

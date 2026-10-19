@@ -80,6 +80,7 @@ const LABEL: Record<PayslipLineCode, string> = {
   recovery: 'Recovery',
   advance_recovery: 'Advance recovery',
   rounding: 'Rounding',
+  time_credits: 'Time credits',
 };
 
 const EARNING_KINDS = new Set<Adjustment['kind']>([

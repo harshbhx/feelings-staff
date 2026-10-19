@@ -541,6 +541,9 @@ async function table(ctx: Ctx, kind: ExportKind, p: Params): Promise<Table> {
         ],
       };
     }
+    case 'credits_ledger':
+    case 'presence_log':
+      return fail('NOT_IMPLEMENTED', 'This report is not ready yet.');
     case 'audit': {
       const rows = await ctx.db.all<{
         created_at: number;

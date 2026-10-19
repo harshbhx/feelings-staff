@@ -1,0 +1,23 @@
+{
+  "slots": [
+    {
+      "id": "01K8WP9RC10000000000000000",
+      "slotTime": "12:00",
+      "status": "done",
+      "submittedBy": {
+        "id": "01K894PPK418TJT35A8CDEANDV",
+        "name": "Urmi Mengar"
+      }
+    },
+    {
+      "id": "01K8WP9RC20000000000000000",
+      "slotTime": "15:00",
+      "status": "upcoming"
+    },
+    {
+      "id": "01K8WP9RC30000000000000000",
+      "slotTime": "18:00",
+      "status": "upcoming"
+    }
+  ]
+}

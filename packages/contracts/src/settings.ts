@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Divisor, SetupStep, SetupStepState } from './enums';
-import { HHMM, Lang, Paise } from './primitives';
+import { HHMM, Lang, Paise, WorkDate } from './primitives';
 
 /** Overtime rate (PRD 7.6). Multipliers below 2 show a compliance warning in the UI. */
 export const OtRate = z.discriminatedUnion('mode', [
@@ -109,6 +109,28 @@ export const AppSettings = z.object({
   defaultStaffLang: Lang,
 });
 
+/** Time credits (PRD 4.19.4, 7.17.1): the switch and the day it starts counting. */
+export const TimeCreditsSettings = z.object({
+  enabled: z.boolean(),
+  /** First day entries are written; earlier days keep the automatic rules of PRD 7.5 and 7.6. */
+  startDate: WorkDate,
+});
+export type TimeCreditsSettings = z.infer<typeof TimeCreditsSettings>;
+
+/** Presence (PRD 4.18, 8.2.1): roll-call times, Step out and the optional foreground check. */
+export const PresenceSettings = z.object({
+  enabled: z.boolean(),
+  /** One to four roll-call times, IST, strictly increasing. */
+  rollCallTimes: z.array(HHMM).min(1).max(4),
+  stepOut: z.boolean(),
+  foreground: z.object({
+    enabled: z.boolean(),
+    intervalMin: z.number().int().min(10).max(120),
+  }),
+  quietDuringBreaks: z.boolean(),
+});
+export type PresenceSettings = z.infer<typeof PresenceSettings>;
+
 export const SetupProgress = z.record(SetupStep, SetupStepState);
 export type SetupProgress = z.infer<typeof SetupProgress>;
 
@@ -122,6 +144,8 @@ export const OrgSettings = z.object({
   notifications: NotificationSettings,
   privacy: PrivacySettings,
   app: AppSettings,
+  timeCredits: TimeCreditsSettings,
+  presence: PresenceSettings,
   setup: SetupProgress,
 });
 export type OrgSettings = z.infer<typeof OrgSettings>;
@@ -141,6 +165,10 @@ export const OrgSettingsPatch = z.object({
   notifications: NotificationSettings.partial().optional(),
   privacy: PrivacySettings.pick({ grievanceName: true, grievancePhone: true }).partial().optional(),
   app: AppSettings.partial().optional(),
+  timeCredits: TimeCreditsSettings.partial().optional(),
+  presence: PresenceSettings.extend({ foreground: PresenceSettings.shape.foreground.partial() })
+    .partial()
+    .optional(),
 });
 export type OrgSettingsPatch = z.infer<typeof OrgSettingsPatch>;
 
@@ -149,6 +177,8 @@ export const STEP_UP_SETTINGS: ReadonlyArray<readonly [keyof OrgSettings, string
   ['attendance', 'strongMode'],
   ['risk', 'flagAt'],
   ['risk', 'proofAt'],
+  ['timeCredits', 'enabled'],
+  ['presence', 'enabled'],
 ];
 
 /** Defaults we build with (PRD 7.14 and 17.3). */
@@ -212,6 +242,14 @@ export const DEFAULT_ORG_SETTINGS: OrgSettings = {
     selfieRetentionDays: 30,
   },
   app: { defaultStaffLang: 'en' },
+  timeCredits: { enabled: true, startDate: '2026-10-01' },
+  presence: {
+    enabled: true,
+    rollCallTimes: ['12:00', '15:00', '18:00'],
+    stepOut: true,
+    foreground: { enabled: false, intervalMin: 30 },
+    quietDuringBreaks: true,
+  },
   setup: {
     salon: 'todo',
     location: 'todo',

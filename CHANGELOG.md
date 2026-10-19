@@ -23,6 +23,12 @@ WP-1, platform, contracts and CI (merged):
 - Playwright harness with fixtures (`reset`, `setServerClock`, `runCron`, `outbox`, `setGeo`, `checkA11y`), a fake camera and four projects.
 - Active staff are capped at 15 (`MAX_ACTIVE_STAFF`).
 - `Fix.accuracySpreadM` in the engine contract.
+
+WP-9 Time credits and presence, contracts (`contracts-v1.2`):
+
+- Engine types for the minute ledger and presence (`CreditRules`, `CreditEntry`, `CreditAdjustment`, `CreditSettlement`, `MinuteRate`, `AwayInterval`, `PresenceRules` and friends), the `time_credits` payslip line, `TimeRules.credits`.
+- Settings `timeCredits` and `presence` (changing their `enabled` flag needs step-up), the `rollcall` manager permission, the `presence_checks` consent, the `credits_ledger` and `presence_log` export kinds.
+- 20 endpoints: owner credits, adjustments, settle step, roll-calls, away intervals; staff Step out, I'm back, foreground check and presence history. The `away` Needs-action item, `TodayBoard.rollCall` and notification events N32 to N36.
 - Extra endpoints on top of PRD 9.4: join lookup, leave preview, owner security, setup checklist, payroll preview, door device list, consents, bulk approve, staff photo, staff rehire and device revoke.
 
 WP-6, owner panel:

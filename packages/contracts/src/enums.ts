@@ -17,6 +17,7 @@ export const Permission = z.enum([
   'payroll',
   'staff',
   'exports',
+  'rollcall',
 ]);
 export type Permission = z.infer<typeof Permission>;
 
@@ -100,6 +101,9 @@ export const DayTag = z.enum([
   'flagged',
   'pending',
   'worked_off_day',
+  'away',
+  'overbreak',
+  'left_no_checkout',
 ]);
 export type DayTag = z.infer<typeof DayTag>;
 
@@ -189,6 +193,7 @@ export const PayslipLineCode = z.enum([
   'recovery',
   'advance_recovery',
   'rounding',
+  'time_credits',
 ]);
 export type PayslipLineCode = z.infer<typeof PayslipLineCode>;
 
@@ -202,6 +207,8 @@ export const ExportKind = z.enum([
   'advances',
   'exceptions',
   'audit',
+  'credits_ledger',
+  'presence_log',
 ]);
 export type ExportKind = z.infer<typeof ExportKind>;
 
@@ -211,7 +218,13 @@ export type ExportFormat = z.infer<typeof ExportFormat>;
 export const ExportStatus = z.enum(['queued', 'ready', 'failed']);
 export type ExportStatus = z.infer<typeof ExportStatus>;
 
-export const ConsentKind = z.enum(['privacy_notice', 'selfie', 'night_work', 'fines_notice']);
+export const ConsentKind = z.enum([
+  'privacy_notice',
+  'selfie',
+  'night_work',
+  'fines_notice',
+  'presence_checks',
+]);
 export type ConsentKind = z.infer<typeof ConsentKind>;
 
 export const AuditCategory = z.enum(['change', 'security', 'access', 'export']);
@@ -263,6 +276,11 @@ export const NotifyEventType = z.enum([
   'weekly_digest',
   'sign_in_link',
   'payslip_pdf_failed',
+  'roll_call_due',
+  'roll_call_missed',
+  'staff_stepped_out',
+  'away_to_confirm',
+  'left_without_checkout',
 ]);
 export type NotifyEventType = z.infer<typeof NotifyEventType>;
 
@@ -299,6 +317,11 @@ export const NOTIFY_EVENT_NUMBER: Record<NotifyEventType, number> = {
   weekly_digest: 30,
   sign_in_link: 31,
   payslip_pdf_failed: 37,
+  roll_call_due: 32,
+  roll_call_missed: 33,
+  staff_stepped_out: 34,
+  away_to_confirm: 35,
+  left_without_checkout: 36,
 };
 
 /** Events whose push the recipient cannot switch off (PRD 6, delivery rules). */
@@ -319,6 +342,7 @@ export const ActionType = z.enum([
   'offsite_request',
   'auto_closed',
   'advance_request',
+  'away',
 ]);
 export type ActionType = z.infer<typeof ActionType>;
 
@@ -353,3 +377,70 @@ export const Designation = z.enum([
   'Other',
 ]);
 export type Designation = z.infer<typeof Designation>;
+
+// ---- Time credits and presence (PRD 7.17, 7.18, 8.2.1) -----------------------------------------
+
+/** The four kinds of credit entry: minus for late, early and away, plus for approved overtime. */
+export const CreditKind = z.enum(['late', 'early', 'away', 'ot']);
+export type CreditKind = z.infer<typeof CreditKind>;
+
+/** What a credit entry points at: a punch, a presence interval or an overtime decision. */
+export const CreditSourceKind = z.enum(['punch', 'presence', 'ot_decision']);
+export type CreditSourceKind = z.infer<typeof CreditSourceKind>;
+
+export const CreditAdjustmentStatus = z.enum(['active', 'void']);
+export type CreditAdjustmentStatus = z.infer<typeof CreditAdjustmentStatus>;
+
+export const CreditSettlementStatus = z.enum(['draft', 'applied', 'void']);
+export type CreditSettlementStatus = z.infer<typeof CreditSettlementStatus>;
+
+/** How an away interval started: a roll-call mark, a staff Step out, or both merged. */
+export const AwaySource = z.enum(['roll_call', 'step_out', 'mixed']);
+export type AwaySource = z.infer<typeof AwaySource>;
+
+/** The Step out reason chips (personal, lunch outside, work errand, other). */
+export const AwayReason = z.enum(['personal', 'lunch', 'errand', 'other']);
+export type AwayReason = z.infer<typeof AwayReason>;
+
+/** State of an away interval: open while running, pending until the owner decides a step-out. */
+export const AwayState = z.enum(['open', 'pending', 'confirmed', 'work', 'ignored']);
+export type AwayState = z.infer<typeof AwayState>;
+
+/** What staff see of an interval: Waiting, Counted, Work or Ignored (never minutes of credit). */
+export const AwayStaffState = z.enum(['open', 'waiting', 'counted', 'work', 'ignored']);
+export type AwayStaffState = z.infer<typeof AwayStaffState>;
+
+export const AwayEndReason = z.enum([
+  'back',
+  'roll_call_here',
+  'check_out',
+  'auto_close',
+  'shift_end',
+  'owner_edit',
+]);
+export type AwayEndReason = z.infer<typeof AwayEndReason>;
+
+export const RollCallMarkValue = z.enum(['here', 'not_here']);
+export type RollCallMarkValue = z.infer<typeof RollCallMarkValue>;
+
+export const RollCallSlotStatus = z.enum(['upcoming', 'open', 'done', 'missed']);
+export type RollCallSlotStatus = z.infer<typeof RollCallSlotStatus>;
+
+/** Result of one foreground presence check. */
+export const PresenceCheckResult = z.enum(['inside', 'edge', 'outside', 'no_fix']);
+export type PresenceCheckResult = z.infer<typeof PresenceCheckResult>;
+
+/** Audit actions added by WP-9 (PRD 8.2.1). */
+export const CREDIT_AUDIT_ACTIONS = [
+  'credits.settle',
+  'credits.adjust',
+  'credits.adjust.void',
+  'credits.export',
+  'rollcall.submit',
+  'rollcall.edit',
+  'presence.away.confirm',
+  'presence.away.work',
+  'presence.away.ignore',
+  'presence.away.edit',
+  'presence.step_out',
+] as const;
