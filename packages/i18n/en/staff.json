@@ -56,7 +56,8 @@
     "sendToOwner": "Send to {{owner}}",
     "remove": "Remove from this phone",
     "removeConfirm": "Remove this check-in from the phone? It won't be sent.",
-    "sentToOwner": "We've told {{owner}}. She'll fix your time."
+    "sentToOwner": "We've told {{owner}}. She'll fix your time.",
+    "waText": "{{item}}. {{reason}}"
   },
   "install": {
     "title": "Add Feelings to your home screen",
@@ -79,7 +80,9 @@
     "desktop": "Open this link on your phone.",
     "desktopHint": "Scan the code with your phone's camera.",
     "qrLabel": "QR code for {{url}}",
-    "linkLabel": "Link"
+    "linkLabel": "Link",
+    "chromeLabel": "Chrome",
+    "safariLabel": "Safari"
   },
   "today": {
     "greeting": {
@@ -321,7 +324,14 @@
     },
     "settingAllow": "Allow",
     "settingOn": "On",
-    "settingWhileUsing": "While Using the App"
+    "settingWhileUsing": "While Using the App",
+    "mock": {
+      "safariWebsites": "Safari Websites",
+      "precise": "Precise Location",
+      "preciseAndroid": "Use precise location",
+      "camera": "Camera",
+      "appName": "Feelings"
+    }
   },
   "month": {
     "title": "{{month}}",
@@ -439,7 +449,9 @@
     "fixLine": "{{kind}} · {{date}}",
     "proposedIn": "Arrived {{time}}",
     "proposedOut": "Left {{time}}",
-    "loadError": "We couldn't load your requests."
+    "loadError": "We couldn't load your requests.",
+    "left_one": "{{count}} left",
+    "left_other": "{{count}} left"
   },
   "leave": {
     "type": "Type of leave",

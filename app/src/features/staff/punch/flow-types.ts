@@ -6,10 +6,12 @@
  * this shape, and `flow-stub.ts` drives it from fixtures in mock mode (kit, visual tests, preview
  * before the punch API lands).
  */
-import type { PunchKind, PunchResult } from '@fs/contracts';
-import type { PunchConfirm } from '../today/today-model';
+import type { PunchKind, PunchRequest, PunchResult } from '@fs/contracts';
 
 export type PunchAction = Extract<PunchKind, 'in' | 'out'>;
+
+/** Confirmations sent with the punch (PRD 4.3.2). */
+export type PunchAck = PunchRequest['ack'][number];
 
 /** Where the location check put the person. */
 export interface PlaceFix {
@@ -35,18 +37,12 @@ export type PunchProblem =
   | { code: 'account_inactive' }
   | { code: 'upgrade_required' }
   | { code: 'session_expired' }
-  | { code: 'unknown'; requestId: string | null };
+  | { code: 'unknown'; requestId: string | null }
+  /** This build has no punch module yet (before WP-4's flow is wired). */
+  | { code: 'not_ready' };
 
 export type PunchFlowState =
   | { step: 'idle' }
-  /** "Today is your week off. Check in anyway?" */
-  | {
-      step: 'confirm';
-      kind: PunchAction;
-      reason: PunchConfirm;
-      shiftStartTs: number | null;
-      earliestTs: number | null;
-    }
   /** Explain before the first location request ("We check your location only when..."). */
   | { step: 'permission'; kind: PunchAction }
   /** "Finding you... 42 m accuracy" */
@@ -84,9 +80,11 @@ export type PunchFlowState =
   | { step: 'problem'; kind: PunchAction; problem: PunchProblem };
 
 export interface PunchFlowActions {
-  start(kind: PunchAction): void;
-  /** Accept the confirmation (week off, holiday, leave, too early). */
-  confirm(): void;
+  /**
+   * Begin a punch. `ack` carries the confirmations the person already gave in the sheet
+   * ("Check in anyway" on a week off, holiday, leave day or before the earliest time).
+   */
+  start(kind: PunchAction, ack: PunchAck[]): void;
   /** From the pre-permission explainer: ask for location from this tap. */
   allowLocation(): void;
   retry(): void;
