@@ -66,6 +66,11 @@ export interface ComputePayslipInput {
   creditDays?: readonly string[];
   /** The owner's Time credits settlement for this run (PRD 7.17.5); null or absent settles nothing. */
   settlement?: CreditSettlementInput | null;
+  /**
+   * Legal-band overtime minutes of the month on Time credits days (`legalOtBand`) and the "Pay legal
+   * overtime at 2x" setting, for the owner's warnings (PRD 7.17.7). Absent: none.
+   */
+  legalOt?: { minutes: number; pay2x: boolean };
 }
 
 /** The payslip plus what a Time credits settlement applied (null when there was none). */
@@ -506,6 +511,20 @@ export function computePayslip(input: ComputePayslipInput): PayslipWithCredits {
   }
   if (otPendingMin > 0) {
     warn('pending_overtime', `${otPendingMin} min of overtime not decided, so not paid.`);
+  }
+  const legal = input.legalOt;
+  if (legal !== undefined && legal.minutes > 0) {
+    if (legal.pay2x) {
+      warn(
+        'legal_ot_2x',
+        `${legal.minutes} min of overtime beyond 9 h a day or 48 h a week count at 2x, as the law requires.`,
+      );
+    } else {
+      warn(
+        'legal_ot_shortfall',
+        `Overtime beyond 9 h a day or 48 h a week must be paid at 2x by law; ${legal.minutes} min this month count at 1x.`,
+      );
+    }
   }
 
   const monthlyDays = parts.reduce((s, p) => s + (p.monthly ? p.days : 0), 0);

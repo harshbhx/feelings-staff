@@ -9,7 +9,13 @@ import type {
 } from '@fs/contracts';
 import { monthDates, PayslipResult as PayslipSchema, weekday } from '@fs/contracts';
 import { describe, expect, it } from 'vitest';
-import { creditBalance, creditEntriesForDay, creditRate, creditValue } from '../src/credits';
+import {
+  creditBalance,
+  creditEntriesForDay,
+  creditRate,
+  creditValue,
+  legalOtBand,
+} from '../src/credits';
 import { computeDay } from '../src/day';
 import { frac, toPaise } from '../src/money';
 import { computePayslip, timeLines } from '../src/pay';
@@ -68,19 +74,39 @@ function month(
   });
 }
 
-const rules = (otApprovedMin = 0): CreditRules => ({
+const rules = (otApprovedMin: number, legalOtMin: number): CreditRules => ({
   enabled: true,
   otApprovedMin,
   lateSourceId: '01J0000000000000000000P001',
   earlySourceId: '01J0000000000000000000P002',
   otSourceId: '01J0000000000000000000D001',
+  legalOtMin,
 });
 
-/** Active ledger rows for a list of days, with the approved overtime per date. */
-const ledger = (days: DayResult[], ot: Record<string, number> = {}, aways: ConfirmedAway[] = []) =>
-  days
-    .flatMap((d) => creditEntriesForDay(d, aways, rules(ot[d.workDate] ?? 0)))
+/**
+ * Active ledger rows for a list of days, with the approved overtime per date. "Pay legal overtime at
+ * 2x" is on (the default): each day's legal band comes from `legalOtBand` over the same days.
+ */
+const ledger = (
+  days: DayResult[],
+  ot: Record<string, number> = {},
+  aways: ConfirmedAway[] = [],
+) => {
+  const legal = new Map(
+    legalOtBand(
+      days.map((d) => ({
+        workDate: d.workDate,
+        totalMin: d.totalMin ?? 0,
+        otApprovedMin: ot[d.workDate] ?? 0,
+      })),
+    ).map((b) => [b.workDate, b.legalMin]),
+  );
+  return days
+    .flatMap((d) =>
+      creditEntriesForDay(d, aways, rules(ot[d.workDate] ?? 0, legal.get(d.workDate) ?? 0)),
+    )
     .map((e) => ({ ...e, status: 'active' as const }));
+};
 
 const kinds = (entries: { kind: string; minutes: number }[]) =>
   entries.map((e) => `${e.kind} ${e.minutes}`);
@@ -94,7 +120,7 @@ const confirmedAway = (n: number, date: string, from: string, minutes: number): 
   confirmedBy: OWNER,
 });
 
-describe('PRD 7.15 example 13: late every day, plus overtime (Time credits on)', () => {
+describe('PRD 7.15 example 13: late every day, plus overtime beyond 9 h (Time credits on)', () => {
   const lates = ['01', '02', '03', '05', '07', '08', '17'].map((d) => `2026-10-${d}`);
   const script = Object.fromEntries(
     lates.map((d) => [d, ['10:10', d === '2026-10-17' ? '22:10' : '20:00']]),
@@ -110,7 +136,8 @@ describe('PRD 7.15 example 13: late every day, plus overtime (Time credits on)',
         days: on,
         approvals,
         creditDays: monthDates(OCT),
-        settlement: { balanceMin: 50, settleMin, rate },
+        settlement: { balanceMin: 170, settleMin, rate },
+        legalOt: { minutes: 120, pay2x: true },
       }),
     );
 
@@ -122,44 +149,51 @@ describe('PRD 7.15 example 13: late every day, plus overtime (Time credits on)',
     expect(amount(r, 'overtime')).toBe(21_505);
   });
 
-  it('ledger: 7 x (-10) and +120 make +50, worth about ₹44.80 (one rounding of the net minutes)', () => {
-    expect(kinds(entries)).toEqual([...Array(7).fill('late -10'), 'ot 120']);
-    expect(creditBalance(entries, [], [], '2026-10-31')).toBe(50);
-    expect(rate).toEqual({ rDay: { num: 1_500_000, den: 31 }, sStd: 540 });
-    expect(creditValue(50, rate)).toBe(4_480);
-    expect(creditValue(120, rate) + creditValue(-70, rate)).toBe(4_481);
+  it('17 Oct: 10:10 to 22:10 is 660 worked minutes, 120 beyond 9 h, all approved, so all legal', () => {
+    expect(on.find((d) => d.workDate === '2026-10-17')).toMatchObject({
+      totalMin: 660,
+      otCandidateMin: 120,
+    });
   });
 
-  it('settle 0: nothing on the payslip and +50 carries over', () => {
+  it('ledger: 7 x (-10), +120 and +120 legal make +170, worth about ₹152.33 (one rounding)', () => {
+    expect(kinds(entries)).toEqual([...Array(7).fill('late -10'), 'ot 120', 'ot_legal 120']);
+    expect(creditBalance(entries, [], [], '2026-10-31')).toBe(170);
+    expect(rate).toEqual({ rDay: { num: 1_500_000, den: 31 }, sStd: 540 });
+    expect(creditValue(170, rate)).toBe(15_233);
+  });
+
+  it('settle 0: nothing on the payslip and +170 carries over; the owner sees the 2x note', () => {
     const r = settle(0);
     expect(r.lines.map((l) => l.code)).toEqual(['salary']);
     expect(r).toMatchObject({
       grossPaise: 1_500_000,
       netPaise: 1_500_000,
-      credits: { appliedMin: 0, amountPaise: 0, stayMin: 50 },
+      credits: { appliedMin: 0, amountPaise: 0, stayMin: 170 },
     });
+    expect(r.warnings.map((w) => w.code)).toContain('legal_ot_2x');
   });
 
-  it('settle +50: a payslip earning "Time credits: +50 min, +₹44.80" and a balance of 0', () => {
-    const r = settle(50);
+  it('settle +170: a payslip earning "Time credits: +170 min, +₹152.33" and a balance of 0', () => {
+    const r = settle(170);
     expect(() => PayslipSchema.parse(r)).not.toThrow();
     expect(r.lines.map((l) => l.code)).toEqual(['salary', 'time_credits', 'rounding']);
-    expect(amount(r, 'time_credits')).toBe(4_480);
-    expect(formula(r, 'time_credits')).toBe('₹483.87 × 50 min ÷ 540');
+    expect(amount(r, 'time_credits')).toBe(15_233);
+    expect(formula(r, 'time_credits')).toBe('₹483.87 × 170 min ÷ 540');
     expect(r).toMatchObject({
-      grossPaise: 1_504_480,
-      netBeforeRoundingPaise: 1_504_480,
-      netPaise: 1_504_500,
-      roundingPaise: 20,
-      credits: { appliedMin: 50, amountPaise: 4_480, stayMin: 0 },
+      grossPaise: 1_515_233,
+      netBeforeRoundingPaise: 1_515_233,
+      netPaise: 1_515_200,
+      roundingPaise: -33,
+      credits: { appliedMin: 170, amountPaise: 15_233, stayMin: 0 },
     });
-    const applied = { month: OCT, appliedMin: 50, status: 'applied' as const };
+    const applied = { month: OCT, appliedMin: 170, status: 'applied' as const };
     expect(creditBalance(entries, [], [applied], '2026-10-31')).toBe(0);
   });
 
-  it('adjust: +10 for an excused late makes the balance +60', () => {
+  it('adjust: +10 for an excused late makes the balance +180', () => {
     const excused = { workDate: '2026-10-01', deltaMin: 10, status: 'active' as const };
-    expect(creditBalance(entries, [excused], [], '2026-10-31')).toBe(60);
+    expect(creditBalance(entries, [excused], [], '2026-10-31')).toBe(180);
   });
 });
 
@@ -193,7 +227,14 @@ describe('PRD 7.15 example 14: a minus month, carried over, then partly settled 
     expect(amount(r, 'overtime')).toBe(6_667);
   });
 
-  it('November ledger: -25 -10 -20 -40 -80 +45 = -130, "might cut around ₹96.30"', () => {
+  it('20 Nov: 10:00 to 20:45 is 585 worked minutes, 45 beyond 9 h', () => {
+    expect(onNov.find((d) => d.workDate === '2026-11-20')).toMatchObject({
+      totalMin: 585,
+      otCandidateMin: 45,
+    });
+  });
+
+  it('November ledger: -25 -10 -20 -40 -80 +45 +45 legal = -85, "might cut around ₹62.96"', () => {
     expect(kinds(nov)).toEqual([
       'late -25',
       'late -10',
@@ -203,13 +244,14 @@ describe('PRD 7.15 example 14: a minus month, carried over, then partly settled 
       'away -40',
       'late -10',
       'ot 45',
+      'ot_legal 45',
     ]);
-    expect(creditBalance(nov, [], [], '2026-11-30')).toBe(-130);
+    expect(creditBalance(nov, [], [], '2026-11-30')).toBe(-85);
     expect(rate).toEqual({ rDay: { num: 40_000, den: 1 }, sStd: 540 });
-    expect(creditValue(-130, rate)).toBe(-9_630);
+    expect(creditValue(-85, rate)).toBe(-6_296);
   });
 
-  it('November: settle 0, salary ₹12,000.00, no time-credits line; -130 carries over', () => {
+  it('November: settle 0, salary ₹12,000.00, no time-credits line; -85 carries over', () => {
     const r = computePayslip(
       input({
         person: pay,
@@ -217,17 +259,17 @@ describe('PRD 7.15 example 14: a minus month, carried over, then partly settled 
         days: onNov,
         approvals,
         creditDays: monthDates(NOV),
-        settlement: { balanceMin: -130, settleMin: 0, rate },
+        settlement: { balanceMin: -85, settleMin: 0, rate },
       }),
     );
     expect(r.lines.map((l) => l.code)).toEqual(['salary']);
-    expect(r).toMatchObject({ netPaise: 1_200_000, credits: { stayMin: -130 } });
+    expect(r).toMatchObject({ netPaise: 1_200_000, credits: { stayMin: -85 } });
   });
 
-  it('December: -20 more makes -150; settle -100 cuts ₹74.07, net ₹11,926 (+₹0.07), -50 stays', () => {
+  it('December: -20 more makes -105; settle -100 cuts ₹74.07, net ₹11,926 (+₹0.07), -5 stays (₹3.70)', () => {
     expect(kinds(dec)).toEqual(['late -10', 'late -10']);
     const entries = [...nov, ...dec];
-    expect(creditBalance(entries, [], [novSettled], '2026-12-31')).toBe(-150);
+    expect(creditBalance(entries, [], [novSettled], '2026-12-31')).toBe(-105);
     // The example values December at ₹400 a day, as stated; the engine settles at the rate it is given.
     const r = computePayslip(
       input({
@@ -235,7 +277,7 @@ describe('PRD 7.15 example 14: a minus month, carried over, then partly settled 
         month: DEC,
         days: month(DEC, {}, ON, { policy: kajal }),
         creditDays: monthDates(DEC),
-        settlement: { balanceMin: -150, settleMin: -100, rate },
+        settlement: { balanceMin: -105, settleMin: -100, rate },
       }),
     );
     expect(() => PayslipSchema.parse(r)).not.toThrow();
@@ -246,20 +288,20 @@ describe('PRD 7.15 example 14: a minus month, carried over, then partly settled 
       netBeforeRoundingPaise: 1_192_593,
       netPaise: 1_192_600,
       roundingPaise: 7,
-      credits: { appliedMin: -100, amountPaise: -7_407, stayMin: -50 },
+      credits: { appliedMin: -100, amountPaise: -7_407, stayMin: -5 },
     });
-    expect(creditBalance(entries, [], [novSettled, decSettled], '2026-12-31')).toBe(-50);
-    expect(creditValue(-50, rate)).toBe(-3_704);
+    expect(creditBalance(entries, [], [novSettled, decSettled], '2026-12-31')).toBe(-5);
+    expect(creditValue(-5, rate)).toBe(-370);
   });
 
-  it('January: the 5 Nov early entry adjusted -20 -> 0 (+20) makes -30, "might cut around ₹22.22"; void restores -50', () => {
+  it('January: the 5 Nov early entry adjusted -20 -> 0 (+20) makes +15, "worth about ₹11.11"; void restores -5', () => {
     const entries = [...nov, ...dec];
     const adj = { workDate: '2026-11-05', deltaMin: 20, status: 'active' as const };
     const settled = [novSettled, decSettled];
     expect(nov.find((e) => e.workDate === '2026-11-05' && e.kind === 'early')?.minutes).toBe(-20);
-    expect(creditBalance(entries, [adj], settled, '2027-01-31')).toBe(-30);
-    expect(creditValue(-30, rate)).toBe(-2_222);
-    expect(creditBalance(entries, [{ ...adj, status: 'void' }], settled, '2027-01-31')).toBe(-50);
+    expect(creditBalance(entries, [adj], settled, '2027-01-31')).toBe(15);
+    expect(creditValue(15, rate)).toBe(1_111);
+    expect(creditBalance(entries, [{ ...adj, status: 'void' }], settled, '2027-01-31')).toBe(-5);
   });
 });
 
