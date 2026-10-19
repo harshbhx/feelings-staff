@@ -98,12 +98,9 @@ function useCellText() {
     if (!c.meta) return `${name}, ${dayLabel(c.date)}: ${t('owner:register.future')}`;
     const status = t(c.meta.labelKey);
     const extra = cellDetail(c.cell).map((p) => t(p.key, p.values));
-    // The visible letter ("WO", "OD") is part of the name, so what you see is what is read.
-    const letter = /\w/.test(c.meta.letter) ? ` (${c.meta.letter})` : '';
-    return [
-      `${t('owner:register.dayLink', { name, date: dayLabel(c.date), status })}${letter}`,
-      ...extra,
-    ].join(' · ');
+    return [t('owner:register.dayLink', { name, date: dayLabel(c.date), status }), ...extra].join(
+      ' · ',
+    );
   };
 }
 
@@ -116,7 +113,9 @@ function CellMark({ c, size = 'grid' }: { c: CellModel; size?: 'grid' | 'strip' 
       className={`grid place-items-center rounded-sm ${TINT[chip]} ${size === 'grid' ? 'h-11 w-9 content-center gap-0.5' : 'h-12 w-full content-center gap-0.5'}`}
     >
       <Icon name={icon} className={`size-3.5 ${c.late && chip === 'present' ? 'text-late' : ''}`} />
-      <span className="font-bold text-xs leading-none">{c.meta.letter}</span>
+      <span className="font-bold text-xs leading-none" aria-hidden="true">
+        {c.meta.letter}
+      </span>
     </span>
   );
 }
@@ -238,11 +237,11 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
                         tabIndex={active ? 0 : -1}
                         onFocus={() => setFocus([r, c])}
                         onKeyDown={(e) => move(e, r, c)}
-                        aria-label={label}
                         title={label}
                         className="relative inline-block rounded-sm"
                       >
                         <CellMark c={m} />
+                        <span className="sr-only">{label}</span>
                         {m.flagged || m.pending || m.edited ? (
                           <span
                             aria-hidden="true"
@@ -297,10 +296,10 @@ function Strip({
               {d.meta ? (
                 <Link
                   to={`/o/register/${row.user.id}/${d.date}`}
-                  aria-label={cellText(name, d)}
                   className="relative block rounded-sm"
                 >
                   <CellMark c={d} size="strip" />
+                  <span className="sr-only">{cellText(name, d)}</span>
                   {d.flagged || d.pending || d.edited ? (
                     <span
                       aria-hidden="true"

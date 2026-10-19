@@ -5,7 +5,7 @@
  * have. Mock mode (`?mock=1`, fixtures from packages/contracts) with the client clock fixed at
  * 10:42 IST on 19 Oct 2026, so the data and the "updated" times never move.
  */
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { expect, test, VISUAL_NOW } from '../../fixtures';
 
 const OWNER_PROJECTS = new Set(['owner-phone', 'owner-desktop']);
@@ -19,15 +19,50 @@ interface Screen {
   path: string;
   /** The endpoint behind the screen's main query, for the frozen loading and error states. */
   endpoint: string;
+  /** Something only the loaded screen shows, checked before every main-state screenshot. */
+  ready: (page: Page) => Locator;
 }
 
+const shown = (page: Page, text: string) =>
+  page.locator('#owner-main').getByText(text, { exact: true }).filter({ visible: true }).first();
+
 const SCREENS: Screen[] = [
-  { name: 'today', path: '/o/today', endpoint: 'ownerToday' },
-  { name: 'actions', path: '/o/actions', endpoint: 'ownerActions' },
-  { name: 'register', path: '/o/register', endpoint: 'ownerRegister' },
-  { name: 'day', path: DAY_PATH, endpoint: 'ownerDay' },
-  { name: 'staff', path: '/o/staff', endpoint: 'ownerStaffList' },
-  { name: 'profile', path: PROFILE_PATH, endpoint: 'ownerStaffGet' },
+  {
+    name: 'today',
+    path: '/o/today',
+    endpoint: 'ownerToday',
+    ready: (page) => page.getByTestId('today-headline'),
+  },
+  {
+    name: 'actions',
+    path: '/o/actions',
+    endpoint: 'ownerActions',
+    ready: (page) => shown(page, 'New phone for Bhumi'),
+  },
+  {
+    name: 'register',
+    path: '/o/register',
+    endpoint: 'ownerRegister',
+    ready: (page) => shown(page, 'Priya Solanki'),
+  },
+  {
+    name: 'day',
+    path: DAY_PATH,
+    endpoint: 'ownerDay',
+    ready: (page) => page.locator('#owner-main .owner-map .leaflet-container'),
+  },
+  {
+    name: 'staff',
+    path: '/o/staff',
+    endpoint: 'ownerStaffList',
+    ready: (page) => shown(page, 'Priya Solanki'),
+  },
+  {
+    name: 'profile',
+    path: PROFILE_PATH,
+    endpoint: 'ownerStaffGet',
+    ready: (page) => page.locator('#owner-main').getByRole('tablist'),
+  },
 ];
 
 /**
@@ -42,20 +77,19 @@ async function openOwner(page: Page, path: string, variants: string[] = [], sett
   );
   const variant = ['me:owner', ...variants].join(',');
   await page.goto(`${path}?mock=1&variant=${variant}`);
+  // The shell and its landmarks must be there: a crash page can never become a baseline.
+  await expect(page.getByRole('main')).toBeVisible();
   await expect(page.getByTestId('owner-title')).toBeVisible();
   if (settle) await expect(page.locator('.fs-skeleton')).toHaveCount(0);
   await page.evaluate(() => document.fonts.ready);
 }
 
-import AxeBuilder from '@axe-core/playwright';
-
-test('OWN-DEBUG register names', async ({ page }, info) => {
-  test.skip(!OWNER_PROJECTS.has(info.project.name), 'owner only');
-  await openOwner(page, '/o/register');
-  const r = await new AxeBuilder({ page }).withRules(['label-content-name-mismatch']).analyze();
-  for (const v of r.violations)
-    for (const n of v.nodes.slice(0, 6)) console.log('AXE', n.target.join(' '), n.html.slice(0, 300));
-});
+/** No crash card and no React Router error page, right before a screenshot. */
+async function noCrash(page: Page) {
+  await expect(page.getByTestId('owner-route-error')).toHaveCount(0);
+  await expect(page.getByText('Unexpected Application Error')).toHaveCount(0);
+  await expect(page.getByRole('main')).toBeVisible();
+}
 
 test.describe('owner visual', () => {
   test.beforeEach(({ page: _page }, info) => {
@@ -68,13 +102,16 @@ test.describe('owner visual', () => {
       checkA11y,
     }) => {
       await openOwner(page, s.path);
+      await expect(s.ready(page)).toBeVisible();
+      await noCrash(page);
       await expect(page).toHaveScreenshot(`owner-${s.name}.png`, { fullPage: true });
       await checkA11y();
     });
 
     test(`OWN-V ${s.name}: loading keeps the layout`, async ({ page }) => {
       await openOwner(page, s.path, [`${s.endpoint}:loading`], false);
-      await expect(page.locator('.fs-skeleton').first()).toBeVisible();
+      await expect(page.locator('#owner-main .fs-skeleton').first()).toBeVisible();
+      await noCrash(page);
       await expect(page).toHaveScreenshot(`owner-${s.name}-loading.png`);
     });
 
@@ -84,6 +121,7 @@ test.describe('owner visual', () => {
     }) => {
       await openOwner(page, s.path, [`${s.endpoint}:error`]);
       await expect(page.getByTestId('owner-error')).toBeVisible();
+      await noCrash(page);
       await expect(page).toHaveScreenshot(`owner-${s.name}-error.png`);
       await checkA11y();
     });
@@ -91,18 +129,24 @@ test.describe('owner visual', () => {
 
   test('OWN-V today: holiday says the salon is closed', async ({ page, checkA11y }) => {
     await openOwner(page, '/o/today', ['ownerToday:holiday']);
+    await expect(shown(page, 'Salon closed today (Dussehra).')).toBeVisible();
+    await noCrash(page);
     await expect(page).toHaveScreenshot('owner-today-holiday.png', { fullPage: true });
     await checkA11y();
   });
 
   test('OWN-V today: before the first shift', async ({ page }) => {
     await openOwner(page, '/o/today', ['ownerToday:before-first-shift']);
+    await expect(page.getByTestId('owner-route-error')).toHaveCount(0);
+    await expect(page.locator('#owner-main').getByText(/First shift starts at/)).toBeVisible();
+    await noCrash(page);
     await expect(page).toHaveScreenshot('owner-today-early.png', { fullPage: true });
   });
 
   test('OWN-V actions: all clear', async ({ page, checkA11y }) => {
     await openOwner(page, '/o/actions', ['ownerActions:empty']);
     await expect(page.getByTestId('owner-empty')).toBeVisible();
+    await noCrash(page);
     await expect(page).toHaveScreenshot('owner-actions-empty.png');
     await checkA11y();
   });

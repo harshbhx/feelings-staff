@@ -5,6 +5,7 @@
 import type { StaffCreate, StaffDetail, StaffPatch } from '@fs/contracts';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApi } from '../../../api/provider';
+import { filterStaff } from '../staff/staff-list-model';
 import { ownerKeys, type StaffStatusFilter } from './keys';
 import { ownerQuery, useOwnerMutation } from './query';
 
@@ -16,6 +17,7 @@ export function useStaffList(status: StaffStatusFilter = 'active', q = '') {
       api.ownerStaffList({ query: query ? { status, q: query } : { status } }),
     ),
     placeholderData: (prev) => prev,
+    select: (rows) => filterStaff(rows, status, query),
   });
 }
 
