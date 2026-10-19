@@ -11,11 +11,12 @@ import {
   type ActionsView,
   ActionType,
   addDays,
-  type BulkDecideResult as BulkDecideResultSchema,
   DAY_MS,
+  type Endpoints,
   istDate,
   istStartOfDay,
   istTime,
+  type OutputOf,
   type PersonBrief,
   type PunchResult,
 } from '@fs/contracts';
@@ -678,7 +679,7 @@ export async function decideAutoClose(
 
 // ---- Bulk -----------------------------------------------------------------------------------------
 
-type BulkDecideResult = z.infer<typeof BulkDecideResultSchema>;
+type BulkDecideResult = OutputOf<Endpoints['ownerActionsBulk']>;
 
 type BulkBody = {
   type:

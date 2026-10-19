@@ -5,7 +5,6 @@
  */
 import type {
   ActionsView,
-  BulkDecideResult as BulkDecideResultSchema,
   Endpoints,
   OutputOf,
   OwnerDayDetail,
@@ -14,14 +13,13 @@ import type {
   TodayBoard,
 } from '@fs/contracts';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { z } from 'zod';
 import { setServiceOverridesForTests } from '../../services/registry';
 import { fakeNotifier } from '../../test/fakes';
 import { callJson, sessionFor, testEnv } from '../../test/helpers';
 import { addPunch, addUser, ctxAt, DAY, ist, newSalon, type Salon } from '../../test/notify-kit';
 import { setClock } from '../auth/test/kit';
 
-type BulkDecideResult = z.infer<typeof BulkDecideResultSchema>;
+type BulkDecideResult = OutputOf<Endpoints['ownerActionsBulk']>;
 type OvertimeResult = OutputOf<Endpoints['ownerOvertimeDecide']>;
 
 let salon: Salon;
