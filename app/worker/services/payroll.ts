@@ -42,6 +42,7 @@ import {
   payslipView,
   snapshotOf,
 } from './payslip';
+import { generateRunPdfs } from './payslip-pdf';
 import type { Ctx, PayrollService } from './ports';
 
 type OwnerPayslip = OutputOf<Endpoints['ownerPayslipPreview']>;
@@ -682,6 +683,7 @@ export async function finaliseRun(
       month: run.month,
     });
   }
+  ctx.waitUntil(generateRunPdfs(ctx, run.id));
   return runView(ctx, await loadRun(ctx, run.id));
 }
 
@@ -761,6 +763,7 @@ export async function reopenRun(
     }),
   ];
   await ctx.db.batch(stmts);
+  ctx.waitUntil(generateRunPdfs(ctx, run.id));
   return runView(ctx, await loadRun(ctx, id));
 }
 

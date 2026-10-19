@@ -32,7 +32,7 @@ export async function createServices(env: Env): Promise<Services> {
     stepUp: createStepUp(),
     days: createDayService(),
     payroll: createPayrollService(),
-    pdf: createPdfRenderer(),
+    pdf: createPdfRenderer(env),
     push: createPushSender(env),
     email: createEmailSender(),
     maps: createMapsResolver(),

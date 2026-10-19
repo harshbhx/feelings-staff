@@ -14,6 +14,7 @@ import {
   patchAdvance,
   requestAdvance,
 } from '../../services/advance';
+import { createExport, exportFile, getExport, listExports } from '../../services/export';
 import {
   addAdjustment,
   deleteAdjustment,
@@ -30,7 +31,8 @@ import {
   reopenRun,
   runView,
 } from '../../services/payroll';
-import { myPayslip, myPayslips, payslipPdf, verifyPayslip } from '../../services/payslip';
+import { myPayslip, myPayslips, verifyPayslip } from '../../services/payslip';
+import { payslipPdf } from '../../services/payslip-pdf';
 
 export const handlers: Handlers = {
   // Staff
@@ -67,6 +69,12 @@ export const handlers: Handlers = {
   ownerPayrollReopen: ({ params, body }, ctx) => reopenRun(ctx, params.id, body),
   ownerPayslipMarkPaid: ({ params, body }, ctx) => markPaid(ctx, params.id, body),
   ownerPayrollMarkAllPaid: ({ params, body }, ctx) => markAllPaid(ctx, params.id, body),
+
+  // Exports
+  ownerExportsList: (_i, ctx) => listExports(ctx),
+  ownerExportCreate: ({ body }, ctx) => createExport(ctx, body),
+  ownerExportGet: ({ params }, ctx) => getExport(ctx, params.id),
+  ownerExportFile: ({ params }, ctx) => exportFile(ctx, params.id),
 
   // Public
   verifyPayslip: ({ params }, ctx) => verifyPayslip(ctx, params.token),

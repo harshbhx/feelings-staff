@@ -241,6 +241,9 @@ importers:
       '@fs/i18n':
         specifier: workspace:*
         version: link:../i18n
+      uqr:
+        specifier: 0.1.3
+        version: 0.1.3
     devDependencies:
       '@types/react':
         specifier: 19.3.0
