@@ -290,7 +290,7 @@
       "title": "Location is off for this app. Here's how to turn it on.",
       "android1": "Open Chrome and tap the three dots at the top right, then Settings.",
       "android2": "Tap Site settings, then Location.",
-      "android3": "Find staff.feelingsbeautycare.in and choose Allow.",
+      "android3": "Find {{site}} and choose Allow.",
       "android4": "In your phone's Settings, open Apps, then Chrome, then Permissions, then Location. Choose Allow only while using the app and turn on Use precise location.",
       "iphone1": "Open Settings, then Privacy & Security, then Location Services.",
       "iphone2": "Make sure Location Services is on.",
@@ -308,7 +308,7 @@
       "title": "Camera is off for this app. Here's how to turn it on.",
       "android1": "Open Chrome and tap the three dots at the top right, then Settings.",
       "android2": "Tap Site settings, then Camera.",
-      "android3": "Find staff.feelingsbeautycare.in and choose Allow.",
+      "android3": "Find {{site}} and choose Allow.",
       "android4": "In your phone's Settings, open Apps, then Chrome, then Permissions, then Camera, and choose Allow.",
       "iphone1": "Open Settings, then Apps, then Safari.",
       "iphone2": "Tap Camera and choose Allow or Ask."
@@ -317,7 +317,7 @@
       "title": "Notifications are off. Here's how to turn them on.",
       "android1": "In your phone's Settings, open Apps, then Chrome, then Notifications, and turn them on.",
       "android2": "Open Chrome, tap the three dots, then Settings, then Site settings, then Notifications.",
-      "android3": "Find staff.feelingsbeautycare.in and choose Allow.",
+      "android3": "Find {{site}} and choose Allow.",
       "iphone1": "Open Settings, then Notifications.",
       "iphone2": "Find Feelings in the list.",
       "iphone3": "Turn on Allow Notifications."
@@ -424,7 +424,8 @@
     "balances": "Balances",
     "balance_one": "{{name}} · {{count}} left",
     "balance_other": "{{name}} · {{count}} left",
-    "expires": "{{count}} expire on {{date}}",
+    "expires_one": "{{count}} day expires on {{date}}",
+    "expires_other": "{{count}} days expire on {{date}}",
     "empty": "No requests yet.",
     "emptyFixes": "No fixes asked for yet.",
     "status": {

@@ -22,7 +22,8 @@ function useSteps(topic: FixItTopic, os: Os): { title: string; steps: Step[] } {
   const { t } = useTranslation();
   const allow = t('staff:fixit.settingAllow');
   const on = t('staff:fixit.settingOn');
-  const site = 'staff.feelingsbeautycare.in';
+  // The address the person actually opened (production, or a preview link).
+  const site = typeof window === 'undefined' ? '' : window.location.host;
   switch (topic) {
     case 'location':
       return {
@@ -32,7 +33,10 @@ function useSteps(topic: FixItTopic, os: Os): { title: string; steps: Step[] } {
             ? [
                 { text: t('staff:fixit.location.android1') },
                 { text: t('staff:fixit.location.android2') },
-                { text: t('staff:fixit.location.android3'), mock: { label: site, value: allow } },
+                {
+                  text: t('staff:fixit.location.android3', { site }),
+                  mock: { label: site, value: allow },
+                },
                 { text: t('staff:fixit.location.android4') },
               ]
             : [
@@ -79,7 +83,10 @@ function useSteps(topic: FixItTopic, os: Os): { title: string; steps: Step[] } {
             ? [
                 { text: t('staff:fixit.camera.android1') },
                 { text: t('staff:fixit.camera.android2') },
-                { text: t('staff:fixit.camera.android3'), mock: { label: site, value: allow } },
+                {
+                  text: t('staff:fixit.camera.android3', { site }),
+                  mock: { label: site, value: allow },
+                },
                 { text: t('staff:fixit.camera.android4') },
               ]
             : [
@@ -99,7 +106,7 @@ function useSteps(topic: FixItTopic, os: Os): { title: string; steps: Step[] } {
                 { text: t('staff:fixit.notifications.android1') },
                 { text: t('staff:fixit.notifications.android2') },
                 {
-                  text: t('staff:fixit.notifications.android3'),
+                  text: t('staff:fixit.notifications.android3', { site }),
                   mock: { label: site, value: allow },
                 },
               ]
