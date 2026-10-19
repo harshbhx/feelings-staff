@@ -8,7 +8,7 @@
 | **Built and run by** | Harsh Bhanushali (GitHub `harshbhx`) |
 | **URL** | https://staff.feelingsbeautycare.in |
 | **Repository** | `harshbhx/feelings-staff` (new, private) |
-| **Version** | 1.1, 19 Oct 2026 |
+| **Version** | 1.2, 19 Oct 2026 |
 | **Status** | Ready for build. Open questions for the owner are in §17, each with the default we build if nobody answers. |
 | **Inputs** | `research/brand-and-stack.md` (brand, stack, hosting, salon location) and `research/domain.md` (competitors, anti-spoofing, push, PWA, Indian payroll law, DPDP, costs) |
 
@@ -86,9 +86,9 @@ It runs on one Cloudflare Worker (static assets + API + scheduled jobs) with D1 
 - Commissions, service targets, tips, or a link to a booking or billing system (a manual "Incentive" line covers v1).
 - Statutory filing: PF, ESI, professional tax and TDS returns. The fields exist (off), the filing does not.
 - Paying salaries. The app records "paid" with a date and mode; money moves outside the app.
-- Background location tracking or route history. Location is read only at check-in and check-out.
+- Background location tracking or route history. Location is read at check-in and check-out and, only while the app happens to be open on screen, as an optional silent check every 30 minutes that never prompts and never costs minutes by itself (§4.18). It is never read while the app is closed, and no trail is stored. Time away is found by the owner's roll-call and the staff member's own Step out button.
 - Self-serve sign-up for other salons, billing and multi-branch UI. The data model is multi-tenant ready (`org_id` everywhere); the product is single-salon.
-- Native Android or iOS apps. SMS OTP. Shift bidding and swaps between staff. Dark mode (the brand is light only). Hindi (phase 2).
+- Native Android or iOS apps (a native wrapper for OS geofence events is a P2 option, §4.18.7). SMS OTP. Shift bidding and swaps between staff. Dark mode (the brand is light only). Hindi (phase 2).
 
 ### 1.4 Success metrics
 
@@ -174,6 +174,7 @@ P0 ships at launch. P1 follows within about four weeks of launch. P2 is later or
 | S-21 | Blink liveness check on the selfie (MediaPipe, lazy-loaded) | P1 | §10.4 |
 | S-22 | Passkey (fingerprint or face unlock) instead of typing the PIN | P2 | Passkeys sync across a person's devices, so the device key stays for binding |
 | S-23 | Hindi | P2 | |
+| S-24 | Presence: consent screen, **Step out / I'm back** with reason chips, the marked-away card, own presence history in My data, optional silent foreground location check (hint only, never prompts) | P1 | §4.18, §7.18 |
 
 ### 3.2 Owner panel
 
@@ -207,6 +208,8 @@ P0 ships at launch. P1 follows within about four weeks of launch. P2 is later or
 | O-26 | Statutory deductions: PF, ESI, Gujarat professional tax, TDS (fields only) | P2 | §7.10 |
 | O-27 | Multi-branch UI; tenant onboarding for other salons | P2 | |
 | O-28 | Live board over WebSockets (Durable Objects) instead of polling | P2 | ADR-13 |
+| O-29 | Time credits: owner-only minute ledger (late, early, away, overtime), balance with a ₹ estimate, Credits screen, Credits tab on the staff profile, settle step in the payroll run, CSV export | P0 | §4.19, §7.17 |
+| O-30 | Roll-call (2–3 times a shift, owner or manager taps only the exceptions), away intervals to confirm in Needs action, presence settings, early-leave and left-without-check-out tracking on Today and Register | P1 | §4.18, §7.18 |
 
 ### 3.3 Platform
 
@@ -219,6 +222,7 @@ P0 ships at launch. P1 follows within about four weeks of launch. P2 is later or
 | X-05 | Worker Previews per pull request with a preview D1 and R2 | P0 |
 | X-06 | Weekly D1 export to R2 (on top of D1 Time Travel's 30 days) | P1 |
 | X-07 | Error alert email to Harsh when the 5xx rate spikes | P1 |
+| X-08 | Native Android and iOS wrapper (Capacitor or TWA) with OS geofence enter/exit events, passive and accurate | P2 |
 
 ---
 
@@ -276,7 +280,7 @@ The page detects `display-mode`. In a browser tab it never enrols; it teaches th
 First launch with no session shows **Join your team** (staff) with a small "Owner sign-in" link at the bottom.
 
 1. **Phone and code.** Phone number + join code (prefilled on Android if available). `POST /api/v1/join/verify` → returns the staff name and salon name. Screen: "Hi Priya. Let's set you up."
-2. **Privacy notice** (DPDP s.5): a short plain-language screen, in the staff member's language, with a link to the full notice. "We check your location only when you tap Check in or Check out, to confirm you are at the salon. We never track you. We keep exact locations for 90 days and selfies for 30 days." Button **I understand**. If the salon requires selfies, a second, separate consent: "Take a photo when you check in" with **I agree** (required to continue when selfies are on). Night-shift consent is asked later only if needed (§7.11).
+2. **Privacy notice** (DPDP s.5): a short plain-language screen, in the staff member's language, with a link to the full notice. "We check your location when you tap Check in or Check out, to confirm you are at the salon. We never track you on a route. We keep exact locations for 90 days and selfies for 30 days." Button **I understand**. When presence checks are on, a second screen asks for a separate acknowledgement (§4.18.1). If the salon requires selfies, a second, separate consent: "Take a photo when you check in" with **I agree** (required to continue when selfies are on). Night-shift consent is asked later only if needed (§7.11).
 3. **Set your PIN.** 4–6 digits, entered twice on the PIN pad. Rejected: all same digit (`1111`), straight runs (`1234`, `4321`), the last 4–6 digits of their own phone, and `0000`. Message: "Pick a PIN that's harder to guess."
 4. **Device key.** The app generates an ECDSA P-256 key pair with `extractable: false` (WebCrypto), stores the `CryptoKey` in IndexedDB (`fs-device` store), calls `navigator.storage.persist()`, and sends the public JWK with a label ("Redmi Note 12 · Chrome", from the UA) to `POST /api/v1/join/complete`. The server creates the device (`status = pending`), marks the invite used, sets `users.status = active`, and starts a session.
 5. **Notifications.** "Get a ping when Urmi approves your phone, your leave, or your payslip." Button **Turn on notifications** (this tap requests permission; required on iOS). "Not now" is allowed.
@@ -363,7 +367,7 @@ Rules:
 
 | State | Trigger | What the staff sees | Options |
 |---|---|---|---|
-| Pre-permission | Permission state is `prompt` (or unknown on iOS) and the app has never asked | "We check your location only when you tap Check in or Check out, to confirm you're at the salon. We never track you." | **Allow location** (calls `getCurrentPosition` from this tap) |
+| Pre-permission | Permission state is `prompt` (or unknown on iOS) and the app has never asked | "We check your location when you tap Check in or Check out, to confirm you're at the salon. We never track you on a route." | **Allow location** (calls `getCurrentPosition` from this tap) |
 | Denied | Error code 1 (`PERMISSION_DENIED`) | "Location is off for this app." + platform fix-it sheet with screenshots (Android: lock icon → Permissions → Location → Allow, choose **Precise**; iPhone: Settings → Privacy & Security → Location Services → Safari Websites → While Using, Precise on) | **Scan door code**, **Send to Urmi for approval** |
 | Timeout | No fix in 20 s | Retry once automatically with `enableHighAccuracy: false`; then "We couldn't find your location. Step near a window or the door and try again." | **Try again**, **Scan door code**, **Send to Urmi** |
 | Approximate | Best `accuracy ≥ 1000 m` | "Your phone is sharing only an approximate location. Turn on Precise location for this app." + fix-it sheet | Same as Denied |
@@ -492,7 +496,7 @@ Known limit (stated in the owner's help text): a photo of the code forwarded on 
 
 ### 4.6 Off-site and wedding-venue mode
 
-Two ways in. Both keep location at check-in and check-out only.
+Two ways in. Both keep location at check-in and check-out only. Presence checks (§4.18) are paused for the whole duty window: the duty has its own fence and nobody is asked to step out and back.
 
 **A. Owner (or manager) creates an off-site duty** (P0)
 1. Owner → Roster → **Add off-site duty** (or from a staff member's day).
@@ -519,7 +523,7 @@ Two ways in. Both keep location at check-in and check-out only.
 Default: no break punches. The template's unpaid break is deducted automatically (§7.4). When the owner turns on **Break punches**:
 1. Today screen shows a secondary button **Start break** under the red Check out button; then **End break**.
 2. Break punches need no location and no PIN (low stakes), only the device signature.
-3. Worked minutes subtract actual breaks. Break minutes beyond the template's allowance count as undertime ("over-break").
+3. Worked minutes subtract actual breaks. Break minutes beyond the template's allowance count as undertime ("over-break"); with Time credits on they are only shown to the owner on the day (§7.17.2).
 4. If no break was punched on a day long enough to need one, the automatic deduction applies and the day shows "Break not punched, 60 min taken off".
 
 ### 4.8 Missed check-out
@@ -530,6 +534,8 @@ Default: no break punches. The template's unpaid break is deducted automatically
 | Shift end + 30 min | Overtime clock: if they stay, it becomes an overtime candidate (§7.6) |
 | Closing time + 60 min (default 21:00) | Owner push (batched): "2 people haven't checked out: Priya, Kajal." |
 | Window end + 6 h (window = shift or duty end) | Auto-close: an `out` punch at the scheduled end (or duty end), `source = auto`, status flagged, no overtime credited. Needs-action item "Confirm Priya's check-out time". Staff push: "We closed your day at 20:00. If you left later, tell Urmi." with **Fix the time** (opens a regularisation) |
+
+When presence tracking is on (§4.18) and the person has an open away interval or a "seems away" hint, the auto-close item adds "Away since 16:10" with **Use 16:10 as check-out** (§4.18.6), and the day gets the tag `left_no_checkout`.
 
 ### 4.9 Leave requests
 
@@ -588,9 +594,10 @@ One queue, newest first, grouped by type, with a count badge on the tab and the 
 | Overtime | Day, minutes, the punches; "pre-approved by duty" if so | **Approve all**, **Approve part** (minutes stepper in 15-min blocks), **Reject** |
 | Off-site request | Place, map, note | **Approve**, **Approve and let others check in here**, **Reject** |
 | Auto-closed day | Day, auto time | **Keep 20:00**, **Change time** |
+| Away interval (P1, Time credits on) | "Priya stepped out 15:30–16:10", reason chip (personal, lunch outside, work errand, other), minutes, her note, "I'm back missing" flag if auto-closed. Intervals the owner or a manager marked at a roll-call are already counted and are not queued | **Confirm** (becomes minus credits), **Mark as work** (no minus), **Ignore** (no minus) |
 | Advance request (P1) | Amount, reason, open balance | **Approve**, **Reject** |
 
-- Bulk: select several of the same type → **Approve selected** (not for devices).
+- Bulk: select several of the same type → **Approve selected** (not for devices). Away intervals have **Confirm selected**, **Mark as work** and **Ignore selected**.
 - Every decision writes an audit row and notifies the staff member.
 - **Owner override** (any day, from the register): set the day status (P, H, A, L-type, WO, HO), add, edit or delete punches, with a required reason. The day shows "Edited by Urmi" with the history.
 - Items older than 48 h get a gentle reminder in the morning summary, never a separate nag.
@@ -614,6 +621,7 @@ Before finalising, the draft lists what is still open in that month:
 | Leave requests not decided | Not applied (days stay as recorded) |
 | Regularisations not decided | Not applied |
 | Open sessions (no check-out) | Auto-closed per §4.8 |
+| Away intervals not decided (Time credits on) | Not counted yet. They stay in Needs action and count in the balance of the run after you confirm them |
 
 The owner can resolve them inline or tap **Finalise anyway** after a confirm that lists the defaults above.
 
@@ -623,7 +631,8 @@ A table (desktop) or list of cards (phone), one per person: paid days, LOP days,
 - **Add incentive or bonus** (amount, note), **Add other earning**, **Add deduction** (damage needs a show-cause record, §7.9; other deductions need a note).
 - **Change advance recovery for this month** (lower it; the rest carries forward).
 - **Recompute** after any change in attendance.
-- Warnings: minimum-wage check (§7.12), weekly hours over 48 in any week, overtime above 144 h in the quarter, deductions hitting the 50% cap ("₹1,250 of the advance moves to next month").
+- **Settle credits** (only when Time credits is on, §4.19.3): a step with one row per person who has a balance, a stepper for how many minutes to settle, and the money it makes. The payslip preview shows the line "Time credits: −50 min, −₹38.80" (owner copy).
+- Warnings: minimum-wage check (§7.12), weekly hours over 48 in any week, overtime above 144 h in the quarter, deductions hitting the 50% cap ("₹1,250 of the advance moves to next month"). These existing warnings are the only legal warnings with Time credits on (§7.17.7).
 
 #### 4.13.4 Finalise
 
@@ -644,7 +653,7 @@ Owner → Staff → **Mark as left**: last working day, reason. P0: the person s
 ### 4.14 Payslip PDF and share
 
 - Generated after finalising, one PDF per person, from an HTML template rendered by Cloudflare Browser Run (ADR-07), stored at `payslips/<org>/<yyyy-mm>/<payslipId>-r<revision>.pdf`.
-- Contents (Form V style): salon name and address; staff name, code, designation, joining date; month; days in month; counts of P / H / A / L / WO / HO; salary, divisor and per-day rate; earnings (basic earned, overtime, extra for off-day work, incentive, other); deductions (LOP, late/early, advance recovery, fines if on, other); gross, total deductions, net, rounding; payment date and mode; leave balances; a QR and short URL to verify (`/v/<token>`, shows name, month, net and revision, nothing else); "Generated by Feelings Staff on 01 Nov 2026".
+- Contents (Form V style): salon name and address; staff name, code, designation, joining date; month; days in month; counts of P / H / A / L / WO / HO; salary, divisor and per-day rate; earnings (basic earned, overtime, extra for off-day work, incentive, other); deductions (LOP, late/early, advance recovery, fines if on, other); the Time credits settlement when there is one (the owner's preview shows "Time credits: −50 min, −₹38.80"; the PDF and the staff view show only "Time adjustment" with the amount, never minutes or the balance, §7.17.9); gross, total deductions, net, rounding; payment date and mode; leave balances; a QR and short URL to verify (`/v/<token>`, shows name, month, net and revision, nothing else); "Generated by Feelings Staff on 01 Nov 2026".
 - Language: English (P0); Gujarati (P1.1, same template, Noto Sans Gujarati).
 - **Share** (owner, per person): Web Share API Level 2 with the PDF file (Android Chrome, iOS Safari); fallback a `wa.me` link to the staff member's number with the text "Your March salary slip: <verify URL>".
 - **Staff**: Payslips list → view (HTML version of the same template) → **Download PDF** / **Share**.
@@ -691,6 +700,8 @@ Owner → Reports. Month picker, staff filter, format.
 | Leave report and balances | P0 | | Requests and ledger |
 | Advances ledger | P0 | | Given, recovered, carried, balance |
 | Exceptions log | P0 | | Flags, overrides, auto-closes, device changes |
+| Time credits ledger (Time credits on) | P0 | | Per person per entry: date, kind, minutes, running balance, source, confirmed by; settlements as their own rows. Owner only |
+| Presence log (P1) | | P1 | Away intervals: start, end, minutes, source, reason, who marked or decided, edits; roll-call marks |
 
 - CSVs are UTF-8 with a BOM (opens correctly in Excel), dates `DD-MM-YYYY`, money in rupees with 2 decimals, one header row.
 - Generated asynchronously (Worker `waitUntil`), stored at `exports/<org>/<exportId>.<ext>` (R2 lifecycle 7 days), downloaded through `GET /api/v1/owner/exports/:id/file` (session-checked; R2 is never public).
@@ -706,6 +717,8 @@ Owner → Reports. Month picker, staff filter, format.
 | Holidays and blackout days | Per year list; per holiday "If worked: comp-off / extra pay / both" |
 | Attendance rules | Grace, early-leave tolerance, half-day and absent thresholds, make-up time, auto break, break punches, PIN on every punch, selfie (on check-in, on check-out), risk thresholds |
 | Pay rules | Divisor, overtime threshold, block and multiplier, off-day work, sandwich rule, advance defaults, pay day, minimum wage, fines (P1), statutory (P2) |
+| Time credits | On or off for the salon, per-person exclusion, the month it starts counting, a plain-words summary of what changes when it is on (§7.17) |
+| Presence (P1) | On or off; roll-call times (default 12:00, 15:00, 18:00) and who may roll-call (owner, managers with `rollcall`); Step out button on or off; optional foreground check on or off and its interval; quiet during breaks; per-person exclusion |
 | Leave policy | Types, quotas, accrual, notice, probation, comp-off expiry |
 | Notifications | Per event on/off per channel, quiet hours, summary-only mode, WhatsApp fallback (P1) |
 | People and roles | Managers and their permissions (P1) |
@@ -713,7 +726,124 @@ Owner → Reports. Month picker, staff filter, format.
 | Security | Owner email, password + PIN, active sessions (sign out others), audit log |
 | App | Default staff language, show payslips to staff, minimum app version (read-only) |
 
-Every settings change is audit-logged with before and after values; pay-rule changes apply from the next payroll draft (the current draft is recomputed only if the owner taps **Recompute**).
+Turning Time credits or Presence on or off needs the step-up PIN. Every settings change is audit-logged with before and after values; pay-rule changes apply from the next payroll draft (the current draft is recomputed only if the owner taps **Recompute**).
+
+### 4.18 Presence and away tracking (P1)
+
+Harsh's brief (19 Oct, after talking to the client): "make sure we count every minute, and even if anyone leaves the salon early, track that as well." The punch tells us when someone arrived and left; this section is about the time in between.
+
+**Decision (Harsh, 19 Oct, 15:22 UTC).** Time away is found in two human ways, with no hardware and no phone prompts:
+1. **Primary: a manager roll-call** two or three times a shift. The owner or a manager sees everyone who is checked in, defaulted to "Here", and taps only the exceptions. About 20 seconds.
+2. **Fallback: the staff member's own Step out / I'm back button**, for when a roll-call is missed or someone leaves between roll-calls.
+3. **Optional extra:** a silent location check while the app happens to be open, which can only raise a "seems away" hint for the owner.
+
+**Considered and not chosen:** a push every 30 minutes asking staff to open the app and tap (staff are with clients and cannot answer); salon Wi-Fi presence with a router or Raspberry Pi reporter (needs hardware and enrolment of phone addresses). A native Android and iOS wrapper with OS geofence events stays a future P2 option (§4.18.7). Why the web app alone cannot detect leaving is in §11.12.
+
+#### 4.18.1 Consent and notice
+
+- Shown once per person when presence tracking is first on for them (at join for new staff; at the next app open for existing staff), after the privacy notice (§4.1.4). A separate acknowledgement stored as a `consents` row of kind `presence_checks`.
+- Plain words, in the person's language: "During your shift the owner or a manager can mark when you are not at the salon, and you can tap Step out when you leave and I'm back when you return. If the app is open, it may also check once in a while whether you are at the salon; it never asks you. We only look during your shift. We keep only the times, and for a location check only inside or outside and how far. No route, no map trail. The reason you give when you step out is seen by the owner. You can see all of it under Me → My data. Nothing is cut automatically."
+- A person who does not acknowledge can still check in and out and use Step out. The owner sees "Priya has not accepted presence tracking" on her profile. Roll-call is part of the owner's attendance records and still lists her; the foreground check does not run for her (Q29).
+- The owner can turn presence tracking off for everyone or exclude a person. Withdrawing consent works as for the selfie (My data → Consents).
+
+#### 4.18.2 The signals
+
+| Signal | Who acts | Effect on pay | Works with the app closed | iPhone |
+|---|---|---|---|---|
+| **Roll-call** (primary) | Owner or a manager with `rollcall`, 2–3 times a shift | Owner-marked away counts as confirmed: straight to minus credits, still editable, audit-logged | Yes: the staff member does nothing | Yes |
+| **Step out / I'm back** (fallback) | The staff member | Pending until the owner confirms; a "work errand" counts as no minus if the owner marks it "work" | Needs the app opened for one tap | Yes |
+| **Foreground check** (optional) | Nobody: silent, only while the app is open on screen | None. It can only flag "seems away" to the owner; it never creates minus credits on its own | No | While open |
+| Native geofence (P2) | The OS | Future | Yes | Yes |
+
+#### 4.18.3 Roll-call (owner and managers)
+
+1. **Times.** Owner-set and editable any time in Settings → Presence, default 12:00, 15:00 and 18:00 (one to four, any time inside opening hours; a change applies from the next slot). At each time the owner and managers with `rollcall` get a gentle reminder (N32, in-app and push, batched, held during the owner's quiet hours). If it is not done within 30 minutes, the Today card says so (N33).
+2. **The view.** Today → **Roll-call** card (and the push opens it): `/o/roll-call/:id`. One row per person who is checked in at that time. Every row defaults to **Here**. Tap a row to switch it to **Not here**. Rows show the person's name, check-in time, and small hints: "Seems away" (the optional foreground check was outside), "Stepped out 14:40, lunch outside" (an open step-out), "On break", "On duty at a venue". People on leave, off duty, or not checked in are not listed.
+3. **Done.** One button, **Done**, saves the roll-call. Everyone left on Here is recorded as here. The roll-call can be reopened and edited at any time until the day is locked (audit-logged, old → new).
+4. **What "Not here" does.** It starts an away interval at the roll-call time, until the person's **I'm back**, the next roll-call where they are marked Here, or check-out, whichever is first. The owner can edit the start and end afterwards (§4.18.5). If the person already has an open interval, "Not here" simply continues it; the row then shows "Away since 15:00" and the owner taps **Here** to end it.
+5. **Counts at once.** An owner or manager mark is an authorised decision, so the interval counts as confirmed: it creates the minus entry immediately (§7.18) and appears in the ledger as "confirmed by Urmi". It stays editable and every mark and edit is audit-logged. Nothing is paid or cut until the owner settles (§4.19.3).
+6. **Missed roll-call.** If nobody submits it, nothing is assumed. The Step out button and the foreground hint still apply, and Today shows "Roll-call at 15:00 not done" to the owner.
+
+#### 4.18.4 Step out and I'm back (staff)
+
+- **Today** (checked in): under the red Check out button a secondary **Step out**. Tap → a sheet with reason chips **Personal**, **Lunch outside**, **Work errand**, **Other**, and an optional note ("Bank for the salon"). Then the Today card reads "You're out since 15:30" with **I'm back**. Tapping I'm back records the server time; success: "Welcome back. You were out 40 min."
+- **Marked away by the owner**: if a roll-call marked the person Not here, Today shows "Urmi marked you away since 15:00" with **I'm back** and an optional note. The same button ends it.
+- **Missing I'm back.** An interval from Step out with no I'm back closes automatically at check-out or at the next roll-call where the person is marked Here, whichever comes first, and is flagged "I'm back missing" for the owner.
+- **Away note.** For any interval of today the person can add a note; it goes to the owner's item.
+- **My data → Presence**: own roll-call marks (Here, Not here), step-outs with reasons, away intervals with state (Waiting, Counted, Work, Ignored), foreground checks (inside, edge, outside, no fix, distance bucket). Never minutes of credit, balance or ₹ (§7.17.9).
+- **Foreground check**: nothing visible. It runs only when location permission is already granted, never asks, and a check with poor accuracy is `no_fix`.
+
+#### 4.18.5 What the owner sees and edits
+
+- **Today board**: "Away now" chip and counter (open intervals, with the start time and reason); "Seems away" hint rows; "Roll-call at 15:00 not done"; in **Checked out**, an early badge "−35 m early".
+- **Needs action**: an *Away interval* item for each closed step-out that is still pending (§4.12): "Priya stepped out 15:30–16:10 · lunch outside · 40 min". **Confirm**, **Mark as work** (no minus; the usual choice for a work errand) or **Ignore**.
+- **Editing.** Any away interval, whether from a roll-call or a staff step-out, can be edited by the owner or a manager with `rollcall`: start, end, reason and the work flag (§4.19.5), with the old and new values in the audit log. Minutes and the ledger entry follow. Overlapping intervals of one person merge into one (union), source `mixed`; if any part was owner-marked the merged interval is confirmed.
+- **Register and day detail**: tags `away` and `early`; row totals gain **Early min** and (owner only, Time credits on) **Credits ±min**; the day detail timeline shows punches, roll-call marks, step-outs, foreground checks and the credit entries each one made.
+- With **Time credits off**, away intervals are information only: no entry, and no Needs-action item to decide.
+
+#### 4.18.6 Early leave and leaving without checking out
+
+- **Early leave, every minute.** A check-out before the shift end is already recorded (N8 at the early tolerance). With Time credits on, **every** early minute from the first one is a minus entry (§7.17.2) and shows in Today and Register, even when below the tolerance. N8 still fires only past the tolerance, to avoid noise.
+- **Left without checking out.** If someone is still checked in at shift end + 30 minutes and has an open away interval or a "seems away" hint, the owner gets N36 "Priya may have left without checking out". When the day is auto-closed (§4.8), the auto-close item shows "Away since 16:10" and offers **Use 16:10 as check-out**: it creates an owner punch at that time, so the early minutes go to the ledger and the away interval is cut at the check-out (away time cannot overlap early time, §7.18). **Keep 20:00** leaves the interval running to the auto-close time.
+
+#### 4.18.7 When presence is not used, and the future
+
+| Situation | Behaviour |
+|---|---|
+| Not checked in, or after the last shift segment ends | No roll-call row, no foreground check, no interval |
+| Scheduled break window | Foreground check paused; away minutes inside the window are not counted again (§7.18). The window is the break punches when on, else the template's optional usual break start for `break_min`, else the automatic break region of §7.4 |
+| Off-site duty running (duty mode) | Paused: not listed in the roll-call, no Step out; the duty has its own fence |
+| Approved leave or the leave part of a half day | Not listed |
+| Day is `H` or `A`, or locked | Intervals are shown but make no credits (§7.17.2) |
+| Presence off for the person or the salon | Nothing recorded |
+
+**Future (P2).** A native wrapper (Capacitor or TWA) could register OS geofences around the salon and post enter and exit events, which would become one more signal feeding the same away intervals, passive and accurate. It is a bigger job (X-08) and out of scope for v1.
+
+### 4.19 Time credits (owner view) (P0)
+
+Why: someone who arrives 10 minutes late every day (70 minutes in a week, all hidden by the 10-minute grace) but works 2 hours of overtime used to get full salary and full overtime pay. With Time credits every minute counts, plus or minus, and the owner decides what to do with the balance. The rules and formulas are in §7.17. **Staff never see credits**: not in the staff app, the payslip or any notification (§7.17.9).
+
+#### 4.19.1 Credits screen
+
+Owner → More → **Credits** (`/o/credits`). One row per active staff member: name, balance in minutes (+50 or −130), its money ("worth about ₹45" for a plus balance, "might cut around ₹96" for a minus balance, at the person's normal per-minute rate, 1×), last settlement ("Nov: −60 min, ₹44.44"), a chip with the number of away intervals still waiting for a decision. Sort by balance; filter by plus or minus. Nothing on this screen changes pay. Tap a row for the person's ledger.
+
+#### 4.19.2 Person ledger
+
+`/o/credits/:userId`, and the same list under **Credits** on the staff profile.
+- Header: balance, the money, "carried over from earlier months" part, and a line "Nothing is cut or paid until you settle it at payroll."
+- Table (newest first on phone, date order on desktop): date, kind chip (late, early, away, overtime, adjusted, settled), minutes (±), running balance, source (link to the punch, the away interval or the overtime decision), who confirmed (the owner or manager who marked or confirmed it for away, the owner for overtime, "automatic" for late and early).
+- Filters: kind, date range, only unsettled. **Export CSV** (§4.16, step-up, audit-logged).
+- Tapping an entry opens the day detail on that date; an entry that was adjusted shows its history (original, each adjustment with reason, who and when).
+
+#### 4.19.3 Settling at payroll
+
+In the payroll run (§4.13.3) the **Settle credits** step lists people with a balance as of the month end.
+- Row: balance and its money, a **stepper** (step 5 min, type an exact number, **0** and **Suggested** buttons) from 0 up to the balance, the money it makes, and "balance after". **Default 0** (nothing is settled unless the owner chooses). **Suggestion = the full balance.**
+- A minus settlement is a deduction, subject to the 50% cap (§7.10); minutes that do not fit stay on the balance, with the note "20 min stay on the balance". A plus settlement is an earning.
+- The step is editable until **Finalise** (§4.19.5). The existing payroll warnings (weekly hours over 48, minimum wage, the 50% cap) show here as everywhere else.
+- On **Finalise** the settlement becomes the payslip line and an audit entry, and reduces the balance by that many minutes. **Reopen** voids the settlement of the old revision; the stepper comes back with the same values.
+- Unsettled credits carry over to the next month. There is no reset.
+
+#### 4.19.4 Turning it on or off
+
+Settings → Time credits. Default **on** for this salon. It starts counting from the first day of the next month (or an earlier day in the current open month if the owner picks one), because pay-rule changes apply from the next draft. Turning it off stops new entries from the first day of the next month and brings back §7.5 and §7.6 for those days; the existing balance stays visible and can still be settled.
+
+#### 4.19.5 Everything is editable
+
+Harsh: "everything should be editable, times and all." The owner can change any presence or credit item, and permitted managers can change the presence items. Nothing is locked in by a mistake.
+
+| Item | Who | How | Limit |
+|---|---|---|---|
+| Roll-call times, how many, who may do it | Owner | Settings → Presence | A change applies from the next slot; roll-calls already held keep their times |
+| Roll-call marks (Here, Not here) | Owner, managers with `rollcall` | Reopen the roll-call and **Done** again | Until the day is locked |
+| Away intervals: start, end, reason, work flag, state (counted, work, ignored) | Owner, managers with `rollcall` | Edit sheet on Today, the day detail or Needs action | Until the day is locked; on a locked day the owner only, and the change counts in the next run |
+| Step-out entries made by staff | Owner, managers with `rollcall` | Same sheet; removing one sets it to Ignored | Same |
+| One credit entry (late, early, away, overtime) | Owner only | **Adjust minutes** with a required reason: an adjustment row is added, the original stays visible | Any time; in a finalised month the change counts in the next run |
+| A settlement | Owner | The stepper in the Settle credits step: change it or set 0 | Until **Finalise**; afterwards **Reopen** (§4.13.6) |
+| Punches and days | Owner (managers with `approve_attendance` where granted) | Day override, regularisation (§4.12) | As today (locked months need a reopen) |
+| Time credits and Presence settings | Owner | Settings (step-up to switch either on or off) | Applies from the next payroll draft |
+
+Every edit writes an audit row with the old and new values and the reason, and appears in the ledger history of that entry or in the day detail for presence items (who, when, old → new). Staff can see their own presence items change in My data (never credits).
 
 ---
 
@@ -743,13 +873,15 @@ Bottom tab bar (5): **Today · Month · Requests · Payslips · Me**. The bell i
 | Waiting for approval | Hold until the device is approved | Status card with the device label, "We've let Urmi know", **Call Urmi** link | Rejected state | "Urmi needs to approve this phone before you can check in." |
 | Sign in (`/signin`) | Phone + PIN on an approved device | PhoneField, PinPad, "I have a new phone", "Forgot PIN?" | Wrong PIN, locked, device not approved | "Welcome back." |
 | Install gate | Shown in a browser tab for staff routes | Platform install sheet | | "The staff app works after you add it to your home screen." |
-| **Today** (`/`) | Check in/out; today at a glance | Greeting h1 ("Good morning, Priya" + bindi full stop; the sindoor line may appear here once, on the first screen of the day only), shift card ("Full day · 10:00–20:00"), status chip, live hours (tabular numerals, updated each minute), last punch row, off-site duty card if any, queued-punch banner, the one red **Check in / Check out** button in the bottom action bar (glass, safe-area padded), secondary **Start break** (P1) | Loading skeleton; no shift today ("Today is your week off."); on leave ("You're on leave today.") | "You're in since 10:02 · 3 h 14 m so far." |
+| **Today** (`/`) | Check in/out; today at a glance | Greeting h1 ("Good morning, Priya" + bindi full stop; the sindoor line may appear here once, on the first screen of the day only), shift card ("Full day · 10:00–20:00"), status chip, live hours (tabular numerals, updated each minute), last punch row, off-site duty card if any, queued-punch banner, the one red **Check in / Check out** button in the bottom action bar (glass, safe-area padded), secondary **Start break** (P1) and, when presence tracking is on, **Step out** (P1, §4.18.4); a card for an open or marked-away interval with **I'm back** and a note field | Loading skeleton; no shift today ("Today is your week off."); on leave ("You're on leave today.") | "You're in since 10:02 · 3 h 14 m so far." |
 | Check-in sheet | The punch flow | Bottom sheet (Radix Dialog), step text with accuracy, distance line, CameraView (if selfie), PinPad, result state | All states in §4.3.3–4.3.5 | "Finding you… 42 m accuracy" / "You're in at 10:02." |
 | Needs-proof sheet | When the score or fence asks for more | Explanation, **Scan door code**, **I'm at a venue**, **Send to Urmi** (note field) | | "We couldn't confirm you're at the salon." |
+| Presence consent (`/presence/consent`, P1) | One-time acknowledgement of presence tracking | Notice card in plain words (§4.18.1), **I understand**, **Not now** | | "During your shift the owner can mark when you are not at the salon." |
+| Step-out sheet (P1) | Leave and return during a shift | Reason chips (Personal, Lunch outside, Work errand, Other), optional note, **Step out**; on Today **I'm back**; the "Urmi marked you away since 15:00" card with **I'm back** | Already stepped out | "You're out since 15:30." |
 | Scan (`/scan`) | Door QR scanner | Camera viewport with a square guide, torch toggle (where supported), manual "Type the code" fallback (10 chars) | Camera denied; wrong code | "Point at the code on the door screen." |
 | Fix-it guides | Location, camera, notifications, precise location | Platform-specific steps with screenshots (Android Chrome, iPhone Safari), **Try again** | | "Location is off for this app. Here's how to turn it on." |
 | **Month** (`/month`) | My calendar | Month header with prev/next, MonthCalendar (7 columns; each day a status chip with letter + icon; today ringed), totals row (present, half, absent, leave, late minutes, overtime approved), legend | Empty future days; loading skeleton grid | "October · 22 present · 1 half day · 35 min late" |
-| Day detail (`/day/:date`) | One day explained | Timeline of punches (time, kind, place, "offline" or "edited by Urmi" tags), shift, worked vs scheduled, late/early/overtime lines with the pay effect ("−₹13.44 for 15 min late"), **Something's wrong with this day** | "No punches on this day." | "Late by 25 min. 10 min grace, so 15 min count." |
+| Day detail (`/day/:date`) | One day explained | Timeline of punches (time, kind, place, "offline" or "edited by Urmi" tags), shift, worked vs scheduled, late/early/overtime lines with the pay effect ("−₹13.44 for 15 min late"; with Time credits on the lines show the minutes only, with no money and no word "credits", because the owner decides at payroll), **Something's wrong with this day** | "No punches on this day." | "Late by 25 min. 10 min grace, so 15 min count." |
 | **Requests** (`/requests`) | Leave and fixes | Segmented control (Leave · Fixes · Advances P1), list of requests with status chips, **Ask for leave** / **Fix a day** | "No requests yet." | "Approved by Urmi on 12 Oct." |
 | Leave form | Ask for leave | Leave-type chips with balances, DateRange calendar, reason, warnings (notice, balance, blackout), **Send** | Validation inline above fields | "You have 2 casual leaves left. The other 1 day will be unpaid." |
 | Fix-a-day form | Regularisation | Kind chips, time pickers (large 24 h wheels or native `input type=time`), reason, **Send** | | "Tell Urmi what happened." |
@@ -757,29 +889,33 @@ Bottom tab bar (5): **Today · Month · Requests · Payslips · Me**. The bell i
 | Payslip (`/payslips/:id`) | One payslip | HTML payslip (same template as the PDF), every line with its formula, **Download PDF**, **Share** | PDF preparing state | "₹15,000 ÷ 31 days × 29 paid days" |
 | Inbox (`/inbox`) | All notifications | List grouped Today / Earlier, unread dot, tap opens the target | "Nothing new." | |
 | **Me** (`/me`) | Profile and settings | Name, role, phone, joining date, language switch (English or Gujarati; the Gujarati option is labelled in Gujarati script), notifications toggle and status, this phone (label, approved on), **My data**, **Privacy notice**, **Sign out** | | |
-| My data (`/me/data`) | DPDP rights | Punches with location results (inside / edge / outside, distance bucket), selfies still kept (with deletion dates), consents given, **Ask for a correction**, grievance contact (owner name and phone) | | "Your selfies are deleted after 30 days. The next one goes on 28 Oct." |
+| My data (`/me/data`) | DPDP rights | Punches with location results (inside / edge / outside, distance bucket), presence history (P1: roll-call marks, step-outs with reasons, away intervals and their state, foreground checks; never credits), selfies still kept (with deletion dates), consents given, **Ask for a correction**, grievance contact (owner name and phone) | | "Your selfies are deleted after 30 days. The next one goes on 28 Oct." |
 | Update toast | New version | Toast: "A new version is ready." **Update** | | |
 
 ### 5.2 Owner panel
 
-Phone: bottom tab bar **Today · Needs action · Register · Staff · More** (More: Payroll, Roster, Advances, Reports, Inbox, Show door code, Settings). Desktop (≥ 64rem): a left rail with all items, content max 76rem, the register and payroll tables get full width.
+Phone: bottom tab bar **Today · Needs action · Register · Staff · More** (More: Payroll, Roster, Advances, Credits, Reports, Inbox, Show door code, Settings). Desktop (≥ 64rem): a left rail with all items, content max 76rem, the register and payroll tables get full width.
 
 | Screen (route) | Purpose | Components | Empty / loading / error | Copy examples |
 |---|---|---|---|---|
 | Owner sign-in (`/auth/owner`) | Email link + code; password fallback | EmailField, **Send me a sign-in link**, CodeField (6 digits), "Use password instead" | Expired link; too many codes | "Check your email. Type the 6-digit code here, or tap the link." |
 | Setup (`/o/setup`) | First-run checklist | Checklist card list with progress, each opening a focused screen (§4.15.1) | | "Five quick things, then you're ready." |
-| **Today** (`/o/today`) | Live board | Date + "updated 10:42" (polls every 30 s while visible; refetch on push), counter chips (Present · Late · Not in yet · On leave · Week off · At a venue; tap filters), Needs-action card with count, **Who's in** list (avatar initials, name, in-time, late badge "+18 m", place badge Inside / Edge / Venue, hours so far), **Not in yet** list (shift start, **Call**, **WhatsApp**), **Checked out** list | Before the first shift: "No one is due yet. First shift starts at 10:00." Sunday/holiday: "Salon closed today (Diwali)." | "Priya is 18 min late. Checked in 10:28 at the salon." |
+| **Today** (`/o/today`) | Live board | Date + "updated 10:42" (polls every 30 s while visible; refetch on push), counter chips (Present · Late · Not in yet · On leave · Week off · At a venue · Away now (P1); tap filters), Needs-action card with count, **Roll-call** card when one is due (P1), **Who's in** list (avatar initials, name, in-time, late badge "+18 m", place badge Inside / Edge / Venue, amber "Away" chip with the time it started (P1), "Seems away" hint, hours so far), **Not in yet** list (shift start, **Call**, **WhatsApp**), **Checked out** list (early badge "−35 m early") | Before the first shift: "No one is due yet. First shift starts at 10:00." Sunday/holiday: "Salon closed today (Diwali)." | "Priya is 18 min late. Checked in 10:28 at the salon." |
 | **Needs action** (`/o/actions`) | One approvals queue | Filter chips by type with counts, ActionCards (§4.12), bulk select, step-up sheet for devices | "All clear. Nothing waiting." | "New phone for Priya · Redmi Note 12" |
-| **Register** (`/o/register`) | Month grid | Month picker; desktop: DataGrid staff × days, sticky first column and header, each cell a letter + icon + tint, row totals (P, H, A, L, late min, OT h, LOP); phone: list of staff with a 7-day strip per week and a tap-through to a person's month | Loading skeleton grid; future days blank | Cell tooltip "Late 25 m · in 10:25 · out 20:04" |
-| Day detail (`/o/register/:userId/:date`) | Evidence for one person-day | Timeline of punches with source tags, map (fence circle + pin, lazy Leaflet), accuracy, distance, risk reasons, selfie (tap to compare with enrolled photo), computed lines (worked, late, early, OT, status), **Edit day** (override sheet with reason), audit trail | "No punches. Marked absent at 02:00." | "Edited by Urmi on 3 Nov: status Absent → Present. Reason: 'Was at bridal trial, I asked her to'." |
+| **Register** (`/o/register`) | Month grid | Month picker; desktop: DataGrid staff × days, sticky first column and header, each cell a letter + icon + tint, row totals (P, H, A, L, late min, early min, OT h, LOP, and owner-only Credits ±min when Time credits is on); phone: list of staff with a 7-day strip per week and a tap-through to a person's month | Loading skeleton grid; future days blank | Cell tooltip "Late 25 m · in 10:25 · out 20:04" |
+| Day detail (`/o/register/:userId/:date`) | Evidence for one person-day | Timeline of punches with source tags, map (fence circle + pin, lazy Leaflet), accuracy, distance, risk reasons, selfie (tap to compare with enrolled photo), computed lines (worked, late, early, OT, status), roll-call marks, step-outs, away intervals, the credit entries of the day (Time credits on), **Edit day** (override sheet with reason), audit trail | "No punches. Marked absent at 02:00." | "Edited by Urmi on 3 Nov: status Absent → Present. Reason: 'Was at bridal trial, I asked her to'." |
 | **Staff** (`/o/staff`) | People list | Search, filter (active, invited, left), rows with name, role, status, device state, **Add staff** | "Add your first staff member." | |
-| Staff profile (`/o/staff/:id`) | One person | Tabs: Overview (today, month summary), Salary (type, amount, divisor override, effective-from history), Shift (template, week-off, strong mode), Leave (balances, ledger, adjust), Advances (ledger), Devices (approved/pending, revoke, reset PIN), Documents (P2), Exit | | "Salary ₹15,000 a month from 1 Apr 2026." |
+| Staff profile (`/o/staff/:id`) | One person | Tabs: Overview (today, month summary), Salary (type, amount, divisor override, effective-from history), Shift (template, week-off, strong mode), Leave (balances, ledger, adjust), Advances (ledger), **Credits** (the person's ledger, §4.19.2; owner only), Presence (P1: consent state, roll-call marks, step-outs), Devices (approved/pending, revoke, reset PIN), Documents (P2), Exit | | "Salary ₹15,000 a month from 1 Apr 2026." |
 | Add staff (`/o/staff/new`) | §4.1.1 | Form + share sheet | Duplicate phone, rehire | |
 | **Roster** (`/o/roster`) | Week plan | Week grid staff × 7 days showing template or WO/HO/L/duty; tap a cell to change; drag to swap week-offs (desktop) or "Swap with…" (phone); weekly hours per person with a 48 h warning; **Add off-site duty** | | "Neha · 52 h this week, over 48." |
 | Off-site duty form (`/o/duties/new`) | §4.6 A | Staff multi-select, date, times, place, location (current / map / paste link), radius stepper, mode chips, overtime toggle | Unparseable link | "Venue duty for Neha, Kajal · 9 Nov 04:00–09:00 · Hotel Aram" |
 | **Payroll** (`/o/payroll`) | Runs list | One row per month: status (Draft, Finalised, Paid, Revision 2), totals; **Start payroll** | "Your first payroll will be ready on 1 Nov." | |
-| Payroll run (`/o/payroll/:runId`) | Review and finalise | Blockers card, summary (gross, deductions, net, people), table/cards per person, warnings, **Finalise October** (step-up), **Mark all paid**, **Reopen** | Recomputing state | "3 things to check before you finalise." |
+| Payroll run (`/o/payroll/:runId`) | Review and finalise | Blockers card, summary (gross, deductions, net, people), table/cards per person, **Settle credits** step (stepper per person, default 0, suggestion = full balance; §4.19.3), warnings, **Finalise October** (step-up), **Mark all paid**, **Reopen** | Recomputing state | "3 things to check before you finalise." |
 | Payslip review (`/o/payroll/:runId/:userId`) | One person's lines | Payslip preview with formulas, add incentive/earning/deduction, change advance recovery, **Share** (after finalise) | | |
+| **Credits** (`/o/credits`, P0) | Balances of Time credits | List of staff: balance (min), money estimate ("worth about ₹45" / "might cut around ₹96"), last settlement, pending-away chip; sort and plus/minus filter | "Time credits are off." with a link to Settings | "Priya: +50 min, worth about ₹45" |
+| Person ledger (`/o/credits/:userId`) | Everything behind the number | Balance header, ledger table (date, kind, minutes, running balance, source, confirmed by), filters, **Export CSV** | "No entries yet." | "Late 10 min · 7 Oct · −10 · balance −10" |
+| **Roll-call** (`/o/roll-call/:id`, P1) | Mark who is not here | List of checked-in people, all defaulting to **Here**; tap to switch to **Not here**; hints (Seems away, Stepped out, On break); **Done**; edit start and end of an interval | "Nobody is checked in." | "15:00 roll-call · 8 here · 1 not here" |
+| Presence settings (`/o/settings/presence`, P1) | Roll-call and Step out | Roll-call times and who may do it, Step out on or off, foreground check on or off and interval, quiet during breaks, per-person exclusion | | "Roll-call at 12:00, 15:00 and 18:00." |
 | Advances (`/o/advances`) | All advances | Ledger list with balance per person, **Give an advance** | "No advances." | |
 | Reports (`/o/reports`) | Exports | Export cards (§4.16) with month and format pickers, recent exports list with download links (7 days) | | |
 | Show door code (`/o/door-code`) | Owner phone as the door | Full-screen QR, "New code in 12 s", **Done** | Offline: "You're offline. The door code needs the internet on this phone." | |
@@ -837,8 +973,13 @@ Phone: bottom tab bar **Today · Needs action · Register · Staff · More** (Mo
 | N29 | Needs-action reminder | Owner | Folded into N1 | Items older than 48 h | Line in the summary: "2 requests are waiting more than 2 days." |
 | N30 | Weekly digest (P1) | Owner | Email | Monday 09:00 | "Last week: 94% on time, 6 h overtime approved, 1 leave." |
 | N31 | Sign-in link | Owner | Email | On request | Subject "Your Feelings Staff sign-in code: 482913" · link + code, valid 15 min |
+| N32 | Roll-call time (P1) | Owner, managers with `rollcall` | In-app, push (batched, held by quiet hours) | At each roll-call time (default 12:00, 15:00, 18:00), if anyone is checked in | "Roll-call time" · "Who's not here? It takes about 20 seconds." |
+| N33 | Roll-call not done (P1) | Owner | In-app only (a card on Today) | Roll-call time + 30 min, not submitted | "Roll-call at 15:00 not done" · "Tap to do it now." |
+| N34 | Staff stepped out (P1) | Owner | In-app only (shows on Today) | On Step out | "Priya stepped out" · "Lunch outside, since 14:40." |
+| N35 | Away interval to confirm (P1) | Owner | In-app, push (batched, held by quiet hours) | When a step-out closes (I'm back, auto-close) and Time credits is on | "Priya stepped out 15:30–16:10" · "40 min, lunch outside. Confirm, mark as work or ignore." |
+| N36 | May have left without checking out (P1) | Owner | In-app, push (batched) | Shift end + 30 min, still checked in, open away interval or "seems away" | "Priya may have left without checking out" · "Away since 16:10." |
 
-Gujarati copy for staff events ships with the Gujarati strings (phase 1.1). Push `lang` follows the recipient's language.
+There is no staff push for presence: nobody is asked to answer a notification during a shift (§4.18). Time credits create no staff notification at all (§7.17.9). N24's "things to check" count includes away intervals waiting and credit balances to settle. Gujarati copy for staff events ships with the Gujarati strings (phase 1.1).
 
 ---
 
@@ -856,6 +997,7 @@ All rules live in one pure TypeScript package, `packages/engine`, with no I/O. T
 4. **Never pay for less than the time missed** (Code on Wages s.20): absence and undertime deductions are proportional. Anything disproportionate is a fine (§7.9) and is off by default.
 5. **No silent changes.** Owner overrides, approvals and rule changes are audit-logged; payroll uses a settings snapshot frozen into the run.
 6. **One rule set per org**, with per-person overrides only where the table in §7.14 says so.
+7. **Credits never cut or pay by themselves.** With Time credits on (§7.17), late, early and away minutes and approved overtime go to an owner-only ledger. Money moves only when the owner settles a balance at payroll, inside the 50% cap and with the legal overtime warning.
 
 ### 7.2 Time zone and work date
 
@@ -919,6 +1061,7 @@ Then, with `grace` (default 10) and `early_tolerance` (default 15):
 - `undertime = late_billable + early_billable + overbreak − makeup`.
 - Undertime is only charged on days with status **P**. A half day or absent day is already paid by the day fraction, so there is no double penalty.
 - **Undertime deduction for the day** = `r_day × undertime / S_day` (it uses that day's scheduled minutes, so 15 minutes of a 3-hour Sunday cost the same share of the day as 45 minutes of a 9-hour day).
+- **With Time credits on (§7.17)** this whole section is replaced for the pay calculation: grace and tolerance do not apply, make-up is off and no undertime is deducted. The day still shows late, early and over-break minutes; late and early go to the ledger from the first minute, over-break is only shown to the owner (no credits, no deduction).
 
 ### 7.6 Overtime
 
@@ -930,6 +1073,7 @@ Then, with `grace` (default 10) and `early_tolerance` (default 15):
 - **Approval**: pre-approved minutes are approved automatically. All others need the owner's decision (approve all, approve part in 15-min steps, reject). Undecided overtime is not paid.
 - **Rate**: `ot_hourly = r_day / (S_std / 60)`; **overtime pay** = `ot_hourly × ot_multiplier × ot_min / 60` = `r_day × ot_multiplier × ot_min / S_std`. Multiplier default **2** (Code on Wages s.14). Options: 1, 1.5, 2, flat ₹ per hour, comp-off (every 4 h of approved overtime = 0.5 comp-off day), or tracked but unpaid. Picking anything below 2 shows: "Below 2× may not comply with the Code on Wages."
 - **Warnings** (never blocks): more than 48 worked hours in a Monday–Sunday week; more than 144 overtime hours in a calendar quarter.
+- **With Time credits on (§7.17)** candidates, blocks and approvals work exactly as above, but the approved minutes become plus credits instead of overtime pay, and the rate options below are not used. The existing weekly-hours warning above stays (§7.17.7).
 
 ### 7.7 Day status
 
@@ -981,7 +1125,7 @@ The owner can override any status with a reason.
 - **The cap** (Code on Wages s.18): total deductions in a month ≤ 50% of gross wages `G`.
   1. Absence (LOP) and undertime deductions are applied in full first; they are time not worked.
   2. `room = max(0, 50% × G − absence − undertime)`.
-  3. Other deductions are taken from `room` in this order: statutory (P2), fines, damage, other deductions, advance recovery.
+  3. Other deductions are taken from `room` in this order: **Time credits cut** (a minus settlement, §7.17.5; only when Time credits is on), statutory (P2), fines, damage, other deductions, advance recovery. A cut that does not fit is not taken: the minutes that do not fit stay on the balance.
   4. What does not fit carries forward: advance recovery to the next month; damage and other deductions to the next month; fines are dropped after 90 days from the fine date.
   5. The payslip shows "₹X of the advance moves to next month" for anything carried.
 - If absence and undertime alone exceed 50% of `G`, nothing else is deducted that month and the payroll review shows a note for the owner. (Whether absence counts toward the 50% cap is a point for the CA to confirm, Q19. This default is the more protective reading for the worker.)
@@ -1034,6 +1178,18 @@ net        = G − undertime − capped
 
 `paid_holidays` is on by default for daily-wage staff; `paid_week_offs` is off by default.
 
+**With Time credits on** (days where `credits_on` is true, §7.17.1), per day:
+
+```
+undertime_d = 0 and makeup_d = 0                 (replaced by ledger entries)
+overtime_d  = 0                                  (approved OT goes to the ledger)
+credit_value = §7.17.5 settlement, signed:  earning = max(0, credit_value);  cut = max(0, −credit_value)
+G            = M_pro + earning + offday_extra + incentives + other_earnings + arrears
+net          = G − absence − capped − cut                      (the cut sits first inside the capped group, §7.10)
+```
+
+Daily-wage staff are the same with `R` in place of `r_day`. Days before `credits_on` start keep the formulas above.
+
 **Mid-month salary change**: the month is split at each `salary_history.effective_from` date inside it; each part is prorated by calendar days exactly like joining (`M_part × days_in_part / D`), and `r_day` for days in each part uses that part's salary.
 
 **Display on the payslip**: rate line "₹15,000 ÷ 31 days = ₹483.87 a day"; "Paid days 29.5 of 31"; each deduction with its formula ("15 min late × ₹0.90 a minute"). Displayed per-minute and per-hour rates are rounded for reading only; the line amounts use exact fractions.
@@ -1070,6 +1226,14 @@ net        = G − undertime − capped
 | Strong mode (door QR always) | Off | On | Yes |
 | Geofence radius / max accuracy | 100 m / 50 m | 50–300 / 30–100 | Per site |
 | Risk flag / proof thresholds | 30 / 60 | 10–90 | No |
+| Time credits | On (this salon) | Off | Yes (exclude a person) |
+| Time credits start | First day of the month after switching on | Any day in the open month | No |
+| Value of one credit minute | Normal per-minute rate, 1× (`r_day / S_std`) | Fixed, not a setting | No |
+| Presence tracking (P1) | On (this salon), after each person's acknowledgement | Off | Yes (exclude a person) |
+| Roll-call (P1) | On: 12:00, 15:00, 18:00, owner and managers with `rollcall` | 1–4 times, any time in opening hours | No |
+| Step out / I'm back button (P1) | On | Off | No |
+| Foreground check (P1) | On, only while the app is open and location is already allowed; hint only | Off; interval 30 min, 15–60 in steps of 5 | No |
+| Quiet during breaks (P1) | On (foreground check paused in the break window) | Off | No |
 
 ### 7.15 Worked examples
 
@@ -1181,6 +1345,47 @@ Priya, October 2026: 1 absent, 1 half day; late billable 47 min on full days and
 
 Rule "3 lates beyond grace = ½ day". Priya has 4 such lates in October → 1 fine = 0.5 × 483.87 = **₹241.94**. Cap 3% × 15,000 = ₹450 → allowed, after her show-cause acknowledgement. The 4th late counts toward nothing (no partial fines).
 
+**Example 13: late every day, plus overtime (Harsh's case, Time credits on)**
+
+Priya, October 2026. On seven working days she checks in at 10:10 (10 minutes late, which the 10-minute grace hides). On 17 Oct she checks in at 10:10 and out at 22:10: `after` = 130, overtime candidate floor(130/15) × 15 = 120 min, and Urmi approves all of it.
+
+| | Today's rules (Time credits off) | Time credits on |
+|---|---|---|
+| Lateness | 7 × 10 min, all inside the grace, billable 0 → ₹0.00 | 7 × (−10) = **−70** (late from the first minute) |
+| Overtime | 120 min at 2× = 483.87 × 2 × 120/540 = **₹215.05** paid | **+120** (approved), nothing paid yet |
+| Balance | not kept | **+50** |
+| Money | ₹215.05 | "worth about ₹44.80" = 483.87 × 50/540 at 1× (one rounding of the net minutes; ₹107.53 − ₹62.72 would give ₹44.81) |
+
+The owner's options at payroll:
+- **Settle 0**: nothing on the payslip; +50 carries over.
+- **Settle +50**: a payslip earning "Time credits: +50 min, +₹44.80", balance 0.
+- **Adjust**: she can also change one entry with a reason, for example +10 for a late she excused (§4.19.5). The existing payroll warnings (§7.6, §7.12) show in the preview if they apply.
+
+**Example 14: a minus month, carried over, then partly settled (Time credits on)**
+
+**Kajal**, monthly ₹12,000, calendar divisor, `S_std = 540`, grace 10. November 2026 (30 days): `r_day` = ₹400, per minute = 400/540 ≈ ₹0.741.
+
+| Date | What happened | Entry |
+|---|---|---|
+| 3 Nov | in 10:25, out 20:00 | late −25 |
+| 5 Nov | in 10:10, out 19:40 | late −10, early −20 |
+| 17 Nov | Roll-call at 18:00: Urmi marks her Not here; she taps I'm back at 18:40 (counted at once, "confirmed by Urmi") | away −40 |
+| 8 other days | in 10:10 | late −80 |
+| 20 Nov | in 10:00, out 20:45; 45 min overtime approved | ot +45 |
+
+November balance: −25 − 10 − 20 − 40 − 80 + 45 = **−130** → "might cut around ₹96.30" (400 × 130/540). Today's rules would have cut 15 + 20 = 35 min (₹25.93) and paid ₹66.67 overtime.
+- November: Urmi settles **0**. November payslip: salary ₹12,000.00, no time-credits line, net **₹12,000**. (Today's rules would have cut ₹25.93 and paid ₹66.67 overtime.) The balance **−130** carries over.
+- December: two more days at 10:10 → −20; balance −130 − 20 = **−150** (carried over, no reset). Urmi settles **−100** → 400 × 100/540 = 74.07 → ₹74.07 cut. Cap: 50% × 12,000 = 6,000, absence 0 → room 6,000, fits. Payslip line "Time credits: −100 min, −₹74.07". Net: 12,000.00 − 74.07 = ₹11,925.93 → **₹11,926** (rounding +₹0.07). **−50 min** stays on the balance ("might cut around ₹37.04") for January.
+- January edit: Urmi remembers she approved the 5 Nov early leave. She adjusts that day's early entry from −20 to 0 (+20, reason "approved by Urmi"). The ledger shows the original −20, the +20 adjustment and who made it; the balance becomes **−30** ("might cut around ₹22.22").
+
+**Example 15: away time, step-outs and early leave (Time credits on; short-shift valuation)**
+
+Priya on the Evening template 15:00–20:00 (`S_day` = 300, no break; `S_std` still 540).
+- 12 Nov: at the 18:00 roll-call Urmi taps Priya **Not here**. The interval starts at 18:00; Priya taps **I'm back** at 18:40. It counts at once: entry away **−40**, "confirmed by Urmi" (she can still edit the start and end). Money of the 40 minutes: 483.87 × 40/540 = ₹35.84 (not charged yet).
+- 14 Nov: Priya taps **Step out** at 16:05 with the reason Work errand and **I'm back** at 16:30 (25 min). It waits in Needs action; Urmi taps **Mark as work**: no entry. Had she tapped Confirm, −25 would have been added.
+- 13 Nov: out 19:30 → early 30 min → entry early **−30** from the first minute (tolerance does not apply). Value 483.87 × 30/540 = **₹26.88**. Today's rule would deduct r_day × 30/300 = ₹48.39: a credit minute is worth the same on every day because it uses `S_std`, like overtime (§7.6).
+- Balance from the 12 Nov away (−40) and the 13 Nov early leave (−30): −70 min.
+
 ### 7.16 Engine contract
 
 `packages/engine` exports pure functions (types live in `packages/contracts`):
@@ -1198,9 +1403,133 @@ computePayslip(input: {
 }): PayslipResult  // lines[] with code, label, formula, amountPaise; totals; carryOut; warnings
 riskScore(input: RiskInput): { score: number; reasons: RiskReason[]; outcome: 'accept'|'flag'|'proof'|'block' }
 fenceCheck(fix: Fix, site: Site): { result: 'pass'|'uncertain'|'outside'|'approximate'; distanceM: number }
+
+// Time credits and presence (WP-9; pure, same rules as §7.17 and §7.18)
+creditEntriesForDay(day: DayResult, away: ConfirmedAway[], rules: CreditRules): CreditEntryDraft[]  // late, early, away, ot; signed minutes
+creditBalance(entries: CreditEntry[], adjustments: CreditAdjustment[], settlements: CreditSettlement[], asOf: WorkDate): number     // signed minutes
+creditValue(minutes: number, rate: MinuteRate): number                  // signed paise, one rounding, half up; rate = { rDay: Fraction, sStd: number }
+settleCredits(input: { balanceMin: number; settleMin: number; room: number; rate: MinuteRate }):
+  { appliedMin: number; amountPaise: number; stayMin: number }
+buildAwayIntervals(input: { rollCalls: RollCallMark[]; stepOuts: StepOut[]; checks: PresenceCheck[]; punches: PunchForCalc[];
+  schedule: DaySchedule; breakWindow: Interval | null; leave: LeaveOnDay | null; rules: PresenceRules }): { intervals: AwayInterval[]; hints: SeemsAway[] }
 ```
 
+With `rules.credits` on, `computeDay` returns `undertime = 0`, `makeup = 0`, no overtime pay minutes, and the raw late, early and over-break minutes (over-break is only reported); `computePayslip` takes `settlement: CreditSettlementInput | null` and returns the `time_credits` line.
+
 Every function is deterministic for its inputs. `DayResult` and `PayslipResult` carry a `version` (engine semver) so stored results can be traced to the code that made them.
+
+### 7.17 Time credits
+
+A minute ledger, visible to the owner only. It replaces the automatic lateness deduction and the automatic overtime pay with a balance the owner settles. Harsh's reason: someone can be 10 minutes late every day (70 minutes a week, all hidden by the grace) and still do 2 hours of overtime, and under §7.5 and §7.6 she would get full salary and full overtime.
+
+#### 7.17.1 The switch
+
+`credits_on(person, date)` = the salon setting is on, `date` is on or after the start date, and the person is not excluded. It is decided per day. Default: on for this salon. When off for a day, §7.5 and §7.6 apply unchanged and no entries are written.
+
+#### 7.17.2 Entries per day
+
+One credit = one minute. Minus entries for a day `d` (all only on days with status **P**; a half day or absent day is already paid by its fraction, so there is no double penalty, as in §7.5):
+
+```
+late_d      = −Σ_k late_k            from the first minute: grace does not apply
+early_d     = −Σ_k early_k           from the first minute: tolerance does not apply
+away_d      = −Σ counted away minutes of the day   (owner-marked at a roll-call, or a step-out the owner confirmed; never one marked "work" or ignored; §7.18)
+```
+
+Over-break (break punches on, P1) is **not** a credit (Harsh, Q28): with credits on it is shown to the owner on the day (day detail and a Register tag), gives no credits and causes no automatic deduction. With credits off it stays undertime (§7.5).
+
+Plus entry (any day, including worked off-days):
+
+```
+ot_d        = +ot_approved_d         owner-approved overtime minutes only
+```
+
+Unapproved or pending overtime, and rejected overtime, give nothing. Make-up (§7.5) does not apply: staying late no longer erases lateness, because both stay visible and the owner settles them. Overtime candidates, the 30-minute threshold, 15-minute blocks and approvals are exactly §7.6.
+
+Owner edits never live in the derived rows: an adjustment (§4.19.5) is its own row keyed to the person, date and kind, so a recompute does not undo it. Each entry stores its kind, signed minutes, source (the first `in` punch for late, the `out` punch for early, the presence interval for away, the overtime decision for ot) and who confirmed it. Late, early and ot entries are derived: the day recompute rewrites them while the day is unlocked. Away entries exist only for intervals the owner or a manager marked at a roll-call, or the owner confirmed after a step-out. A locked day (finalised month) keeps its entries; reopening the month unlocks them. The owner overriding a day to a non-P status removes its minus entries.
+
+#### 7.17.3 Balance and carry-over
+
+```
+balance(t) = Σ (entries + adjustments) with work_date ≤ t  −  Σ settled minutes of finalised settlements with period end ≤ t
+```
+
+There is no monthly reset. Unsettled credits stay, plus or minus. A settlement reduces the balance by the minutes it settles. The balance may change sign (−70 then +120 gives +50).
+
+#### 7.17.4 Money value and rounding
+
+```
+r_min   = r_day / S_std                      (exact fraction; daily-wage staff: R / S_std)
+value(m) = round_half_up_to_paisa( r_day × m / S_std )      signed, one rounding
+```
+
+At **1×**, the normal rate; never the overtime multiplier. The Credits screen shows value for reading: "worth about ₹45" (plus) and "might cut around ₹96" (minus), rounded to the rupee, computed from the person's current `r_day` and the current standard day. A settlement uses the `r_day` of the run's month (the salary in effect on the last day of that month). Minutes are integers, so the balance is an exact integer. The value of a net balance is computed on the net minutes, not by netting rounded rupees.
+
+#### 7.17.5 Settlement
+
+At payroll the owner picks, per person, `settleMin` `s` (signed like the balance), `0 ≤ |s| ≤ |B|` where `B` is the balance at the month end. Default 0, suggested |B|.
+
+```
+if s > 0:  applied = s;  amount = +value(s)        -> earning, joins G
+if s < 0:  room    = max(0, 50% × G − absence)      (§7.10; the cut is first in the capped group)
+           applied = −(largest a ≤ |s| with value(a) ≤ room);  amount = −value(a)
+           stay    = |B| − a                        (not settled; stays on the balance)
+balance_after = B − applied
+```
+
+A settlement is saved as a `credit_settlements` row linked to the payroll run, produces the payslip line `time_credits` (owner copy: "Time credits: −50 min, −₹38.80") and an audit entry `credits.settle`, and takes effect on **Finalise**. A deduction here is proportional to time not worked (principle 4 in §7.1), never a fine.
+
+#### 7.17.6 How it coexists with the other rules
+
+| Rule | Time credits off | Time credits on |
+|---|---|---|
+| Late and early undertime deduction (§7.5) | Grace and tolerance, then `r_day × undertime / S_day` | Replaced: every late and early minute is a ledger entry; no automatic deduction |
+| Make-up time (§7.5) | On by default | Not used |
+| Over-break (§7.5, P1) | Counts as undertime | Shown to the owner on the day; no credits, no deduction |
+| Overtime pay (§7.6) | Automatic after approval at the chosen rate | Replaced: approved minutes are plus credits; pay only through settlement at 1× |
+| Day status, LOP, half day, absence (§7.7) | Unchanged | Unchanged |
+| Off-day work: comp-off or extra pay (§7.7) | Unchanged | Unchanged (sub-threshold minutes still become overtime candidates, which become credits when approved) |
+| Fines (§7.9), advances and the 50% cap (§7.10) | Unchanged | Cut joins the capped group, first in order |
+| Minimum-wage check (§7.12) | Runs | Still runs, unchanged |
+| Late, early, overtime on the day screens | Shown | Still shown (minutes) |
+| Staff view of pay effect | "−₹13.44 for 15 min late" | Minutes only; no ₹ for these lines |
+
+#### 7.17.7 Legal guardrails (G5 and §7.1 still apply)
+
+Harsh's decision (19 Oct): hours at this salon never exceed 9 h a day or 48 h a week, so Time credits has no 2× overtime logic and no switch for it. What stays, unchanged:
+- The existing passive payroll-preview warnings, in case it ever happens: weekly hours over 48 and overtime above 144 h in a quarter (§7.6, §4.13.3), and the minimum-wage check (§7.12).
+- The 50% deduction cap (§7.10) applies to every cut (§7.17.5).
+- A cut is proportional to time not worked (§7.1 principle 4), never a fine.
+- The CA reviews the defaults before the first real payroll (Q19).
+
+#### 7.17.8 Where the numbers appear
+
+`credit_entries`, `credit_adjustments` and `credit_settlements` (§8.2.1), the Credits screen and ledger (§4.19), the payroll Settle step, the payslip line, the audit log, the ledger CSV. Entries and settlements are wage records: retained 5 years (§8.3).
+
+#### 7.17.9 Who sees what
+
+Only the owner. No staff endpoint returns credits, balances, ledger rows or credit values (a privacy test asserts it, §14.3); no staff notification mentions credits; managers do not see them in v1 (§10.2). The one place money from a settlement reaches staff is the payslip, where it appears as **"Time adjustment"** (an amount and "settled by Urmi for time not worked in October") without minutes, the balance or the word "credits"; the 2× overtime line is an ordinary Overtime line. The staff day detail shows late, early and overtime minutes as before. See Q27.
+
+### 7.18 Presence rules
+
+The builder behind §4.18. Input: the day's roll-call marks, step-outs, foreground checks and punches, the schedule, the break window, leave and rules. Output: away intervals and "seems away" hints.
+
+1. **Start and end of an interval** per source:
+   - **Roll-call** (primary): a **Not here** mark starts the interval at the roll-call time. If the person already has an open interval, the mark continues it.
+   - **Step out** (fallback): starts at the server time of the tap, with a reason (`personal`, `lunch`, `errand`, `other`) and an optional note.
+   - **Ends** at the first of: the person's **I'm back** (server time), the next roll-call where the person is marked **Here**, check-out, auto-close (§4.8), or the end of the shift segment. A step-out that ends only because of the next roll-call or check-out is flagged `back_missing`.
+   - The owner can edit start and end afterwards (audit-logged).
+2. **Merge.** Overlapping intervals of one person become one (union), source `mixed`; if any part was owner-marked the merged interval is confirmed.
+3. **Minutes.** `away_min` = the minutes of the interval that lie inside a shift segment and inside the day's presence `[first in, last out)`, minus the minutes inside the break window (already unpaid, §7.4). Intervals under 5 minutes are dropped. Late and early minutes (§7.5) lie outside presence, so away and early never overlap.
+4. **Decision (state).**
+   - Roll-call intervals are **confirmed** when they are created (the owner or a manager is the authority). They produce an `away` entry of −`away_min` at once and stay editable.
+   - Step-out intervals are **pending** when they close. The owner taps **Confirm** (→ entry), **Mark as work** (state `work`, no entry) or **Ignore** (no entry). The engine treats a step-out with reason `errand` like any other: the owner decides.
+   - When the day's punches change afterwards (regularisation, override), minutes are recomputed and the entry follows, keeping the decision. If Time credits is off for the day, intervals are stored but no entry is written and no decision is asked.
+5. **Skip rules** (§4.18.7): break window, duty, leave, outside the shift, not checked in, presence off.
+6. **Foreground check** (optional hint). Only while the app is visible, the person is checked in, inside a segment, outside the break window and a duty, **and location permission is already granted** (the app never prompts for it). `getCurrentPosition({ enableHighAccuracy: true, maximumAge: 0, timeout: 15000 })` every `foregroundIntervalMin` (default 30), one retry after 60 s if accuracy is worse than `A_max`, then `no_fix`. The request is signed with the device key and carries a nonce of purpose `presence`; no PIN. The server runs `fenceCheck` and the location risk signals; `uncertain` counts as inside. An `outside` check raises a **seems away** hint (Today, roll-call row); the next inside check or check-out clears it. **A hint never creates an interval and never creates credits.** No coordinates are stored.
+7. **Left without checking out.** Still checked in at shift end + 30 min with an open interval or a hint: N36. If the day is auto-closed with an open interval, the day gets the tag `left_no_checkout`.
+8. **Server jobs.** The `rules` job (every 5 min) opens roll-calls at their times and sends N32, sends N33 after 30 minutes, auto-closes step-outs with no I'm back (flagging them) and raises N35 and N36 (§9.5).
+9. **No automatic penalty.** Presence never changes pay by itself. Credits become money only when the owner settles a balance (§7.17.5).
 
 ---
 
@@ -1746,7 +2075,7 @@ CREATE TABLE notifications (
   id TEXT PRIMARY KEY,
   org_id TEXT NOT NULL,
   user_id TEXT NOT NULL REFERENCES users(id),
-  type TEXT NOT NULL,                          -- N1..N31 codes, e.g. 'late_checkin'
+  type TEXT NOT NULL,                          -- N1..N36 codes, e.g. 'late_checkin'
   title TEXT NOT NULL, body TEXT,
   url TEXT NOT NULL,
   data_json TEXT CHECK (data_json IS NULL OR json_valid(data_json)),
@@ -1818,6 +2147,139 @@ CREATE TABLE app_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);  -- min_app_v
 
 **Settings JSON** (`orgs.settings_json`) is validated by the `OrgSettings` zod schema in `packages/contracts`; it holds every value in §7.14 plus notification, quiet-hours, risk and retention settings. Shape versioned by `settings_version`.
 
+### 8.2.1 Migration `0003_time_credits_presence.sql` (WP-9)
+
+New file, never an edit of `0001`. Adds the Time credits ledger and the presence tables, and a few columns. The `consents` table is rebuilt to widen its `kind` check (SQLite cannot alter a CHECK): create `consents_new`, copy, drop, rename.
+
+```sql
+-- Settings live in orgs.settings_json: timeCredits { enabled, startDate }, presence { enabled, rollCallTimes[], stepOut, foreground { enabled, intervalMin }, quietDuringBreaks }
+ALTER TABLE staff_profiles ADD COLUMN time_credits INTEGER CHECK (time_credits IN (0,1));    -- NULL = org default; 0 = excluded
+ALTER TABLE staff_profiles ADD COLUMN presence_enabled INTEGER CHECK (presence_enabled IN (0,1));
+ALTER TABLE shift_templates ADD COLUMN break_start TEXT;                  -- optional usual break start "HH:MM" (presence break window)
+ALTER TABLE attendance_days ADD COLUMN away_min INTEGER NOT NULL DEFAULT 0;   -- confirmed away minutes of the day
+-- consents.kind gains 'presence_checks' (table rebuilt); the manager permission list gains 'rollcall'
+
+-- Time credits (owner only; never exposed on a staff route) ----------------
+CREATE TABLE credit_entries (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL REFERENCES orgs(id),
+  user_id TEXT NOT NULL REFERENCES users(id),
+  work_date TEXT NOT NULL,
+  kind TEXT NOT NULL CHECK (kind IN ('late','early','away','ot')),
+  minutes INTEGER NOT NULL CHECK (minutes <> 0),            -- signed: minus for late/early/away, plus for ot
+  source_kind TEXT NOT NULL CHECK (source_kind IN ('punch','presence','ot_decision')),
+  source_id TEXT NOT NULL,                                  -- punch id, away_intervals id or ot_decisions id
+  confirmed_by TEXT, confirmed_at INTEGER,                  -- owner for away and ot; NULL = automatic
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','superseded')),
+  engine_version TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX credit_entries_day_kind ON credit_entries(user_id, work_date, kind)
+  WHERE status = 'active' AND kind <> 'away';
+CREATE UNIQUE INDEX credit_entries_away ON credit_entries(source_id) WHERE status = 'active' AND kind = 'away';
+CREATE INDEX credit_entries_user_date ON credit_entries(org_id, user_id, work_date);
+
+CREATE TABLE credit_adjustments (                           -- owner edits of credits; survive a recompute
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL REFERENCES orgs(id),
+  user_id TEXT NOT NULL REFERENCES users(id),
+  work_date TEXT NOT NULL,
+  kind TEXT NOT NULL CHECK (kind IN ('late','early','away','ot')),
+  delta_min INTEGER NOT NULL CHECK (delta_min <> 0),        -- signed change to that day and kind
+  reason TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','void')),
+  created_by TEXT NOT NULL, created_at INTEGER NOT NULL,
+  voided_by TEXT, voided_at INTEGER, void_reason TEXT
+);
+CREATE INDEX credit_adj_user_date ON credit_adjustments(org_id, user_id, work_date);
+
+CREATE TABLE credit_settlements (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL REFERENCES orgs(id),
+  user_id TEXT NOT NULL REFERENCES users(id),
+  payroll_run_id TEXT NOT NULL REFERENCES payroll_runs(id),
+  month TEXT NOT NULL,                                      -- period end = last day of this month
+  balance_min INTEGER NOT NULL,                             -- signed balance at the period end, before this step
+  settle_min INTEGER NOT NULL DEFAULT 0,                    -- owner's choice, signed like the balance, 0 allowed
+  applied_min INTEGER NOT NULL DEFAULT 0,                   -- after the 50% cap
+  amount_paise INTEGER NOT NULL DEFAULT 0,                  -- signed: negative = cut, positive = earning (1x value of applied_min)
+  rate_json TEXT NOT NULL CHECK (json_valid(rate_json)),    -- r_day fraction and S_std used
+  warnings_json TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(warnings_json)),   -- existing payroll warnings at the time of the step
+  status TEXT NOT NULL CHECK (status IN ('draft','applied','void')),
+  decided_by TEXT NOT NULL, decided_at INTEGER NOT NULL,
+  note TEXT
+);
+CREATE UNIQUE INDEX credit_settlements_run_user ON credit_settlements(payroll_run_id, user_id) WHERE status <> 'void';
+CREATE INDEX credit_settlements_user ON credit_settlements(org_id, user_id, month);
+
+-- Presence (staff may read their own rows; credits stay owner only) -----------
+CREATE TABLE roll_calls (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL REFERENCES orgs(id),
+  work_date TEXT NOT NULL,
+  slot_time TEXT NOT NULL,                                  -- "15:00", from settings
+  slot_ts INTEGER NOT NULL,
+  reminded_at INTEGER,                                      -- N32 sent
+  submitted_by TEXT, submitted_at INTEGER,                  -- owner or manager; NULL = not done
+  edited_at INTEGER,
+  created_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX roll_calls_slot ON roll_calls(org_id, work_date, slot_time);
+
+CREATE TABLE roll_call_marks (                              -- one row per person who was checked in at the slot
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL REFERENCES orgs(id),
+  roll_call_id TEXT NOT NULL REFERENCES roll_calls(id),
+  user_id TEXT NOT NULL REFERENCES users(id),
+  mark TEXT NOT NULL CHECK (mark IN ('here','not_here')),
+  away_interval_id TEXT REFERENCES away_intervals(id),      -- set for not_here
+  marked_by TEXT NOT NULL, marked_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX roll_call_marks_person ON roll_call_marks(roll_call_id, user_id);
+
+CREATE TABLE away_intervals (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL REFERENCES orgs(id),
+  user_id TEXT NOT NULL REFERENCES users(id),
+  work_date TEXT NOT NULL,
+  source TEXT NOT NULL CHECK (source IN ('roll_call','step_out','mixed')),
+  reason TEXT CHECK (reason IN ('personal','lunch','errand','other')),   -- step-out reason chip; NULL for roll-call
+  reason_note TEXT, staff_note TEXT,
+  start_ts INTEGER NOT NULL, end_ts INTEGER,                -- end NULL while open
+  end_reason TEXT CHECK (end_reason IN ('back','roll_call_here','check_out','auto_close','shift_end','owner_edit')),
+  back_missing INTEGER NOT NULL DEFAULT 0,                  -- closed without an I'm back
+  minutes INTEGER NOT NULL DEFAULT 0,                       -- clipped per §7.18
+  state TEXT NOT NULL DEFAULT 'open' CHECK (state IN ('open','pending','confirmed','work','ignored')),
+  roll_call_id TEXT REFERENCES roll_calls(id),
+  opened_by TEXT NOT NULL,                                  -- the staff member, or the owner or manager who marked
+  decided_by TEXT, decided_at INTEGER,
+  edited_by TEXT, edited_at INTEGER,
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX away_user_date ON away_intervals(user_id, work_date);
+CREATE INDEX away_pending ON away_intervals(org_id, state) WHERE state = 'pending';
+
+CREATE TABLE presence_checks (                              -- optional foreground check; a hint only, no coordinates
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL REFERENCES orgs(id),
+  user_id TEXT NOT NULL REFERENCES users(id),
+  work_date TEXT NOT NULL,
+  check_ts INTEGER NOT NULL,                                -- server time
+  result TEXT NOT NULL CHECK (result IN ('inside','edge','outside','no_fix')),
+  fence_result TEXT CHECK (fence_result IN ('pass','uncertain','outside','approximate')),
+  distance_m INTEGER, accuracy_m REAL,                      -- NULLed after 90 days
+  distance_bucket TEXT CHECK (distance_bucket IN ('0-50','50-100','100-200','200-500','500+')),
+  risk_reasons_json TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(risk_reasons_json)),
+  device_id TEXT NOT NULL,
+  idempotency_key TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX presence_checks_idem ON presence_checks(user_id, idempotency_key);
+CREATE INDEX presence_checks_user_date ON presence_checks(user_id, work_date, check_ts);
+```
+
+The payslip line code `time_credits` is added to `PayslipLineCode`; the audit actions are `credits.settle`, `credits.adjust`, `credits.adjust.void`, `credits.export`, `rollcall.submit`, `rollcall.edit`, `presence.away.confirm`, `presence.away.work`, `presence.away.ignore`, `presence.away.edit`, `presence.step_out`. `notifications.type` carries N32 to N36. `ot_decisions` is unchanged: its approved minutes feed the `ot` entry.
+
 ### 8.3 Retention
 
 | Data | Kept | Then | Job |
@@ -1833,6 +2295,9 @@ CREATE TABLE app_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);  -- min_app_v
 | Push subscriptions | Until 410/404, device revoked, or staff exit | Deleted at once | On event |
 | Devices | Until revoked + 30 days | Deleted (keep id for audit references) | Nightly |
 | Calibration samples | 30 days after the calibration is applied | Deleted | Nightly |
+| `presence_checks.distance_m`, `accuracy_m` | 90 days | Set to NULL (same rule as punch locations) | Nightly purge |
+| `presence_checks` rows, `roll_call_marks` rows with `here` | 90 days | Deleted (not-here marks live on in the away interval) | Nightly |
+| `away_intervals`, `roll_call_marks` with `not_here`, `credit_entries`, `credit_adjustments`, `credit_settlements` | 5 years after the last entry of that person (wage records) | Deleted | Monthly purge |
 | Salon network IPs (HMAC) | 7 days since last seen | Deleted | Nightly |
 | Exports (R2 `exports/`) | 7 days | R2 lifecycle | R2 rule |
 | Staff profile after exit | Statutory fields (name, code, designation, dates, wage records) 5 years; phone, photo, consents detail deleted 30 days after exit | Partial delete | Nightly |
@@ -1907,6 +2372,7 @@ Short windows use the Workers rate-limit binding (periods of 10 or 60 s; counts 
 | Exports per org | 10 / hour | D1 count on `exports` |
 | Door status per door device | 12 / 60 s | Binding |
 | Google Maps link resolve per org | 20 / hour | D1 |
+| Presence checks per user | 4 / 60 s | Binding `RL_PRESENCE` |
 
 ### 9.4 Endpoints
 
@@ -1936,13 +2402,24 @@ Roles: **P** public, **S** staff, **M** manager (with the named permission), **O
 
 | Method and path | Role | Request → response | Notes |
 |---|---|---|---|
-| `POST /punch/nonce` | S | `{ purpose: 'punch' \| 'offline' }` → `{ nonce, expiresAt, serverTime, timeSig }` or `{ nonces: [..2] }` | |
+| `POST /punch/nonce` | S | `{ purpose: 'punch' \| 'offline' \| 'presence' }` → `{ nonce, expiresAt, serverTime, timeSig }` or `{ nonces: [..2] }` | |
 | `POST /punches` | S | multipart: `payload` = `PunchRequest`, `selfie` = JPEG (optional, ≤ 200 KB); header `Idempotency-Key` → `PunchResult { punch, outcome, riskReasons, day }` | §4.3, §4.4 |
 | `POST /punches/:id/proof` | S | `{ qrToken, signature }` → `PunchResult` | Upgrade a pending punch within 10 min |
 | `POST /punches/:id/request-approval` | S | `{ note, placeName? }` → `PunchResult` | |
 | `GET /me/today` | S | → `TodayView { schedule, punches, day, duty, queuedHint }` | NetworkFirst-cached |
 | `GET /me/days?month=YYYY-MM` | S | → `MonthView { days[], totals }` | |
 | `GET /me/days/:date` | S | → `DayDetail { punches, day, lines[] }` | |
+
+**Staff: presence (P1)**. None of these routes returns credits, balances or ₹ values.
+
+| Method and path | Role | Request → response | Notes |
+|---|---|---|---|
+| `GET /me/presence` | S | → `PresenceState { enabled, consentNeeded, stepOutEnabled, openAway?: AwayIntervalStaff, foreground?: { intervalMin, nextDueAt } }` | Drives the Step out button, the marked-away card and the foreground timer |
+| `POST /presence/step-out` | S | `{ reason: 'personal' \| 'lunch' \| 'errand' \| 'other', note?, idempotencyKey }` → `AwayIntervalStaff` | Opens an interval (source `step_out`); 409 `CONFLICT` if not checked in or already out; owner gets N34 |
+| `POST /presence/back` | S | `{ idempotencyKey }` → `AwayIntervalStaff` | I'm back: ends the person's open interval, whether they stepped out or the owner marked them away |
+| `POST /me/presence/away/:id/note` | S | `{ note }` → `AwayIntervalStaff` | One note per interval |
+| `POST /presence/checks` | S | `PresenceCheckRequest { v: 1, nonce, deviceId, clientTs, fix: { lat, lng, accuracy, samples, spreadM, altitudeNullAll, speedNullAll } \| null, deviceTz, idempotencyKey, signature }` → `{ result: 'inside' \| 'edge' \| 'outside' \| 'no_fix' }` | Optional foreground check; nonce from `POST /punch/nonce` with `purpose: 'presence'`; coordinates are not stored; 409 `CONFLICT` if not checked in |
+| `GET /me/presence/history?month=` | S | → `PresenceHistory { rollCalls[], away[], checks[] }` | `away[]` carries state `Waiting`, `Counted`, `Work` or `Ignored` only, with the reason chip and note |
 
 `PunchRequest`: `{ v: 1, kind, nonce, deviceId, clientTs, idempotencyKey, fix: { lat, lng, accuracy, samples, spreadM, altitudeNullAll, speedNullAll } | null, selfieSha256 | null, qrToken | null, offsiteDutyId | null, placeName | null, deviceTz, offline: { lastServerTime, timeSig, perfDeltaMs, wallDeltaMs, pinEnvelope } | null, pin | null, clientDurationMs, signature }`. The signature is ECDSA P-256/SHA-256 over the RFC 8785 canonical JSON of every field except `signature`, `pin` and `pinEnvelope`.
 
@@ -1960,7 +2437,7 @@ Roles: **P** public, **S** staff, **M** manager (with the named permission), **O
 | `GET /me/payslips` | S | → `PayslipSummary[]` |
 | `GET /me/payslips/:id` | S | → `PayslipView` |
 | `GET /payslips/:id/pdf` | S (own), O, M(payroll) | → `application/pdf` (302 to a signed Worker route when ready; 202 while pending) |
-| `GET /me/data` | S | → `MyData { punches[], selfies[], consents[], retention }` |
+| `GET /me/data` | S | → `MyData { punches[], presence[] (P1), selfies[], consents[], retention }`; never credits |
 | `PATCH /me` | S, O, M | `{ lang?, name? (owner only) }` → `Me` |
 
 **Notifications (all roles)**
@@ -2021,7 +2498,27 @@ Roles: **P** public, **S** staff, **M** manager (with the named permission), **O
 | `GET /owner/exports/:id`, `GET /owner/exports/:id/file` | O | |
 | `GET /owner/settings`, `PATCH /owner/settings` | O | `OrgSettingsPatch` (step-up for retention, strong mode, risk thresholds) |
 | `GET /owner/audit?entity=&cursor=` | O | |
-| `CRUD /owner/managers` (P1) | O (step-up) | Permissions: `approve_attendance`, `approve_leave`, `approve_overtime`, `offsite`, `roster`, `door`, `payroll`, `staff`, `exports` |
+| `CRUD /owner/managers` (P1) | O (step-up) | Permissions: `approve_attendance`, `approve_leave`, `approve_overtime`, `offsite`, `roster`, `door`, `payroll`, `staff`, `exports`, `rollcall` (P1) |
+
+**Owner: Time credits and presence.** Credits routes are owner only; managers get 403 on all of them.
+
+| Method and path | Role | Request → response | Notes |
+|---|---|---|---|
+| `GET /owner/credits?asOf=` | O | → `CreditsOverview { enabled, staff: CreditsRow[] { userId, name, balanceMin, estimatePaise, lastSettlement?, awayPending }, asOf }` | Estimate at 1× from the current rate (§7.17.4) |
+| `GET /owner/credits/:userId/ledger?from=&to=&kind=&unsettled=&cursor=` | O | → `Paginated<CreditLedgerRow { date, kind, minutes, adjustedMin, runningBalanceMin, source: { kind, id }, confirmedBy?, history[] }>` + `{ balanceMin, estimatePaise }` | Settlements appear as `settled` rows |
+| `GET /owner/payroll-runs/:id/credits` | O | → `CreditsSettleView { rows: { userId, name, balanceMin, suggestedMin, settleMin, appliedMin, amountPaise, stayMin }[] }` | The Settle credits step |
+| `PUT /owner/payroll-runs/:id/credits/:userId` | O | `{ settleMin }` → `CreditSettlement` + the person's recomputed payslip lines and warnings | Edit any time until finalise (0 removes it); 422 `RULE_VIOLATION` if sign or size is wrong; 409 `MONTH_LOCKED` after finalise (use reopen) |
+| `POST /owner/credits/:userId/adjustments` | O | `{ workDate, kind, deltaMin, reason }` → `CreditAdjustment` | Adjust one day and kind with a required reason; audit `credits.adjust` |
+| `PATCH /owner/credits/adjustments/:id`, `DELETE /owner/credits/adjustments/:id` | O | `{ deltaMin?, reason }` / `{ reason }` → `CreditAdjustment` | Change or void an adjustment; the original stays in the history |
+| `GET /owner/roll-calls?date=` | O, M(rollcall) | → `RollCallDay { slots: { id, slotTime, status: 'upcoming' \| 'open' \| 'done' \| 'missed', submittedBy? }[] }` | Slots come from settings |
+| `GET /owner/roll-calls/:id` | O, M(rollcall) | → `RollCallView { id, slotTime, people: { userId, name, inAt, state: 'here' \| 'away_open' \| 'on_break', awaySince?, hint?: 'seems_away' \| 'stepped_out', hintDetail? }[] }` | Lists only people checked in at the slot time |
+| `POST /owner/roll-calls/:id/submit` | O, M(rollcall) | `{ notHere: string[], here: string[], idempotencyKey }` → `RollCallResult { started[], continued[], ended[] }` | `notHere` starts or continues an interval from the slot time; `here` ends an open one; everyone else checked in is recorded as here. Submitting again edits the roll-call (`rollcall.edit`) until the day is locked |
+| `PATCH /owner/presence/away/:id` | O, M(rollcall) | `{ startTs?, endTs?, reason?, reasonNote?, state?: 'confirmed' \| 'work' \| 'ignored', editReason }` → `AwayInterval` | Edit start, end, reason or the work flag, of roll-call and step-out intervals; minutes and the ledger entry follow; audit-logged old → new |
+| `GET /owner/presence/away?state=` | O | → `AwayInterval[]` | Same items as the Needs action type `away` |
+| `POST /owner/presence/away/:id/decide` | O | `{ decision: 'confirm' \| 'work' \| 'ignore', note? }` → `AwayInterval` | Only for `pending` step-outs; `confirm` creates the `away` entry; `ALREADY_DECIDED` on repeat |
+| `GET /owner/presence/:userId/:date` | O, M | → `{ rollCalls[], away[], checks[] }` | Also inside `OwnerDayDetail` |
+
+`ActionItem` gains the variant `away { id, userId, workDate, startTs, endTs, minutes, reason, staffNote?, backMissing }` (pending step-outs only) and the `rollcall` item surfaces on `TodayBoard.rollCall { id, slotTime, status }`. `POST /owner/exports` gains the kinds `credits_ledger` and `presence_log`. `OrgSettings` gains `timeCredits` and `presence` (§8.2.1); changing their `enabled` flags needs step-up. `POST /owner/days/:userId/:date/auto-close` accepts `{ useAwayStart: true }`.
 
 **Door device**
 
@@ -2051,8 +2548,8 @@ Two cron triggers on the production Worker (they do not run on Previews; tests u
 
 | Cron (UTC) | Job | What it does |
 |---|---|---|
-| `*/5 * * * *` | `rules` | For each org, in IST: reminders (N4, N10), not-in-yet (N3), late batching flush, overtime-running (N9), missed check-outs (N11), auto-close (§4.8), held-notification release at quiet-hours end, WhatsApp escalation (P1), morning summary (N1), payroll draft on the 1st at 09:00 (N24), pay-day reminder (N26), duty reminders (N18). Each action is guarded by a `cron_runs` row so it runs once per slot. |
-| `30 21 * * *` (03:00 IST) | `nightly` | Close the previous work date: compute `A` for no-shows, recompute changed `attendance_days`, retention purge (§8.3), comp-off expiry, CL/SL credit on 1 Jan, delete stale sessions and challenges, prune `salon_networks`, refresh offline nonces' expiry. Monthly on the 1st: 5-year purge. |
+| `*/5 * * * *` | `rules` | For each org, in IST: reminders (N4, N10), not-in-yet (N3), late batching flush, overtime-running (N9), missed check-outs (N11), auto-close (§4.8), held-notification release at quiet-hours end, WhatsApp escalation (P1), morning summary (N1), payroll draft on the 1st at 09:00 (N24), pay-day reminder (N26), duty reminders (N18); presence (P1): open the day's roll-calls and send N32, not-done card (N33), auto-close step-outs with no I'm back, away items (N35), left-without-check-out (N36). Each action is guarded by a `cron_runs` row so it runs once per slot. |
+| `30 21 * * *` (03:00 IST) | `nightly` | Close the previous work date: compute `A` for no-shows, recompute changed `attendance_days` and rewrite the derived credit entries of those days, retention purge (§8.3), comp-off expiry, CL/SL credit on 1 Jan, delete stale sessions and challenges, prune `salon_networks`, refresh offline nonces' expiry. Monthly on the 1st: 5-year purge. |
 
 Each run logs one structured line per org with counts and duration. A job that fails retries on the next tick (idempotent by `cron_runs`).
 
@@ -2094,6 +2591,9 @@ Each run logs one structured line per org with counts and duration. A job that f
 | Staff profiles (non-salary) | ✓ | | `staff` | | |
 | Salaries, advances, payroll, payslips of others | ✓ | | `payroll` | | |
 | Exports | ✓ | | `exports` | | |
+| Time credits, credit adjustments, settlements, away confirm/work/ignore, presence settings (P1) | ✓ only | | | | |
+| Roll-call (mark Not here, edit marks and away intervals) (P1) | ✓ | | `rollcall` | | |
+| Presence timeline of a day (view) | ✓ | ✓ | | Own only | |
 | Devices, settings, managers, retention, door pairing | ✓ only | | | | |
 
 The owner is a single user per org in v1. Harsh has no in-app super-admin; see §10.11.
@@ -2154,9 +2654,10 @@ X-Robots-Tag: noindex, nofollow
 | Lawful basis | s.7(i), "for the purposes of employment", for attendance, location at the moment of a punch, and payroll. A clear notice is still shown and acknowledged at enrolment. |
 | Selfie | Explicit, separate consent (also satisfies the SPDI Rules 2011, which treat facial images used for identification carefully). No face templates in v1. |
 | Notice | Plain language, English and Gujarati, shown at join and kept under Me → Privacy notice: what is collected, why, how long, who sees it, rights, grievance contact. Versioned; a new version asks for a fresh acknowledgement. |
-| Minimisation | Location read only during a check-in or check-out action; only the best fix stored (5 decimals); no route history, contacts, device identifiers beyond our key, or analytics SDKs. Gender and date of birth are not collected. |
+| Minimisation | Location read at a check-in or check-out and, only while the app happens to be open and permission is already granted, an optional silent fix every 30 minutes during the shift (§4.18), which stores only inside or outside, distance and accuracy (no coordinates) and is never read in the background; only the best fix stored for punches (5 decimals); roll-call stores who was here or not here and when; no route history, contacts, device identifiers beyond our key, or analytics SDKs. Gender and date of birth are not collected. |
 | Purpose limitation | Attendance, payroll and disputes only. Never performance scoring or marketing (stated in the notice). |
-| Staff rights | My data screen (§5.1): view punches, location results, selfies while kept, consents; ask for a correction (a regularisation); withdraw selfie consent; grievance contact. "On exit, your selfies and locations are deleted within 30 days; wage records are kept 5 years as the law requires." |
+| Staff rights | My data screen (§5.1): view punches, location results, presence history (P1), selfies while kept, consents; ask for a correction (a regularisation); withdraw selfie consent; grievance contact. "On exit, your selfies and locations are deleted within 30 days; wage records are kept 5 years as the law requires." |
+| Presence | A separate acknowledgement (consent kind `presence_checks`, §4.18.1) in plain language: the owner or a manager can mark when you are not at the salon during your shift, you can step out and back, and an open app may check inside or outside. Only during the shift; no location trail; self-declared reasons are visible to the owner. Retention: distance and accuracy 90 days, check rows 90 days, away intervals and credit records 5 years as wage records. Staff see their own presence history in My data (roll-call marks, step-outs, away intervals and their state); credits are not shown to staff. The owner can turn it off, or exclude a person. A person who declines can still work and punch. |
 | Children | v1 does not enrol anyone under 18. The owner confirms "18 or older" when adding staff (a required tick). Academy trainees under 18 are out of scope until a guardian-consent flow exists (Q21). |
 | Retention | §8.3, enforced by jobs and R2 lifecycle rules. |
 | Security | §10.3 and §10.5; D1 and R2 encrypted at rest by Cloudflare; TLS everywhere. |
@@ -2168,6 +2669,7 @@ X-Robots-Tag: noindex, nofollow
 - Append-only table `audit_log` (§8.2); the data layer exposes only `insert` and `select`.
 - Logged: every create, update and delete by a user (before and after JSON, reason where required); every approval and rejection; settings and rule changes; payroll create, recompute, finalise, reopen, mark paid; exports and payslip downloads (`export`); sign-ins, failed PINs, lockouts, device changes, step-ups (`security`); owner views of selfies (`access`).
 - System actions (auto-close, absent marking, comp-off expiry, retention purge counts) are logged with `actor_type = system`.
+- Time credits and presence: every settlement, ledger export, roll-call submit and edit, away interval confirm, work or ignore, away interval edit, and every change of the Time credits or Presence settings.
 - The owner can view and filter the log (Settings → Audit log) and export it as CSV. Staff see the audit entries that touch their own days on the day detail ("Edited by Urmi").
 
 ### 10.8 Tenant isolation
@@ -2353,6 +2855,23 @@ Every path calls `showNotification` inside `waitUntil`, including parse errors, 
 ### 11.11 Accessibility
 
 WCAG 2.2 AA. One `h1` per screen. Every control labelled; errors linked with `aria-describedby`; status never by colour alone (icon + word); visible 2 px sindoor focus ring; tap targets ≥ 44 px; inputs ≥ 16 px; the PIN pad is a real `input type=password inputmode=numeric autocomplete=one-time-code` behind the visual keypad so screen readers and password managers behave; motion respects `prefers-reduced-motion` (tiers in §12.8); live regions announce check-in results and queue status; the register grid is a real `table` with row and column headers on desktop.
+
+### 11.12 Why the web app cannot detect leaving by itself (P1)
+
+This is why §4.18 uses the owner's roll-call and the staff member's own Step out button, with location only as an optional hint.
+
+| Capability | Reality | Consequence |
+|---|---|---|
+| Geolocation in a service worker | Not available: `navigator.geolocation` exists only in a window | The service worker cannot take a location fix, even when a push wakes it |
+| Background geolocation for a web app | None on Android Chrome or iOS Safari. Location is delivered only while the page is visible | A closed or backgrounded app cannot report where the person is |
+| Periodic Background Sync | Chromium only, for installed apps, the browser decides the interval from site engagement and does not guarantee it, and it has no geolocation | Cannot be a 30-minute heartbeat |
+| iOS in the background | Nothing except web push, which needs a tap to open the app | No passive location signal on iPhone from the web app |
+| Push every 30 minutes with a tap | Possible, but needs staff to open the app mid-service | Rejected by Harsh: staff are with clients |
+| Wi-Fi presence from the router | Needs hardware and enrolment of phone Wi-Fi addresses | Not chosen |
+| Foreground timer | Works while the page is visible: `getCurrentPosition` once per interval, one fix | Kept as an optional hint, never prompts, never costs minutes alone |
+| OS geofences | Need a native app (Capacitor or TWA wrapper) | Future P2 option (X-08) |
+
+Battery and data: the roll-call and Step out cost the staff phone nothing. A foreground check is one GPS fix (a few seconds) and a request under 1 KB, at most 18 times in a 9-hour shift at the default interval, and only while the screen shows the app.
 
 ---
 
@@ -2664,12 +3183,14 @@ All test runs happen in GitHub Actions (never on the 2-CPU VM). Locally, builder
 | Rounding | Line half-up at .5 paise; net rounding ±0.50; examples 1–12 of §7.15 reproduced exactly |
 | Leave | CL proration for joiners; usable-after; comp-off expiry; sandwich on/off; blackout flag; split paid/unpaid |
 | Fence and risk | PASS, UNCERTAIN, OUTSIDE, APPROXIMATE at boundaries; haversine against known pairs; every risk signal on/off; thresholds 29/30/60/61; QR override |
+| Time credits (§7.17) | Late from the first minute (grace ignored) and early from the first minute (tolerance ignored); only approved overtime is plus (pending and rejected give nothing); minus only on P days; away counted only when owner-marked or confirmed; with credits on `undertime`, `makeup` and overtime pay are 0, with credits off results equal today's; start date splits a month; balance across months and across a sign change; value `r_day × m / S_std` with one rounding, on net minutes; settlement 0, partial, full, plus and minus; 50% cap trims a cut to whole minutes and reports `stay`; reopen voids and restores; over-break shown but no credits and no deduction with credits on; adjustments survive a recompute and are included in the balance, void restores; examples 13–15 reproduced exactly |
+| Presence (§7.18) | Roll-call Not here starts at the slot time, continues an open interval, ends at I'm back, at a later Here, at check-out; step-out reasons and auto-close with `back_missing`; overlapping intervals merge; clipping to presence, shift segments and the break window; intervals under 5 min dropped; confirm, work and ignore; edits recompute the entry; foreground outside raises a hint but never an interval or credits; skip rules (duty, leave, H or A day, locked) |
 
-Property-based tests (fast-check) for: net = gross − deductions; deductions ≤ 50% gross unless absence alone exceeds it; day minutes never negative; `computeDay` is idempotent.
+Property-based tests (fast-check) for: net = gross − deductions; deductions ≤ 50% gross unless absence alone exceeds it; day minutes never negative; `computeDay` is idempotent; balance = Σ entries − Σ settled minutes; `|applied| ≤ |settle| ≤ |balance|`; with `settle = 0` and the 2× switch off, pay equals the credits-off pay minus the automatic late, early and overtime amounts.
 
 ### 14.3 API tests (Workers pool)
 
-Suites: auth (join, PIN rules, lockouts, device approval, new device, owner magic link + code, password, step-up, CSRF, version 426); punches (signature valid/invalid, nonce reuse, idempotency, fence outcomes, risk outcomes, selfie hash mismatch, offline bounds and envelope, QR window and reuse, too-early rule); days and overrides; leave and regularisation lifecycles; advances; payroll (draft, blockers, adjust, finalise locks, reopen revision, mark paid); exports (CSV shape, BOM); notifications (inbox rows, quiet-hours holding, batching, topic, 410 cleanup with a mocked push endpoint); cron jobs with a fake clock; retention purge; tenant isolation (two orgs, every route); rate limits; error shape for every code.
+Suites: auth (join, PIN rules, lockouts, device approval, new device, owner magic link + code, password, step-up, CSRF, version 426); punches (signature valid/invalid, nonce reuse, idempotency, fence outcomes, risk outcomes, selfie hash mismatch, offline bounds and envelope, QR window and reuse, too-early rule); days and overrides; leave and regularisation lifecycles; advances; payroll (draft, blockers, adjust, finalise locks, reopen revision, mark paid); exports (CSV shape, BOM); notifications (inbox rows, quiet-hours holding, batching, topic, 410 cleanup with a mocked push endpoint); cron jobs with a fake clock; retention purge; Time credits (entries written on recompute, Credits overview and ledger, settle step with step-up on finalise, `MONTH_LOCKED`, reopen voids, CSV export, owner only; **privacy test: every staff and manager route, `/me/*`, payslip views, notifications and the day detail never return credits, balances, ledger rows or credit values**); presence (roll-call open, submit and edit, step-out and back, away decisions and edits, foreground check, cron slots with a fake clock); **edits** (every edit in §4.19.5 writes an audit row with old and new values and shows in the ledger or day history, the balance and the day recompute, a manager with `rollcall` can edit marks and away intervals but gets 403 on credit adjustments and settlements, locked-day rules); tenant isolation (two orgs, every route); rate limits; error shape for every code.
 
 ### 14.4 End-to-end (Playwright)
 
@@ -2701,6 +3222,11 @@ Fixtures: `context.setGeolocation` + `grantPermissions(['geolocation'])` per sce
 | E2E-20 | Update prompt waits while a punch is queued |
 | E2E-21 | Owner sign-in with the 6-digit code; password fallback; step-up before finalise |
 | E2E-22 | Language switch to Gujarati on staff screens (from 1.1; until then asserts the fallback to English) |
+| E2E-23 | Time credits (example 13): owner sees +50 on Credits, opens the ledger, exports the CSV; payroll Settle credits step (default 0, suggestion = full balance); edit the settlement before finalise; finalise; reopen |
+| E2E-24 | Roll-call: N32 reaches the owner, one person marked Not here, Done; the staff app shows "marked you away" and I'm back; the ledger shows the away entry confirmed by the owner; owner edits the start |
+| E2E-25 | Step out as a work errand and back → Needs action → Mark as work → no entry; a second step-out confirmed → entry; a step-out with no I'm back closes at check-out and is flagged |
+| E2E-26 | Privacy: a staff session visits every staff screen and calls every staff API after a settlement exists; no credit strings or numbers appear; presence consent shows once |
+| E2E-27 | Edit everything: owner changes a roll-call time, flips a mark, edits an away interval's start and end and its work flag, adjusts a credit entry with a reason, changes a settlement before finalise; each shows in the history with old → new and the balance follows |
 
 ### 14.5 Visual baselines
 
@@ -2765,6 +3291,9 @@ One low-end Android (Redmi or Realme, Chrome) and one iPhone (iOS 18 or 26): ins
 | X-03 | 1) Every response carries the headers in §10.5. 2) The retention job removes data per §8.3 (fake-clock test). 3) Rate limits return 429 with `Retry-After`. |
 | X-04 | 1) All suites in §14.1 run in Actions on every PR. 2) A failing suite blocks merge. |
 | X-05 | 1) Every same-repo PR gets a Worker Preview URL posted as a comment. 2) The preview uses the preview D1 and R2, never production. |
+| O-29 | 1) With Time credits on, each day writes entries per §7.17.2 (late and early from the first minute, only approved overtime is plus, minus only on P days). 2) The balance carries over month to month, across settlements and sign changes. 3) Value is `r_day × minutes / S_std` at 1× and examples 13–15 reproduce to the paisa. 4) The Settle credits step defaults to 0, suggests the full balance, accepts 0 up to the balance, and trims a cut to the 50% cap with the rest staying on the balance. 5) Finalise creates the `time_credits` line and an audit row and reduces the balance; reopen voids it. 6) The existing payroll warnings (weekly hours over 48, minimum wage) and the 50% cap still apply; there is no 2× switch (§7.17.7). Over-break is shown on the day but gives no credits. 7) The Credits screen, person ledger with filters and the CSV export work, for the owner only. 8) With the setting off, examples 1–12 still reproduce. 9) No staff or manager route returns credits (privacy test). 10) An entry can be adjusted with a reason, the adjustment survives a recompute, and the settlement can be edited until Finalise. |
+| O-30 | 1) Roll-calls open at the set times and N32 reaches the owner and managers with `rollcall`. 2) Everyone checked in defaults to Here; Not here starts an interval at the slot time and writes a confirmed entry at once. 3) The interval ends at I'm back, a later Here, or check-out. 4) Start and end are editable and audit-logged. 5) Pending step-outs appear in Needs action with Confirm, Mark as work and Ignore. 6) Early minutes from the first minute reach the ledger, Today and Register. 7) N36 fires for someone who may have left without checking out; **Use 16:10 as check-out** works. 8) A foreground "seems away" hint never creates an interval or credits. 9) The skip rules of §4.18.7 hold. 10) Roll-call times and marks, away interval start, end, reason and work flag, and step-out entries can all be edited, each with an audit row of old and new values. |
+| S-24 | 1) The presence consent shows once and is stored. 2) Step out takes a reason chip; I'm back records server time; a missing I'm back closes at check-out or the next Here roll-call and is flagged. 3) The "marked you away" card appears after a Not here mark and I'm back ends it. 4) My data shows roll-call marks, step-outs, away intervals with state and foreground checks, never credits. 5) The foreground check never prompts, runs only while the app is open with permission already granted, and stores no coordinates. 6) Staff get no presence push. |
 
 ---
 
@@ -2906,6 +3435,7 @@ Secrets are generated on Harsh's own machine (or by a one-off workflow that writ
 | WP-6 | Owner panel | L | WP-2 kit v0 | Release |
 | WP-7 | Staff app, PWA and offline | L | WP-2 kit v0 | Release |
 | WP-8 | Notifications and scheduled jobs | M | `contracts-v1` | Release (N-events), WP-6/7 inbox |
+| WP-9 | Time credits + presence | L | 9a: WP-5 `computeDay` and `computePayslip` merged. 9b: WP-4 `DayService`, WP-5 `PayrollService`, WP-8 `Notifier` and cron. 9c: WP-6 Today, Staff and payroll screens. 9d: WP-7 shell and `usePunchFlow`, 9b | Release (credits P0; presence P1) |
 
 ```
 Day 0-2   WP-1 scaffold + contracts-v1 + CI ─────────────────────────────┐
@@ -2917,15 +3447,17 @@ Day 12-15 integration: real client, cross-flow E2E, baselines, real-device check
 
 The day numbers are a sequencing guide, not a promise. A package may finish early and pick up review work.
 
+WP-9 starts once the slices it depends on have merged (it is the last package, after WP-4, WP-5, WP-6 and WP-8 land the pieces named in its row). Time credits is P0, so slices 9a to 9c must finish before the first real payroll; presence (9d) can follow within the P1 window.
+
 ### 16.3 Contracts between packages
 
 **Shared types (`packages/contracts`, owner WP-1)**
 
 | Kind | Names |
 |---|---|
-| Enums | `Role`, `PunchKind`, `PunchSource`, `PunchStatus`, `FenceResult`, `RiskReason`, `DayType`, `DayStatus`, `DayTag`, `LeaveCode`, `RequestStatus`, `SalaryType`, `Divisor`, `OtRateMode`, `OffsiteMode`, `PayslipLineCode`, `NotifyEventType` (N1–N31), `ErrorCode` |
-| API schemas | `Me`, `OrgSettings`, `OrgSettingsPatch`, `StaffCreate`, `StaffView`, `StaffPatch`, `ShiftTemplate`, `RosterChange`, `Holiday`, `Site`, `OffsiteDuty`, `PunchRequest`, `PunchResult`, `TodayView`, `MonthView`, `DayDetail`, `OwnerDayDetail`, `DayOverride`, `LeaveRequestCreate`, `LeaveRequest`, `RegularisationCreate`, `Regularisation`, `AdvanceCreate`, `Advance`, `AdjustmentCreate`, `PayrollRunView`, `PayslipSummary`, `PayslipView`, `ExportRequest`, `Notification`, `NotificationPrefs`, `ActionItem` (discriminated union), `TodayBoard`, `RegisterView`, `ApiError`, `Paginated<T>` |
-| Engine types | `DaySchedule`, `PunchForCalc`, `DayResult`, `TimeRules`, `PayRules`, `PersonPay`, `PayslipResult`, `PayslipLine`, `CarryForward`, `RiskInput`, `RiskResult`, `Fix`, `SiteGeo` |
+| Enums | `Role`, `PunchKind`, `PunchSource`, `PunchStatus`, `FenceResult`, `RiskReason`, `DayType`, `DayStatus`, `DayTag`, `LeaveCode`, `RequestStatus`, `SalaryType`, `Divisor`, `OtRateMode`, `OffsiteMode`, `CreditKind`, `AwayState`, `AwayReason`, `PayslipLineCode` (gains `time_credits`), `NotifyEventType` (N1–N36), `ErrorCode` |
+| API schemas | `Me`, `OrgSettings`, `OrgSettingsPatch`, `StaffCreate`, `StaffView`, `StaffPatch`, `ShiftTemplate`, `RosterChange`, `Holiday`, `Site`, `OffsiteDuty`, `PunchRequest`, `PunchResult`, `TodayView`, `MonthView`, `DayDetail`, `OwnerDayDetail`, `DayOverride`, `LeaveRequestCreate`, `LeaveRequest`, `RegularisationCreate`, `Regularisation`, `AdvanceCreate`, `Advance`, `AdjustmentCreate`, `PayrollRunView`, `PayslipSummary`, `PayslipView`, `ExportRequest`, `Notification`, `NotificationPrefs`, `ActionItem` (discriminated union, with the `away` variant), `TodayBoard`, `RegisterView`, `CreditsOverview`, `CreditLedgerRow`, `CreditsSettleView`, `CreditSettlement`, `RollCallDay`, `RollCallView`, `AwayInterval`, `AwayIntervalStaff`, `PresenceState`, `PresenceHistory`, `ApiError`, `Paginated<T>` |
+| Engine types | `DaySchedule`, `PunchForCalc`, `DayResult`, `TimeRules`, `PayRules`, `PersonPay`, `PayslipResult`, `PayslipLine`, `CarryForward`, `RiskInput`, `RiskResult`, `Fix`, `SiteGeo`, `CreditEntry`, `CreditRules`, `MinuteRate`, `CreditSettlementInput`, `RollCallMark`, `StepOut`, `PresenceCheck`, `PresenceRules` |
 | Events | `NotifyEvent` union, one variant per `NotifyEventType`, each with `orgId`, recipients rule, ids and display fields |
 | Client | `ApiClient` interface (one method per endpoint in §9.4); `fixtures/*.json` valid examples for every response |
 
@@ -3021,6 +3553,17 @@ export interface MapsResolver { resolve(url: string): Promise<{ lat: number; lng
 - **Interfaces**: implements `Notifier`, `PushSender`, `EmailSender`; calls `DayService` and `PayrollService` from cron.
 - **Done when**: every row of §6 has a fake-clock test that asserts recipient, channel, timing and copy; quiet hours and batching tested; ACs S-15, O-17, X-03 (retention) pass; a real push reaches an Android test device from the preview (manual, recorded in the PR).
 
+#### WP-9. Time credits and presence
+
+- **Scope**, in four slices, each its own PR:
+  - **9a Engine ledger and tests**: `creditEntriesForDay`, `creditBalance`, `creditValue`, `settleCredits`, `legalOvertime`, `buildAwayIntervals`; `computeDay` and `computePayslip` changes for credits on and off; the table-driven and property tests of §14.2 and examples 13–15 of §7.15 as fixtures.
+  - **9b API and contracts**: migration `0003_time_credits_presence.sql` (§8.2.1); a `contract-change` PR for the schemas and endpoints of §9.4; ledger entries written by the day recompute; the settle step inside `PayrollService`; roll-call, step-out, away and foreground-check endpoints; settings; exports; audit rows; the privacy test; the `rules` job additions (N32 to N36).
+  - **9c Owner screens and payroll settle step**: Credits list, person ledger, staff-profile Credits tab, Settle credits step and the payslip line and warnings, ledger CSV, Time credits and Presence settings.
+  - **9d Presence client**: presence consent, Step out and I'm back, the marked-away card, My data presence list, the optional foreground check, the Roll-call view and Today card, Needs-action away items, E2E-23 to E2E-26.
+- **Owns**: `packages/engine/src/{credits,presence}/`, `app/worker/routes/{credits,presence}/`, `app/worker/services/{credits,presence,rollcall}.ts`, `app/src/features/owner/{credits,rollcall}/`, `app/src/features/staff/presence/`, `migrations/0003_time_credits_presence.sql`.
+- **Interfaces**: calls `computeDay` and `computePayslip` (WP-5), `DayService` (WP-4), `Notifier` and the `rules` job (WP-8), `ApiClient`, `@fs/ui`. Changes to files another package owns (`PayrollService`, the day recompute, the Today board, the `rules` job) go through that owner's review.
+- **Done when**: ACs O-29, O-30 and S-24 pass; examples 13–15 reproduce to the paisa; examples 1–12 still reproduce with credits off; the privacy test is green; baselines at 390 and 1280 for every new screen; axe clean.
+
 ### 16.5 Integration and release
 
 1. Switch both UIs to the real `ApiClient`; remove mocks from production builds.
@@ -3048,6 +3591,8 @@ These keep Harsh's defaults but change a detail because the research showed a ha
 | F6 | Selfie optional, with liveness | The selfie toggle is P0; the **blink liveness check is P1** (MediaPipe is a heavy download for low-end phones; it loads only when selfies are on). |
 | F7 | Payslip PDF in English and Gujarati | PDFs are rendered with **Browser Run** from HTML, because Worker PDF libraries cannot shape Gujarati script. English at launch, Gujarati in 1.1. |
 | F8 | Cloudflare Worker with crons | **Crons do not run on Worker Previews**, so previews expose test-only endpoints to trigger jobs, guarded by a token and absent in production. |
+| F9 | Location only at check-in and check-out | Time in between is found by the owner's roll-call and the staff member's own Step out button. An optional silent check runs only while the app happens to be open, never prompts, and cannot cost minutes. Browsers cannot track in the background (§11.12). |
+| F10 | Overtime paid at 2× after approval | With Time credits on (default for this salon, Harsh), approved overtime becomes plus minutes settled at 1× by the owner. Harsh says hours at this salon never exceed 9 h a day or 48 h a week, so there is no 2× logic; the existing passive warnings stay (§7.17.7). |
 
 ### 17.2 Risks
 
@@ -3056,7 +3601,7 @@ These keep Harsh's defaults but change a detail because the research showed a ha
 | Indoor GPS at Om Residency is too poor, causing many UNCERTAIN punches | Medium | Staff frustration, owner noise | Calibration with real phones; UNCERTAIN alone (35 points) only flags; salon Wi-Fi signal; door QR; tune R and A_max from the first two weeks of data |
 | Staff phones kill Chrome in the background (Xiaomi, Oppo, Vivo) so reminders arrive late | High | Missed reminders | Battery-setting guidance; reminders are nice-to-have, the owner's alerts are what matter; inbox is the source of truth |
 | iPhone staff do not install the app properly | Medium | No push, no device key | Install gate; illustrated steps; Harsh or Urmi installs it with them on day one |
-| Staff feel watched | Medium | Low adoption, resentment | Location only at the tap, said plainly; no streaks or scores; selfies off by default; My data screen; flags never cut pay |
+| Staff feel watched | Medium | Low adoption, resentment | Location at the tap (plus an optional silent check while the app is open, which never prompts); time away is marked by people, not tracked; the person sees every roll-call mark and step-out in My data; no streaks or scores; selfies off by default; My data screen; flags never cut pay |
 | Owner finds payroll numbers different from her habit (she may use ÷30 or ignore lateness) | High | Distrust | Every rule is a setting; first month in parallel with paper; formulas on every line |
 | Legal reading of OT, cap or fines is wrong for her case | Medium | Compliance | Defaults are protective; CA review before the first real payroll (Q19); disclaimer in settings |
 | Cloudflare Email Sending is in beta | Low | Owner cannot sign in | Password + PIN fallback; Resend adapter switch |
@@ -3065,6 +3610,13 @@ These keep Harsh's defaults but change a detail because the research showed a ha
 | Lost phone means lost device key | Medium | Staff cannot punch until approval | "I have a new phone" flow; owner approves in one tap |
 | A minor (academy trainee) is enrolled | Low | DPDP children's data rules | Required "18 or older" tick; trainees under 18 out of scope (Q21) |
 | Parallel agents drift from the contracts | Medium | Integration pain | Contracts frozen and versioned; mock client from fixtures; contract tests in CI |
+| Time credits settles overtime at 1× although the Code on Wages pays overtime beyond 9 h a day or 48 h a week at 2× | Low | Wage claim, compliance | Harsh: hours at this salon never exceed those limits (Q30). The existing passive warnings stay in the payroll preview if it ever happens (weekly hours over 48, §7.6; minimum wage, §7.12); the 50% cap applies to cuts; CA review before the first real payroll (Q19) |
+| Staff cannot see why a Time adjustment was deducted (credits are owner-only, Harsh's rule) | Medium | Distrust, payslip disputes | Late, early and overtime minutes stay on the staff day screens; the owner explains a cut; step-out reasons and roll-call marks are visible to the person; Q27 asks whether the payslip line should show minutes |
+| The browser cannot see when someone leaves (§11.12) and the owner skips roll-calls | Medium | Away time goes uncounted | Roll-call defaults to Here and takes about 20 seconds, three times a day; a missed one is flagged on Today; Step out is the fallback; the foreground hint helps the owner spot someone |
+| Staff do not use Step out when they leave | High | Undercounted away time | Roll-call is the primary signal; the person sees what is marked; no penalty for honest reasons (work errand marked as work) |
+| Owner-marked away feels unfair or wrong | Medium | Resentment, disputes | Staff see the mark in My data and can add a note; the owner can edit start and end; every mark and edit is audit-logged; nothing is paid or cut until a settlement at payroll |
+| Owner leaves every balance at 0, so lateness never costs anything | Medium | Rules lose force | Suggested full balance, N24 counts balances to settle, the Credits screen shows the money value |
+| A phone left at the salon or a mocked location makes the foreground hint wrong | Medium | False hint or missed away | A hint never creates minutes; the owner decides; roll-call is human |
 
 ### 17.3 Open questions for the owner (with the default we build if unanswered)
 
@@ -3094,6 +3646,13 @@ These keep Harsh's defaults but change a detail because the research showed a ha
 | Q22 | Is recolouring the logo (maroon wordmark) approved, and is there a vector logo? | Use the bindi icon and the masked maroon wordmark; ask for an SVG |
 | Q23 | Domain: `staff.` or `team.feelingsbeautycare.in`? | `staff.feelingsbeautycare.in` |
 | Q24 | Should payslips be visible to staff in the app? | Yes, after you finalise |
+| Q25 | (Harsh) How do we detect time away? | **Answered 19 Oct, 15:22 UTC**: manager roll-call two or three times a shift as the primary method (default 12:00, 15:00, 18:00; owner taps only the exceptions); staff Step out / I'm back as the fallback; an optional silent foreground check as a hint only. No Wi-Fi box, no hardware, no push-and-tap. Native geofence stays a P2 option |
+| Q26 | (Harsh) Are Time credits P0 and presence P1? | **Answered yes, 19 Oct, 15:39 UTC**: credits P0, roll-call, Step out and the foreground check P1 |
+| Q27 | (Harsh) Staff must not see credits, but the settlement is a payslip line. Should the staff payslip show minutes? | **Answered yes (no minutes), 19 Oct, 15:39 UTC**: staff payslip and PDF show "Time adjustment" with the amount only; minutes and credits are owner-only |
+| Q28 | (Harsh) Over-break minutes (break punches, P1) go to the ledger as minus credits? | **Answered no, 19 Oct, 15:39 UTC**: with credits on, over-break is shown to the owner on the day, gives no credits and causes no automatic deduction (§7.17.2) |
+| Q29 | (Harsh, Urmi) A staff member declines presence tracking: what then? | **Answered 19 Oct, 15:39 UTC**: declining is fine; they still work and punch and still appear in roll-call; the foreground check does not run for them |
+| Q30 | (Harsh, Urmi, CA) Should Time credits pay legally protected overtime at 2×? | **Answered no switch, 19 Oct, 15:39 UTC**: Harsh says hours never exceed 9 h a day or 48 h a week at this salon. No 2× switch; only the existing passive payroll-preview warnings stay (§7.17.7). The CA still reviews the defaults (Q19) |
+| Q31 | Who does the roll-call, and at what times? | **Answered yes, 19 Oct, 15:39 UTC**: the owner and managers with the `rollcall` permission; 12:00, 15:00 and 18:00 (editable) |
 
 ---
 
@@ -3107,6 +3666,7 @@ These keep Harsh's defaults but change a detail because the research showed a ha
 | Production-ready website with proper PWA features, end-to-end, UI tested, with notifications | §11 (PWA), §14 (tests, ACs), §15 (CI/CD), §6 (notifications) |
 | Non-generic UI in the Feelings Beauty Care brand colours | §12 (tokens copied exactly, status colours, the bindi, anti-slop checklist and CI enforcement) |
 | Defaults: staff. subdomain, private repo, phone + PIN, invite, owner device approval, no SMS OTP, owner magic link or password + PIN, 100 m geofence, optional selfie, off-site mode, owner-editable salary rules, lawful defaults, fines off | Document header, §4.1, §4.4, §4.6, §7.14, §17.1 |
+| Harsh, 19 Oct 2026, after a client discussion: someone 10 minutes late every day but with 2 h overtime gets full pay; "count every minute"; track people who leave early | §4.18 (roll-call, Step out, early leave), §4.19 and §7.17 (Time credits), §7.18, §11.12 (why the browser cannot), §6 (N32–N36), §8.2.1, §9.4, §14, §16 (WP-9), §17 (F9, F10, Q25–Q31), examples 13–15 in §7.15 |
 
 ## Appendix B. Sources
 
@@ -3118,3 +3678,4 @@ The two research files in `research/` carry the full citations (Code on Wages 20
 |---|---|---|
 | 1.0 | 19 Oct 2026 | First complete PRD for build |
 | 1.1 | 19 Oct 2026 | Build-time additions from WP-1: migration `0002_platform.sql` (`idempotency_keys`, `test_outbox`); extra endpoints (join lookup, leave preview, owner security, setup checklist, payroll preview, door device list, consents, bulk approve, staff photo, staff rehire, device revoke); `Fix.accuracySpreadM`; `upgrade-insecure-requests` dropped from the CSP (HSTS covers it, and WebKit applies it to localhost); i18n namespaces `auth`, `door` and `ui`; cap of 15 active staff (Harsh, 19 Oct); §17.3 Q16 answered (Workers Paid is active). Docs handbook added under `docs/` |
+| 1.2 | 19 Oct 2026 | Time credits and presence checks (requested by Harsh after a client discussion). Time credits (§4.19, §4.19.5, §7.17, §7.15 examples 13–15): owner-only minute ledger of late, early, away and approved-overtime minutes, balance with carry-over, a ₹ estimate at 1×, owner settlement at payroll inside the 50% cap, a payslip line, a Credits screen, ledger CSV, default on for this salon, with over-break shown but not credited and no 2× logic (Harsh: hours never exceed 9 h/day or 48 h/week). Everything is editable (§4.19.5): roll-call times and marks, away intervals, step-outs, credit entries with a reason, settlements before finalise, each audit-logged old → new. Presence (§4.18, §7.18, §11.12): manager roll-call two or three times a shift as the primary method, staff Step out / I'm back as the fallback, an optional silent foreground check as a hint only; native geofence left as P2. Data model `0003_time_credits_presence.sql` (§8.2.1), API (§9.4), notifications N32–N36, privacy (§10.2, §10.6), tests (§14), build plan WP-9 (§16), risks and Q25–Q31 answered by Harsh on 19 Oct (§17) |
