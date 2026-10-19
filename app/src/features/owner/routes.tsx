@@ -7,6 +7,7 @@
  */
 import { lazy, Suspense } from 'react';
 import type { RouteObject } from 'react-router';
+import { RouteError } from './shell/RouteError';
 
 export interface OwnerRouteHandle {
   titleKey: string;
@@ -14,8 +15,10 @@ export interface OwnerRouteHandle {
   back?: string;
 }
 
-const h = (titleKey: string, back?: string): { handle: OwnerRouteHandle } => ({
-  handle: back ? { titleKey, back } : { titleKey },
+/** Title (and back link) for the header, and the error card if the screen crashes. */
+const h = (titleKey: string, back?: string) => ({
+  handle: (back ? { titleKey, back } : { titleKey }) satisfies OwnerRouteHandle,
+  errorElement: <RouteError />,
 });
 
 export const ownerRoutes: RouteObject[] = [

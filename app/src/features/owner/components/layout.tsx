@@ -1,5 +1,12 @@
 /** Small layout pieces shared by owner screens: sections with an h2, a muted meta line, a ticking clock. */
 import { type ReactNode, useEffect, useId, useState } from 'react';
+import './rows.css';
+
+/** For a ListRow whose trailing chips or buttons would squeeze the name (see rows.css). */
+export const WRAP_ROW = 'owner-wrap-row';
+
+/** Filter chips that scroll on phones and wrap from 64rem (see rows.css). */
+export const CHIPS_WRAP = 'owner-chips-wrap';
 
 export function Section({
   title,

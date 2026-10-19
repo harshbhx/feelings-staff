@@ -15,6 +15,10 @@ const ERROR_KEYS: Partial<Record<ErrorCode, string>> = {
   MONTH_LOCKED: 'owner:errors.monthLocked',
   ALREADY_DECIDED: 'owner:errors.alreadyDecided',
   CONFLICT: 'owner:errors.conflict',
+  DUPLICATE: 'owner:errors.duplicate',
+  RATE_LIMITED: 'owner:errors.rateLimited',
+  NOT_IMPLEMENTED: 'owner:errors.notReady',
+  INTERNAL: 'owner:errors.server',
 };
 
 /** Plain words for an error; never a raw code. */
@@ -36,6 +40,8 @@ export function useErrorText() {
 export function ErrorCard({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
   const { t } = useTranslation();
   const requestId = error instanceof ApiError ? error.requestId : undefined;
+  // "Try again" can't help with a part of the server that isn't switched on yet.
+  const canRetry = onRetry && !(error instanceof ApiError && error.code === 'NOT_IMPLEMENTED');
   return (
     <div
       role="alert"
@@ -43,11 +49,11 @@ export function ErrorCard({ error, onRetry }: { error: unknown; onRetry?: () => 
       data-testid="owner-error"
     >
       <p className="flex items-start gap-2 font-bold text-text">
-        <Icon name="warning-circle" className="mt-1 shrink-0 text-accent" />
+        <Icon name="warning-circle" className="mt-1 size-5 shrink-0 text-accent" />
         <span>{t('owner:errors.title')}</span>
       </p>
       <p className="text-text-body">{t(errorKey(error))}</p>
-      {onRetry ? (
+      {canRetry ? (
         <div>
           <Button variant="secondary" size="sm" icon="arrows-clockwise" onClick={onRetry}>
             {t('owner:common.retry')}

@@ -6,6 +6,7 @@
   "description": "i18next setup, en/gu catalogs by namespace, Intl formatters (PRD 11.9).",
   "exports": {
     ".": "./src/index.ts",
+    "./fonts": "./src/fonts.ts",
     "./en/*": "./en/*",
     "./gu/*": "./gu/*"
   },

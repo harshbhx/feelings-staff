@@ -6,7 +6,7 @@
 import type { ApiClient, CallOptions, EndpointKey } from '@fs/contracts';
 import { type QueryKey, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useApi } from '../../../api/provider';
-import { useStepUp } from '../lib/step-up';
+import { useStepUp } from '../../auth/step-up';
 import { held, retryUnlessHeld } from './mock-states';
 
 /** Base options for an owner query: key, held query function, retry policy. */
@@ -33,11 +33,11 @@ export interface OwnerMutationOptions<TVars, TData> {
 export function useOwnerMutation<TVars, TData>(opts: OwnerMutationOptions<TVars, TData>) {
   const api = useApi();
   const qc = useQueryClient();
-  const stepUp = useStepUp();
+  const { run } = useStepUp();
   return useMutation<TData, Error, TVars>({
     mutationFn: (vars) => {
       const call: CallOptions = { idempotencyKey: newIntentKey() };
-      return stepUp(() => opts.run(api, vars, call));
+      return run(() => opts.run(api, vars, call));
     },
     onSuccess: async (data, vars) => {
       opts.onSuccess?.(data, vars);
