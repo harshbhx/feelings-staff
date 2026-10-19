@@ -1,5 +1,10 @@
 /* Chip and ChipGroup (PRD 12.6): real radios and checkboxes drawn as pills, from the website's Chip.astro. */
 @layer components {
+  /* A legend is not a grid item, so the fieldset's gap does not reach it. */
+  .fs-chip-group > legend {
+    margin-bottom: var(--space-2);
+  }
+
   .fs-chip-group__items {
     display: flex;
     flex-wrap: wrap;

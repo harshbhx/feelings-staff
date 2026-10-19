@@ -28,7 +28,8 @@
     flex: 1;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* Top-aligned, so icons stay on one line when a label wraps. */
+    justify-content: flex-start;
     gap: 0.1rem;
     min-width: 2.75rem;
     min-height: 2.75rem;
@@ -82,14 +83,19 @@
     visibility: hidden;
   }
 
+  /* Long labels ("Needs action", Gujarati) wrap to two lines rather than being cut. */
   .fs-tab__label {
+    display: -webkit-box;
     max-width: 100%;
     overflow: hidden;
     font-size: var(--text-xs);
     font-weight: var(--weight-ui);
-    line-height: 1.2;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.15;
+    text-align: center;
+    text-wrap: balance;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 
   .fs-tab[aria-current="page"] {
