@@ -1,0 +1,252 @@
+/* StatChipGroup and ProgressStrip (WP-10): tappable counts and the "8 of 11 in" strip. */
+@layer components {
+  /* Tone → colours, shared by the chips, the bar segments and the legend. */
+  :is(.fs-stat, .fs-meter__seg, .fs-meter__legend > li) {
+    --fs-tone-fg: var(--intent-neutral);
+    --fs-tone-bg: var(--intent-neutral-bg);
+  }
+
+  :is(.fs-stat, .fs-meter__seg, .fs-meter__legend > li)[data-tone="present"] {
+    --fs-tone-fg: var(--status-present);
+    --fs-tone-bg: var(--status-present-bg);
+  }
+
+  :is(.fs-stat, .fs-meter__seg, .fs-meter__legend > li)[data-tone="late"] {
+    --fs-tone-fg: var(--status-late);
+    --fs-tone-bg: var(--status-late-bg);
+  }
+
+  :is(.fs-stat, .fs-meter__seg, .fs-meter__legend > li)[data-tone="half"] {
+    --fs-tone-fg: var(--status-half);
+    --fs-tone-bg: var(--status-half-bg);
+  }
+
+  :is(.fs-stat, .fs-meter__seg, .fs-meter__legend > li)[data-tone="absent"] {
+    --fs-tone-fg: var(--status-absent);
+    --fs-tone-bg: var(--status-absent-bg);
+  }
+
+  :is(.fs-stat, .fs-meter__seg, .fs-meter__legend > li):is(
+    [data-tone="leave"],
+    [data-tone="venue"]
+  ) {
+    --fs-tone-fg: var(--status-leave);
+    --fs-tone-bg: var(--status-leave-bg);
+  }
+
+  :is(.fs-stat, .fs-meter__seg, .fs-meter__legend > li):is(
+    [data-tone="off"],
+    [data-tone="holiday"],
+    [data-tone="waiting"]
+  ) {
+    --fs-tone-fg: var(--status-off);
+    --fs-tone-bg: var(--status-off-bg);
+  }
+
+  /* ---- StatChipGroup ---- */
+  .fs-stat-group > legend {
+    margin-bottom: var(--space-2);
+  }
+
+  .fs-stat-group__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .fs-stat-group__items[data-layout="scroll"] {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 0.25rem var(--gutter);
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+
+  .fs-stat-group__items[data-layout="scroll"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .fs-stat-group__items[data-layout="scroll"] {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+    }
+  }
+
+  .fs-stat {
+    position: relative;
+    display: flex;
+    flex: none;
+  }
+
+  .fs-stat__input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .fs-stat__input:disabled {
+    cursor: not-allowed;
+  }
+
+  .fs-stat__face {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 3rem;
+    padding: 0.375rem 1rem 0.375rem 0.375rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-pill);
+    background: var(--bg);
+    color: var(--text);
+    pointer-events: none;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+  }
+
+  .fs-stat__disc {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--fs-tone-bg);
+    color: var(--fs-tone-fg);
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .fs-stat__disc > .fs-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .fs-stat__text {
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
+  .fs-stat__count {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-display);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fs-stat__label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-ui);
+    color: var(--text-body);
+  }
+
+  /* Chosen: the face takes the status tint, a 2 px edge in the status colour, the disc turns white. */
+  .fs-stat__input:checked + .fs-stat__face {
+    border-color: var(--fs-tone-fg);
+    background: var(--fs-tone-bg);
+    box-shadow: inset 0 0 0 1px var(--fs-tone-fg);
+  }
+
+  .fs-stat__input:checked + .fs-stat__face .fs-stat__disc {
+    background: var(--bg);
+  }
+
+  .fs-stat__input:checked + .fs-stat__face .fs-stat__label {
+    color: var(--text);
+  }
+
+  .fs-stat__input:focus-visible + .fs-stat__face {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .fs-stat[data-disabled] .fs-stat__face {
+    border-color: var(--border);
+    background: var(--bg-soft);
+    color: var(--text-muted);
+  }
+
+  .fs-stat:hover:not([data-disabled]) .fs-stat__input:not(:checked) + .fs-stat__face {
+    border-color: var(--border-control);
+  }
+
+  /* ---- ProgressStrip ---- */
+  .fs-meter {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .fs-meter__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .fs-meter__label {
+    font-weight: var(--weight-strong);
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fs-meter__aside {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fs-meter__bar {
+    display: flex;
+    gap: var(--meter-gap);
+    height: var(--meter-h);
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background: var(--meter-track);
+  }
+
+  .fs-meter__seg {
+    flex: none;
+    height: 100%;
+    background: var(--fs-tone-fg);
+  }
+
+  .fs-meter__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-ui);
+    color: var(--text-body);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fs-meter__legend > li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+  }
+
+  .fs-meter__legend .fs-icon {
+    width: 1.15em;
+    height: 1.15em;
+    color: var(--fs-tone-fg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fs-stat__face,
+    .fs-stat__disc {
+      transition: none;
+    }
+  }
+}

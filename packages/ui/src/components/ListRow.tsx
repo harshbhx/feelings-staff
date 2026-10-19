@@ -20,6 +20,11 @@ export interface ListRowProps extends Omit<ComponentProps<'button'>, 'title'> {
   leading?: ReactNode;
   title: ReactNode;
   subtitle?: ReactNode;
+  /**
+   * Badges under the subtitle ("+28 m", "Inside", "Waiting for you"). They wrap under the name
+   * instead of squeezing it, so rows stay one shape on a 390 px phone.
+   */
+  meta?: ReactNode;
   /** A `StatusChip`, an amount or a time at the end. */
   trailing?: ReactNode;
   /**
@@ -36,6 +41,7 @@ export function ListRow({
   leading,
   title,
   subtitle,
+  meta,
   trailing,
   asChild = false,
   chevron,
@@ -53,6 +59,7 @@ export function ListRow({
       <span className="fs-row__text">
         <span className="fs-row__title">{title}</span>
         {subtitle ? <span className="fs-row__subtitle">{subtitle}</span> : null}
+        {meta ? <span className="fs-row__meta">{meta}</span> : null}
       </span>
       {trailing ? <span className="fs-row__trailing">{trailing}</span> : null}
       {showChevron ? <Icon name="caret-right" className="fs-row__chevron" /> : null}

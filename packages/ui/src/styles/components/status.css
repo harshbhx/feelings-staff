@@ -72,3 +72,35 @@
     border: 1px dashed var(--border-control);
   }
 }
+
+/* Badge (WP-10): the same shape for words that are not day statuses ("Inside", "Edge", "Synced").
+   Semantic tint + icon + word; red stays for the brand and errors. */
+@layer components {
+  .fs-status[data-tone="success"] {
+    --fs-status-fg: var(--intent-success);
+    --fs-status-bg: var(--intent-success-bg);
+  }
+
+  .fs-status[data-tone="warning"] {
+    --fs-status-fg: var(--intent-warning);
+    --fs-status-bg: var(--intent-warning-bg);
+  }
+
+  .fs-status[data-tone="info"] {
+    --fs-status-fg: var(--intent-info);
+    --fs-status-bg: var(--intent-info-bg);
+  }
+
+  .fs-status[data-tone="neutral"] {
+    --fs-status-fg: var(--intent-neutral);
+    --fs-status-bg: var(--intent-neutral-bg);
+  }
+
+  /* Outline: a quiet word next to a tinted one ("Phone", "Added by you"). */
+  .fs-status[data-tone="outline"] {
+    --fs-status-fg: var(--text-body);
+    --fs-status-bg: var(--bg);
+    --fs-status-icon: var(--text-muted);
+    border-color: var(--border-strong);
+  }
+}

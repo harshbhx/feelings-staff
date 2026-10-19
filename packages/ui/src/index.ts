@@ -7,6 +7,7 @@
  */
 
 export { Avatar, type AvatarProps, initials } from './components/Avatar';
+export { Badge, type BadgeProps, type BadgeTone } from './components/Badge';
 export { Banner, type BannerProps } from './components/Banner';
 export { Bindi, type BindiProps, type BindiSize } from './components/Bindi';
 export {
@@ -17,6 +18,7 @@ export {
   IconButton,
   type IconButtonProps,
 } from './components/Button';
+export { Card, type CardProps } from './components/Card';
 export {
   Chip,
   type ChipCheckboxGroupProps,
@@ -63,14 +65,35 @@ export {
 export { List, type ListProps, ListRow, type ListRowProps } from './components/ListRow';
 export { PinPad, type PinPadProps } from './components/PinPad';
 export { Popover, type PopoverProps, Tooltip, type TooltipProps } from './components/Popover';
+export {
+  type ProgressSegment,
+  ProgressStrip,
+  type ProgressStripProps,
+} from './components/ProgressStrip';
+export {
+  RailGroup,
+  type RailGroupProps,
+  RailItem,
+  type RailItemProps,
+  RailNav,
+  type RailNavProps,
+} from './components/Rail';
 export { Select, type SelectOption, type SelectProps } from './components/Select';
 export { Sheet, type SheetProps } from './components/Sheet';
 export {
   Skeleton,
   SkeletonGroup,
   type SkeletonGroupProps,
+  SkeletonList,
+  type SkeletonListProps,
   type SkeletonProps,
 } from './components/Skeleton';
+export {
+  StatChipGroup,
+  type StatChipGroupProps,
+  type StatOption,
+  type StatTone,
+} from './components/StatChip';
 export {
   type DayStatus,
   STATUS_HAS_LETTER,
