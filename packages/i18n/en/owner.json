@@ -401,7 +401,8 @@
       },
       "openPdf": "Open PDF",
       "warnings": "Worth a look",
-      "paid": "Paid {{date}} · {{mode}}"
+      "paid": "Paid {{date}} · {{mode}}",
+      "removeTitle": "Remove the {{what}} of {{amount}}?"
     }
   },
   "actions": {

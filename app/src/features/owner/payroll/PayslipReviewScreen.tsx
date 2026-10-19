@@ -32,6 +32,7 @@ import {
   useMarkPaid,
   usePayslipReview,
 } from '../api/payroll';
+import { ConfirmButton } from '../components/ConfirmButton';
 import { Meta, Section } from '../components/layout';
 import { QueryView, useErrorText } from '../components/states';
 import { days, longDate, money, monthLabel, shortDate } from '../lib/format';
@@ -244,14 +245,16 @@ function Adjustments({ slip, runId }: { slip: OwnerPayslipView; runId: string })
                 </span>
                 <span className="text-sm text-text-muted">{a.note}</span>
               </span>
-              <Button
+              <ConfirmButton
                 size="sm"
-                variant="danger-secondary"
-                disabled={remove.isPending}
-                onClick={() => remove.mutate(a.id, { onError: fb.fail })}
-              >
-                {t('owner:payroll.slip.remove')}
-              </Button>
+                label={t('owner:payroll.slip.remove')}
+                title={t('owner:payroll.slip.removeTitle', {
+                  what: t(`owner:payroll.slip.kinds.${a.kind}`),
+                  amount: money(a.amountPaise),
+                })}
+                busy={remove.isPending}
+                onConfirm={(done) => remove.mutate(a.id, { onSuccess: done, onError: fb.fail })}
+              />
             </li>
           ))}
         </ul>
