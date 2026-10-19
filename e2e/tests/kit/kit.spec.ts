@@ -11,6 +11,8 @@ const SECTIONS = [
   'fields',
   'chips',
   'status',
+  'stats',
+  'cards',
   'lists',
   'states',
   'overlays',

@@ -1,6 +1,6 @@
 /**
  * @fs/engine public API (PRD 7.16). Every function is pure and deterministic.
- * Folders: schedule/, day/, pay/, leave/, money/ (WP-5); fence/, risk/ (WP-4); credits/ (WP-9).
+ * Folders: schedule/, day/, pay/, leave/, money/ (WP-5); fence/, risk/ (WP-4); credits/, presence/ (WP-9).
  */
 
 export * from './credits';
@@ -18,6 +18,7 @@ export * from './leave';
 export * as money from './money';
 export { formatInr, type Q } from './money';
 export * from './pay';
+export * from './presence';
 export {
   DOOR_STEP_MS,
   doorStep,

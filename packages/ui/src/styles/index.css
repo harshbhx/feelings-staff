@@ -3,6 +3,7 @@
  *
  *   tokens.css      brand tokens, byte-for-byte copy (PRD 12.1); never edited
  *   app-tokens.css  status colours and app chrome (PRD 12.3)
+ *   intent-tokens.css  kit aliases (WP-10): intents, tab bar, rail, meter; no new values
  *   @theme below    the locked Tailwind v4 theme (docs/research/brand-and-stack.md 6.3): every
  *                   default scale cleared, brand values only, semantic names (bg-bg-soft,
  *                   text-text-muted, bg-accent). No default greys, blues, large radii or large
@@ -16,6 +17,7 @@
 @import "@fontsource-variable/plus-jakarta-sans/wght-italic.css";
 @import "./tokens.css";
 @import "./app-tokens.css";
+@import "./intent-tokens.css";
 @import "./base.css";
 @import "./motion.css";
 @import "./components/button.css";
@@ -30,6 +32,9 @@
 @import "./components/pinpad.css";
 @import "./components/feedback.css";
 @import "./components/controls.css";
+@import "./components/stat.css";
+@import "./components/card.css";
+@import "./components/rail.css";
 
 /* Scan the app and this package for class names (the Vite root is app/). */
 @source "../";
@@ -165,6 +170,16 @@
   --color-off-bg: var(--status-off-bg);
   --color-flag: var(--status-flag);
   --color-flag-bg: var(--status-flag-bg);
+
+  /* Intents (intent-tokens.css): tints for words that are not day statuses */
+  --color-success: var(--intent-success);
+  --color-success-bg: var(--intent-success-bg);
+  --color-warning: var(--intent-warning);
+  --color-warning-bg: var(--intent-warning-bg);
+  --color-info: var(--intent-info);
+  --color-info-bg: var(--intent-info-bg);
+  --color-neutral: var(--intent-neutral);
+  --color-neutral-bg: var(--intent-neutral-bg);
 }
 
 @keyframes fs-bindi-in {
