@@ -31,6 +31,13 @@ WP-9 Time credits and presence, contracts (`contracts-v1.2`):
 - 20 endpoints: owner credits, adjustments, settle step, roll-calls, away intervals; staff Step out, I'm back, foreground check and presence history. The `away` Needs-action item, `TodayBoard.rollCall` and notification events N32 to N36.
 - Extra endpoints on top of PRD 9.4: join lookup, leave preview, owner security, setup checklist, payroll preview, door device list, consents, bulk approve, staff photo, staff rehire and device revoke.
 
+WP-9 Time credits, engine:
+
+- The minute ledger in `@fs/engine`: entries for a day (late and early from the first minute, confirmed away time, approved overtime), the balance with carry-over, the 1x money value with one rounding, the settlement inside the 50% cap, and 9 h a day / 48 h a week warnings.
+- With Time credits on, a day owes nothing (no grace, tolerance, make-up or undertime; over-break is only tagged) and the payslip pays no overtime for it; the owner's settlement becomes one `time_credits` line. With it off, payslips are unchanged.
+- Legal overtime at 2x (setting on by default): approved overtime beyond 9 h a day or 48 h a week (`legalOtBand`) adds an `ot_legal` entry, so it counts twice in the balance and the settlement; the payroll preview tells the owner, or warns when the setting is off.
+- Presence in `@fs/engine`: away intervals from roll-call marks and step-outs (start, end at I'm back, the next Here, check-out or shift end, merge, clipping to the shift, presence and break, the 5-minute floor) and the "seems away" hint from foreground checks.
+
 WP-6, owner panel:
 
 - Owner shell, Today, Needs action, Register with day detail, and Staff (list, add and invite, profile) on phone and desktop, with loading, empty, error and offline states.

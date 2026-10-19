@@ -1,7 +1,9 @@
 /**
  * The time lines of a payslip (PRD 7.5-7.7, 7.13): late and early undertime, overtime pay and the
  * extra for off-day work, with the minute totals behind them. A pure stage of computePayslip with its
- * own input and output, so Time credits (PRD 7.17) can replace the late/early and overtime parts.
+ * own input and output. Time credits (PRD 7.17) replaces the late/early and overtime parts per day:
+ * on a credits day nothing is deducted for late or early and approved overtime is not paid (it is a
+ * plus credit, settled by the owner); the off-day extra is unchanged.
  *
  * Cap order (PRD 7.10): the overtime and off-day lines are earnings and join gross pay; undertime is
  * time not worked, so the caller deducts it in full next to absence, before the 50% cap room.
@@ -40,6 +42,8 @@ export interface TimeDay {
   offPaid: boolean;
   /** How a worked off day with credit is rewarded (PRD 7.7): extra pay, comp-off or both. */
   offMode: WorkedOffDayComp;
+  /** Time credits is on for the day (PRD 7.17.1): no undertime and no overtime pay. */
+  credits: boolean;
 }
 
 export interface TimeLinesInput {
@@ -65,7 +69,10 @@ export interface TimeLinesResult {
   undertime: { amount: Q; formula: string };
   lateBillableMin: number;
   earlyBillableMin: number;
+  /** Approved overtime on every day: paid on days without Time credits, plus credits on the others. */
   otApprovedMin: number;
+  /** The part of `otApprovedMin` on Time credits days (not paid here). */
+  otCreditMin: number;
   otPendingMin: number;
   compOffEarned: number;
 }
@@ -85,16 +92,17 @@ export function timeLines(input: TimeLinesInput): TimeLinesResult {
   const off = new Map<string, { rate: Q; factor: Q; text: string; credit: number }>();
   let lateBillableMin = 0;
   let earlyBillableMin = 0;
-  let otApprovedMin = 0;
+  let otPaidMin = 0;
+  let otCreditMin = 0;
   let otPendingMin = 0;
   let compOffEarned = 0;
 
-  for (const { day: d, status, part, offPaid, offMode } of input.days) {
+  for (const { day: d, status, part, offPaid, offMode, credits } of input.days) {
     if (status === 'P') {
       lateBillableMin += d.lateBillableMin;
       earlyBillableMin += d.earlyBillableMin;
     }
-    if (d.undertimeMin > 0) {
+    if (d.undertimeMin > 0 && !credits) {
       const sDay = Math.max(1, d.scheduledMin);
       const key = `${part.index}|${sDay}`;
       grouped(ut, key, () => ({ rate: part.rate, sDay, min: 0 })).min += d.undertimeMin;
@@ -104,8 +112,11 @@ export function timeLines(input: TimeLinesInput): TimeLinesResult {
     const decided = decision === undefined ? 0 : Math.min(decision.approvedMin, d.otCandidateMin);
     const approved = d.otPreapprovedMin + decided;
     otPendingMin += decision === undefined ? d.otCandidateMin : 0;
-    otApprovedMin += approved;
-    grouped(ot, String(part.index), () => ({ rate: part.rate, min: 0 })).min += approved;
+    if (credits) otCreditMin += approved;
+    else {
+      otPaidMin += approved;
+      grouped(ot, String(part.index), () => ({ rate: part.rate, min: 0 })).min += approved;
+    }
 
     // Worked a weekly off or holiday with credit (PRD 7.7): extra pay and/or comp-off.
     if (d.offdayCredit > 0) {
@@ -137,16 +148,14 @@ export function timeLines(input: TimeLinesInput): TimeLinesResult {
         (t) => `${formatRate(t.rate)} × ${formatNum(rate.multiplier)} × ${t.min} min ÷ ${stdMin}`,
       )
       .join(' + ');
-    if (otApprovedMin > 0)
-      earnings.push({ code: 'overtime', amountPaise: toPaise(amount), formula });
+    if (otPaidMin > 0) earnings.push({ code: 'overtime', amountPaise: toPaise(amount), formula });
   } else if (rate.mode === 'flat') {
-    const amount = frac(rate.paisePerHour * otApprovedMin, 60);
-    const formula = `${formatInr(rate.paisePerHour)} an hour × ${formatNum(otApprovedMin / 60)} h`;
-    if (otApprovedMin > 0)
-      earnings.push({ code: 'overtime', amountPaise: toPaise(amount), formula });
+    const amount = frac(rate.paisePerHour * otPaidMin, 60);
+    const formula = `${formatInr(rate.paisePerHour)} an hour × ${formatNum(otPaidMin / 60)} h`;
+    if (otPaidMin > 0) earnings.push({ code: 'overtime', amountPaise: toPaise(amount), formula });
   } else if (rate.mode === 'comp_off') {
     // Every 4 hours of approved overtime is half a comp-off day (PRD 7.6).
-    compOffEarned += Math.floor(otApprovedMin / 240) / 2;
+    compOffEarned += Math.floor(otPaidMin / 240) / 2;
   }
 
   const offTerms = [...off.values()];
@@ -167,7 +176,8 @@ export function timeLines(input: TimeLinesInput): TimeLinesResult {
     },
     lateBillableMin,
     earlyBillableMin,
-    otApprovedMin,
+    otApprovedMin: otPaidMin + otCreditMin,
+    otCreditMin,
     otPendingMin,
     compOffEarned,
   };

@@ -17,6 +17,7 @@ const td = (day: DayResult, over: Partial<Omit<TimeDay, 'day'>> = {}): TimeDay =
   part: PRIYA,
   offPaid: true,
   offMode: 'extra_pay',
+  credits: false,
   ...over,
 });
 
@@ -32,6 +33,7 @@ describe('time lines stage (PRD 7.5-7.7, extracted from computePayslip)', () => 
       lateBillableMin: 0,
       earlyBillableMin: 0,
       otApprovedMin: 0,
+      otCreditMin: 0,
       otPendingMin: 0,
       compOffEarned: 0,
     });

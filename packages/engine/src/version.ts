@@ -1,5 +1,5 @@
 /** Engine semver, stored with every DayResult and PayslipResult (PRD 7.16). Bump on any rule change. */
-export const ENGINE_VERSION = '0.3.0';
+export const ENGINE_VERSION = '0.4.0';
 
 export class EngineNotReady extends Error {
   constructor(fn: string) {
