@@ -837,6 +837,7 @@ Phone: bottom tab bar **Today · Needs action · Register · Staff · More** (Mo
 | N29 | Needs-action reminder | Owner | Folded into N1 | Items older than 48 h | Line in the summary: "2 requests are waiting more than 2 days." |
 | N30 | Weekly digest (P1) | Owner | Email | Monday 09:00 | "Last week: 94% on time, 6 h overtime approved, 1 leave." |
 | N31 | Sign-in link | Owner | Email | On request | Subject "Your Feelings Staff sign-in code: 482913" · link + code, valid 15 min |
+| N32 | Payslip PDF not made | Owner | In-app, push | A payslip PDF failed after the last retry (§4.14) | "1 payslip PDF couldn't be made" · "The online slip works." |
 
 Gujarati copy for staff events ships with the Gujarati strings (phase 1.1). Push `lang` follows the recipient's language.
 
@@ -1746,7 +1747,7 @@ CREATE TABLE notifications (
   id TEXT PRIMARY KEY,
   org_id TEXT NOT NULL,
   user_id TEXT NOT NULL REFERENCES users(id),
-  type TEXT NOT NULL,                          -- N1..N31 codes, e.g. 'late_checkin'
+  type TEXT NOT NULL,                          -- N1..N32 codes, e.g. 'late_checkin'
   title TEXT NOT NULL, body TEXT,
   url TEXT NOT NULL,
   data_json TEXT CHECK (data_json IS NULL OR json_valid(data_json)),
@@ -2923,7 +2924,7 @@ The day numbers are a sequencing guide, not a promise. A package may finish earl
 
 | Kind | Names |
 |---|---|
-| Enums | `Role`, `PunchKind`, `PunchSource`, `PunchStatus`, `FenceResult`, `RiskReason`, `DayType`, `DayStatus`, `DayTag`, `LeaveCode`, `RequestStatus`, `SalaryType`, `Divisor`, `OtRateMode`, `OffsiteMode`, `PayslipLineCode`, `NotifyEventType` (N1–N31), `ErrorCode` |
+| Enums | `Role`, `PunchKind`, `PunchSource`, `PunchStatus`, `FenceResult`, `RiskReason`, `DayType`, `DayStatus`, `DayTag`, `LeaveCode`, `RequestStatus`, `SalaryType`, `Divisor`, `OtRateMode`, `OffsiteMode`, `PayslipLineCode`, `NotifyEventType` (N1–N32), `ErrorCode` |
 | API schemas | `Me`, `OrgSettings`, `OrgSettingsPatch`, `StaffCreate`, `StaffView`, `StaffPatch`, `ShiftTemplate`, `RosterChange`, `Holiday`, `Site`, `OffsiteDuty`, `PunchRequest`, `PunchResult`, `TodayView`, `MonthView`, `DayDetail`, `OwnerDayDetail`, `DayOverride`, `LeaveRequestCreate`, `LeaveRequest`, `RegularisationCreate`, `Regularisation`, `AdvanceCreate`, `Advance`, `AdjustmentCreate`, `PayrollRunView`, `PayslipSummary`, `PayslipView`, `ExportRequest`, `Notification`, `NotificationPrefs`, `ActionItem` (discriminated union), `TodayBoard`, `RegisterView`, `ApiError`, `Paginated<T>` |
 | Engine types | `DaySchedule`, `PunchForCalc`, `DayResult`, `TimeRules`, `PayRules`, `PersonPay`, `PayslipResult`, `PayslipLine`, `CarryForward`, `RiskInput`, `RiskResult`, `Fix`, `SiteGeo` |
 | Events | `NotifyEvent` union, one variant per `NotifyEventType`, each with `orgId`, recipients rule, ids and display fields |

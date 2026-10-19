@@ -82,6 +82,14 @@ async function attempt(ctx: Ctx, row: PayslipRow): Promise<void> {
           reason: 'Browser Run failed after the last retry; the online slip is shown instead.',
         }),
       ]);
+      await ctx.services.notifier.emit(ctx, {
+        type: 'payslip_pdf_failed',
+        orgId: ctx.orgId ?? '',
+        at: ctx.now(),
+        runId: run.id,
+        month: run.month,
+        failedCount: 1,
+      });
       return;
     }
     const state: RetryState = { attempts, nextAt: ctx.now() + delay * 60_000 };

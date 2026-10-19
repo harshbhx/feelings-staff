@@ -3,7 +3,7 @@ import type { PayrollRunView } from '@fs/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PdfRenderer } from '../../services/ports';
 import { setServiceOverridesForTests } from '../../services/registry';
-import { fakePdf } from '../../test/fakes';
+import { fakeNotifier, fakePdf } from '../../test/fakes';
 import {
   call,
   callJson,
@@ -99,7 +99,8 @@ describe('O-14.1 a PDF per payslip after finalising', () => {
 describe('O-14.4 retries and the HTML fallback', () => {
   it('O-14.4 retries after 1, 5 and 30 minutes, then serves the printable page', async () => {
     const renderer = flaky(99);
-    setServiceOverridesForTests({ pdf: renderer });
+    const notifier = fakeNotifier();
+    setServiceOverridesForTests({ pdf: renderer, notifier });
     await finalise();
     await vi.waitFor(async () => expect(renderer.calls).toBe(1));
     expect((await slip())?.pdf_status).toBe('pending');
@@ -114,6 +115,7 @@ describe('O-14.4 retries and the HTML fallback', () => {
     }
     expect((await slip())?.pdf_status).toBe('failed');
     expect(renderer.calls).toBe(4);
+    expect(notifier.events.filter((e) => e.type === 'payslip_pdf_failed')).toHaveLength(1);
     const staff = await login(priya.id);
     const page = await call('GET', `/payslips/${(await slip())?.id}/pdf`, { cookie: staff });
     expect(page.status).toBe(200);

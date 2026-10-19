@@ -179,6 +179,12 @@ export const NotifyEvent = z.discriminatedUnion('type', [
     unpaidCount: z.number().int(),
   }),
   Base.extend({
+    type: z.literal('payslip_pdf_failed'),
+    runId: Id,
+    month: YearMonth,
+    failedCount: z.number().int(),
+  }),
+  Base.extend({
     type: z.literal('schedule_changed'),
     userId: Id,
     date: WorkDate,

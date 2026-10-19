@@ -156,6 +156,11 @@
       "title_other": "{{count}} salaries for {{month}} are not marked paid",
       "body": "The legal deadline is the 7th."
     },
+    "payslip_pdf_failed": {
+      "title_one": "1 payslip PDF couldn't be made",
+      "title_other": "{{count}} payslip PDFs couldn't be made",
+      "body": "The online slip works."
+    },
     "holiday_announced": {
       "title": "Salon closed on {{date}} for {{name}}"
     },
