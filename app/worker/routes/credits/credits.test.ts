@@ -151,7 +151,7 @@ afterEach(async () => {
 });
 
 describe('O-29.1 each day writes entries (PRD 7.17.2)', () => {
-  it('O-29.1 example 13: late from the first minute, approved overtime plus, balance +50 worth Rs 44.80', async () => {
+  it('O-29.1 example 13: late from the first minute, approved overtime plus, balance +50', async () => {
     await example13();
     const rows = await entries();
     expect(rows.filter((r) => r.kind === 'late')).toHaveLength(7);
@@ -162,7 +162,9 @@ describe('O-29.1 each day writes entries (PRD 7.17.2)', () => {
     const o = await overview();
     expect(o.enabled).toBe(true);
     const row = o.staff.find((r) => r.userId === priya.id);
-    expect(row).toMatchObject({ balanceMin: 50, estimatePaise: 4480, awayPending: 0 });
+    // The estimate uses today's r_day (November, 30 days): 15,000 / 30 x 50 / 540 = Rs 46.30.
+    // The settlement below uses the run month's r_day (October): Rs 44.80.
+    expect(row).toMatchObject({ balanceMin: 50, estimatePaise: 4630, awayPending: 0 });
   });
 
   it('O-29.1 early leave counts from the first minute, below the tolerance too', async () => {
@@ -257,7 +259,7 @@ describe('O-29.7 Credits screen, ledger and CSV, owner only', () => {
     });
     expect(res.status).toBe(200);
     expect(res.body.balanceMin).toBe(50);
-    expect(res.body.estimatePaise).toBe(4480);
+    expect(res.body.estimatePaise).toBe(4630);
     expect(res.body.items).toHaveLength(8);
     // Newest first; the running balance of the newest row is the balance.
     expect(res.body.items[0]).toMatchObject({ date: '2026-10-17', runningBalanceMin: 50 });
