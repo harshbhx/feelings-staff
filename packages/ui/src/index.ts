@@ -81,6 +81,11 @@ export {
 export { Select, type SelectOption, type SelectProps } from './components/Select';
 export { Sheet, type SheetProps } from './components/Sheet';
 export {
+  type ShiftSpan,
+  ShiftTimeline,
+  type ShiftTimelineProps,
+} from './components/ShiftTimeline';
+export {
   Skeleton,
   SkeletonGroup,
   type SkeletonGroupProps,
