@@ -2,7 +2,7 @@
  * WP-3 auth suite (PRD 14.3): join, PIN rules, lockouts, device approval, new device, owner magic
  * link + code, password, step-up, setup, sessions and consents. Named after the ACs in PRD 14.8.
  */
-import type { JoinLookup, JoinVerifyResult, Me, SecurityView, StepUpResult } from '@fs/contracts';
+import type { Endpoints, JoinLookup, JoinVerifyResult, Me, OutputOf } from '@fs/contracts';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { setServiceOverridesForTests } from '../../services/registry';
 import { fakeEmail, fakeNotifier } from '../../test/fakes';
@@ -34,6 +34,9 @@ import {
 const OWNER_EMAIL = 'owner@feelings.test';
 const OWNER_PASSWORD = 'feelings-demo-2026';
 const OWNER_PIN = '482913';
+
+type SecurityView = OutputOf<Endpoints['ownerSecurityGet']>;
+type StepUpResult = OutputOf<Endpoints['stepUp']>;
 
 let s: Scenario;
 let notifier: ReturnType<typeof fakeNotifier>;

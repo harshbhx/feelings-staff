@@ -2,7 +2,7 @@
  * WP-3 staff accounts suite (PRD 4.1.1, 4.1.5, 4.1.6, O-07): add, edit, invite, re-invite, reset
  * PIN, exit, rehire, duplicates, the 15-person cap, effective-dated salary and device decisions.
  */
-import type { DeviceView, StaffCreated, StaffDetail, StaffRow } from '@fs/contracts';
+import type { DeviceView, Endpoints, OutputOf, StaffDetail, StaffRow } from '@fs/contracts';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { setServiceOverridesForTests } from '../../services/registry';
 import { fakeNotifier } from '../../test/fakes';
@@ -27,6 +27,8 @@ import {
   staffLogin,
   templateId,
 } from '../auth/test/kit';
+
+type StaffCreated = OutputOf<Endpoints['ownerStaffCreate']>;
 
 let s: Scenario;
 let notifier: ReturnType<typeof fakeNotifier>;

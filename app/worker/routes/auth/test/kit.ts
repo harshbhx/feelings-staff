@@ -2,9 +2,11 @@
  * WP-3 test kit for Workers API tests: real ECDSA P-256 device keys (WebCrypto), staff creation,
  * join, sign-in and the fake clock. Test-only module (the /test/ path allows raw D1 access).
  */
-import type { InviteView, Me, StaffCreated } from '@fs/contracts';
+import type { Endpoints, InviteView, Me, OutputOf } from '@fs/contracts';
 import { toBase64Url } from '@fs/contracts';
 import { call, callJson, e2eHeaders, sessionFor, testEnv } from '../../../test/helpers';
+
+type StaffCreated = OutputOf<Endpoints['ownerStaffCreate']>;
 
 export interface DeviceKey {
   privateKey: CryptoKey;
