@@ -104,8 +104,8 @@ function decodePng(buf: Buffer): Png {
   expect(channels, `colour type ${colorType}`).toBeGreaterThan(0);
 
   const idat: Buffer[] = [];
-  let palette = Buffer.alloc(0);
-  let trns = Buffer.alloc(0);
+  let palette: Buffer = Buffer.alloc(0);
+  let trns: Buffer = Buffer.alloc(0);
   for (let pos = 8; pos < buf.length; ) {
     const len = buf.readUInt32BE(pos);
     const type = buf.toString('ascii', pos + 4, pos + 8);

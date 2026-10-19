@@ -446,6 +446,7 @@ describe('triggers', () => {
 
     online = false;
     await enqueue(punch('out'));
+    await settle(); // enqueue's own flush finds the device offline
     online = true;
     visibility = 'hidden';
     document.dispatchEvent(new Event('visibilitychange'));
