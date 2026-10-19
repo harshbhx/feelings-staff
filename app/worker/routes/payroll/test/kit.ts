@@ -1,7 +1,7 @@
 /** WP-5 test kit: people, month-long punch scripts and the clock for payroll API tests. */
 import { istToEpoch, monthDates, weekday } from '@fs/contracts';
 import { ulid } from '../../../lib/ulid';
-import { testEnv } from '../../../test/helpers';
+import { sessionFor, testEnv } from '../../../test/helpers';
 import { createStaff, setClock, templateId } from '../../auth/test/kit';
 
 /** 2 Nov 2026, 10:30 IST: October is over. */
@@ -132,3 +132,17 @@ export async function addPunches(
 ): Promise<void> {
   await testEnv.DB.batch(punchStmts(await orgOf(userId), userId, date, punches, status));
 }
+
+/** A session that outlives the fake clock these tests set (sessionFor stamps real time). */
+export async function login(userId: string, opts: { stepUp?: boolean } = {}): Promise<string> {
+  const token = await sessionFor(userId);
+  const far = Date.UTC(2027, 5, 1);
+  await testEnv.DB.prepare(
+    'UPDATE sessions SET expires_at = ?1, step_up_until = ?2 WHERE user_id = ?3',
+  )
+    .bind(far, opts.stepUp ? far : null, userId)
+    .run();
+  return token;
+}
+
+export const stepUpLogin = (userId: string) => login(userId, { stepUp: true });

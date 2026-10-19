@@ -57,6 +57,7 @@ export interface AdjustmentRow {
   amount_paise: number;
   note: string;
   show_cause_ref: string | null;
+  created_by: string;
   created_at: number;
 }
 

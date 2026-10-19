@@ -6,23 +6,18 @@ import type { Endpoints, OutputOf, PayrollRunView } from '@fs/contracts';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { setServiceOverridesForTests } from '../../services/registry';
 import { fakeNotifier } from '../../test/fakes';
-import {
-  call,
-  callJson,
-  resetScenario,
-  type Scenario,
-  sessionFor,
-  testEnv,
-} from '../../test/helpers';
-import { auditActions, errorCode, ownerStepUp, setClock } from '../auth/test/kit';
+import { call, callJson, resetScenario, type Scenario, testEnv } from '../../test/helpers';
+import { auditActions, errorCode, setClock } from '../auth/test/kit';
 import {
   addPerson,
   addPunches,
   decideOvertime,
   fillMonth,
+  login,
   monthIsOver,
   noHolidays,
   type Person,
+  stepUpLogin,
   sundayRoster,
 } from './test/kit';
 
@@ -80,7 +75,7 @@ beforeEach(async () => {
   s = await resetScenario('basic-salon');
   notifier = fakeNotifier();
   setServiceOverridesForTests({ notifier });
-  owner = await sessionFor(s.ownerId);
+  owner = await login(s.ownerId);
   await noHolidays();
   priya = await addPerson(owner, { name: 'Priya Solanki' });
   await sundayRoster(priya.id, '2026-10');
@@ -175,7 +170,7 @@ describe('O-13.2 blockers and their defaults', () => {
     await example11();
     await addPunches(priya.id, '2026-10-12', [['in', '10:00']], 'pending');
     const id = await startOctober();
-    const stepUp = await ownerStepUp(s.ownerId);
+    const stepUp = await stepUpLogin(s.ownerId);
     const refused = await call('POST', `/owner/payroll-runs/${id}/finalise`, {
       cookie: stepUp,
       body: { acceptDefaults: false },
@@ -254,7 +249,7 @@ describe('O-13.6 the October fixture reproduces example 11 to the paisa', () => 
 
   it('O-13.3 finalise freezes the snapshot, locks the month and tells staff', async () => {
     const { id } = await review();
-    const stepUp = await ownerStepUp(s.ownerId);
+    const stepUp = await stepUpLogin(s.ownerId);
     const done = await callJson<PayrollRunView>('POST', `/owner/payroll-runs/${id}/finalise`, {
       cookie: stepUp,
       body: { acceptDefaults: true },
@@ -303,7 +298,7 @@ describe('S-14 staff payslips, verify and PDF (O-14 API parts)', () => {
   async function finalised(): Promise<{ id: string; slipId: string }> {
     await example11();
     const id = await startOctober();
-    const stepUp = await ownerStepUp(s.ownerId);
+    const stepUp = await stepUpLogin(s.ownerId);
     await call('POST', `/owner/payroll-runs/${id}/finalise`, {
       cookie: stepUp,
       body: { acceptDefaults: true },
@@ -317,9 +312,9 @@ describe('S-14 staff payslips, verify and PDF (O-14 API parts)', () => {
   it('S-14.1 staff see only their own payslips, and only after finalise', async () => {
     await example11();
     const id = await startOctober();
-    const staff = await sessionFor(priya.id);
+    const staff = await login(priya.id);
     expect((await callJson<unknown[]>('GET', '/me/payslips', { cookie: staff })).body).toEqual([]);
-    const stepUp = await ownerStepUp(s.ownerId);
+    const stepUp = await stepUpLogin(s.ownerId);
     await call('POST', `/owner/payroll-runs/${id}/finalise`, {
       cookie: stepUp,
       body: { acceptDefaults: true },
@@ -332,7 +327,7 @@ describe('S-14 staff payslips, verify and PDF (O-14 API parts)', () => {
     expect(list.body).toHaveLength(1);
     expect(list.body[0]).toMatchObject({ month: '2026-10', netPaise: 1_198_700 });
     const asha = await addPerson(owner, { name: 'Asha Mehta' });
-    const other = await sessionFor(asha.id);
+    const other = await login(asha.id);
     const denied = await call('GET', `/me/payslips/${list.body[0]?.id}`, { cookie: other });
     expect(denied.status).toBe(404);
     const mine = await callJson<{ result: { netPaise: number }; verifyUrl: string }>(
@@ -349,13 +344,13 @@ describe('S-14 staff payslips, verify and PDF (O-14 API parts)', () => {
     await testEnv.DB.prepare(
       "UPDATE orgs SET settings_json = json_set(settings_json, '$.pay.showPayslipsToStaff', json('false'))",
     ).run();
-    const staff = await sessionFor(priya.id);
+    const staff = await login(priya.id);
     expect((await callJson<unknown[]>('GET', '/me/payslips', { cookie: staff })).body).toEqual([]);
   });
 
   it('S-14.2 the PDF answers 202 while pending, then serves the stored file', async () => {
     const { slipId } = await finalised();
-    const staff = await sessionFor(priya.id);
+    const staff = await login(priya.id);
     const pending = await call('GET', `/payslips/${slipId}/pdf`, { cookie: staff });
     expect(pending.status).toBe(202);
     const key = `payslips/test/2026-10/${slipId}-r1.pdf`;
@@ -372,7 +367,7 @@ describe('S-14 staff payslips, verify and PDF (O-14 API parts)', () => {
     expect(ownerRes.status).toBe(200);
     const asha = await addPerson(owner, { name: 'Asha Mehta' });
     const denied = await call('GET', `/payslips/${slipId}/pdf`, {
-      cookie: await sessionFor(asha.id),
+      cookie: await login(asha.id),
     });
     expect(denied.status).toBe(404);
   });
@@ -410,7 +405,7 @@ describe('O-13.5 mark paid', () => {
     await fillMonth(asha.id, '2026-10');
     await example11();
     const id = await startOctober();
-    const stepUp = await ownerStepUp(s.ownerId);
+    const stepUp = await stepUpLogin(s.ownerId);
     await call('POST', `/owner/payroll-runs/${id}/finalise`, {
       cookie: stepUp,
       body: { acceptDefaults: true },
@@ -450,7 +445,7 @@ describe('O-13.4 reopen', () => {
   it('O-13.4 creates revision 2, unlocks the month and keeps revision 1 payslips as superseded', async () => {
     await example11();
     const id = await startOctober();
-    const stepUp = await ownerStepUp(s.ownerId);
+    const stepUp = await stepUpLogin(s.ownerId);
     await call('POST', `/owner/payroll-runs/${id}/finalise`, {
       cookie: stepUp,
       body: { acceptDefaults: true },
@@ -483,7 +478,7 @@ describe('O-13.4 reopen', () => {
       .bind(priya.id)
       .first<{ l: number }>();
     expect(unlocked?.l).toBe(0);
-    const staff = await sessionFor(priya.id);
+    const staff = await login(priya.id);
     const list = await callJson<{ superseded: boolean; revision: number }[]>(
       'GET',
       '/me/payslips',
@@ -513,7 +508,7 @@ describe('O-13.4 reopen', () => {
   it('O-13.4 settle next month posts the difference into the next draft', async () => {
     await example11();
     const id = await startOctober();
-    const stepUp = await ownerStepUp(s.ownerId);
+    const stepUp = await stepUpLogin(s.ownerId);
     await call('POST', `/owner/payroll-runs/${id}/finalise`, {
       cookie: stepUp,
       body: { acceptDefaults: true },
@@ -618,7 +613,7 @@ describe('O-13 recompute and adjustments', () => {
     )
       .bind(manager.id)
       .run();
-    const cookie = await sessionFor(manager.id);
+    const cookie = await login(manager.id);
     expect((await call('GET', `/owner/payroll-runs/${id}`, { cookie })).status).toBe(200);
     expect((await call('POST', `/owner/payroll-runs/${id}/recompute`, { cookie })).status).toBe(
       403,

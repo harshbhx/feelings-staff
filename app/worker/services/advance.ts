@@ -4,11 +4,11 @@
  */
 import {
   type AdvanceCreate,
-  type AdvancesView,
   type AdvanceView,
   type Endpoints,
   formatRupees,
   istDate,
+  type OutputOf,
   type ParsedInputOf,
   type PersonBrief,
 } from '@fs/contracts';
@@ -162,7 +162,7 @@ async function checkPlan(
 export async function listAdvances(
   ctx: Ctx,
   q: { userId?: string | undefined; status?: 'open' | 'all' | undefined },
-): Promise<AdvancesView> {
+): Promise<OutputOf<Endpoints['ownerAdvancesList']>> {
   const rows = await ctx.db.all<AdvanceRow>(
     `SELECT * FROM advances WHERE org_id = ?org AND (? IS NULL OR user_id = ?)
         AND (? = 'all' OR status IN ('requested', 'active'))

@@ -3,21 +3,16 @@ import type { AdvanceView, PayrollRunView } from '@fs/contracts';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { setServiceOverridesForTests } from '../../services/registry';
 import { fakeNotifier } from '../../test/fakes';
-import {
-  call,
-  callJson,
-  resetScenario,
-  type Scenario,
-  sessionFor,
-  testEnv,
-} from '../../test/helpers';
-import { auditActions, errorCode, ownerStepUp, setClock } from '../auth/test/kit';
+import { call, callJson, resetScenario, type Scenario, testEnv } from '../../test/helpers';
+import { auditActions, errorCode, setClock } from '../auth/test/kit';
 import {
   addPerson,
   fillMonth,
+  login,
   monthIsOver,
   noHolidays,
   type Person,
+  stepUpLogin,
   sundayRoster,
 } from './test/kit';
 
@@ -42,7 +37,7 @@ beforeEach(async () => {
   s = await resetScenario('basic-salon');
   notifier = fakeNotifier();
   setServiceOverridesForTests({ notifier });
-  owner = await sessionFor(s.ownerId);
+  owner = await login(s.ownerId);
   await noHolidays();
   priya = await addPerson(owner, { name: 'Priya Solanki' });
 });
@@ -133,7 +128,7 @@ describe('O-12.2 recovery follows the plan and the cap', () => {
       cookie: owner,
       body: { month: '2026-10' },
     });
-    const stepUp = await ownerStepUp(s.ownerId);
+    const stepUp = await stepUpLogin(s.ownerId);
     const done = await callJson<PayrollRunView>(
       'POST',
       `/owner/payroll-runs/${run.body.run.id}/finalise`,
@@ -181,7 +176,7 @@ describe('O-12.2 recovery follows the plan and the cap', () => {
       body: { month: '2026-10' },
     });
     await call('POST', `/owner/payroll-runs/${run.body.run.id}/finalise`, {
-      cookie: await ownerStepUp(s.ownerId),
+      cookie: await stepUpLogin(s.ownerId),
       body: { acceptDefaults: true },
     });
     const cancel = await call('DELETE', `/owner/advances/${made.body.id}`, { cookie: owner });
@@ -200,7 +195,7 @@ describe('O-12.3 staff acknowledgement and requests', () => {
       cookie: owner,
       body: advanceBody(),
     });
-    const staff = await sessionFor(priya.id);
+    const staff = await login(priya.id);
     const mine = await callJson<AdvanceView[]>('GET', '/me/advances', { cookie: staff });
     expect(mine.body).toHaveLength(1);
     const ack = await callJson<AdvanceView>('POST', `/advances/${made.body.id}/ack`, {
@@ -211,7 +206,7 @@ describe('O-12.3 staff acknowledgement and requests', () => {
     expect(ack.body.staffAckAt).not.toBeNull();
     const asha = await addPerson(owner, { name: 'Asha Mehta' });
     const other = await call('POST', `/advances/${made.body.id}/ack`, {
-      cookie: await sessionFor(asha.id),
+      cookie: await login(asha.id),
       body: { answer: 'disputed' },
     });
     expect(other.status).toBe(404);
@@ -219,7 +214,7 @@ describe('O-12.3 staff acknowledgement and requests', () => {
   });
 
   it('O-12.3 a request goes to the owner, who approves it and records how it was paid', async () => {
-    const staff = await sessionFor(priya.id);
+    const staff = await login(priya.id);
     const asked = await callJson<AdvanceView>('POST', '/advance-requests', {
       cookie: staff,
       body: { amountPaise: 200_000, reason: 'Rent', plan: 'full' },
