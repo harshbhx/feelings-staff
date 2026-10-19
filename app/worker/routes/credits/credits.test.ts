@@ -765,7 +765,7 @@ describe('O-29.12 legal overtime at 2x (PRD 7.17.7, example 13: +170)', () => {
       await recompute(d);
     const all = await entries();
     const days = await testEnv.DB.prepare(
-      'SELECT work_date, worked_min, ot_approved_min, status FROM attendance_days WHERE user_id = ?1 ORDER BY work_date',
+      'SELECT work_date, total_min, ot_approved_min, status FROM attendance_days WHERE user_id = ?1 ORDER BY work_date',
     )
       .bind(priya.id)
       .all();

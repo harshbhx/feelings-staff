@@ -12,7 +12,7 @@ import type { Ctx } from './ports';
 
 interface WeekRow {
   work_date: string;
-  worked_min: number;
+  total_min: number;
   ot_approved_min: number;
   locked: number;
 }
@@ -37,7 +37,7 @@ export async function legalPlan(
   const monday = addDays(day.date, -((weekday(day.date) + 6) % 7));
   const sunday = addDays(monday, 6);
   const rows = await ctx.db.all<WeekRow>(
-    `SELECT work_date, worked_min, ot_approved_min, locked FROM attendance_days
+    `SELECT work_date, total_min, ot_approved_min, locked FROM attendance_days
       WHERE org_id = ?org AND user_id = ? AND work_date BETWEEN ? AND ?`,
     userId,
     monday,
@@ -46,7 +46,7 @@ export async function legalPlan(
   const days = new Map(
     rows.map((r) => [
       r.work_date,
-      { workDate: r.work_date, totalMin: r.worked_min, otApprovedMin: r.ot_approved_min },
+      { workDate: r.work_date, totalMin: r.total_min, otApprovedMin: r.ot_approved_min },
     ]),
   );
   days.set(day.date, {
