@@ -72,7 +72,7 @@ export function punchStmts(
       `INSERT INTO punches (id, org_id, user_id, kind, server_ts, effective_ts, work_date, source, pin_verified,
                             sig_verified, risk_score, risk_reasons_json, status, idempotency_key, created_at)
        VALUES (?1, ?2, ?3, ?4, ?5, ?5, ?6, 'online', 1, 1, 0, '[]', ?7, ?8, ?5)`,
-    ).bind(ulid(ts + i), org, userId, kind, ts, date, status, `k-${userId}-${date}-${i}`);
+    ).bind(ulid(ts + i), org, userId, kind, ts, date, status, `k-${ulid(ts + i)}`);
   });
 }
 

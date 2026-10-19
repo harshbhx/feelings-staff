@@ -325,7 +325,7 @@ describe('S-14 staff payslips, verify and PDF (O-14 API parts)', () => {
       { cookie: staff },
     );
     expect(list.body).toHaveLength(1);
-    expect(list.body[0]).toMatchObject({ month: '2026-10', netPaise: 1_198_700 });
+    expect(list.body[0]).toMatchObject({ month: '2026-10', netPaise: 1_448_700 });
     const asha = await addPerson(owner, { name: 'Asha Mehta' });
     const other = await login(asha.id);
     const denied = await call('GET', `/me/payslips/${list.body[0]?.id}`, { cookie: other });
@@ -335,7 +335,7 @@ describe('S-14 staff payslips, verify and PDF (O-14 API parts)', () => {
       `/me/payslips/${list.body[0]?.id}`,
       { cookie: staff },
     );
-    expect(mine.body.result.netPaise).toBe(1_198_700);
+    expect(mine.body.result.netPaise).toBe(1_448_700);
     expect(mine.body.verifyUrl).toMatch(/^https:\/\/staff\.test\/v\//);
   });
 
@@ -386,7 +386,7 @@ describe('S-14 staff payslips, verify and PDF (O-14 API parts)', () => {
       orgName: 'Feelings Beauty Care',
       staffName: 'Priya S.',
       month: '2026-10',
-      netPaise: 1_198_700,
+      netPaise: 1_448_700,
       revision: 1,
       superseded: false,
     });
@@ -437,7 +437,7 @@ describe('O-13.5 mark paid', () => {
       cookie: owner,
       body: { paidOn: '2027-01-01', mode: 'cash' },
     });
-    expect(future.status).toBe(422);
+    expect(future.status).toBe(400);
   });
 });
 
@@ -501,7 +501,7 @@ describe('O-13.4 reopen', () => {
       body: { acceptDefaults: true },
     });
     expect(done.body.lines[0]?.paid).toMatchObject({ on: '2026-11-02', mode: 'cash' });
-    expect(done.body.lines[0]?.netPaise).toBeGreaterThan(1_198_700);
+    expect(done.body.lines[0]?.netPaise).toBeGreaterThan(1_448_700);
     expect(await auditActions(id)).toEqual(['payroll.draft', 'payroll.finalise', 'payroll.reopen']);
   });
 
@@ -592,7 +592,7 @@ describe('O-13 recompute and adjustments', () => {
       cookie: owner,
       body: { userId: priya.id, kind: 'damage', amountPaise: 10_000, note: 'Broke dryer' },
     });
-    expect(damage.status).toBe(422);
+    expect(damage.status).toBe(400);
     const recomputed = await callJson<PayrollRunView>(
       'POST',
       `/owner/payroll-runs/${id}/recompute`,

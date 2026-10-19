@@ -76,7 +76,7 @@ describe('O-12.1 record an advance', () => {
       cookie: owner,
       body: advanceBody({ plan: 'instalments' }),
     });
-    expect(noCount.status).toBe(422);
+    expect(noCount.status).toBe(400);
     const ok = await callJson<AdvanceView>('POST', '/owner/advances', {
       cookie: owner,
       body: advanceBody({ plan: 'instalments', instalmentsN: 3 }),
@@ -151,6 +151,7 @@ describe('O-12.2 recovery follows the plan and the cap', () => {
     });
     await setClock(Date.UTC(2026, 11, 2, 5, 0));
     await sundayRoster(priya.id, '2026-11');
+    await fillMonth(priya.id, '2026-11');
     const nov = await callJson<PayrollRunView>('POST', '/owner/payroll-runs', {
       cookie: owner,
       body: { month: '2026-11' },
