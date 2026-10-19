@@ -7,7 +7,7 @@
  */
 import { read, report, walk } from './lib.mjs';
 
-const NS = ['common', 'staff', 'owner', 'errors', 'notify', 'payslip'];
+const NS = ['common', 'staff', 'owner', 'errors', 'notify', 'payslip', 'auth', 'door', 'ui'];
 const KEY = new RegExp(`['"\`](${NS.join('|')}):([A-Za-z0-9_.]+)['"\`]`, 'g');
 
 function flatten(obj, prefix = '') {

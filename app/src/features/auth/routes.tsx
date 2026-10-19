@@ -3,9 +3,9 @@ import type { RouteObject } from 'react-router';
 import { Placeholder } from '../../app/placeholder';
 
 export const authRoutes: RouteObject[] = [
-  { path: '/join/:code', element: <Placeholder titleKey="staff:screens.invite" /> },
-  { path: '/join', element: <Placeholder titleKey="staff:screens.join" /> },
-  { path: '/waiting', element: <Placeholder titleKey="staff:screens.waiting" /> },
-  { path: '/signin', element: <Placeholder titleKey="staff:screens.signIn" /> },
-  { path: '/auth/owner', element: <Placeholder titleKey="owner:screens.signIn" /> },
+  { path: '/join/:code', element: <Placeholder titleKey="auth:screens.invite" /> },
+  { path: '/join', element: <Placeholder titleKey="auth:screens.join" /> },
+  { path: '/waiting', element: <Placeholder titleKey="auth:screens.waiting" /> },
+  { path: '/signin', element: <Placeholder titleKey="auth:screens.signIn" /> },
+  { path: '/auth/owner', element: <Placeholder titleKey="auth:screens.ownerSignIn" /> },
 ];

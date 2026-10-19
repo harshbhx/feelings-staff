@@ -31,7 +31,7 @@ export class ApiError extends Error {
   constructor(init: {
     code: ErrorCode;
     status: number;
-    message?: string;
+    message?: string | undefined;
     details?: Record<string, unknown> | undefined;
     requestId?: string | undefined;
   }) {

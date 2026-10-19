@@ -3,5 +3,5 @@ import type { RouteObject } from 'react-router';
 import { Placeholder } from '../../app/placeholder';
 
 export const doorRoutes: RouteObject[] = [
-  { path: '/door', element: <Placeholder titleKey="owner:screens.doorScreen" /> },
+  { path: '/door', element: <Placeholder titleKey="door:screens.door" /> },
 ];
