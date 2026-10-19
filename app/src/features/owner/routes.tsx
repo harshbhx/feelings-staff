@@ -75,6 +75,18 @@ export const ownerRoutes: RouteObject[] = [
     lazy: () => import('./roster/DutyFormScreen').then((m) => ({ Component: m.DutyFormScreen })),
   },
   {
+    path: 'roll-call',
+    ...h('owner:screens.rollCall'),
+    lazy: () =>
+      import('./rollcall/RollCallScreen').then((m) => ({ Component: m.RollCallListScreen })),
+  },
+  {
+    path: 'roll-call/:id',
+    ...h('owner:screens.rollCall', '/o/today'),
+    lazy: () =>
+      import('./rollcall/RollCallScreen').then((m) => ({ Component: m.RollCallViewScreen })),
+  },
+  {
     path: 'payroll',
     ...h('owner:screens.payroll'),
     lazy: () =>

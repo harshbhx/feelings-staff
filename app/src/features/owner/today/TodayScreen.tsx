@@ -29,6 +29,7 @@ import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { clock, dayLabel, duration } from '../lib/format';
 import { telLink, waLink } from '../lib/share';
 import { leaveKey } from '../lib/status';
+import { RollCallCard } from '../rollcall/RollCallCard';
 import {
   type BoardAwayRow,
   type BoardInRow,
@@ -231,6 +232,9 @@ function Board({ board }: { board: TodayBoard }) {
           </Button>
         </div>
       ) : null}
+
+      {/* PRD 4.18.3: the roll-call that is open or missed (N33), else one quiet line. */}
+      <RollCallCard slot={board.rollCall} primary={board.actionsCount === 0} />
 
       <div className="xl:sticky xl:top-16 xl:z-20 xl:-my-3 xl:bg-bg xl:py-3">
         <StatChipGroup

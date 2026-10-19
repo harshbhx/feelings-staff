@@ -22,6 +22,7 @@ export const TYPE_ORDER: readonly ActionType[] = [
   'leave_request',
   'regularisation',
   'overtime',
+  'away',
   'auto_closed',
   'advance_request',
 ];

@@ -13,7 +13,8 @@
     "inbox": "Inbox",
     "doorCode": "Show door code",
     "settings": "Settings",
-    "label": "Owner panel"
+    "label": "Owner panel",
+    "rollCall": "Roll-call"
   },
   "screens": {
     "signIn": "Owner sign-in",
@@ -37,7 +38,8 @@
     "settings": "Settings",
     "audit": "Audit log",
     "doorScreen": "Door screen",
-    "verify": "Payslip check"
+    "verify": "Payslip check",
+    "rollCall": "Roll-call"
   },
   "shell": {
     "back": "Back",
@@ -437,7 +439,8 @@
       "overtime": "Overtime",
       "offsite_request": "At a venue",
       "auto_closed": "Auto-closed days",
-      "advance_request": "Advance requests"
+      "advance_request": "Advance requests",
+      "away": "Stepped out"
     },
     "select": "Select {{name}}",
     "approveSelected_one": "Approve {{count}} selected",
@@ -521,7 +524,12 @@
     "away": {
       "title": "{{name}} stepped out {{start}}–{{end}}",
       "line_one": "1 minute away. Confirm, mark as work or ignore.",
-      "line_other": "{{count}} minutes away. Confirm, mark as work or ignore."
+      "line_other": "{{count}} minutes away. Confirm, mark as work or ignore.",
+      "backMissing": "I'm back missing",
+      "note": "“{{note}}”",
+      "confirm": "Confirm",
+      "work": "Mark as work",
+      "ignore": "Ignore"
     },
     "advance": {
       "title": "{{name}} asked for an advance",
@@ -600,6 +608,10 @@
       "audit": {
         "title": "Audit log",
         "hint": "Who changed what, and why"
+      },
+      "presence": {
+        "title": "Presence",
+        "hint": "Roll-call times and Step out"
       }
     },
     "units": {
@@ -975,7 +987,8 @@
         "door": "Show the door code",
         "staff": "See staff",
         "payroll": "Run payroll",
-        "exports": "Download reports"
+        "exports": "Download reports",
+        "rollcall": "Do the roll-call"
       },
       "removeTitle": "Remove {{name}} as a manager?"
     }
@@ -1597,7 +1610,8 @@
       "roster": "Who works when, venue duties",
       "inbox": "Every alert in one place",
       "doorCode": "Use this phone as the door screen",
-      "settings": "Rules, holidays, security"
+      "settings": "Rules, holidays, security",
+      "rollCall": "Who's here, two or three times a day"
     }
   },
   "audit": {
@@ -1721,5 +1735,122 @@
     "invalid": "This payslip link isn't valid.",
     "invalidLine": "Check the link, or ask the salon for a new payslip.",
     "footer": "Checked with Feelings Staff."
+  },
+  "presence": {
+    "reason": {
+      "personal": "Personal",
+      "lunch": "Lunch outside",
+      "errand": "Work errand",
+      "other": "Other"
+    },
+    "card": {
+      "open": "Roll-call at {{time}} is open",
+      "openBody": "Who's not here? It takes about 20 seconds.",
+      "start": "Start roll-call",
+      "missed": "Roll-call at {{time}} not done",
+      "missedBody": "Tap to do it now.",
+      "doIt": "Do it now",
+      "done": "Roll-call at {{time}} done.",
+      "upcoming": "Next roll-call at {{time}}.",
+      "all": "Today's roll-calls"
+    },
+    "slot": {
+      "upcoming": "Later",
+      "open": "Open",
+      "done": "Done",
+      "missed": "Not done",
+      "doneBy": "Done by {{name}}",
+      "opensAt": "Opens at {{time}}"
+    },
+    "list": {
+      "title": "Roll-call",
+      "hint": "Roll-calls open at the times set in Settings. A done roll-call can be opened and changed until payroll is finalised.",
+      "empty": "No roll-call times are set.",
+      "settings": "Change the times"
+    },
+    "view": {
+      "title": "Roll-call at {{time}}",
+      "legend": "Who is not here at {{time}}",
+      "intro": "Who's not here?",
+      "how": "Everyone checked in is Here. Tap only the people who are not at the salon.",
+      "edit": "Saved by {{name}}. Change a mark and tap Done to save it again.",
+      "editNoName": "Already saved. Change a mark and tap Done to save it again.",
+      "empty": "Nobody is checked in.",
+      "inAt": "In {{time}}",
+      "here": "Here",
+      "notHere": "Not here",
+      "notHereFor": "Not here:",
+      "summary": "{{here}} here · {{notHere}} not here",
+      "done": "Done",
+      "saved": "Roll-call at {{time}} saved: {{here}} here, {{notHere}} not here."
+    },
+    "hint": {
+      "awaySince": "Away since {{time}}",
+      "steppedOut": "Stepped out",
+      "steppedOutSince": "Stepped out {{time}}",
+      "steppedOutDetail": "Stepped out: {{detail}}",
+      "seemsAway": "Seems away",
+      "onBreak": "On break"
+    },
+    "edit": {
+      "open": "Edit times",
+      "title": "Edit {{name}}'s time away",
+      "start": "Out from",
+      "end": "Back at",
+      "endOpen": "Still away. Leave empty to keep it open.",
+      "badTime": "Use a time like 15:30.",
+      "endBeforeStart": "Back at must be after Out from.",
+      "reason": "Reason",
+      "countsAs": "How it counts",
+      "countsAsHint": "Away takes the minutes off. Work and Ignore take nothing off.",
+      "state": {
+        "confirmed": "Away",
+        "work": "Work",
+        "ignored": "Ignore"
+      },
+      "why": "Why the change",
+      "whyHint": "Kept in the history with the old and new times.",
+      "whyMissing": "Say why, in a few words.",
+      "save": "Save change",
+      "saved": "Saved. {{name}}'s time away is updated."
+    },
+    "settings": {
+      "intro": "Roll-call is how you see who is not at the salon. Staff can also tap Step out and I'm back. Nothing is cut automatically.",
+      "enabled": {
+        "label": "Presence tracking",
+        "on": "On. Roll-calls open at the times below and staff see Step out.",
+        "off": "Off. No roll-calls and no Step out; nothing is recorded."
+      },
+      "times": {
+        "legend": "Roll-call times",
+        "hint": "One to four times a day, before closing. A change applies from the next roll-call.",
+        "timeLabel": "Roll-call {{n}}",
+        "remove": "Remove roll-call {{n}}",
+        "add": "Add a time",
+        "problems": {
+          "tooMany": "Keep one to four times.",
+          "invalid": "Use a time like 15:00.",
+          "order": "Put the times in order, each after the one before.",
+          "afterClosing": "Roll-call times must be before closing at {{time}}."
+        }
+      },
+      "who": "Managers with the Do the roll-call permission can do roll-calls too (Settings, People).",
+      "stepOut": {
+        "label": "Step out button for staff",
+        "on": "Staff can tap Step out and I'm back on Today.",
+        "off": "Staff don't see Step out. Roll-call still works."
+      },
+      "foreground": {
+        "label": "Quiet location check while the app is open",
+        "on": "Every {{min}} min, only while the app is on screen and location is already allowed. It can only show \"Seems away\" to you and never costs minutes.",
+        "off": "Off. Location is read only at check-in and check-out.",
+        "interval": "How often"
+      },
+      "quietBreaks": {
+        "label": "Pause during breaks",
+        "on": "No checks and no away minutes inside the break.",
+        "off": "Breaks count like the rest of the shift."
+      }
+    }
   }
 }
