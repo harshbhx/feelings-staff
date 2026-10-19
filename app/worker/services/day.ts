@@ -87,6 +87,8 @@ export interface AttendanceDayRow {
   template_id: string | null;
   scheduled_min: number;
   worked_min: number;
+  /** Every worked minute of the day, inside the shift or not (`DayResult.totalMin`). */
+  total_min: number;
   break_min: number;
   late_min: number;
   late_billable_min: number;
@@ -551,14 +553,14 @@ export function computeFrom(
 export function upsertDayStmt(ctx: Ctx, c: Computed, now: number): D1PreparedStatement {
   const r = c.result;
   return ctx.db.stmt(
-    `INSERT INTO attendance_days (org_id, user_id, work_date, day_type, template_id, scheduled_min, worked_min,
+    `INSERT INTO attendance_days (org_id, user_id, work_date, day_type, template_id, scheduled_min, worked_min, total_min,
         break_min, late_min, late_billable_min, early_min, early_billable_min, overbreak_min, makeup_min,
         undertime_min, ot_preapproved_min, ot_candidate_min, ot_approved_min, ot_status, status,
         leave_type_code, offday_credit, tags_json, override_json, engine_version, computed_at, locked)
-     VALUES (?org, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+     VALUES (?org, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
      ON CONFLICT (user_id, work_date) DO UPDATE SET
         day_type = excluded.day_type, template_id = excluded.template_id,
-        scheduled_min = excluded.scheduled_min, worked_min = excluded.worked_min,
+        scheduled_min = excluded.scheduled_min, worked_min = excluded.worked_min, total_min = excluded.total_min,
         break_min = excluded.break_min, late_min = excluded.late_min,
         late_billable_min = excluded.late_billable_min, early_min = excluded.early_min,
         early_billable_min = excluded.early_billable_min, overbreak_min = excluded.overbreak_min,
@@ -576,6 +578,7 @@ export function upsertDayStmt(ctx: Ctx, c: Computed, now: number): D1PreparedSta
     r.templateId,
     r.scheduledMin,
     r.workedMin,
+    r.totalMin ?? r.workedMin,
     r.breakMin,
     r.lateMin,
     r.lateBillableMin,
