@@ -17,6 +17,7 @@ import {
   Input,
   PinPad,
   Sheet,
+  StatusChip,
   Textarea,
 } from '@fs/ui';
 import {
@@ -591,9 +592,14 @@ function Success({
       : t('staff:punch.successSalonNoDistance');
   return (
     <div className="flex flex-col items-start gap-3 py-2" data-success="">
-      <Bindi size="success" land={!frozen} />
-      <p className="staff-bignum" aria-hidden="true">
+      {/* Status is colour + icon + word (PRD 12.11); the bindi lands once as the time's full stop (12.9). */}
+      <StatusChip
+        status="present"
+        label={kind === 'out' ? t('staff:today.status.done') : t('staff:today.status.in')}
+      />
+      <p className="staff-bignum flex items-end gap-1.5" aria-hidden="true">
         {time}
+        <Bindi size="success" land={!frozen} className="mb-[0.22em]" />
       </p>
       <p className="text-lg font-bold text-text" role="status">
         {headline}
