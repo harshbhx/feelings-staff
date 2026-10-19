@@ -5,7 +5,7 @@ import { expect, test } from '../../fixtures';
  * password fallback, and the owner PIN step-up. Runs on `owner-desktop`.
  */
 test.describe('E2E-21 owner sign-in', () => {
-  test.beforeEach((_args, info) => {
+  test.beforeEach(({ page: _page }, info) => {
     test.skip(info.project.name !== 'owner-desktop', 'Owner desktop path');
   });
 
