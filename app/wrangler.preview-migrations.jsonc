@@ -6,7 +6,7 @@
     {
       "binding": "DB",
       "database_name": "fbc-staff-preview",
-      "database_id": "00000000-0000-0000-0000-000000000001",
+      "database_id": "a97d7b42-e19f-4887-96e2-f9764c975d2e",
       "migrations_dir": "../migrations"
     }
   ]
