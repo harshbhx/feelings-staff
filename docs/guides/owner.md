@@ -6,7 +6,7 @@ Harsh looks after the system behind the app. You never need to touch any of that
 
 <!-- Source: PRD sections 4 to 6 and 10. Update this guide when the copy on a screen changes. -->
 
-Contents: [Sign in](#sign-in) · [Set up the app first time](#set-up-the-app-first-time) · [Add staff and approve phones](#add-staff-and-approve-phones) · [Today](#today) · [Needs action](#needs-action) · [The register](#the-register) · [Roster and venue duties](#roster-and-venue-duties) · [The door code](#the-door-code) · [Advances](#advances) · [Payroll at month end](#payroll-at-month-end) · [Exports](#exports) · [Settings](#settings) · [Your own sign-in and security](#your-own-sign-in-and-security) · [Notifications you get](#notifications-you-get) · [What the app never does](#what-the-app-never-does) · [Good to know](#good-to-know) · [When something is wrong](#when-something-is-wrong)
+Contents: [Sign in](#sign-in) · [Set up the app first time](#set-up-the-app-first-time) · [Add staff and approve phones](#add-staff-and-approve-phones) · [Today](#today) · [Needs action](#needs-action) · [The register](#the-register) · [Roster and venue duties](#roster-and-venue-duties) · [The door code](#the-door-code) · [Advances](#advances) · [Time credits](#time-credits) · [Roll-call and step-outs](#roll-call-and-step-outs) · [Payroll at month end](#payroll-at-month-end) · [Exports](#exports) · [Settings](#settings) · [Your own sign-in and security](#your-own-sign-in-and-security) · [Notifications you get](#notifications-you-get) · [What the app never does](#what-the-app-never-does) · [Good to know](#good-to-know) · [When something is wrong](#when-something-is-wrong)
 
 ## Sign in
 
@@ -122,6 +122,7 @@ One list for everything that waits for your decision. Newest first, grouped by k
 | Overtime | The day, minutes, and "approved in advance" if it was a venue duty | **Approve all**, **Approve part** (in 15-minute steps) or **Reject** |
 | Venue request | The place, map and note | **Approve**, **Approve and let others check in here**, or **Reject** |
 | Day closed by the app | The day and the time the app used | **Keep 20:00** or **Change time** |
+| Away interval | A step-out that is waiting: name, times, reason, minutes, her note | **Confirm**, **Mark as work** or **Ignore** (see [Roll-call and step-outs](#roll-call-and-step-outs)) |
 
 - To approve several of the same kind, tap them and choose **Approve selected**. (Phones are always one by one.)
 - Every decision is written down and the staff member gets a message.
@@ -174,6 +175,111 @@ Be honest with yourself about one limit. A photo of the code sent on WhatsApp wo
 
 The ledger shows what was given, what was taken back each month, what was moved to next month, and the balance. By default no more than half of a month's salary is taken back in one month; the rest moves to the next month. (This is how the law is read for the default; ask your CA if you want to change it.)
 
+## Time credits
+
+Time credits keep a count of minutes for each person, in your favour or against. Every minute counts: a late arrival from the first minute, an early leave from the first minute, time spent away from the salon that you confirmed, and overtime you approved. The count is a **balance**: a plus or minus number of minutes, for example +50 or −130.
+
+The balance never cuts or pays anything by itself. It only becomes money when you settle it at payroll, and you choose how much to settle. Staff never see it: not in their app, not on their payslip and not in a ping.
+
+Why it exists: someone can arrive 10 minutes late every day (70 minutes in a week, all hidden by the 10-minute grace) and still stay 2 hours late on a busy day. Under the old rules she would get full salary and full overtime. With Time credits both stay visible and you decide.
+
+### The Credits screen
+
+**More → Credits** shows one row per active person: name, balance, what it is worth in money, the last settlement and a chip for away times still waiting for your decision.
+
+<!-- screenshot: owner-credits -->
+
+- The money is for reading only: "worth about ₹45" for a plus balance and "might cut around ₹96" for a minus balance. It uses the person's normal rate per minute.
+- Sort by balance, or filter by plus or minus.
+- Nothing on this screen changes pay.
+
+Tap a person to open her **ledger**: every entry, newest first on a phone. Each line shows the date, the kind (late, early, away, overtime, legal 2×, adjusted, settled), the minutes, the running balance, where it came from and who confirmed it. Late and early entries say "automatic". At the top it says "Nothing is cut or paid until you settle it at payroll." You can filter by kind and date, show only what is not settled yet, and **Export CSV** (PIN).
+
+### Adjust an entry
+
+Tap an entry, then **Adjust minutes**, type the change and a reason. For example, you excuse a late of 10 minutes: adjust that day's late entry by +10, reason "approved by Urmi". The original entry stays visible with your change and your reason under it, so the history is always readable. You can change or remove an adjustment later. You can do this any time; in a month that is already finalised the change counts in the next payroll.
+
+### A worked example
+
+Priya is late by 10 minutes on seven days in October. Her pay rules would hide all of it. On 17 October she works 10:10 to 22:10 and you approve 120 minutes of overtime.
+
+| Entry | Minutes |
+|---|---|
+| 7 late arrivals, 10 minutes each | −70 |
+| Overtime you approved | +120 |
+| Legal 2×: the 120 minutes beyond 9 hours that day count a second time | +120 |
+| **Balance** | **+170** |
+
+The Credits screen says "worth about ₹152". At payroll you can settle 0 (nothing on the payslip, the +170 carries over), or settle +170 (a payslip line "Time credits: +170 min, +₹152.33", and the balance goes to 0).
+
+### Settle credits at payroll
+
+In the payroll run, the **Settle credits** step lists everyone who has a balance at the end of the month. For each person you see her balance and its money, a stepper, the money it makes and the "balance after".
+
+- The stepper moves in steps of 5 minutes. You can also type an exact number. **0** sets it back to nothing. **Suggested** sets the whole balance.
+- **The default is 0.** Nothing is settled unless you choose it.
+- A minus settlement is a deduction. It follows the same rule as other deductions: no more than half of the salary can be cut in a month. Minutes that do not fit stay on the balance, with a note such as "20 min stay on the balance".
+- A plus settlement is an earning.
+- You can change the step until you tap **Finalise**. On Finalise the settlement becomes the payslip line and the balance goes down by that many minutes. If you **Reopen** the month, the settlement is voided and the stepper comes back with the same values.
+- What you do not settle carries over to next month. There is no reset.
+
+The usual payroll warnings (more than 48 hours in a week, pay below the minimum wage, deductions reaching half the salary) show here too.
+
+### Pay legal overtime at 2×
+
+The law says overtime beyond 9 hours a day or 48 hours a week must be paid at twice the normal rate. **Pay legal overtime at 2×** is **on** by default. With it on, approved overtime beyond those limits counts twice in the ledger (the "legal 2×" entry), so it is worth twice as much whenever you settle it, or when it cancels late and early minutes. Priya's 120 minutes above are an example.
+
+At the Settle credits step, the payslip preview and Finalise, you see "120 min of overtime beyond 9 h a day or 48 h a week count at 2×, as the law requires." If you turn the setting off you see a warning instead: "Overtime beyond 9 h a day or 48 h a week must be paid at 2× by law. 120 min this month count at 1×." The warning stays until you turn the setting on again. Changing it asks for your PIN, is recorded, and applies to every day that is not locked. Have your CA confirm this before the first real payroll.
+
+### Turn credits on or off
+
+**Settings → Time credits.** It is on for the salon by default. It starts counting from the first day of next month, or from an earlier day of the current month if you pick one. Turning it off stops new entries from the first day of next month. From then on the old rules apply again (grace and make-up time for lateness, automatic overtime pay after approval). The existing balances stay visible and can still be settled. Switching it on or off asks for your PIN.
+
+You can leave one person out in her profile.
+
+## Roll-call and step-outs
+
+The punch tells the app when someone arrived and left. Roll-call and step-outs tell it about the time in between. The app does not track anyone's phone in the background: it cannot, and the reasons are in [ADR-18](../decisions/0018-presence-by-roll-call-and-step-out-not-background-location.md). People are found away in two human ways.
+
+### Roll-call
+
+You, or a manager you allow, check who is here two or three times a shift.
+
+- **Times.** Settings → Presence. The default is 12:00, 15:00 and 18:00. You can have one to four, any time inside opening hours. A change applies from the next one.
+- At each time you get a gentle ping. If it is not done within 30 minutes, **Today** says "Roll-call at 15:00 not done". Nothing is assumed if you miss one.
+- **Today → Roll-call** lists everyone who is checked in at that moment. Everyone is set to **Here**. Tap a row to switch it to **Not here**. The row can carry a hint: "Seems away", "Stepped out 14:40, lunch outside", "On break", "On duty at a venue". People on leave, off duty or not checked in are not listed.
+- Tap **Done**. Everyone left on Here is recorded as here. It takes about 20 seconds. You can reopen and change it until the day is locked.
+
+<!-- screenshot: owner-roll-call -->
+
+**Not here** starts an away time from the roll-call time. It ends when the person taps **I'm back**, when the next roll-call marks her Here, or when she checks out, whichever is first. Because you marked it, it counts at once as minus minutes ("confirmed by Urmi"). You can still edit it. Nothing is cut until you settle at payroll.
+
+If someone is already away, the row says "Away since 15:00" and you tap **Here** to end it.
+
+### Edit an away time
+
+Open it from **Today**, the day detail or **Needs action**, and change the start, the end, the reason or the work flag. The old and new values are recorded, and the minutes and the ledger entry follow. Managers with the roll-call permission can do this too. Overlapping away times of one person merge into one. Away times under 5 minutes are dropped. A day that is locked can only be changed by you, and the change counts in the next payroll.
+
+### Decide a step-out
+
+When a staff member steps out and comes back on her own, it waits in **Needs action** as an "Away interval", for example "Priya stepped out 15:30–16:10 · lunch outside · 40 min".
+
+| Button | What happens |
+|---|---|
+| **Confirm** | The minutes count as minus credits |
+| **Mark as work** | No minus. The usual choice for a work errand ("Bank for the salon"). |
+| **Ignore** | No minus |
+
+Her own note, if she added one, is shown. A step-out that has no **I'm back** is closed at check-out or at the next roll-call where she is marked Here, and flagged "I'm back missing". The app does not decide for you: even a work errand waits for your tap.
+
+If someone is still checked in 30 minutes after the shift ends and has an away time open, you get "Priya may have left without checking out". When the app closes her day, it offers **Use 16:10 as check-out** (the time she went away), or **Keep 20:00**.
+
+With Time credits off, away times are only information: no minutes, and nothing to decide.
+
+### Presence settings and consent
+
+**Settings → Presence** has the roll-call times, who may do roll-calls, and the on and off switches. Each person sees a short notice once and taps to accept. If she does not, she can still check in and out and use Step out, and her profile says "Priya has not accepted presence tracking". An optional check can raise "Seems away" while her app happens to be open on screen. It never asks for location, never creates minutes by itself, and stores no route.
+
 ## Payroll at month end
 
 Payroll is worked out from check-ins and your pay rules. Every number has a formula you can see.
@@ -207,6 +313,8 @@ You see one row per person: paid days, unpaid days, late and early minutes, over
 - **Change advance recovery for this month** (lower it; the rest moves on).
 - **Recompute** after you change anything in attendance.
 
+With Time credits on, the **Settle credits** step comes with the draft: see [Settle credits at payroll](#settle-credits-at-payroll).
+
 The app warns about: pay below the minimum wage you entered, more than 48 hours in a week, too much overtime in a quarter, and deductions reaching half of a salary.
 
 <!-- screenshot: owner-payroll-review -->
@@ -230,6 +338,7 @@ The app does not pay anyone; money moves outside the app. After you pay, mark it
 These are the defaults the app starts with. Change any of them in Settings. Have your CA confirm them, and run the first month alongside the paper register.
 
 - Salary is divided by the **days in the month**.
+- **Time credits are on.** Every late and early minute and every approved overtime minute goes on a balance, and you settle it at payroll (see [Time credits](#time-credits)). The next two rules apply when credits are off.
 - A late arrival counts after **10 minutes** of grace; only the minutes after that are cut, in proportion. Fines are **off**.
 - Overtime is paid at **2 times** the normal rate, only after you approve it. Time after the shift counts as overtime candidate after 30 minutes, in 15-minute blocks.
 - Casual leave and sick leave are 7 days a year each, usable after 90 days; casual leave needs 2 days' notice.
@@ -250,6 +359,8 @@ Everything is in **Settings**. Each change shows a line about what it does, and 
 | Shifts and roster | Shift templates, weekly off, the 48-hour warning |
 | Holidays and no-leave days | Per year; for each holiday, what happens if someone works (comp-off, extra pay, or both) |
 | Attendance rules | Grace, early-leave allowance, half-day and absent limits, make-up time, automatic break, break buttons, PIN on every check-in, selfies, how careful the checks are |
+| Time credits | The switch and start date, **Pay legal overtime at 2×** (PIN) |
+| Presence | Roll-call times, who may do roll-calls, the switch, the optional location hint (PIN to switch on or off) |
 | Pay rules | Divisor, overtime rules, work on week off, advances, pay day, minimum wage, fines, statutory items |
 | Leave policy | Types, yearly days, notice, when leave can first be used, comp-off expiry |
 | Notifications | Which pings you get, quiet hours (21:30 to 08:00), summary only |
@@ -288,6 +399,9 @@ Pings come as a message on your phone and as a list in the inbox. The inbox is a
 | 21:00, people not checked out | "2 people haven't checked out" |
 | Leave, fixes, venue requests | When they arrive |
 | Many wrong PINs on one account | "Several wrong PIN tries on Priya's account" |
+| Roll-call time (default 12:00, 15:00, 18:00) | A reminder to do the roll-call, and "Roll-call at 15:00 not done" after 30 minutes |
+| A step-out waits for you | "Priya stepped out 15:30–16:10" |
+| Still checked in after the shift with an away time open | "Priya may have left without checking out" |
 | 1st of the month | Payroll ready |
 | The 5th | Salaries not marked paid |
 
