@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { createI18n, formatClock, formatDate, formatMonth, resources } from '../src/index';
+import {
+  createI18n,
+  formatClock,
+  formatDate,
+  formatMonth,
+  loadCatalog,
+  NAMESPACES,
+  STAFF_NAMESPACES,
+} from '../src/index';
 
 describe('i18n setup (PRD 11.9, AC S-17)', () => {
   it('S-17.3 a key missing in Gujarati falls back to English', async () => {
@@ -26,8 +34,25 @@ describe('i18n setup (PRD 11.9, AC S-17)', () => {
   it('interpolates the owner name from settings, never a fixed name', async () => {
     const i18n = await createI18n('en');
     expect(i18n.t('staff:today.sendToOwner', { owner: 'Urmi' })).toBe('Send to Urmi');
-    const staff = JSON.stringify(resources.en.staff);
+    const staff = JSON.stringify(await loadCatalog('en', 'staff'));
     expect(staff).not.toMatch(/\bUrmi\b/);
+  });
+
+  it('loads the owner copy from its own chunk by default, and only when asked for', async () => {
+    const all = await createI18n('en');
+    expect(all.hasResourceBundle('en', 'owner')).toBe(true);
+    const staffOnly = await createI18n('en', STAFF_NAMESPACES);
+    expect(staffOnly.hasResourceBundle('en', 'owner')).toBe(false);
+    await staffOnly.loadNamespaces('owner');
+    expect(staffOnly.hasResourceBundle('en', 'owner')).toBe(true);
+  });
+
+  it('every namespace has an English and a Gujarati catalog', async () => {
+    for (const ns of NAMESPACES) {
+      expect(typeof (await loadCatalog('en', ns))).toBe('object');
+      expect(typeof (await loadCatalog('gu', ns))).toBe('object');
+    }
+    expect(await loadCatalog('fr', 'staff')).toEqual({});
   });
 
   it('formats IST clock, dates and months with Latin digits', () => {

@@ -23,7 +23,7 @@ import {
   useToast,
 } from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 import { mockChoice, useApi } from '../../../api/provider';
@@ -31,10 +31,7 @@ import { useQueue } from '../../../pwa/queue';
 import { staffKeys, useOwnerName, useStaffMe, useToday } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
 import { useNow } from '../lib/use-now';
-import { usePunchSheetFlow } from '../punch/flow';
-import type { PunchFlow, PunchFlowActions } from '../punch/flow-types';
 import type { FrozenSheet } from '../punch/frozen';
-import { PunchSheet } from '../punch/PunchSheet';
 import { ActionBar } from '../shell/ActionBar';
 import { QueryError } from '../shell/ScreenFallback';
 import { ScreenHeader } from '../shell/ScreenHeader';
@@ -45,6 +42,11 @@ import {
   type QueuedPunchBrief,
   type TodayModel,
 } from './today-model';
+
+/** Today's first paint never waits for the sheet; its chunk is fetched shortly after. */
+const PRELOAD_SHEET_MS = 1500;
+const loadPunchSheet = () => import('../punch/PunchSheet');
+const PunchSheetHost = lazy(() => loadPunchSheet().then((m) => ({ default: m.PunchSheetHost })));
 
 export function TodayScreen() {
   const { t } = useTranslation();
@@ -105,8 +107,13 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
   const [params, setParams] = useSearchParams();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [frozen, setFrozen] = useState<FrozenSheet | null>(null);
-  const realFlow = usePunchSheetFlow();
-  const flow = useMemo(() => (frozen ? frozenFlow(frozen) : realFlow), [frozen, realFlow]);
+  // The sheet (and the punch flow inside it) is its own chunk: mount it on the first open only.
+  const [sheetMounted, setSheetMounted] = useState(false);
+  if (sheetOpen && !sheetMounted) setSheetMounted(true);
+  useEffect(() => {
+    const id = setTimeout(() => void loadPunchSheet(), PRELOAD_SHEET_MS);
+    return () => clearTimeout(id);
+  }, []);
 
   // Manifest shortcut "Check in" (`/?action=punch`) opens the sheet once (PRD 11.1).
   useEffect(() => {
@@ -218,45 +225,26 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
         )}
       </ActionBar>
 
-      <PunchSheet
-        key={frozen ? `frozen-${params.get('sheet')}` : 'live'}
-        open={sheetOpen}
-        onOpenChange={(open) => {
-          setSheetOpen(open);
-          if (!open && frozen) setFrozen(null);
-        }}
-        kind={kind}
-        confirm={kind === 'in' ? model.confirm : null}
-        shiftStartTs={model.shiftStartTs}
-        earliestTs={model.earliestCheckInTs}
-        flow={flow}
-        initialView={frozen?.view}
-        frozen={frozen !== null}
-        onSettled={onSettled}
-      />
+      {sheetMounted ? (
+        <Suspense fallback={null}>
+          <PunchSheetHost
+            key={frozen ? `frozen-${params.get('sheet')}` : 'live'}
+            open={sheetOpen}
+            onOpenChange={(open) => {
+              setSheetOpen(open);
+              if (!open && frozen) setFrozen(null);
+            }}
+            kind={kind}
+            confirm={kind === 'in' ? model.confirm : null}
+            shiftStartTs={model.shiftStartTs}
+            earliestTs={model.earliestCheckInTs}
+            frozenSheet={frozen}
+            onSettled={onSettled}
+          />
+        </Suspense>
+      ) : null}
     </div>
   );
-}
-
-/** A flow that only shows a frozen state (visual review); every action is a no-op. */
-function frozenFlow(f: FrozenSheet): PunchFlow {
-  const noop = () => {};
-  const actions: PunchFlowActions = {
-    start: noop,
-    allowLocation: noop,
-    retry: noop,
-    capture: noop,
-    retake: noop,
-    usePhoto: noop,
-    sendWithoutPhoto: noop,
-    submitPin: noop,
-    scanDoorCode: noop,
-    submitDoorCode: noop,
-    sendToOwner: noop,
-    atVenue: noop,
-    close: noop,
-  };
-  return { state: f.state, actions, busy: false };
 }
 
 function ShiftLine({ view }: { view: TodayView }) {

@@ -19,7 +19,15 @@ import {
   Sheet,
   Textarea,
 } from '@fs/ui';
-import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -30,7 +38,16 @@ import { useFmt } from '../lib/format';
 import { telLink } from '../lib/links';
 import { ScanPanel } from '../scan/ScanPanel';
 import type { PunchConfirm } from '../today/today-model';
-import type { PlaceFix, PunchAction, PunchFlow, PunchFlowState, PunchProblem } from './flow-types';
+import { usePunchSheetFlow } from './flow';
+import type {
+  PlaceFix,
+  PunchAction,
+  PunchFlow,
+  PunchFlowActions,
+  PunchFlowState,
+  PunchProblem,
+} from './flow-types';
+import type { FrozenSheet } from './frozen';
 
 /** Views the sheet shows on its own, on top of the flow state. */
 export type LocalView =
@@ -53,6 +70,51 @@ export interface PunchSheetProps {
   frozen?: boolean | undefined;
   /** A punch reached the server (or the queue): refresh Today. */
   onSettled: () => void;
+}
+
+export interface PunchSheetHostProps
+  extends Omit<PunchSheetProps, 'flow' | 'initialView' | 'frozen'> {
+  /** Visual review (`?sheet=<state>`, localhost mock mode): show this state, run nothing. */
+  frozenSheet: FrozenSheet | null;
+}
+
+/**
+ * What Today lazy-loads: the sheet plus the punch flow it drives, so neither is in the staff
+ * initial chunk (PRD 11.10). Stays mounted after the first open, so a running punch survives a
+ * close and reopen.
+ */
+export function PunchSheetHost({ frozenSheet, ...props }: PunchSheetHostProps) {
+  const live = usePunchSheetFlow();
+  const flow = useMemo(() => (frozenSheet ? frozenFlow(frozenSheet) : live), [frozenSheet, live]);
+  return (
+    <PunchSheet
+      {...props}
+      flow={flow}
+      initialView={frozenSheet?.view}
+      frozen={frozenSheet !== null}
+    />
+  );
+}
+
+/** A flow that only shows a frozen state (visual review); every action is a no-op. */
+function frozenFlow(f: FrozenSheet): PunchFlow {
+  const noop = () => {};
+  const actions: PunchFlowActions = {
+    start: noop,
+    allowLocation: noop,
+    retry: noop,
+    capture: noop,
+    retake: noop,
+    usePhoto: noop,
+    sendWithoutPhoto: noop,
+    submitPin: noop,
+    scanDoorCode: noop,
+    submitDoorCode: noop,
+    sendToOwner: noop,
+    atVenue: noop,
+    close: noop,
+  };
+  return { state: f.state, actions, busy: false };
 }
 
 export function PunchSheet({
