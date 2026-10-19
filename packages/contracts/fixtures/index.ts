@@ -72,6 +72,7 @@ import ownerAudit from './ownerAudit.json';
 import ownerAutoCloseDecide from './ownerAutoCloseDecide.json';
 import ownerAwayDecide from './ownerAwayDecide.json';
 import ownerAwayList from './ownerAwayList.json';
+import ownerAwayList_open from './ownerAwayList.open.json';
 import ownerAwayPatch from './ownerAwayPatch.json';
 import ownerBlackoutCreate from './ownerBlackoutCreate.json';
 import ownerBlackoutList from './ownerBlackoutList.json';
@@ -382,6 +383,9 @@ export const variants: Partial<Record<EndpointKey, Record<string, unknown>>> = {
   ownerActions: {
     empty: ownerActions_empty,
     away: ownerActions_away,
+  },
+  ownerAwayList: {
+    open: ownerAwayList_open,
   },
   ownerRollCallGet: {
     open: ownerRollCallGet_open,

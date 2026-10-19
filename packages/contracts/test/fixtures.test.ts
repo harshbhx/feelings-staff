@@ -52,6 +52,7 @@ describe('fixtures', () => {
       ownerToday: ['before-first-shift', 'holiday', 'roll-call-open', 'roll-call-missed'],
       ownerActions: ['empty', 'away'],
       ownerRollCallGet: ['open', 'empty'],
+      ownerAwayList: ['open'],
       mePresence: ['stepped-out', 'marked-away', 'consent-needed'],
       ownerPayrollGet: ['finalised', 'with-blockers'],
       mePayslips: ['empty'],
