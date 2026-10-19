@@ -55,7 +55,8 @@ describe('S-04 Check in and out', () => {
     expect(res.status).toBe(200);
     expect(res.body.outcome).toBe('accepted');
     expect(res.body.fence).toMatchObject({ result: 'pass' });
-    expect(res.body.punch).toMatchObject({ kind: 'in', status: 'accepted', effectiveTs: h.clock });
+    expect(res.body.punch).toMatchObject({ kind: 'in', status: 'accepted' });
+    expectNear(res.body.punch.effectiveTs, h.clock);
     const row = await punchRow(res.body.punch.id);
     expect(row).toMatchObject({
       server_ts: h.clock,

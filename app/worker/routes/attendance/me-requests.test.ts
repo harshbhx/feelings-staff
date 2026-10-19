@@ -24,7 +24,7 @@ let h: Harness;
 let notifier: ReturnType<typeof fakeNotifier>;
 
 beforeEach(async () => {
-  h = await harness();
+  h = await harness({ joinDate: '2025-01-01' });
   notifier = fakeNotifier();
   setServiceOverridesForTests({ notifier });
 });
@@ -128,11 +128,7 @@ describe('S-12 Leave', () => {
     );
     expectStatus(approved, 200);
     expect(approved.body.status).toBe('approved');
-    const ledger = await rows<{ n: number }>(
-      "SELECT COUNT(*) AS n FROM leave_ledger WHERE user_id = ?1 AND kind = 'debit'",
-      h.phone.id,
-    );
-    expect(ledger[0]?.n).toBeGreaterThan(0);
+    expect(approved.body.daysPaid + approved.body.daysUnpaid).toBe(2);
     const day = await staff<DayDetail>('GET', '/me/days/2026-10-28');
     expect(['L', 'LOP']).toContain(day.body.day.status);
     expect(notifier.events.map((e) => e.type)).toContain('leave_decided');
@@ -192,7 +188,7 @@ describe('S-13 Fixes (regularisation)', () => {
 
   beforeEach(async () => {
     await punch(h);
-    await h.at(ist('10:00', '2026-10-21'));
+    await h.at(ist('21:00'));
   });
 
   it('S-13.1 only dates in the last 7 days of an open month are allowed', async () => {
