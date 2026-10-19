@@ -87,10 +87,27 @@ export const ownerRoutes: RouteObject[] = [
       import('./payroll/PayrollRunScreen').then((m) => ({ Component: m.PayrollRunScreen })),
   },
   {
+    path: 'payroll/:runId/credits',
+    ...h('owner:screens.settleCredits'),
+    lazy: () =>
+      import('./credits/SettleCreditsScreen').then((m) => ({ Component: m.SettleCreditsScreen })),
+  },
+  {
     path: 'payroll/:runId/:userId',
     ...h('owner:screens.payslipReview'),
     lazy: () =>
       import('./payroll/PayslipReviewScreen').then((m) => ({ Component: m.PayslipReviewScreen })),
+  },
+  {
+    path: 'credits',
+    ...h('owner:screens.credits'),
+    lazy: () => import('./credits/CreditsScreen').then((m) => ({ Component: m.CreditsScreen })),
+  },
+  {
+    path: 'credits/:userId',
+    ...h('owner:screens.creditLedger', '/o/credits'),
+    lazy: () =>
+      import('./credits/CreditLedgerScreen').then((m) => ({ Component: m.CreditLedgerScreen })),
   },
   {
     path: 'advances',

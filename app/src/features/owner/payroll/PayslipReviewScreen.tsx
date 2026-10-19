@@ -35,6 +35,7 @@ import {
 import { ConfirmButton } from '../components/ConfirmButton';
 import { Meta, Section } from '../components/layout';
 import { QueryView, useErrorText } from '../components/states';
+import { SlipCreditsNote } from '../credits/SettleCreditsCard';
 import { days, longDate, money, monthLabel, shortDate } from '../lib/format';
 import { canShare, shareNative } from '../lib/share';
 import { useOwnerTitle } from '../shell/chrome';
@@ -74,6 +75,7 @@ function Review({ slip, runId }: { slip: OwnerPayslipView; runId: string }) {
   const draft = slip.status === 'draft';
   const statusChip =
     slip.status === 'draft' ? 'waiting' : slip.status === 'final' ? 'present' : 'off';
+  const creditsLine = slip.result.lines.find((l) => l.code === 'time_credits');
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] xl:items-start xl:gap-12">
@@ -96,6 +98,7 @@ function Review({ slip, runId }: { slip: OwnerPayslipView; runId: string }) {
       </div>
       <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
         {draft ? <Adjustments slip={slip} runId={runId} /> : null}
+        {draft && creditsLine ? <SlipCreditsNote runId={runId} line={creditsLine} /> : null}
         {draft && slip.advances.length > 0 ? <Recovery slip={slip} runId={runId} /> : null}
         {!draft ? <Final slip={slip} runId={runId} /> : null}
       </div>
