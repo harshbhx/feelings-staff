@@ -242,7 +242,7 @@ export const DEFAULT_ORG_SETTINGS: OrgSettings = {
     selfieRetentionDays: 30,
   },
   app: { defaultStaffLang: 'en' },
-  timeCredits: { enabled: true, startDate: '2026-10-01' },
+  timeCredits: { enabled: true, startDate: '2026-11-01' },
   presence: {
     enabled: true,
     rollCallTimes: ['12:00', '15:00', '18:00'],
