@@ -687,14 +687,14 @@ describe('PRD 7.17.7 legal overtime at 2x', () => {
     expect(on.warnings).toContainEqual({
       code: 'legal_ot_2x',
       message:
-        '120 min of overtime beyond 9 h a day or 48 h a week count at 2x, as the law requires.',
+        '120 min of overtime beyond 9 h a day or 48 h a week count at 2×, as the law requires.',
       amountPaise: null,
     });
     const off = computePayslip(input({ legalOt: { minutes: 45, pay2x: false } }));
     expect(off.warnings).toContainEqual({
       code: 'legal_ot_shortfall',
       message:
-        'Overtime beyond 9 h a day or 48 h a week must be paid at 2x by law; 45 min this month count at 1x.',
+        'Overtime beyond 9 h a day or 48 h a week must be paid at 2× by law. 45 min this month count at 1×.',
       amountPaise: null,
     });
     const none = computePayslip(input({ legalOt: { minutes: 0, pay2x: false } }));

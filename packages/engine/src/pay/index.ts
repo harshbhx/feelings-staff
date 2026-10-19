@@ -234,7 +234,8 @@ export function computePayslip(input: ComputePayslipInput): PayslipWithCredits {
     const week = isoWeekOf(d.workDate);
     weekMin.set(
       week,
-      (weekMin.get(week) ?? 0) + d.workedMin + d.otPreapprovedMin + d.otCandidateMin,
+      (weekMin.get(week) ?? 0) +
+        (d.totalMin ?? d.workedMin + d.otPreapprovedMin + d.otCandidateMin),
     );
   }
 
@@ -517,12 +518,12 @@ export function computePayslip(input: ComputePayslipInput): PayslipWithCredits {
     if (legal.pay2x) {
       warn(
         'legal_ot_2x',
-        `${legal.minutes} min of overtime beyond 9 h a day or 48 h a week count at 2x, as the law requires.`,
+        `${legal.minutes} min of overtime beyond 9 h a day or 48 h a week count at 2×, as the law requires.`,
       );
     } else {
       warn(
         'legal_ot_shortfall',
-        `Overtime beyond 9 h a day or 48 h a week must be paid at 2x by law; ${legal.minutes} min this month count at 1x.`,
+        `Overtime beyond 9 h a day or 48 h a week must be paid at 2× by law. ${legal.minutes} min this month count at 1×.`,
       );
     }
   }
