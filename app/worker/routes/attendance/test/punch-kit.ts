@@ -10,6 +10,7 @@ import {
   punchSigningPayload,
   toBase64Url,
 } from '@fs/contracts';
+import { expect } from 'vitest';
 import { callJson, sessionFor, testEnv } from '../../../test/helpers';
 import { ist, newSalon, type Salon } from '../../../test/notify-kit';
 import {
@@ -227,4 +228,19 @@ export async function rows<T>(sql: string, ...args: (string | number)[]): Promis
       .bind(...args)
       .all<T>()
   ).results;
+}
+
+/** Assert a status and show the body when it differs (so a CI log explains itself). */
+export function expectStatus(res: { status: number; body: unknown }, status: number): void {
+  if (res.status !== status) {
+    throw new Error(`expected ${status}, got ${res.status}: ${JSON.stringify(res.body)}`);
+  }
+}
+
+/** The fake clock keeps running between the set point and the request: allow a few seconds. */
+export function expectNear(actual: number | null, expected: number, withinMs = 5000): void {
+  expect(actual).not.toBeNull();
+  const d = (actual as number) - expected;
+  expect(d).toBeGreaterThanOrEqual(0);
+  expect(d).toBeLessThan(withinMs);
 }

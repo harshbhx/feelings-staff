@@ -16,7 +16,7 @@ import { fakeNotifier } from '../../test/fakes';
 import { callJson, testEnv } from '../../test/helpers';
 import { DAY, ist, setSettings } from '../../test/notify-kit';
 import { setClock } from '../auth/test/kit';
-import { fixAt, type Harness, harness, jpeg, punch, rows } from './test/punch-kit';
+import { expectStatus, fixAt, type Harness, harness, jpeg, punch, rows } from './test/punch-kit';
 
 type Err = { error: { code: string; details?: Record<string, unknown> } };
 
@@ -107,7 +107,7 @@ describe('S-12 Leave', () => {
 
   it('S-12.3 overlapping requests are blocked', async () => {
     const first = await staff<LeaveRequestView>('POST', '/leave-requests', body());
-    expect(first.status).toBe(201);
+    expectStatus(first, 201);
     const second = await staff<Err>(
       'POST',
       '/leave-requests',
@@ -118,6 +118,7 @@ describe('S-12 Leave', () => {
 
   it('S-12.4 approval writes the ledger and the days; rejection keeps a reason', async () => {
     const made = await staff<LeaveRequestView>('POST', '/leave-requests', body());
+    expectStatus(made, 201);
     const approved = await owner<LeaveRequestView>(
       'POST',
       `/owner/leave-requests/${made.body.id}/decide`,
@@ -125,6 +126,7 @@ describe('S-12 Leave', () => {
         decision: 'approve',
       },
     );
+    expectStatus(approved, 200);
     expect(approved.body.status).toBe('approved');
     const ledger = await rows<{ n: number }>(
       "SELECT COUNT(*) AS n FROM leave_ledger WHERE user_id = ?1 AND kind = 'debit'",
@@ -157,7 +159,9 @@ describe('S-12 Leave', () => {
 
   it('S-12.4 a pending request can be cancelled by the person', async () => {
     const made = await staff<LeaveRequestView>('POST', '/leave-requests', body());
+    expectStatus(made, 201);
     const res = await staff<LeaveRequestView>('POST', `/leave-requests/${made.body.id}/cancel`);
+    expectStatus(res, 200);
     expect(res.body.status).toBe('cancelled');
   });
 
@@ -211,6 +215,7 @@ describe('S-13 Fixes (regularisation)', () => {
 
   it('S-13.3 approval creates owner-source punches, recomputes the day and writes audit rows', async () => {
     const made = await staff<RegularisationView>('POST', '/regularisations', fix());
+    expectStatus(made, 201);
     const res = await owner<RegularisationView>(
       'POST',
       `/owner/regularisations/${made.body.id}/decide`,
@@ -218,6 +223,7 @@ describe('S-13 Fixes (regularisation)', () => {
         decision: 'approve',
       },
     );
+    expectStatus(res, 200);
     expect(res.body.status).toBe('approved');
     const out = await rows<{ source: string; effective_ts: number }>(
       "SELECT source, effective_ts FROM punches WHERE user_id = ?1 AND kind = 'out'",
