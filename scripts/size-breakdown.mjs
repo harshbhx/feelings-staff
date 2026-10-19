@@ -5,6 +5,7 @@
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { gzipSync } from 'node:zlib';
 import { ROOT } from './lib.mjs';
 
 const dist = join(ROOT, 'app/dist/client');
@@ -38,6 +39,7 @@ function decode(s) {
   return out;
 }
 const sizes = new Map();
+const texts = new Map();
 for (const k of seen) {
   const file = join(dist, manifest[k].file);
   if (!existsSync(`${file}.map`)) {
@@ -72,9 +74,16 @@ for (const k of seen) {
             .slice(0, 5)
             .join('/');
       sizes.set(key, (sizes.get(key) ?? 0) + Math.max(0, end - c));
+      texts.set(key, `${texts.get(key) ?? ''}${(lines[ln] ?? '').slice(c, end)}`);
     });
   });
 }
-const rows = [...sizes].sort((a, b) => b[1] - a[1]).slice(0, 50);
-console.info('size-breakdown: raw KB per package/folder in the staff initial chunks');
-for (const [k, n] of rows) console.info(`  ${(n / 1024).toFixed(1).padStart(7)}  ${k}`);
+const gzOf = (k) => gzipSync(texts.get(k) ?? '').length;
+const rows = [...sizes].sort((a, b) => gzOf(b[0]) - gzOf(a[0])).slice(0, 45);
+console.info(
+  'size-breakdown: raw KB and own-gzip KB per package/folder in the staff initial chunks',
+);
+for (const [k, n] of rows)
+  console.info(
+    `  ${(n / 1024).toFixed(1).padStart(7)} raw ${(gzOf(k) / 1024).toFixed(1).padStart(6)} gz  ${k}`,
+  );
