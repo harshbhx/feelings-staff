@@ -91,7 +91,8 @@ const view: PayslipView = {
 };
 
 const i18n = await createI18n('en');
-const t: PayslipDocumentProps['t'] = (key, vars) => i18n.t(key, vars) as string;
+const t: PayslipDocumentProps['t'] = (key, vars) =>
+  (vars ? i18n.t(key, vars) : i18n.t(key)) as string;
 const html = (el: Parameters<typeof renderToStaticMarkup>[0]) => renderToStaticMarkup(el);
 
 describe('payslip template (PRD 4.14)', () => {

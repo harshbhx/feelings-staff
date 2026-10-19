@@ -28,7 +28,7 @@ export type PdfData =
 
 async function translator(lang: 'en' | 'gu'): Promise<T> {
   const i18n = await createI18n(lang);
-  return (key, vars) => i18n.t(key, vars) as string;
+  return (key, vars) => (vars ? i18n.t(key, vars) : i18n.t(key)) as string;
 }
 
 /** The full HTML page of a document; `fallback` adds the print notice (PRD 4.14 states table). */

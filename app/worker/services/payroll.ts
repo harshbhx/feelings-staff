@@ -739,6 +739,11 @@ export async function reopenRun(
       'UPDATE attendance_days SET locked = 0, payroll_run_id = NULL WHERE org_id = ?org AND payroll_run_id = ?',
       run.id,
     ),
+    // The replaced payslips are rendered again with the "Replaced by revision N" watermark.
+    ctx.db.stmt(
+      "UPDATE payslips SET pdf_status = 'pending' WHERE org_id = ?org AND payroll_run_id = ?",
+      run.id,
+    ),
     ...adjustments.map((a) =>
       ctx.db.insert('adjustments', {
         id: ulid(now),

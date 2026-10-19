@@ -41,10 +41,9 @@ async function csv(kind: string, extra: Record<string, unknown> = {}): Promise<s
   expect(res.status).toBe(200);
   expect(res.headers.get('Content-Type')).toBe('text/csv; charset=utf-8');
   expect(res.headers.get('Content-Disposition')).toContain(`${kind.replace('_', '-')}-2026-10.csv`);
-  const text = await res.text();
-  expect(text.charCodeAt(0)).toBe(0xfeff);
-  return text
-    .slice(1)
+  const bytes = new Uint8Array(await res.clone().arrayBuffer());
+  expect([...bytes.slice(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
+  return (await res.text())
     .trim()
     .split('\r\n')
     .map((line) => line.split(','));
