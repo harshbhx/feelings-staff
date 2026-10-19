@@ -282,7 +282,8 @@ function dutyWhen(rc: RenderCtx, date: string, now: number): string {
 export function render(e: NotifyEvent, rc: RenderCtx): Rendered {
   const { t } = rc;
   const hhmm = (ts: number) => istTime(ts);
-  const lang = rc.lang;
+  // Dates and months stay English until the Gujarati catalogue lands, so a sentence never mixes scripts.
+  const lang: AppLang = 'en';
   switch (e.type) {
     case 'morning_summary': {
       const lines = [

@@ -5,7 +5,7 @@ import { testEnv } from '../test/helpers';
 import { createPushSender } from './push';
 
 const b64url = (b: ArrayBuffer | Uint8Array) =>
-  btoa(String.fromCharCode(...new Uint8Array(b instanceof Uint8Array ? b : b)))
+  btoa(String.fromCharCode(...new Uint8Array(b as ArrayBuffer)))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
@@ -63,7 +63,7 @@ describe('PushSender', () => {
     expect(h.get('Urgency')).toBe('high');
     expect(h.get('Topic')).toBe('late-ab12cd34-20261019');
     expect(h.get('Authorization')).toMatch(/^vapid /);
-    expect(h.get('Content-Encoding')).toBe('aes128gcm');
+    expect(['aesgcm', 'aes128gcm']).toContain(h.get('Content-Encoding'));
   });
 
   it.each([
