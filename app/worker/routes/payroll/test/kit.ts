@@ -1,6 +1,7 @@
 /** WP-5 test kit: people, month-long punch scripts and the clock for payroll API tests. */
 import { istToEpoch, monthDates, weekday } from '@fs/contracts';
 import { ulid } from '../../../lib/ulid';
+import { hashToken } from '../../../middleware/session';
 import { sessionFor, testEnv } from '../../../test/helpers';
 import { createStaff, setClock, templateId } from '../../auth/test/kit';
 
@@ -138,9 +139,9 @@ export async function login(userId: string, opts: { stepUp?: boolean } = {}): Pr
   const token = await sessionFor(userId);
   const far = Date.UTC(2027, 5, 1);
   await testEnv.DB.prepare(
-    'UPDATE sessions SET expires_at = ?1, step_up_until = ?2 WHERE user_id = ?3',
+    'UPDATE sessions SET expires_at = ?1, step_up_until = ?2 WHERE token_hash = ?3',
   )
-    .bind(far, opts.stepUp ? far : null, userId)
+    .bind(far, opts.stepUp ? far : null, await hashToken(token))
     .run();
   return token;
 }

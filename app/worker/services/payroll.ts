@@ -42,6 +42,7 @@ import {
   payslipView,
   snapshotOf,
 } from './payslip';
+import { generateRunPdfs } from './payslip-pdf';
 import type { Ctx, PayrollService } from './ports';
 
 type OwnerPayslip = OutputOf<Endpoints['ownerPayslipPreview']>;
@@ -682,6 +683,7 @@ export async function finaliseRun(
       month: run.month,
     });
   }
+  ctx.waitUntil(generateRunPdfs(ctx, run.id));
   return runView(ctx, await loadRun(ctx, run.id));
 }
 
@@ -737,6 +739,11 @@ export async function reopenRun(
       'UPDATE attendance_days SET locked = 0, payroll_run_id = NULL WHERE org_id = ?org AND payroll_run_id = ?',
       run.id,
     ),
+    // The replaced payslips are rendered again with the "Replaced by revision N" watermark.
+    ctx.db.stmt(
+      "UPDATE payslips SET pdf_status = 'pending' WHERE org_id = ?org AND payroll_run_id = ?",
+      run.id,
+    ),
     ...adjustments.map((a) =>
       ctx.db.insert('adjustments', {
         id: ulid(now),
@@ -761,6 +768,7 @@ export async function reopenRun(
     }),
   ];
   await ctx.db.batch(stmts);
+  ctx.waitUntil(generateRunPdfs(ctx, run.id));
   return runView(ctx, await loadRun(ctx, id));
 }
 

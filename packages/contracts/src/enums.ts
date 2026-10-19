@@ -227,7 +227,7 @@ export const PushStatus = z.enum(['none', 'held', 'queued', 'sent', 'failed']);
 export type PushStatus = z.infer<typeof PushStatus>;
 
 /**
- * Notification events N1-N31 (PRD 6). The value is the stable code stored in
+ * Notification events N1-N37 (PRD 6). The value is the stable code stored in
  * `notifications.type`; NOTIFY_EVENT_NUMBER maps it to its N-number.
  */
 export const NotifyEventType = z.enum([
@@ -262,6 +262,7 @@ export const NotifyEventType = z.enum([
   'needs_action_reminder',
   'weekly_digest',
   'sign_in_link',
+  'payslip_pdf_failed',
 ]);
 export type NotifyEventType = z.infer<typeof NotifyEventType>;
 
@@ -297,6 +298,7 @@ export const NOTIFY_EVENT_NUMBER: Record<NotifyEventType, number> = {
   needs_action_reminder: 29,
   weekly_digest: 30,
   sign_in_link: 31,
+  payslip_pdf_failed: 37,
 };
 
 /** Events whose push the recipient cannot switch off (PRD 6, delivery rules). */

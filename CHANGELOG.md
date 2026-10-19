@@ -30,6 +30,7 @@ WP-6, owner panel:
 - Owner shell, Today, Needs action, Register with day detail, and Staff (list, add and invite, profile) on phone and desktop, with loading, empty, error and offline states.
 - Owner actions that need the owner PIN use the shared step-up sheet from sign-in.
 - A screen whose server part isn't built yet says so in plain words instead of a general error, and is not retried.
+- Roster week plan with week-off swaps and the 48 h warning, the off-site duty form (current location, map pick or Google Maps link), Show door code, the More menu, and the public payslip check page.
 
 Docs:
 

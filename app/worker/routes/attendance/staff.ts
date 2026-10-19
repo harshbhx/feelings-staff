@@ -169,6 +169,22 @@ export const handlers: Handlers = {
     };
   },
 
+  /** My own selfie while it is kept (PRD 10.6); only the person it belongs to. */
+  async meSelfie({ params }, ctx) {
+    const user = me(ctx);
+    const row = await ctx.db.first<{ selfie_key: string | null; selfie_deleted_at: number | null }>(
+      'SELECT selfie_key, selfie_deleted_at FROM punches WHERE org_id = ?org AND id = ? AND user_id = ?',
+      params.id,
+      user.id,
+    );
+    if (!row?.selfie_key || row.selfie_deleted_at !== null) return fail('NOT_FOUND');
+    const object = await ctx.env.MEDIA.get(row.selfie_key);
+    if (!object) return fail('NOT_FOUND');
+    return new Response(object.body, {
+      headers: { 'Content-Type': 'image/jpeg', 'Cache-Control': 'private, no-store' },
+    });
+  },
+
   async meData(_input, ctx): Promise<MyData> {
     const user = me(ctx);
     const now = ctx.now();

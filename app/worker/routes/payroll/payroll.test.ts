@@ -533,10 +533,12 @@ describe('O-13.4 reopen', () => {
     });
     await setClock(Date.UTC(2026, 11, 2, 5, 0));
     await sundayRoster(priya.id, '2026-11');
+    owner = await login(s.ownerId);
     const nov = await callJson<PayrollRunView>('POST', '/owner/payroll-runs', {
       cookie: owner,
       body: { month: '2026-11' },
     });
+    expect(nov.status, JSON.stringify(nov.body)).toBe(201);
     const slip = await callJson<OwnerPayslip>(
       'GET',
       `/owner/payroll-runs/${nov.body.run.id}/people/${priya.id}`,

@@ -265,7 +265,145 @@
     "nobodyIn": "No one has checked in yet."
   },
   "payroll": {
-    "_helper": "fs-wp6-payroll-screens"
+    "start": "Start payroll",
+    "startMonth": "Start payroll for {{month}}",
+    "starting": "Starting…",
+    "empty": "Your first payroll will be ready on {{date}}.",
+    "soFar": "Payroll so far",
+    "soFarHint": "{{month}} up to today. Read-only until the month ends.",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} people",
+    "paidOf": "{{paid}} of {{count}} paid",
+    "status": {
+      "draft": "Draft",
+      "finalised": "Finalised",
+      "paid": "Paid",
+      "superseded": "Replaced",
+      "revision": "Revision {{n}}"
+    },
+    "run": {
+      "title": "{{month}} payroll",
+      "blockersTitle_one": "{{count}} thing to check before you finalise.",
+      "blockersTitle_other": "{{count}} things to check before you finalise.",
+      "blockerKind": {
+        "pending_punches": "Check-ins waiting for you",
+        "flagged_punches": "Check-ins to look at",
+        "overtime_undecided": "Overtime not decided",
+        "leave_undecided": "Leave not decided",
+        "regularisations_undecided": "Fixes not decided",
+        "open_sessions": "Days without a check-out"
+      },
+      "ifAnyway": "If you finalise anyway: {{what}}",
+      "openActions": "Open Needs action",
+      "gross": "Gross",
+      "deductions": "Deductions",
+      "net": "Net pay",
+      "people": "People",
+      "summaryLabel": "Totals for {{month}}",
+      "tableCaption": "Pay for each person in {{month}}",
+      "col": {
+        "person": "Staff",
+        "paidDays": "Paid days",
+        "lop": "LOP",
+        "late": "Late min",
+        "ot": "OT h",
+        "gross": "Gross",
+        "deductions": "Deductions",
+        "net": "Net",
+        "paid": "Paid"
+      },
+      "lineDays": "{{paid}} paid days · {{lop}} LOP",
+      "notPaid": "Not paid",
+      "paidOn": "Paid {{date}}",
+      "warningsTitle": "Worth a look",
+      "finalise": "Finalise {{month}}",
+      "finalising": "Finalising…",
+      "finaliseAnyway": "Finalise anyway",
+      "finaliseTitle": "Finalise {{month}}?",
+      "finaliseBody": "Payslips are made and staff can see them. The month's attendance is locked.",
+      "finaliseDefaults": "These are still open. If you go on:",
+      "recompute": "Recompute",
+      "recomputing": "Recomputing…",
+      "recomputed": "Recomputed with the latest attendance.",
+      "markAllPaid": "Mark all paid",
+      "markPaid": "Mark paid",
+      "markPaidTitle": "Mark {{who}} paid",
+      "everyone": "everyone",
+      "paidDate": "Paid on",
+      "paidMode": "How",
+      "modes": {
+        "cash": "Cash",
+        "upi": "UPI",
+        "bank": "Bank transfer"
+      },
+      "paidRef": "Reference",
+      "paidRefHint": "UPI or bank reference, if any",
+      "saved": "Saved.",
+      "reopen": "Reopen",
+      "reopenTitle": "Reopen {{month}}?",
+      "reopenBody": "This makes revision {{n}}. The old payslips stay, marked as replaced.",
+      "reopenReason": "Why",
+      "settle": "Money already paid",
+      "settleModes": {
+        "next_month": "Settle the difference next month",
+        "reissue": "Re-issue this month"
+      },
+      "reopened": "Reopened as revision {{n}}.",
+      "finalised": "{{month}} is finalised. Payslips are being made.",
+      "preview": "This is the month so far. It becomes a draft on the 1st.",
+      "personWarning": "{{name}}: {{text}}"
+    },
+    "slip": {
+      "title": "{{name}} · {{month}}",
+      "status": {
+        "draft": "Draft",
+        "final": "Final",
+        "superseded": "Replaced"
+      },
+      "days": "Days",
+      "counts": "{{P}} present · {{H}} half · {{A}} absent · {{L}} leave · {{WO}} week off · {{HO}} holiday",
+      "rate": "Salary {{salary}} · {{divisor}} days · {{rate}} a day",
+      "earnings": "Earnings",
+      "deductions": "Deductions",
+      "gross": "Gross",
+      "totalDeductions": "Total deductions",
+      "rounding": "Rounding",
+      "net": "Net pay",
+      "adjustments": "Added by you",
+      "add": "Add to this payslip",
+      "addTitle": "Add to {{name}}'s payslip",
+      "kind": "What",
+      "kinds": {
+        "incentive": "Incentive",
+        "bonus": "Bonus",
+        "other_earning": "Other earning",
+        "arrears": "Arrears",
+        "damage": "Damage",
+        "other_deduction": "Other deduction",
+        "recovery": "Recovery"
+      },
+      "amount": "Amount in rupees",
+      "note": "Note",
+      "noteHint": "{{name}} sees this on the payslip.",
+      "showCause": "Show-cause record",
+      "showCauseHint": "A damage deduction needs the number of the show-cause note you gave.",
+      "remove": "Remove",
+      "advance": "Advance recovery",
+      "advanceLine": "Due {{due}} · balance {{balance}}",
+      "recover": "Recover this month",
+      "recoverHint": "Lower it to carry the rest to next month.",
+      "share": "Share",
+      "shareHint": "Sends the payslip link to {{name}} on WhatsApp.",
+      "pdf": {
+        "pending": "Preparing the PDF…",
+        "ready": "PDF ready",
+        "failed": "The PDF couldn't be made. The online slip works."
+      },
+      "openPdf": "Open PDF",
+      "warnings": "Worth a look",
+      "paid": "Paid {{date}} · {{mode}}",
+      "removeTitle": "Remove the {{what}} of {{amount}}?"
+    }
   },
   "actions": {
     "title": "Needs action",
@@ -920,7 +1058,54 @@
     }
   },
   "advances": {
-    "_helper": "fs-wp6-payroll-screens"
+    "give": "Give an advance",
+    "giveTo": "Give {{name}} an advance",
+    "empty": "No advances.",
+    "balances": "Still to recover",
+    "ledger": "Advances",
+    "all": "Show closed too",
+    "person": "Who",
+    "amount": "Amount in rupees",
+    "givenOn": "Given on",
+    "mode": "How",
+    "reason": "Reason",
+    "plan": "Recovery",
+    "plans": {
+      "full": "Full next month",
+      "instalments": "In instalments"
+    },
+    "instalments": "Months",
+    "firstMonth": "First recovery month",
+    "ack": "Ask {{name}} to confirm in the app",
+    "ackShort": "Ask them to confirm in the app",
+    "line": "{{amount}} on {{date}} · {{mode}}",
+    "planLine": {
+      "full": "Recover in full from {{month}}",
+      "instalments": "{{n}} instalments from {{month}}"
+    },
+    "recovered": "{{recovered}} recovered · {{balance}} left",
+    "status": {
+      "requested": "Asked for",
+      "active": "Recovering",
+      "closed": "Recovered",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "ackStatus": {
+      "pending": "Not confirmed yet",
+      "confirmed": "Confirmed by {{name}}",
+      "disputed": "{{name}} says something's wrong"
+    },
+    "cancel": "Cancel advance",
+    "cancelTitle": "Cancel this advance?",
+    "cancelBody": "Use this only if it was recorded by mistake.",
+    "saved": "Advance saved. {{name}} is told.",
+    "save": "Save advance",
+    "errors": {
+      "person": "Pick the person.",
+      "amount": "Enter the amount in rupees."
+    },
+    "asked": "Asked for {{amount}}, not given yet"
   },
   "staff": {
     "title": "Staff",
@@ -1273,7 +1458,63 @@
     }
   },
   "reports": {
-    "_helper": "fs-wp6-payroll-screens"
+    "lead": "Pick a month and a format. Files stay for 7 days.",
+    "month": "Month",
+    "format": "Format",
+    "make": "Make file",
+    "making": "Making…",
+    "kinds": {
+      "register": {
+        "title": "Attendance register",
+        "body": "Staff by days with P, H, A, L, WO, HO, OD and totals."
+      },
+      "salary_register": {
+        "title": "Salary register",
+        "body": "Rate, paid days, earnings, deductions, advances, net and payment."
+      },
+      "punches": {
+        "title": "Punches log",
+        "body": "Every check-in and check-out with place, distance and review."
+      },
+      "late_early": {
+        "title": "Late and early",
+        "body": "Late and early minutes per day and what they cost."
+      },
+      "overtime": {
+        "title": "Overtime",
+        "body": "Asked, approved and rejected minutes, rate and amount."
+      },
+      "leave": {
+        "title": "Leave",
+        "body": "Requests and balances."
+      },
+      "advances": {
+        "title": "Advances",
+        "body": "Given, recovered, carried and balance."
+      },
+      "exceptions": {
+        "title": "Exceptions",
+        "body": "Flags, edits, auto-closed days and phone changes."
+      },
+      "audit": {
+        "title": "Audit log",
+        "body": "Every change with who, when and why."
+      }
+    },
+    "recent": "Recent files",
+    "noRecent": "No files yet.",
+    "status": {
+      "queued": "Being made",
+      "ready": "Ready",
+      "failed": "Couldn't be made"
+    },
+    "download": "Download",
+    "expires": "Until {{date}}",
+    "queued": "We're making the file. It shows below when it's ready.",
+    "formats": {
+      "csv": "CSV",
+      "pdf": "PDF"
+    }
   },
   "door": {
     "title": "Door code",
