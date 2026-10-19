@@ -11,7 +11,9 @@ import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router';
 import { mockChoice, useApi } from '../../../api/provider';
 import { saveLang } from '../../../app/i18n';
-import { onQueueEvent, startQueue } from '../../../pwa/queue';
+import { deviceSigner } from '../../../lib/punch/adapters';
+import { createPunchResigner } from '../../../lib/punch/resign';
+import { onQueueEvent, setResigner, startQueue } from '../../../pwa/queue';
 import { ensurePersisted } from '../../../pwa/storage';
 import { staffKeys, useStaffMe } from '../api';
 import { browserAllowed } from '../install/allow-browser';
@@ -64,6 +66,7 @@ function useStaffBoot(standalone: boolean) {
   const { i18n } = useTranslation();
 
   useEffect(() => {
+    setResigner(createPunchResigner({ api, getSigner: deviceSigner }));
     const stop = startQueue(api);
     const off = onQueueEvent((e) => {
       if (e.type === 'synced') void qc.invalidateQueries({ queryKey: staffKeys.all });
@@ -71,6 +74,7 @@ function useStaffBoot(standalone: boolean) {
     return () => {
       off();
       stop();
+      setResigner(null);
     };
   }, [api, qc]);
 
