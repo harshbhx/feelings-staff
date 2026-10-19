@@ -47,6 +47,16 @@ async function openOwner(page: Page, path: string, variants: string[] = [], sett
   await page.evaluate(() => document.fonts.ready);
 }
 
+import AxeBuilder from '@axe-core/playwright';
+
+test('OWN-DEBUG register names', async ({ page }, info) => {
+  test.skip(!OWNER_PROJECTS.has(info.project.name), 'owner only');
+  await openOwner(page, '/o/register');
+  const r = await new AxeBuilder({ page }).withRules(['label-content-name-mismatch']).analyze();
+  for (const v of r.violations)
+    for (const n of v.nodes.slice(0, 6)) console.log('AXE', n.target.join(' '), n.html.slice(0, 300));
+});
+
 test.describe('owner visual', () => {
   test.beforeEach(({ page: _page }, info) => {
     test.skip(!OWNER_PROJECTS.has(info.project.name), 'owner screens at 390 and 1280 only');
