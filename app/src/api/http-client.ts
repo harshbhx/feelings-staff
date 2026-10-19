@@ -6,15 +6,14 @@ import {
   API_BASE,
   type ApiClient,
   ApiError,
-  ApiErrorBody,
+  type ApiErrorBody,
   buildPath,
   type CallOptions,
-  ENDPOINT_KEYS,
   type EndpointKey,
-  type EndpointShape,
+  ERROR_STATUS,
   type ErrorCode,
-  endpoints,
 } from '@fs/contracts';
+import { ROUTES } from './routes.gen';
 
 export interface HttpClientOptions {
   appVersion: string;
@@ -44,6 +43,15 @@ function queryString(q: Record<string, unknown> | undefined): string {
   return s ? `?${s}` : '';
 }
 
+/** Shape check for the error body (PRD 9.2) without zod, which stays out of the client shell. */
+function isErrorBody(v: unknown): v is ApiErrorBody {
+  if (typeof v !== 'object' || v === null) return false;
+  const e = (v as { error?: unknown }).error;
+  if (typeof e !== 'object' || e === null) return false;
+  const { code, message } = e as { code?: unknown; message?: unknown };
+  return typeof code === 'string' && code in ERROR_STATUS && typeof message === 'string';
+}
+
 function newIdempotencyKey(): string {
   return crypto.randomUUID();
 }
@@ -54,19 +62,18 @@ export function createHttpApiClient(opts: HttpClientOptions): ApiClient {
   const client: Record<string, unknown> = {};
 
   const url = (key: EndpointKey, input?: Input) =>
-    `${base}${API_BASE}${buildPath(endpoints[key].path, input?.params)}${queryString(input?.query)}`;
+    `${base}${API_BASE}${buildPath(ROUTES[key].p, input?.params)}${queryString(input?.query)}`;
 
-  for (const key of ENDPOINT_KEYS) {
-    const def = endpoints[key] as EndpointShape;
+  for (const key of Object.keys(ROUTES) as EndpointKey[]) {
+    const def = ROUTES[key];
     client[key] = async (input: Input | undefined, callOpts: CallOptions = {}) => {
       const headers: Record<string, string> = {
         'X-FS-Client': opts.appVersion,
         ...(callOpts.headers ?? {}),
       };
-      if (def.idempotent)
-        headers['Idempotency-Key'] = callOpts.idempotencyKey ?? newIdempotencyKey();
+      if (def.i) headers['Idempotency-Key'] = callOpts.idempotencyKey ?? newIdempotencyKey();
       let body: BodyInit | undefined;
-      if (def.multipart) {
+      if (def.mp) {
         const form = new FormData();
         form.set('payload', JSON.stringify(input?.body ?? {}));
         for (const [name, blob] of Object.entries(input?.files ?? {}))
@@ -79,7 +86,7 @@ export function createHttpApiClient(opts: HttpClientOptions): ApiClient {
       let res: Response;
       try {
         res = await doFetch(url(key, input), {
-          method: def.method,
+          method: def.m,
           headers,
           credentials: 'same-origin',
           ...(body !== undefined ? { body } : {}),
@@ -92,8 +99,8 @@ export function createHttpApiClient(opts: HttpClientOptions): ApiClient {
       if (!res.ok) {
         let parsed: ApiErrorBody | null = null;
         try {
-          const r = ApiErrorBody.safeParse(await res.json());
-          parsed = r.success ? r.data : null;
+          const body: unknown = await res.json();
+          parsed = isErrorBody(body) ? body : null;
         } catch {
           parsed = null;
         }
@@ -109,8 +116,8 @@ export function createHttpApiClient(opts: HttpClientOptions): ApiClient {
           requestId: parsed?.error.requestId ?? res.headers.get('X-Request-Id') ?? undefined,
         });
       }
-      if (def.binary) return res.blob();
-      if (res.status === 204 || res.status === 202 || def.status === 204) return undefined;
+      if (def.b) return res.blob();
+      if (res.status === 204 || res.status === 202 || def.s === 204) return undefined;
       return res.json();
     };
   }

@@ -1,7 +1,7 @@
 /** The ApiClient interface: one method per endpoint in the table (PRD 16.3). */
 import type { HasInput, InputOf, OutputOf } from './endpoint';
 import type { EndpointKey, Endpoints } from './endpoints';
-import { DEFAULT_ERROR_MESSAGES, type ErrorCode } from './errors';
+import { DEFAULT_ERROR_MESSAGES, type ErrorCode } from './error-codes';
 
 export interface CallOptions {
   /** Sent as `Idempotency-Key` on endpoints marked idempotent (generated if absent). */
