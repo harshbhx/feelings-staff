@@ -20,6 +20,7 @@ import {
 import {
   advanceInstalment,
   computePayslip,
+  creditRate,
   dailyRate,
   divisorDays,
   lateFines,
@@ -27,6 +28,8 @@ import {
   salaryParts,
 } from '@fs/engine';
 import { json } from '../db';
+import { balancesOn, type CreditSettlementRow } from './credit-entries';
+import { draftSettlements, type PersonCredit } from './credit-settlement';
 import {
   type Computed,
   computeFrom,
@@ -99,6 +102,8 @@ export interface PersonCalc {
   days: Computed[];
   result: PayslipResult;
   adjustments: AdjustmentRow[];
+  /** Time credits: balance on the month end, the owner's choice and what the engine applied. */
+  credit: PersonCredit;
 }
 
 export interface RunCalc {
@@ -217,6 +222,8 @@ export interface CalcOptions {
   userId?: string;
   /** "Payroll so far": pay only up to this date. */
   until?: string;
+  /** Settlement minutes to use instead of the saved draft ones (the person's settle step). */
+  settlements?: ReadonlyMap<string, number>;
 }
 
 /** Everything the engine needs, per person, and its result. */
@@ -231,26 +238,31 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
   );
   const ids = eligible.map((p) => p.user_id);
 
-  const [salaryRows, adjustmentRows, quarterRows, carried, schedules] = await Promise.all([
-    ctx.db.all<SalaryHistoryRow>(
-      'SELECT user_id, effective_from, salary_type, amount_paise FROM salary_history WHERE org_id = ?org AND effective_from <= ?',
-      to,
-    ),
-    o.runId
-      ? ctx.db.all<AdjustmentRow>(
-          'SELECT * FROM adjustments WHERE org_id = ?org AND payroll_run_id = ? ORDER BY created_at, id',
-          o.runId,
-        )
-      : Promise.resolve([] as AdjustmentRow[]),
-    ctx.db.all<{ user_id: string; min: number }>(
-      `SELECT user_id, SUM(ot_approved_min) AS min FROM attendance_days
+  const [salaryRows, adjustmentRows, quarterRows, carried, schedules, balances, drafts] =
+    await Promise.all([
+      ctx.db.all<SalaryHistoryRow>(
+        'SELECT user_id, effective_from, salary_type, amount_paise FROM salary_history WHERE org_id = ?org AND effective_from <= ?',
+        to,
+      ),
+      o.runId
+        ? ctx.db.all<AdjustmentRow>(
+            'SELECT * FROM adjustments WHERE org_id = ?org AND payroll_run_id = ? ORDER BY created_at, id',
+            o.runId,
+          )
+        : Promise.resolve([] as AdjustmentRow[]),
+      ctx.db.all<{ user_id: string; min: number }>(
+        `SELECT user_id, SUM(ot_approved_min) AS min FROM attendance_days
         WHERE org_id = ?org AND work_date >= ? AND work_date < ? GROUP BY user_id`,
-      quarterStart(month),
-      from,
-    ),
-    carriedIn(ctx, month),
-    advanceSchedules(ctx, month, ids, o.overrides),
-  ]);
+        quarterStart(month),
+        from,
+      ),
+      carriedIn(ctx, month),
+      advanceSchedules(ctx, month, ids, o.overrides),
+      balancesOn(ctx, ids, to),
+      o.runId
+        ? draftSettlements(ctx, o.runId)
+        : Promise.resolve(new Map<string, CreditSettlementRow>()),
+    ]);
   const rules = payRulesFromSettings(settings);
   const holidays = data.holidays.filter((h) => h.date >= from && h.date <= to);
   const quarterMin = new Map(quarterRows.map((r) => [r.user_id, r.min]));
@@ -329,6 +341,15 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
         });
       }
     }
+    // Time credits (PRD 7.17): the balance on the month end and the owner's settlement choice.
+    const balanceMin = balances.get(profile.user_id) ?? 0;
+    const chosen =
+      o.settlements?.get(profile.user_id) ?? drafts.get(profile.user_id)?.settle_min ?? 0;
+    const rate = creditRate(person, month);
+    const settlement =
+      o.runId !== null && chosen !== 0 && balanceMin !== 0
+        ? { balanceMin, settleMin: chosen, rate }
+        : null;
     const result = computePayslip({
       person,
       month,
@@ -345,8 +366,17 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
         quarterlyOtHours: settings.overtime.quarterlyOtWarnHours,
       },
       quarterOtMinBefore: quarterMin.get(profile.user_id) ?? 0,
+      creditDays: days.filter((c) => c.creditsOn).map((c) => c.date),
+      settlement,
     });
-    people.push({ profile, person, days, result, adjustments: mine });
+    people.push({
+      profile,
+      person,
+      days,
+      result,
+      adjustments: mine,
+      credit: { balanceMin, settleMin: chosen, rate, applied: result.credits },
+    });
   }
   const blockers = o.userId ? [] : await findBlockers(ctx, month, data, people);
   return { month, data, people, blockers };

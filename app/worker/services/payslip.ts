@@ -15,7 +15,7 @@ import {
 import { json } from '../db';
 import { fail } from '../lib/errors';
 import { loadOrg } from '../lib/settings';
-import { leaveBalances } from './leave';
+import { leaveBalances, monthName } from './leave';
 import type { PersonCalc, RunRow } from './payroll-calc';
 import type { Ctx } from './ports';
 
@@ -174,7 +174,7 @@ export async function myPayslip(ctx: Ctx, id: string): Promise<PayslipView> {
   const row = await payslipRow(ctx, id);
   if (row.user_id !== userId || !(await staffMaySee(ctx)))
     fail('NOT_FOUND', 'That payslip was not found.');
-  return payslipView(ctx, row, await runOfPayslip(ctx, row));
+  return staffSafePayslip(ctx, payslipView(ctx, row, await runOfPayslip(ctx, row)));
 }
 
 // ---- Public verify -------------------------------------------------------------------------------
@@ -227,3 +227,41 @@ export async function verifyPayslip(
 }
 
 export const todayIst = (ctx: Ctx) => istDate(ctx.now());
+
+// ---- What staff may see of a settlement ----------------------------------------------------------
+
+/**
+ * The payslip as staff see it (PRD 7.17.9): the settlement shows as "Time adjustment", an amount and
+ * "settled by Urmi for time not worked in October", without minutes, the balance or the word "credits".
+ */
+export async function staffSafePayslip(ctx: Ctx, view: PayslipView): Promise<PayslipView> {
+  if (!view.result.lines.some((l) => l.code === 'time_credits')) return stripCredits(view, null);
+  const owner = (await loadOrg(ctx)).org.owner_display_name;
+  return stripCredits(view, owner);
+}
+
+function stripCredits(view: PayslipView, owner: string | null): PayslipView {
+  const { credits: _credits, ...rest } = view.result as PayslipView['result'] & {
+    credits?: unknown;
+  };
+  const month = monthName(view.month);
+  return {
+    ...view,
+    result: {
+      ...rest,
+      lines: rest.lines.map((l) =>
+        l.code === 'time_credits'
+          ? {
+              ...l,
+              label: 'Time adjustment',
+              formula:
+                l.kind === 'deduction'
+                  ? `settled by ${owner ?? 'the owner'} for time not worked in ${month}`
+                  : `settled by ${owner ?? 'the owner'} for extra time worked in ${month}`,
+            }
+          : l,
+      ),
+      warnings: rest.warnings.filter((w) => !/credit/i.test(w.message)),
+    },
+  };
+}
