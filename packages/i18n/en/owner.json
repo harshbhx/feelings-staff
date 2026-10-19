@@ -1096,7 +1096,81 @@
     }
   },
   "setup": {
-    "_helper": "fs-wp6-settings-screens"
+    "lead": "Eight quick things, then you're ready.",
+    "ready": "You're ready. Change any of this later in Settings.",
+    "progress": "{{done}} of {{total}} done",
+    "continue": "Next: {{step}}",
+    "toToday": "Go to Today",
+    "skip": "Skip for now",
+    "state": {
+      "done": "Done",
+      "skipped": "Skipped",
+      "todo": "To do"
+    },
+    "location": {
+      "circle": "Check-ins within {{m}} m of the pin count as inside the salon."
+    },
+    "install": {
+      "enable": "Turn on alerts",
+      "state": {
+        "unsupported": "This browser can't show alerts. Open the app in Chrome on Android or from the Home Screen on iPhone.",
+        "needs-install": "On iPhone, add the app to the Home Screen first: Share, then Add to Home Screen. Then open it from there.",
+        "default": "Turn on alerts to hear about late staff, new phones and leave requests.",
+        "denied": "Alerts are blocked for this app. Allow them in the phone's settings.",
+        "granted-subscribed": "Alerts are on for this phone.",
+        "granted-unsubscribed": "Alerts are allowed but not set up on this phone yet."
+      }
+    },
+    "steps": {
+      "salon": {
+        "title": "Salon details",
+        "hint": "Name, address, phone",
+        "lead": "Check the salon's name, address and phone. They go on payslips.",
+        "done": "Looks right"
+      },
+      "location": {
+        "title": "Salon location",
+        "hint": "The check-in circle",
+        "lead": "Staff can check in inside this circle. Calibrate at the counter for a better circle, or keep it.",
+        "done": "Looks right"
+      },
+      "shifts": {
+        "title": "Shifts",
+        "hint": "Opening hours and shift times",
+        "lead": "Five shifts are ready. Change the times or add your own.",
+        "done": "These are right"
+      },
+      "holidays": {
+        "title": "Holidays",
+        "hint": "This year's holidays",
+        "lead": "National holidays and five festivals are added. Fix the dates or add more.",
+        "done": "These are right"
+      },
+      "pay_rules": {
+        "title": "Pay rules",
+        "hint": "Overtime, off days, pay day",
+        "lead": "These are the usual rules for a salon. Change what's different for you.",
+        "done": "Use these"
+      },
+      "selfie": {
+        "title": "Selfie on check-in",
+        "hint": "Off unless you want it",
+        "lead": "A photo with each check-in makes it harder to check in for someone else. Off by default.",
+        "done": "Done"
+      },
+      "first_staff": {
+        "title": "Your first staff member",
+        "hint": "Add someone and send the invite",
+        "lead": "Add one person and send the invite on WhatsApp. Add the rest any time.",
+        "done": "Done"
+      },
+      "install": {
+        "title": "This phone",
+        "hint": "Install and turn on alerts",
+        "lead": "Keep Feelings on this phone's Home Screen and turn on alerts.",
+        "done": "Done"
+      }
+    }
   },
   "roster": {
     "title": "Roster",
