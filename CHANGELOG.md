@@ -50,6 +50,26 @@ Docs:
 - Handbook: [architecture](docs/architecture.md) with diagrams, [decision records](docs/decisions/README.md) ADR-01 to ADR-16, [setup](docs/setup.md), [deploy and go-live](docs/deploy.md), [API reference](docs/api.md) with a test that fails when an endpoint is missing from it, [data model](docs/data-model.md), runbooks for [incidents](docs/runbooks/incident.md), [backup and restore](docs/runbooks/backup-restore.md), [retention purge](docs/runbooks/retention-purge.md) and [secrets](docs/runbooks/secrets.md), an [ops log](docs/ops-log.md), and guides for the [owner](docs/guides/owner.md) and [staff](docs/guides/staff.md).
 - `SECURITY.md`, this changelog, and a rewritten README.
 
+WP-9 Time credits and presence, WP-10 polish, merged (PR links: https://github.com/harshbhx/feelings-staff/pull/43, https://github.com/harshbhx/feelings-staff/pull/46, https://github.com/harshbhx/feelings-staff/pull/48, https://github.com/harshbhx/feelings-staff/pull/49, https://github.com/harshbhx/feelings-staff/pull/50, https://github.com/harshbhx/feelings-staff/pull/51, https://github.com/harshbhx/feelings-staff/pull/52, https://github.com/harshbhx/feelings-staff/pull/47, https://github.com/harshbhx/feelings-staff/pull/55):
+
+- PRD 1.3 for Time credits and presence checks, with legal overtime at 2x (setting **Pay legal overtime at 2x**, on by default) and examples 14 and 15 on the month's own daily rate.
+- Contracts, engine ledger and presence away intervals (see the two WP-9 groups above).
+- Migration `0003_time_credits_presence.sql` and the owner credits API: ledger, adjustments, settle step, CSV.
+- UI kit uplift: intents, stat chips, progress strip, card and rail.
+
+WP-9 and WP-10 still open, **unverified**. GitHub Actions has been blocked by billing since 20:10 UTC on 19 Oct, so none of these has had `ci`, `e2e` or visual baselines run on its head. They were reviewed by reading only:
+
+- Legal overtime 2x in the credits API: https://github.com/harshbhx/feelings-staff/pull/54 (day recompute writes `ot_legal`, later days of the ISO week refreshed, payroll notice and shortfall warning).
+- Presence API: https://github.com/harshbhx/feelings-staff/pull/61 (roll-calls, Step out, I'm back, away intervals, foreground check, the `rules` job reminders).
+- Owner Time credits screens: https://github.com/harshbhx/feelings-staff/pull/57 (Credits, person ledger, settle step, settings).
+- Owner roll-call, away items in Needs action and presence settings: https://github.com/harshbhx/feelings-staff/pull/63.
+- Staff Step out, I'm back, the marked-away card and the presence notice: https://github.com/harshbhx/feelings-staff/pull/65.
+- Fixture variants for the presence screens: https://github.com/harshbhx/feelings-staff/pull/62; roll-call view returns each person's saved mark (contract change): https://github.com/harshbhx/feelings-staff/pull/66.
+- Staff leave and fix forms, payslips, Me, My data and Privacy: https://github.com/harshbhx/feelings-staff/pull/64.
+- Staff shift timeline, hero Check in and success check: https://github.com/harshbhx/feelings-staff/pull/58. Owner Today stat chips, register summary grid and rail icons: https://github.com/harshbhx/feelings-staff/pull/53.
+- Staff initial JS under the 170 KB gzip budget (lazy inbox screen, toast layer and icon paths): https://github.com/harshbhx/feelings-staff/pull/56.
+- Docs: Time credits and presence guides, data model for 0003, ADR-17 and ADR-18: https://github.com/harshbhx/feelings-staff/pull/59; PRD `total_min` in migration 0003 and payslip wording for an earning: https://github.com/harshbhx/feelings-staff/pull/60.
+
 ### Changed
 
 - The Content Security Policy no longer sends `upgrade-insecure-requests`. Every source is `'self'`, HSTS already forces HTTPS, and WebKit applies the directive to `http://localhost`, which broke the iPhone project of the CI run.
