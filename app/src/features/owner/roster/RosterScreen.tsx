@@ -253,7 +253,10 @@ function RosterTable({ view, onPick }: { view: RosterView; onPick: (t: Target) =
                       ) : null}
                     </span>
                     {cell.kind === 'template' && cell.segments.length > 0 ? (
-                      <span className="text-text-muted text-xs tabular-nums" aria-hidden="true">
+                      <span
+                        className="whitespace-nowrap text-text-muted text-xs tabular-nums"
+                        aria-hidden="true"
+                      >
                         {segmentsText(cell)}
                       </span>
                     ) : null}
