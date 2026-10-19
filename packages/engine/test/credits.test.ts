@@ -263,6 +263,16 @@ describe('PRD 14.2 time credits: entries for a day', () => {
     expect(creditEntriesForDay(h, [], rules())).toEqual([]);
   });
 
+  it('away entries in start order, then by interval id', () => {
+    const day = dr(WED);
+    const ids = creditEntriesForDay(
+      day,
+      [away(3, WED, 10, '15:00'), away(2, WED, 20, '15:00'), away(1, WED, 30, '12:00')],
+      rules(),
+    ).map((e) => e.sourceId);
+    expect(ids).toEqual([away(1, WED, 1).id, away(2, WED, 1).id, away(3, WED, 1).id]);
+  });
+
   it('nothing when credits are off for the day or the person was not employed', () => {
     const day = dr(WED, { lateMin: 25 });
     expect(creditEntriesForDay(day, [], rules({ enabled: false, otApprovedMin: 30 }))).toEqual([]);
@@ -500,6 +510,11 @@ describe('PRD 7.17.7 legal hours warnings', () => {
     const week = ['05', '06', '07', '08', '09', '10'].map((d) => dr(`2026-10-${d}`));
     const long = dr('2026-10-12', { workedMin: 540, otCandidateMin: 30 });
     const ne = dr('2026-10-13', { dayType: 'NE', status: 'NE', workedMin: 900 });
+    const next = ['13', '14', '15', '16', '17', '18'].map((d) => dr(`2026-10-${d}`));
+    expect(legalOvertime([...next, ...week]).map((w) => w.period)).toEqual([
+      isoWeekOf('2026-10-05'),
+      isoWeekOf('2026-10-12'),
+    ]);
     expect(legalOvertime([long, ne, ...week])).toEqual([
       { code: 'daily_hours', period: '2026-10-12', minutes: 570 },
       { code: 'weekly_hours', period: isoWeekOf('2026-10-05'), minutes: 3_240 },

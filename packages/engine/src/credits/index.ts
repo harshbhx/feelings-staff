@@ -196,6 +196,7 @@ export function legalOvertime(
   limits: { dayMin: number; weekMin: number } = { dayMin: 9 * 60, weekMin: 48 * 60 },
 ): LegalHoursWarning[] {
   const daily: LegalHoursWarning[] = [];
+  // Days in date order, so the weeks come out in order too.
   const weeks = new Map<string, number>();
   for (const d of [...days].sort((a, b) => a.workDate.localeCompare(b.workDate))) {
     if (d.dayType === 'NE') continue;
@@ -206,7 +207,6 @@ export function legalOvertime(
   }
   const weekly = [...weeks.entries()]
     .filter(([, min]) => min > limits.weekMin)
-    .sort(([a], [b]) => a.localeCompare(b))
     .map(
       ([week, min]): LegalHoursWarning => ({ code: 'weekly_hours', period: week, minutes: min }),
     );
