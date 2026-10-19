@@ -1,0 +1,129 @@
+/* Sheet (PRD 12.6): bottom sheet on phones, centred dialog from 48rem. The one place with --shadow-md. */
+@layer components {
+  .fs-sheet-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: var(--scrim-soft);
+  }
+
+  .fs-sheet {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 51;
+    display: flex;
+    flex-direction: column;
+    max-height: min(92dvh, 46rem);
+    padding: 0 var(--gutter) env(safe-area-inset-bottom);
+    border-top: 1px solid var(--border);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: var(--bg);
+    box-shadow: var(--shadow-md);
+    color: var(--text-body);
+    outline: none;
+  }
+
+  .fs-sheet__handle {
+    flex: none;
+    align-self: center;
+    width: 2.25rem;
+    height: 0.25rem;
+    margin: 0.625rem 0 0.375rem;
+    border-radius: var(--radius-pill);
+    background: var(--border-strong);
+  }
+
+  .fs-sheet__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-height: 3rem;
+    padding-top: var(--space-1);
+  }
+
+  .fs-sheet__title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-display);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+
+  .fs-sheet__close {
+    margin-right: -0.625rem;
+  }
+
+  .fs-sheet__desc {
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .fs-sheet__body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-4) 0 var(--space-5);
+  }
+
+  .fs-sheet__footer {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-3) 0 var(--space-4);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Phones: slide up 220ms; fade the scrim. */
+  .fs-sheet[data-state="open"] {
+    animation: fs-slide-up var(--dur-base) var(--ease-soft);
+  }
+
+  .fs-sheet[data-state="closed"] {
+    animation: fs-slide-down var(--dur-fast) var(--ease-out) forwards;
+  }
+
+  .fs-sheet-overlay[data-state="open"] {
+    animation: fs-fade-in var(--dur-base) var(--ease-out);
+  }
+
+  .fs-sheet-overlay[data-state="closed"] {
+    animation: fs-fade-out var(--dur-fast) var(--ease-out) forwards;
+  }
+
+  /* From 48rem: a centred dialog. */
+  @media (min-width: 48rem) {
+    .fs-sheet {
+      inset: 50% auto auto 50%;
+      width: min(100% - var(--space-6) * 2, 32rem);
+      max-height: min(86dvh, 44rem);
+      padding: var(--space-2) var(--space-6) 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      translate: -50% -50%;
+    }
+
+    .fs-sheet__handle {
+      display: none;
+    }
+
+    .fs-sheet[data-state="open"] {
+      animation: fs-enter var(--dur-base) var(--ease-soft);
+    }
+
+    .fs-sheet[data-state="closed"] {
+      animation: fs-fade-out var(--dur-fast) var(--ease-out) forwards;
+    }
+  }
+
+  /* Tier 1: no slide. The sheet just fades in. */
+  @media (prefers-reduced-motion: reduce) {
+    .fs-sheet[data-state="open"] {
+      animation: fs-fade-in 160ms ease-out;
+    }
+
+    .fs-sheet[data-state="closed"] {
+      animation: fs-fade-out 120ms ease-out forwards;
+    }
+  }
+}

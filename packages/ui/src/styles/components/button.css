@@ -1,0 +1,205 @@
+/* Button and IconButton (PRD 12.6), from the website's .btn (global.css, motion.css). */
+@layer components {
+  .fs-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55em;
+    min-height: 3rem;
+    padding: 0.75rem 1.4rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: var(--text-base);
+    font-weight: var(--weight-strong);
+    line-height: 1.1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .fs-btn > .fs-icon {
+    width: 1.2em;
+    height: 1.2em;
+    flex: none;
+  }
+
+  .fs-btn:active:not(:disabled, [aria-disabled="true"]) {
+    transform: scale(0.98);
+  }
+
+  .fs-btn[data-size="sm"] {
+    min-height: 2.5rem;
+    padding: 0.55rem 1.05rem;
+    font-size: var(--text-sm);
+  }
+
+  /* 40px to the eye, 44px to the thumb. */
+  .fs-btn[data-size="sm"]::after {
+    content: "";
+    position: absolute;
+    inset: -0.125rem 0;
+  }
+
+  .fs-btn[data-block] {
+    width: 100%;
+  }
+
+  .fs-btn[data-variant="primary"] {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .fs-btn[data-variant="primary"]:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+
+  .fs-btn[data-variant="secondary"] {
+    background: var(--bg);
+    border-color: var(--border-strong);
+    color: var(--text);
+  }
+
+  .fs-btn[data-variant="secondary"]:hover:not(:disabled) {
+    border-color: var(--text);
+  }
+
+  .fs-btn[data-variant="ghost"]:hover:not(:disabled) {
+    background: var(--bg-soft);
+  }
+
+  /* Destructive: never a second red fill. Secondary pill with absent-red text; confirm first. */
+  .fs-btn[data-variant="danger-secondary"] {
+    background: var(--bg);
+    border-color: var(--border-strong);
+    color: var(--status-absent);
+  }
+
+  .fs-btn[data-variant="danger-secondary"]:hover:not(:disabled) {
+    border-color: var(--status-absent);
+  }
+
+  .fs-btn[aria-busy="true"] {
+    cursor: progress;
+  }
+
+  /* Disabled reads as inert, not as a faded red action. */
+  .fs-btn:disabled {
+    background: var(--bg-soft);
+    border-color: var(--border);
+    color: var(--text-muted);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* On the maroon band (door screen header), primary turns white with red text. */
+  .fs-on-deep .fs-btn[data-variant="primary"] {
+    background: var(--white);
+    color: var(--accent);
+  }
+
+  .fs-on-deep .fs-btn[data-variant="secondary"] {
+    background: transparent;
+    border-color: var(--border-on-deep);
+    color: var(--text-on-deep);
+  }
+
+  .fs-on-deep :focus-visible {
+    outline-color: var(--white);
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .fs-btn:hover:not(:disabled, [aria-disabled="true"]) {
+      transform: translateY(-1px);
+    }
+
+    .fs-btn[data-variant="primary"]:hover:not(:disabled, [aria-disabled="true"]) {
+      box-shadow: var(--shadow-accent);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fs-btn:active:not(:disabled, [aria-disabled="true"]) {
+      transform: none;
+    }
+  }
+
+  /* IconButton: a 44px circle. */
+  .fs-icon-btn {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .fs-icon-btn > .fs-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .fs-icon-btn[data-variant="outline"] {
+    border-color: var(--border-control);
+    background: var(--bg);
+  }
+
+  .fs-icon-btn:hover:not(:disabled) {
+    background: var(--bg-soft);
+  }
+
+  .fs-icon-btn[data-variant="outline"]:hover:not(:disabled) {
+    border-color: var(--text);
+    background: var(--bg);
+  }
+
+  .fs-icon-btn:active:not(:disabled) {
+    transform: scale(0.92);
+  }
+
+  .fs-icon-btn:disabled {
+    color: var(--text-muted);
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .fs-icon-btn__dot {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 2px var(--bg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fs-icon-btn:active:not(:disabled) {
+      transform: none;
+    }
+  }
+}

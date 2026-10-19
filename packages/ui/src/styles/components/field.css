@@ -1,0 +1,154 @@
+/* Field, Input, Textarea (PRD 12.6), from the website's contact form. Hints and errors sit above the control. */
+@layer components {
+  .fs-field {
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .fs-field__label {
+    padding: 0;
+    font-weight: var(--weight-strong);
+    line-height: 1.35;
+    color: var(--text);
+  }
+
+  .fs-field__optional {
+    margin-left: 0.35em;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-body);
+    color: var(--text-muted);
+  }
+
+  .fs-field__hint {
+    margin-top: calc(var(--space-1) * -1);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+
+  .fs-field__error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-ui);
+    line-height: 1.45;
+    color: var(--status-absent);
+  }
+
+  .fs-field__error > .fs-icon {
+    width: 1.25em;
+    height: 1.25em;
+    margin-top: 0.05em;
+  }
+
+  .fs-input,
+  .fs-input-wrap {
+    width: 100%;
+    min-height: 3.25rem;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--text);
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      outline-color var(--dur-fast) var(--ease-out);
+  }
+
+  .fs-input {
+    display: block;
+    padding: 0.8rem 1rem;
+    font: inherit;
+    font-size: max(16px, var(--text-base));
+    line-height: 1.4;
+  }
+
+  .fs-input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+  }
+
+  .fs-input:hover:not(:disabled),
+  .fs-input-wrap:hover:not([data-disabled]) {
+    border-color: var(--text);
+  }
+
+  .fs-input:focus-visible {
+    border-color: var(--accent);
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .fs-input[aria-invalid="true"],
+  .fs-input-wrap[data-invalid] {
+    border-color: var(--status-absent);
+  }
+
+  .fs-input:disabled,
+  .fs-input-wrap[data-disabled] {
+    border-color: var(--border);
+    background: var(--bg-soft);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
+  .fs-input:read-only:not(:disabled) {
+    background: var(--bg-soft);
+  }
+
+  .fs-textarea {
+    min-height: 6.5rem;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  /* Input with something before or after the value ("+91", show password). */
+  .fs-input-wrap {
+    display: flex;
+    align-items: center;
+  }
+
+  .fs-input-wrap > .fs-input {
+    flex: 1;
+    min-width: 0;
+    min-height: calc(3.25rem - 2px);
+    border: 0;
+    background: transparent;
+  }
+
+  .fs-input-wrap > .fs-input:focus-visible {
+    outline: none;
+  }
+
+  .fs-input-wrap:has(> .fs-input:focus-visible) {
+    border-color: var(--accent);
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .fs-input-wrap__start {
+    padding-left: 1rem;
+    font-weight: var(--weight-ui);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fs-input-wrap__start + .fs-input {
+    padding-left: 0.5rem;
+  }
+
+  .fs-input-wrap__end {
+    display: flex;
+    align-items: center;
+    padding-right: 0.25rem;
+    color: var(--text-muted);
+  }
+
+  .fs-input-wrap:has(> .fs-input-wrap__end) > .fs-input {
+    padding-right: 0.25rem;
+  }
+}

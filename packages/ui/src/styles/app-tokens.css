@@ -1,0 +1,12 @@
+/* packages/ui/src/styles/app-tokens.css */
+:root {
+  --status-present: #2f6b47;  --status-present-bg: #eef5f0;
+  --status-late: var(--henna-600);  --status-late-bg: #fbf0ea;
+  --status-half: var(--coral-600);  --status-half-bg: #fdf1ee;
+  --status-absent: var(--red-700);  --status-absent-bg: var(--rose-100);
+  --status-leave: var(--plum-700);  --status-leave-bg: #f6edf2;
+  --status-off: var(--ink-500);     --status-off-bg: var(--rose-50);
+  --status-flag: var(--ink-700);    --status-flag-bg: #f4f0ef;
+  --app-bar-h: 4.75rem;   /* bottom action bar, + env(safe-area-inset-bottom) */
+  --tabbar-h: 4rem;
+}
