@@ -203,7 +203,7 @@ function RosterTable({ view, onPick }: { view: RosterView; onPick: (t: Target) =
           <tr>
             <th
               scope="col"
-              className="sticky left-0 z-10 min-w-40 border-border border-r border-b bg-bg px-3 py-2 text-left font-semibold text-text-muted text-xs"
+              className="sticky left-0 z-10 min-w-36 border-border border-r border-b bg-bg px-3 py-2 text-left font-semibold text-text-muted text-xs"
             >
               {t('owner:roster.staffColumn')}
             </th>
@@ -218,7 +218,7 @@ function RosterTable({ view, onPick }: { view: RosterView; onPick: (t: Target) =
             ))}
             <th
               scope="col"
-              className="border-border border-b border-l px-3 py-2 text-right font-semibold text-text-muted text-xs"
+              className="border-border border-b border-l px-2 py-2 text-right font-semibold text-text-muted text-xs"
             >
               {t('owner:roster.hoursColumn')}
             </th>
@@ -267,14 +267,14 @@ function RosterTable({ view, onPick }: { view: RosterView; onPick: (t: Target) =
                         aria-hidden="true"
                       >
                         <Icon name="map-pin" className="size-3.5 shrink-0" />
-                        <span className="truncate">{d.placeName}</span>
+                        <span className="max-w-[6.5rem] truncate">{d.placeName}</span>
                       </span>
                     ))}
                   </button>
                 </td>
               ))}
               <td
-                className={`border-border border-b border-l px-3 text-right font-semibold tabular-nums ${row.over48 ? 'text-absent' : 'text-text'}`}
+                className={`whitespace-nowrap border-border border-b border-l px-2 text-right font-semibold tabular-nums ${row.over48 ? 'text-absent' : 'text-text'}`}
               >
                 {row.over48 ? (
                   <span className="inline-flex items-center gap-1">
