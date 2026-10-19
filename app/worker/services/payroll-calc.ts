@@ -24,6 +24,7 @@ import {
   dailyRate,
   divisorDays,
   lateFines,
+  legalOtBand,
   payRulesFromSettings,
   salaryParts,
 } from '@fs/engine';
@@ -350,6 +351,15 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
       o.runId !== null && chosen !== 0 && balanceMin !== 0
         ? { balanceMin, settleMin: chosen, rate }
         : null;
+    // Legal-band overtime of the month on Time credits days (PRD 7.17.7), for the warnings.
+    const creditDays = days.filter((c) => c.creditsOn);
+    const legalMin = legalOtBand(
+      creditDays.map((c) => ({
+        workDate: c.date,
+        totalMin: c.result.totalMin ?? c.result.workedMin,
+        otApprovedMin: c.otApprovedMin,
+      })),
+    ).reduce((s, b) => s + b.legalMin, 0);
     const result = computePayslip({
       person,
       month,
@@ -366,7 +376,8 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
         quarterlyOtHours: settings.overtime.quarterlyOtWarnHours,
       },
       quarterOtMinBefore: quarterMin.get(profile.user_id) ?? 0,
-      creditDays: days.filter((c) => c.creditsOn).map((c) => c.date),
+      creditDays: creditDays.map((c) => c.date),
+      legalOt: { minutes: legalMin, pay2x: settings.timeCredits.legalOt2x },
       settlement,
     });
     people.push({
