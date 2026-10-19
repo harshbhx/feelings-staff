@@ -202,7 +202,7 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
           <tr>
             <th
               scope="col"
-              className="sticky top-0 left-0 z-30 w-28 min-w-28 border-border border-r border-b bg-bg px-3 py-2 text-left font-semibold text-text-muted text-xs xl:w-auto xl:min-w-44"
+              className="sticky top-0 left-0 z-30 w-30 min-w-30 border-border border-r border-b bg-bg px-3 py-2 text-left font-semibold text-text-muted text-xs xl:w-auto xl:min-w-44"
             >
               {t('owner:register.staffColumn')}
             </th>
@@ -246,7 +246,7 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
             <tr key={row.user.id}>
               <th
                 scope="row"
-                className="sticky left-0 z-10 max-w-28 border-border border-r border-b bg-bg px-3 py-1 text-left font-bold text-text xl:max-w-none"
+                className="sticky left-0 z-10 max-w-30 border-border border-r border-b bg-bg px-2.5 py-1 text-left font-bold text-sm text-text xl:max-w-none xl:px-3 xl:text-base"
               >
                 <button
                   type="button"
@@ -412,7 +412,7 @@ function MonthSummary({ view }: { view: RegisterView }) {
   return (
     <section
       aria-label={t('owner:register.summary')}
-      className="grid gap-2 rounded-md border border-border bg-bg-soft px-4 py-3"
+      className="grid gap-2 rounded-md border border-border bg-bg px-4 py-3"
     >
       <h2 className="font-semibold text-sm text-text-muted">{t('owner:register.summary')}</h2>
       <TotalChips totals={monthTotals(view)} />
