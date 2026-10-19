@@ -978,6 +978,7 @@ Phone: bottom tab bar **Today · Needs action · Register · Staff · More** (Mo
 | N34 | Staff stepped out (P1) | Owner | In-app only (shows on Today) | On Step out | "Priya stepped out" · "Lunch outside, since 14:40." |
 | N35 | Away interval to confirm (P1) | Owner | In-app, push (batched, held by quiet hours) | When a step-out closes (I'm back, auto-close) and Time credits is on | "Priya stepped out 15:30–16:10" · "40 min, lunch outside. Confirm, mark as work or ignore." |
 | N36 | May have left without checking out (P1) | Owner | In-app, push (batched) | Shift end + 30 min, still checked in, open away interval or "seems away" | "Priya may have left without checking out" · "Away since 16:10." |
+| N37 | Payslip PDF not made | Owner | In-app, push | A payslip PDF failed after the last retry (§4.14) | "1 payslip PDF couldn't be made" · "The online slip works." |
 
 There is no staff push for presence: nobody is asked to answer a notification during a shift (§4.18). Time credits create no staff notification at all (§7.17.9). N24's "things to check" count includes away intervals waiting and credit balances to settle. Gujarati copy for staff events ships with the Gujarati strings (phase 1.1).
 
@@ -2075,7 +2076,7 @@ CREATE TABLE notifications (
   id TEXT PRIMARY KEY,
   org_id TEXT NOT NULL,
   user_id TEXT NOT NULL REFERENCES users(id),
-  type TEXT NOT NULL,                          -- N1..N36 codes, e.g. 'late_checkin'
+  type TEXT NOT NULL,                          -- N1..N37 codes, e.g. 'late_checkin'
   title TEXT NOT NULL, body TEXT,
   url TEXT NOT NULL,
   data_json TEXT CHECK (data_json IS NULL OR json_valid(data_json)),
@@ -3455,7 +3456,7 @@ WP-9 starts once the slices it depends on have merged (it is the last package, a
 
 | Kind | Names |
 |---|---|
-| Enums | `Role`, `PunchKind`, `PunchSource`, `PunchStatus`, `FenceResult`, `RiskReason`, `DayType`, `DayStatus`, `DayTag`, `LeaveCode`, `RequestStatus`, `SalaryType`, `Divisor`, `OtRateMode`, `OffsiteMode`, `CreditKind`, `AwayState`, `AwayReason`, `PayslipLineCode` (gains `time_credits`), `NotifyEventType` (N1–N36), `ErrorCode` |
+| Enums | `Role`, `PunchKind`, `PunchSource`, `PunchStatus`, `FenceResult`, `RiskReason`, `DayType`, `DayStatus`, `DayTag`, `LeaveCode`, `RequestStatus`, `SalaryType`, `Divisor`, `OtRateMode`, `OffsiteMode`, `CreditKind`, `AwayState`, `AwayReason`, `PayslipLineCode` (gains `time_credits`), `NotifyEventType` (N1–N37), `ErrorCode` |
 | API schemas | `Me`, `OrgSettings`, `OrgSettingsPatch`, `StaffCreate`, `StaffView`, `StaffPatch`, `ShiftTemplate`, `RosterChange`, `Holiday`, `Site`, `OffsiteDuty`, `PunchRequest`, `PunchResult`, `TodayView`, `MonthView`, `DayDetail`, `OwnerDayDetail`, `DayOverride`, `LeaveRequestCreate`, `LeaveRequest`, `RegularisationCreate`, `Regularisation`, `AdvanceCreate`, `Advance`, `AdjustmentCreate`, `PayrollRunView`, `PayslipSummary`, `PayslipView`, `ExportRequest`, `Notification`, `NotificationPrefs`, `ActionItem` (discriminated union, with the `away` variant), `TodayBoard`, `RegisterView`, `CreditsOverview`, `CreditLedgerRow`, `CreditsSettleView`, `CreditSettlement`, `RollCallDay`, `RollCallView`, `AwayInterval`, `AwayIntervalStaff`, `PresenceState`, `PresenceHistory`, `ApiError`, `Paginated<T>` |
 | Engine types | `DaySchedule`, `PunchForCalc`, `DayResult`, `TimeRules`, `PayRules`, `PersonPay`, `PayslipResult`, `PayslipLine`, `CarryForward`, `RiskInput`, `RiskResult`, `Fix`, `SiteGeo`, `CreditEntry`, `CreditRules`, `MinuteRate`, `CreditSettlementInput`, `RollCallMark`, `StepOut`, `PresenceCheck`, `PresenceRules` |
 | Events | `NotifyEvent` union, one variant per `NotifyEventType`, each with `orgId`, recipients rule, ids and display fields |

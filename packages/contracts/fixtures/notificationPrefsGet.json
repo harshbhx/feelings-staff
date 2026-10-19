@@ -216,6 +216,13 @@
       "whatsapp": false,
       "email": true,
       "locked": true
+    },
+    {
+      "type": "payslip_pdf_failed",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
     }
   ]
 }
