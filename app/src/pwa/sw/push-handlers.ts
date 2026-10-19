@@ -45,19 +45,37 @@ export function readPayload(data: PushMessageData | null | undefined): PartialPa
   }
 }
 
-export function buildNotification(data: PartialPayload): ShownNotification {
+/**
+ * The in-app path to open. The server sends an absolute URL on our own origin (Declarative Web
+ * Push needs one); anything on another origin, or malformed, falls back to the home screen.
+ */
+export function safePath(raw: unknown, origin?: string): string {
+  if (typeof raw !== 'string' || !raw) return '/';
+  if (raw.startsWith('/') && !raw.startsWith('//')) return raw;
+  if (origin) {
+    try {
+      const u = new URL(raw);
+      if (u.origin === origin) return `${u.pathname}${u.search}${u.hash}`;
+    } catch {
+      // not a URL
+    }
+  }
+  return '/';
+}
+
+export function buildNotification(data: PartialPayload, origin?: string): ShownNotification {
   const n = data.notification;
   const title = typeof n?.title === 'string' && n.title ? n.title : FALLBACK_TITLE;
   const body = typeof n?.title === 'string' && n.title ? n.body : FALLBACK_BODY;
-  const url = typeof n?.navigate === 'string' && n.navigate.startsWith('/') ? n.navigate : '/';
+  const url = safePath(n?.navigate, origin);
   return {
     title,
     options: {
-      body,
+      ...(body ? { body } : {}),
       icon: NOTIFICATION_ICON,
       badge: NOTIFICATION_BADGE,
       ...(data.topic ? { tag: data.topic } : {}),
-      renotify: data.t !== 'summary',
+      renotify: data.t !== 'morning_summary',
       lang: n?.lang ?? 'en-IN',
       data: { url, e: data.e },
     },
@@ -93,7 +111,7 @@ export async function notifyClients(sw: ServiceWorkerGlobalScope, t: string | un
 export function handlePush(sw: ServiceWorkerGlobalScope, event: PushEvent): void {
   let shown: ShownNotification;
   try {
-    shown = buildNotification(readPayload(event.data));
+    shown = buildNotification(readPayload(event.data), sw.location.origin);
   } catch {
     shown = buildNotification({});
   }
@@ -142,7 +160,7 @@ export function handleNotificationClick(
 ): void {
   event.notification.close();
   const data = (event.notification.data ?? {}) as { url?: unknown; e?: unknown };
-  const url = typeof data.url === 'string' && data.url.startsWith('/') ? data.url : '/';
+  const url = safePath(data.url, sw.location.origin);
   event.waitUntil(Promise.all([focusOrOpen(sw, url), reportOpened(data.e, opts)]));
 }
 

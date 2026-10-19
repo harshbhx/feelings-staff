@@ -258,7 +258,7 @@ export async function translator(lang: AppLang): Promise<T> {
     i18nCache.set(lang, p);
   }
   const i18n = await p;
-  return (key, options) => i18n.t(`notify:${key}`, options) as string;
+  return (key, options) => i18n.t(`notify:${key}`, options ?? {}) as string;
 }
 
 /** `26–27 Oct` or `26 Oct`. */
@@ -326,7 +326,12 @@ export function render(e: NotifyEvent, rc: RenderCtx): Rendered {
         data: { workDate: e.workDate },
       };
     case 'flagged_punch': {
-      const reasons = e.reasons.map((r) => t(`n.flagged_punch.reason.${r}`)).join(' · ');
+      const reasons = e.reasons
+        .map((r, i) => {
+          const text = t(`n.flagged_punch.reason.${r}`);
+          return i === 0 ? text : text.charAt(0).toLowerCase() + text.slice(1);
+        })
+        .join(' · ');
       return {
         title: t(e.kind === 'out' ? 'n.flagged_punch.titleOut' : 'n.flagged_punch.titleIn', {
           name: e.name,
@@ -496,7 +501,7 @@ export function render(e: NotifyEvent, rc: RenderCtx): Rendered {
       return {
         title: t('n.advance_recorded.title', {
           owner: rc.owner,
-          amount: formatRupees(e.amountPaise),
+          amount: formatRupees(e.amountPaise, { whole: true }),
         }),
         body: t('n.advance_recorded.body', { summary: e.recoverySummary }),
         url: '/requests',
@@ -506,7 +511,7 @@ export function render(e: NotifyEvent, rc: RenderCtx): Rendered {
       return {
         title: t('n.advance_requested.title', { name: e.name }),
         body: t('n.advance_requested.body', {
-          amount: formatRupees(e.amountPaise),
+          amount: formatRupees(e.amountPaise, { whole: true }),
           reason: e.reason,
         }),
         url: '/o/advances',
@@ -559,7 +564,7 @@ export function render(e: NotifyEvent, rc: RenderCtx): Rendered {
       return {
         title: t('n.weekly_digest.title', {
           onTime: Math.round(e.onTimePct),
-          overtime: formatDuration(e.otApprovedMin),
+          overtime: hoursText(e.otApprovedMin),
           leaves: e.leaves,
         }),
         body: t('n.weekly_digest.body', { week: formatDate(e.weekStart, lang) }),
@@ -574,6 +579,13 @@ export function render(e: NotifyEvent, rc: RenderCtx): Rendered {
         data: null,
       };
   }
+}
+
+/** `6 h` or `6 h 30 m` (the digest copy drops empty minutes). */
+function hoursText(min: number): string {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return m === 0 ? `${h} h` : h === 0 ? `${m} m` : `${h} h ${m} m`;
 }
 
 /** `October` from `2026-10` (month name only, as the PRD copy has it). */

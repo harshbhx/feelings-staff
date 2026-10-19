@@ -31,7 +31,8 @@ export function createPushSender(env?: Env): PushSender {
         privateJWK: jwk,
         subscription: { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
         message: {
-          payload,
+          // Jsonifiable wants plain JSON; PushPayload has optional keys.
+          payload: JSON.parse(JSON.stringify(payload)) as never,
           adminContact: env.VAPID_SUBJECT,
           options: {
             ttl: opts.ttlSec,

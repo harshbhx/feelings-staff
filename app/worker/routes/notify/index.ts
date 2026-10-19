@@ -132,7 +132,7 @@ export const handlers: Handlers = {
         now,
         userId,
       );
-      return;
+      return undefined;
     }
     const stmts: D1PreparedStatement[] = [];
     for (let i = 0; i < body.ids.length; i += IDS_PER_STATEMENT) {
@@ -148,6 +148,7 @@ export const handlers: Handlers = {
       );
     }
     await ctx.db.batch(stmts);
+    return undefined;
   },
 
   async notificationOpened({ params }, ctx) {
@@ -159,6 +160,7 @@ export const handlers: Handlers = {
       me(ctx),
       params.id,
     );
+    return undefined;
   },
 
   async pushSubscribe({ body }, ctx) {
@@ -199,6 +201,7 @@ export const handlers: Handlers = {
         after: { platform: body.platform },
       }),
     ]);
+    return undefined;
   },
 
   async pushUnsubscribe({ body }, ctx) {
@@ -215,6 +218,7 @@ export const handlers: Handlers = {
         entityId: me(ctx),
       }),
     ]);
+    return undefined;
   },
 
   async notificationPrefsGet(_input, ctx) {

@@ -29,7 +29,7 @@ export function useUnreadCount(): number {
   const api = useApi();
   const q = useQuery({
     queryKey: inboxBellKey,
-    queryFn: () => api.notificationsList({}),
+    queryFn: () => api.notificationsList({ query: {} }),
     select: (page) => page.unread,
     refetchOnWindowFocus: true,
   });
