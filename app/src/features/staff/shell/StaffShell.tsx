@@ -9,7 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { lazy, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router';
-import { useApi } from '../../../api/provider';
+import { mockChoice, useApi } from '../../../api/provider';
 import { saveLang } from '../../../app/i18n';
 import { onQueueEvent, startQueue } from '../../../pwa/queue';
 import { ensurePersisted } from '../../../pwa/storage';
@@ -73,6 +73,26 @@ function useStaffBoot(standalone: boolean) {
       stop();
     };
   }, [api, qc]);
+
+  useEffect(() => {
+    // PRD 4.3.6: keep this phone ready to check in offline (two offline nonces, the PIN-sealing key,
+    // a signed server time), on open and whenever the app comes back to the front.
+    if (mockChoice()) return;
+    const load = () =>
+      Promise.all([import('../../../lib/punch/offline'), import('../../../lib/punch/adapters')]);
+    const prepare = () => {
+      void load().then(([offline, adapters]) => {
+        void offline.ensureOfflineReady(api, adapters.idbPunchStore);
+        void offline.refreshTimeAnchor(api, adapters.idbPunchStore);
+      });
+    };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') prepare();
+    };
+    prepare();
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [api]);
 
   useEffect(() => {
     // PRD 4.1.4, 11.8: persist storage once installed so the device key and queue survive.

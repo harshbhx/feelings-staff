@@ -324,6 +324,8 @@ function FlowView({ a }: { a: StepArgs }) {
       );
     case 'camera':
       return <CameraStep a={a} s={s} />;
+    case 'confirm':
+      return <ConfirmView a={a} reason={s.reason} />;
     case 'pin':
     case 'submitting':
       return <PinStep a={a} s={s} />;
@@ -431,7 +433,12 @@ function CameraStep({ a, s }: { a: StepArgs; s: Extract<PunchFlowState, { step: 
           </>
         ) : (
           <>
-            <Button variant="primary" block icon="camera" onClick={a.flow.actions.capture}>
+            <Button
+              variant="primary"
+              block
+              icon="camera"
+              onClick={() => a.flow.actions.capture(video.current)}
+            >
               {t('staff:punch.camera.shutter')}
             </Button>
             {s.tooDark && s.darkTries >= 2 ? (
@@ -789,9 +796,15 @@ function ProblemStep({ a, p }: { a: StepArgs; p: PunchProblem }) {
         </Button>,
       ];
       break;
-    case 'not_ready':
-      message = t('staff:punch.notReady');
-      options = [call, closeBtn];
+    case 'conflict':
+      message = p.checkedIn
+        ? t('staff:punch.problem.conflictIn')
+        : t('staff:punch.problem.conflictOut');
+      options = [closeBtn];
+      break;
+    case 'offline_unavailable':
+      message = t('staff:punch.problem.offline_unavailable');
+      options = [retry(true), closeBtn];
       break;
     default:
       message = t('staff:punch.problem.unknown');
