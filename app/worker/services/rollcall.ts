@@ -320,7 +320,14 @@ export async function rollCallSubmit(
     } else if (own) {
       // Editing: this roll-call made the interval, and now says Here, so there is none.
       result.ended.push(p.userId);
-      stmts.push(ctx.db.stmt('DELETE FROM away_intervals WHERE org_id = ?org AND id = ?', own.id));
+      stmts.push(
+        // Later roll-calls may point at this interval (a continued Not here): let go first.
+        ctx.db.stmt(
+          'UPDATE roll_call_marks SET away_interval_id = NULL WHERE org_id = ?org AND away_interval_id = ?',
+          own.id,
+        ),
+        ctx.db.stmt('DELETE FROM away_intervals WHERE org_id = ?org AND id = ?', own.id),
+      );
     } else if (current) {
       // Here ends an interval that is still open: the roll-call is what closed it.
       result.ended.push(p.userId);
@@ -367,7 +374,14 @@ export async function rollCallSubmit(
       before: edited
         ? { notHere: before.filter((m) => m.mark === 'not_here').map((m) => m.user_id) }
         : null,
-      after: { slotTime: rc.slot_time, notHere: body.notHere, here: body.here },
+      after: {
+        slotTime: rc.slot_time,
+        notHere: body.notHere,
+        here: body.here,
+        started: result.started,
+        continued: result.continued,
+        ended: result.ended,
+      },
     }),
   );
   await ctx.db.batch(stmts);
