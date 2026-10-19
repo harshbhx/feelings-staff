@@ -60,6 +60,16 @@ jobs:
       - name: Size budgets
         if: ${{ !cancelled() }}
         run: pnpm size
+      - name: Upload the build (main only, for preview deploys from the VM)
+        if: ${{ success() && github.ref == 'refs/heads/main' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-dist
+          retention-days: 3
+          include-hidden-files: true
+          path: |
+            app/dist
+            app/.wrangler/deploy
       - name: Upload coverage and size report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
