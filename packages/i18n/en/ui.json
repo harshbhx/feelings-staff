@@ -1,1 +1,64 @@
-{}
+{
+  "loading": "Loading",
+  "field": {
+    "optional": "optional"
+  },
+  "password": {
+    "show": "Show password",
+    "hide": "Hide password"
+  },
+  "sheet": {
+    "close": "Close"
+  },
+  "toast": {
+    "close": "Close",
+    "region": "Notifications"
+  },
+  "pinPad": {
+    "delete": "Delete digit",
+    "progress": "{{filled}} of {{total}} digits entered"
+  },
+  "status": {
+    "present": {
+      "word": "Present",
+      "letter": "P"
+    },
+    "late": {
+      "word": "Late"
+    },
+    "half": {
+      "word": "Half day",
+      "letter": "H"
+    },
+    "absent": {
+      "word": "Absent",
+      "letter": "A"
+    },
+    "leave": {
+      "word": "Leave",
+      "letter": "L"
+    },
+    "off": {
+      "word": "Week off",
+      "letter": "WO"
+    },
+    "holiday": {
+      "word": "Holiday",
+      "letter": "HO"
+    },
+    "flag": {
+      "word": "Needs a look"
+    },
+    "waiting": {
+      "word": "Waiting"
+    },
+    "venue": {
+      "word": "At a venue",
+      "letter": "OD"
+    }
+  },
+  "stepper": {
+    "decrease": "Decrease",
+    "increase": "Increase"
+  }
+}

@@ -1,0 +1,36 @@
+/* Banner (PRD 5, 12.6): offline, queued punches, install, update. A slim hairline strip under the header. */
+@layer components {
+  .fs-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 2.75rem;
+    padding: 0.5rem var(--gutter);
+    border-block: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--text-body);
+    font-size: var(--text-sm);
+    line-height: 1.45;
+  }
+
+  .fs-banner[data-tone="plain"] {
+    background: var(--bg);
+  }
+
+  .fs-banner__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--text);
+  }
+
+  .fs-banner__text {
+    flex: 1;
+    min-width: 0;
+    padding-block: 0.25rem;
+  }
+
+  .fs-banner__action {
+    flex: none;
+    margin-block: -0.125rem;
+  }
+}

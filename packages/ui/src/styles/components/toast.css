@@ -1,0 +1,89 @@
+/* Toast (PRD 12.6): bottom, above the action bar and tab bar; ink on white with a hairline; one at a time. */
+@layer components {
+  .fs-toast-viewport {
+    position: fixed;
+    inset: auto 0 calc(var(--fs-toast-offset, 0px) + env(safe-area-inset-bottom) + var(--space-3));
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 0 var(--gutter);
+    list-style: none;
+    outline: none;
+    pointer-events: none;
+  }
+
+  .fs-toast {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: min(100%, 28rem);
+    min-height: 3.25rem;
+    padding: 0.4rem 0.4rem 0.4rem 1rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    color: var(--text);
+    pointer-events: auto;
+  }
+
+  .fs-toast__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .fs-toast[data-tone="success"] .fs-toast__icon {
+    color: var(--status-present);
+  }
+
+  .fs-toast[data-tone="error"] .fs-toast__icon {
+    color: var(--status-absent);
+  }
+
+  .fs-toast__text {
+    display: grid;
+    flex: 1;
+    gap: 0.1rem;
+    min-width: 0;
+    padding-block: 0.35rem;
+  }
+
+  .fs-toast__title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-strong);
+    line-height: 1.4;
+  }
+
+  .fs-toast__desc {
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .fs-toast__close {
+    color: var(--text-muted);
+  }
+
+  .fs-toast[data-state="open"] {
+    animation: fs-fade-in var(--dur-fast) var(--ease-out);
+  }
+
+  .fs-toast[data-state="closed"] {
+    animation: fs-fade-out var(--dur-fast) var(--ease-out) forwards;
+  }
+
+  /* Swipe down to dismiss follows the finger (direct manipulation, not an animation). */
+  .fs-toast[data-swipe="move"] {
+    transform: translate3d(0, var(--radix-toast-swipe-move-y), 0);
+  }
+
+  .fs-toast[data-swipe="cancel"] {
+    transform: none;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  .fs-toast[data-swipe="end"] {
+    animation: fs-fade-out var(--dur-fast) var(--ease-out) forwards;
+  }
+}

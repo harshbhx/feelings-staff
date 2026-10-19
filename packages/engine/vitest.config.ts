@@ -1,5 +1,8 @@
 import { defineConfig } from 'vitest/config';
 
+/** 100% on every rule folder of packages/engine (PRD 14.1). pay/ joins when its full matrix lands. */
+const full = { branches: 100, functions: 100, lines: 100, statements: 100 };
+
 export default defineConfig({
   test: {
     include: ['test/**/*.test.ts'],
@@ -8,7 +11,10 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.ts'],
       exclude: ['src/index.ts', 'src/**/stub.ts'],
-      reporter: ['text-summary', 'json-summary'],
+      reporter: ['text', 'text-summary', 'json-summary'],
+      thresholds: {
+        'src/{schedule,day,leave,money,fence,risk}/**': full,
+      },
     },
   },
 });

@@ -1,0 +1,117 @@
+/* Bindi, Avatar, Skeleton, EmptyState (PRD 5, 12.6, 12.9). */
+@layer components {
+  /* The bindi: the brand's signature dot. */
+  .fs-bindi {
+    display: inline-block;
+    flex: none;
+    width: 0.17em;
+    height: 0.17em;
+    margin-left: 0.07em;
+    border-radius: 50%;
+    background: var(--tone, var(--accent));
+    vertical-align: baseline;
+  }
+
+  .fs-bindi[data-size="marker"] {
+    width: 6px;
+    height: 6px;
+    margin: 0;
+  }
+
+  .fs-bindi[data-size="success"] {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+  }
+
+  .fs-avatar {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--bg-tint);
+    color: var(--bg-deep);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-strong);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    user-select: none;
+  }
+
+  .fs-avatar[data-size="sm"] {
+    width: 2rem;
+    height: 2rem;
+    font-size: var(--text-xs);
+  }
+
+  .fs-avatar[data-size="lg"] {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: var(--text-lg);
+  }
+
+  /* Skeleton: a slow breathe between two tints, 6 times at most, then still. No shimmer. */
+  .fs-skeleton {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 1em;
+    border-radius: var(--radius-sm);
+    background: var(--bg-tint);
+  }
+
+  .fs-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--border);
+    opacity: 0;
+    animation: fs-breathe 1.6s ease-in-out 6 alternate;
+  }
+
+  .fs-skeleton[data-shape="block"] {
+    height: 3.5rem;
+    border-radius: var(--radius-md);
+  }
+
+  .fs-skeleton[data-shape="pill"] {
+    height: 3rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .fs-skeleton[data-shape="circle"] {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+  }
+
+  .fs-skeleton-group {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fs-skeleton::after {
+      animation: none;
+    }
+  }
+
+  /* Empty: one sentence and at most one action. No illustration. */
+  .fs-empty {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--bg-soft);
+  }
+
+  .fs-empty__text {
+    max-width: 34em;
+    color: var(--text-body);
+  }
+}

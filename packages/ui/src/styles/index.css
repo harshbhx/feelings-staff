@@ -1,6 +1,174 @@
 /*
- * App stylesheet entry (owner: WP-2). WP-2 replaces this with:
- *   tokens.css (verbatim brand copy), app-tokens.css (PRD 12.3), the locked Tailwind v4 @theme
- *   (docs/research/brand-and-stack.md 6.3), base layer, motion and reduced-motion tiers.
+ * @fs/ui stylesheet (WP-2), imported once by app/src/main.tsx.
+ *
+ *   tokens.css      brand tokens, byte-for-byte copy (PRD 12.1); never edited
+ *   app-tokens.css  status colours and app chrome (PRD 12.3)
+ *   @theme below    the locked Tailwind v4 theme (docs/research/brand-and-stack.md 6.3): every
+ *                   default scale cleared, brand values only, semantic names (bg-bg-soft,
+ *                   text-text-muted, bg-accent). No default greys, blues, large radii or large
+ *                   shadows exist in this build.
+ *   base.css        element defaults, focus ring, selection, text-wrap
+ *   motion.css      keyframes, enter and press utilities, reduced-motion tiers (PRD 12.8)
+ *   components/     one file per component, all in @layer components
  */
 @import "tailwindcss";
+@import "@fontsource-variable/plus-jakarta-sans/wght.css";
+@import "@fontsource-variable/plus-jakarta-sans/wght-italic.css";
+@import "./tokens.css";
+@import "./app-tokens.css";
+@import "./base.css";
+@import "./motion.css";
+@import "./components/button.css";
+@import "./components/field.css";
+@import "./components/chip.css";
+@import "./components/status.css";
+@import "./components/sheet.css";
+@import "./components/toast.css";
+@import "./components/banner.css";
+@import "./components/list.css";
+@import "./components/tabbar.css";
+@import "./components/pinpad.css";
+@import "./components/feedback.css";
+@import "./components/controls.css";
+
+/* Scan the app and this package for class names (the Vite root is app/). */
+@source "../";
+@source "../../../../app/src";
+
+@theme {
+  /* Clear Tailwind's defaults so nothing generic can creep in. */
+  --color-*: initial;
+  --font-*: initial;
+  --font-weight-*: initial;
+  --text-*: initial;
+  --tracking-*: initial;
+  --leading-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+  --blur-*: initial;
+  --perspective-*: initial;
+  --breakpoint-*: initial;
+  --container-*: initial;
+  --ease-*: initial;
+  --animate-*: initial;
+
+  /* Type: one family, four weights, nothing under 13px */
+  --font-sans:
+    "Plus Jakarta Sans Variable", "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system,
+    sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.65;
+  --text-lg: 1.25rem;
+  --text-xl: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem);
+  --text-2xl: clamp(1.875rem, 1.3rem + 2.3vw, 3rem);
+  --text-2xl--line-height: 1.1;
+  --text-3xl: clamp(2.5rem, 1.5rem + 4vw, 4.5rem);
+  --text-3xl--line-height: 1.04;
+  --tracking-h1: -0.032em;
+  --tracking-display: -0.025em;
+  --tracking-name: -0.015em;
+  --tracking-eyebrow: 0.09em;
+  --leading-tight: 1.04;
+  --leading-snug: 1.1;
+  --leading-body: 1.65;
+
+  /* Shape and depth (rounded-full = pill buttons) */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 22px;
+  --shadow-sm: 0 1px 2px rgb(30 18 20 / 0.06), 0 2px 8px -2px rgb(30 18 20 / 0.08);
+  --shadow-md: 0 1px 2px rgb(30 18 20 / 0.05), 0 14px 34px -14px rgb(30 18 20 / 0.24);
+  --shadow-cta: 0 10px 24px -10px rgb(179 18 27 / 0.55);
+  --shadow-header: 0 10px 30px -18px rgb(30 18 20 / 0.28);
+  --blur-glass: 10px;
+
+  /* Spacing: Tailwind's 4px step. Brand scale 1..10 = Tailwind 1,2,3,4,6,8,12,16,24,32 */
+  --spacing: 0.25rem;
+  --container-page: 76rem;
+  --container-narrow: 46rem;
+  --container-phone: 30rem;
+
+  /* Breakpoints used by the brand */
+  --breakpoint-sm: 30rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 56rem;
+  --breakpoint-xl: 64rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-soft: cubic-bezier(0.25, 1, 0.35, 1);
+  --default-transition-duration: 140ms;
+  --default-transition-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --animate-bindi-in: fs-bindi-in 520ms cubic-bezier(0.34, 1.5, 0.5, 1) both;
+}
+
+/* Colours point at the brand tokens, so tokens.css stays the one source of truth. */
+@theme inline {
+  --color-white: var(--white);
+  --color-rose-50: var(--rose-50);
+  --color-rose-100: var(--rose-100);
+  --color-rose-200: var(--rose-200);
+  --color-rose-line: var(--rose-line);
+  --color-ink-900: var(--ink-900);
+  --color-ink-700: var(--ink-700);
+  --color-ink-500: var(--ink-500);
+  --color-ink-300: var(--ink-300);
+  --color-sindoor: var(--red-600);
+  --color-sindoor-700: var(--red-700);
+  --color-maroon-800: var(--maroon-800);
+  --color-maroon-900: var(--maroon-900);
+  --color-tone-bridal: var(--tone-bridal);
+  --color-tone-nails: var(--tone-nails);
+  --color-tone-mehndi: var(--tone-mehndi);
+  --color-tone-salon: var(--tone-salon);
+  --color-tone-academy: var(--tone-academy);
+
+  /* Semantic aliases (preferred in markup) */
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-bg-tint: var(--bg-tint);
+  --color-bg-deep: var(--bg-deep);
+  --color-bg-deepest: var(--bg-deepest);
+  --color-text: var(--text);
+  --color-text-body: var(--text-body);
+  --color-text-muted: var(--text-muted);
+  --color-text-on-deep: var(--text-on-deep);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-control: var(--border-control);
+  --color-focus: var(--focus);
+
+  /* Status (PRD 12.3): text or icon colour, and its tint */
+  --color-present: var(--status-present);
+  --color-present-bg: var(--status-present-bg);
+  --color-late: var(--status-late);
+  --color-late-bg: var(--status-late-bg);
+  --color-half: var(--status-half);
+  --color-half-bg: var(--status-half-bg);
+  --color-absent: var(--status-absent);
+  --color-absent-bg: var(--status-absent-bg);
+  --color-leave: var(--status-leave);
+  --color-leave-bg: var(--status-leave-bg);
+  --color-off: var(--status-off);
+  --color-off-bg: var(--status-off-bg);
+  --color-flag: var(--status-flag);
+  --color-flag-bg: var(--status-flag-bg);
+}
+
+@keyframes fs-bindi-in {
+  from {
+    transform: scale(0);
+  }
+}

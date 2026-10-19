@@ -1,0 +1,100 @@
+/* List and ListRow (PRD 12.5, 12.6): hairline rows, 56px or taller, never a stack of shadowed cards. */
+@layer components {
+  .fs-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fs-list__item + .fs-list__item {
+    border-top: 1px solid var(--border);
+  }
+
+  .fs-list[data-framed] {
+    border-block: 1px solid var(--border);
+  }
+
+  .fs-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: 3.5rem;
+    padding: 0.625rem 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+  }
+
+  .fs-row[data-interactive] {
+    position: relative;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  /* The hover tint bleeds into the gutter so the row text stays aligned with the page. */
+  .fs-row[data-interactive]:hover {
+    background: var(--bg-soft);
+    box-shadow:
+      calc(var(--space-3) * -1) 0 0 var(--bg-soft),
+      var(--space-3) 0 0 var(--bg-soft);
+  }
+
+  .fs-row[data-interactive]:focus-visible {
+    outline-offset: 2px;
+  }
+
+  .fs-row__leading {
+    display: grid;
+    place-items: center;
+    flex: none;
+    color: var(--text-muted);
+  }
+
+  .fs-row__leading > .fs-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .fs-row__text {
+    display: grid;
+    flex: 1;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+
+  .fs-row__title {
+    font-weight: var(--weight-strong);
+    line-height: 1.35;
+    color: var(--text);
+    overflow-wrap: anywhere;
+  }
+
+  .fs-row__subtitle {
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .fs-row__trailing {
+    display: flex;
+    align-items: center;
+    flex: none;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-ui);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--text);
+  }
+
+  .fs-row__chevron {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-right: -0.2rem;
+    color: var(--text-muted);
+  }
+}
