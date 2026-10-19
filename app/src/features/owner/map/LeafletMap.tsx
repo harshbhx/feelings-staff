@@ -49,6 +49,8 @@ export default function LeafletMap({
       attributionControl: true,
       scrollWheelZoom: false,
     });
+    // Credit OpenStreetMap only: Leaflet's default prefix adds a flag icon outside the brand.
+    m.attributionControl.setPrefix(false);
     L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(m);
     layer.current = L.layerGroup().addTo(m);
     m.on('click', (e: L.LeafletMouseEvent) =>
@@ -73,6 +75,9 @@ export default function LeafletMap({
       'centre' | 'radiusM' | 'oldCircle' | 'pin'
     >;
     g.clearLayers();
+    // Bounds come from the geometry, not from the layers: a circle only knows its bounds once the
+    // map has a view, and the first fitBounds below is what gives it one.
+    const around = (p: LatLng, r: number) => L.latLng(p.lat, p.lng).toBounds(r * 2);
     const bounds = L.latLngBounds([centre, centre]);
     if (oldCircle) {
       const c = L.circle(oldCircle.centre, {
@@ -80,12 +85,12 @@ export default function LeafletMap({
         className: 'owner-fence-old',
       });
       g.addLayer(c);
-      bounds.extend(c.getBounds());
+      bounds.extend(around(oldCircle.centre, oldCircle.radiusM));
     }
     if (radiusM) {
       const c = L.circle(centre, { radius: radiusM, className: 'owner-fence', interactive: false });
       g.addLayer(c);
-      bounds.extend(c.getBounds());
+      bounds.extend(around(centre, radiusM));
       g.addLayer(
         L.marker(centre, {
           icon: L.divIcon({
@@ -106,7 +111,7 @@ export default function LeafletMap({
           interactive: false,
         });
         g.addLayer(a);
-        bounds.extend(a.getBounds());
+        bounds.extend(around(pin, pin.accuracyM));
       }
       g.addLayer(
         L.marker(pin, {

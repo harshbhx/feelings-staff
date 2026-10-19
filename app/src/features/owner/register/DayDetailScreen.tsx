@@ -24,13 +24,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { useMe } from '../../../api/hooks';
+import { isStepUpCancelled } from '../../auth/step-up';
 import { useDayOverride, useOwnerDay } from '../api/attendance';
 import { Meta, Section, Tag } from '../components/layout';
 import { PunchFacts, PunchMap, RiskReasons, SelfieCompare } from '../components/PunchEvidence';
 import { QueryView, useErrorText } from '../components/states';
 import { clock, dayLabel, duration, longDate, money } from '../lib/format';
 import { dayStatusMeta, leaveKey, punchStatusMeta } from '../lib/status';
-import { isStepUpCancelled } from '../lib/step-up';
 import { useOwnerTitle } from '../shell/chrome';
 import {
   auditChanges,
@@ -81,8 +81,8 @@ function Day({ day }: { day: OwnerDayDetail }) {
           : t('owner:day.noShift');
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:items-start xl:gap-12">
-      <div className="grid gap-8">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:items-start xl:gap-12">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
         {day.locked ? <Banner icon="lock">{t('owner:day.locked')}</Banner> : null}
         <div className="flex flex-wrap items-center gap-3">
           <StatusChip status={meta.chip} label={t(meta.labelKey)} />
@@ -153,7 +153,7 @@ function Day({ day }: { day: OwnerDayDetail }) {
                       <span className="text-sm text-text-muted">{l.formula}</span>
                     </span>
                     {l.amountPaise !== null ? (
-                      <span className="font-semibold text-text tabular-nums">
+                      <span className="whitespace-nowrap font-semibold text-text tabular-nums">
                         {money(l.amountPaise)}
                       </span>
                     ) : null}
@@ -169,7 +169,7 @@ function Day({ day }: { day: OwnerDayDetail }) {
         </div>
       </div>
 
-      <div className="grid gap-8">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
         <Section title={t('owner:day.map')}>
           {located ? (
             <>

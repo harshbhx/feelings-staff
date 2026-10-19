@@ -20,13 +20,13 @@ export function RiskReasons({ punch }: { punch: OwnerPunchView }) {
     <ul className="grid gap-1 text-sm">
       {worries.map((r) => (
         <li key={r} className="flex items-start gap-2 text-text-body">
-          <Icon name="warning-circle" className="mt-0.5 shrink-0 text-accent" />
+          <Icon name="warning-circle" className="mt-0.5 size-5 shrink-0 text-accent" />
           <span>{t(riskKey(r))}</span>
         </li>
       ))}
       {good.map((r) => (
         <li key={r} className="flex items-start gap-2 text-text-muted">
-          <Icon name="check-circle" className="mt-0.5 shrink-0 text-present" />
+          <Icon name="check-circle" className="mt-0.5 size-5 shrink-0 text-present" />
           <span>{t(riskKey(r))}</span>
         </li>
       ))}

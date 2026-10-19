@@ -12,9 +12,7 @@
     "inbox": "Inbox",
     "doorCode": "Show door code",
     "settings": "Settings",
-    "label": "Owner panel",
-    "openItems_one": "{{count}} waiting",
-    "openItems_other": "{{count}} waiting"
+    "label": "Owner panel"
   },
   "screens": {
     "signIn": "Owner sign-in",
@@ -98,7 +96,14 @@
     "monthLocked": "This month is finalised. Reopen payroll to change it.",
     "alreadyDecided": "Someone already decided this one.",
     "saveFailed": "Couldn't save. Check your internet and try again.",
-    "conflict": "This changed in the meantime. We've reloaded it."
+    "conflict": "This changed in the meantime. We've reloaded it.",
+    "duplicate": "That's already there. Check the list before adding it again.",
+    "rateLimited": "That was a lot of tries in a short time. Wait a minute, then try again.",
+    "notReady": "This part of the app isn't switched on yet. It comes with the next update.",
+    "server": "The server had a problem with this. Try again in a moment.",
+    "screenTitle": "This screen stopped working.",
+    "screenBody": "Reload the page to try again. Nothing you saved is lost.",
+    "reload": "Reload"
   },
   "time": {
     "justNow": "just now",
@@ -197,17 +202,6 @@
     "door_qr": "Scanned the door code",
     "offsite_duty": "Inside the venue for a duty",
     "none": "Nothing unusual"
-  },
-  "stepUp": {
-    "title": "Enter your owner PIN",
-    "body": "This change needs your PIN. It stays unlocked for 10 minutes.",
-    "label": "Owner PIN",
-    "hint": "6 digits",
-    "sixDigits": "Your owner PIN has 6 digits.",
-    "wrong": "Wrong PIN. Try again.",
-    "locked": "Too many wrong tries. Sign in with your email link to unlock.",
-    "confirm": "Continue",
-    "checking": "Checking…"
   },
   "today": {
     "title": "Today",
@@ -417,6 +411,15 @@
       "otHours": "Overtime hours approved",
       "lop": "Unpaid days"
     },
+    "line": {
+      "present": "{{n}} present",
+      "half": "{{n}} half",
+      "absent": "{{n}} absent",
+      "leave": "{{n}} leave",
+      "lateMin": "{{n}} min late",
+      "otHours": "{{n}} h overtime",
+      "lop": "{{n}} unpaid"
+    },
     "tip": {
       "late": "Late {{min}} m",
       "in": "in {{time}}",
@@ -426,7 +429,7 @@
     "locked": "Finalised. Reopen payroll to make changes.",
     "legend": "Key",
     "week": "Week of {{date}}",
-    "openMonth": "Open {{name}}'s month",
+    "openMonth": "Open the month",
     "dayLink": "{{name}}, {{date}}: {{status}}",
     "empty": "No staff to show for this month."
   },

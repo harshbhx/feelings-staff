@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useTodayBoard } from '../api/attendance';
-import { Meta, Section, Tag, useNow } from '../components/layout';
+import { CHIPS_WRAP, Meta, Section, Tag, useNow, WRAP_ROW } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { clock, dayLabel, duration } from '../lib/format';
 import { telLink, waLink } from '../lib/share';
@@ -58,7 +58,7 @@ function Board({ board }: { board: TodayBoard }) {
 
   if (m.mode.kind === 'closed') {
     return (
-      <div className="grid gap-4">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
         <Meta>{dayMeta}</Meta>
         <Empty>{t('owner:today.closed', { name: m.mode.holidayName })}</Empty>
       </div>
@@ -150,7 +150,7 @@ function Board({ board }: { board: TodayBoard }) {
     s.in.length + s.out.length + s.notIn.length + s.dueLater.length + s.away.length === 0;
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       <div className="grid gap-1">
         <Meta>{dayMeta}</Meta>
         {m.mode.kind === 'before' ? (
@@ -167,7 +167,7 @@ function Board({ board }: { board: TodayBoard }) {
             {headlineParts(board).map((p, i) => (
               <span key={p.key}>
                 {i > 0 ? <span className="text-text-muted"> · </span> : null}
-                {t(p.key, { count: p.count })}
+                <span className="whitespace-nowrap">{t(p.key, { count: p.count })}</span>
               </span>
             ))}
           </p>
@@ -176,8 +176,8 @@ function Board({ board }: { board: TodayBoard }) {
 
       {board.actionsCount > 0 ? (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-md border border-border bg-bg-soft px-4 py-3">
-          <Icon name="warning-circle" className="shrink-0 text-accent" />
-          <p className="min-w-0 flex-1 font-bold text-text">
+          <Icon name="warning-circle" className="size-6 shrink-0 text-accent" />
+          <p className="min-w-0 flex-1 basis-48 font-bold text-text">
             {t('owner:today.needsAction', { count: board.actionsCount })}
           </p>
           <Button asChild variant="primary" size="sm" iconEnd="arrow-right">
@@ -191,6 +191,7 @@ function Board({ board }: { board: TodayBoard }) {
         legend={t('owner:today.counters.label')}
         legendHidden
         layout="scroll"
+        className={CHIPS_WRAP}
         options={options}
         value={filter ?? 'all'}
         onValueChange={(v) => setFilter(v === 'all' ? null : (v as CounterKey))}
@@ -208,8 +209,8 @@ function Board({ board }: { board: TodayBoard }) {
         </Empty>
       ) : (
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] xl:items-start xl:gap-12">
-          <div className="grid gap-8">{lists}</div>
-          <div className="grid gap-8">{side}</div>
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-8">{lists}</div>
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-8">{side}</div>
         </div>
       )}
     </div>
@@ -244,6 +245,7 @@ function InRow({ row, date, worked }: { row: BoardInRow; date: string; worked: n
   return (
     <ListRow
       asChild
+      className={WRAP_ROW}
       leading={<Avatar name={row.user.name} />}
       title={row.user.name}
       subtitle={
@@ -284,6 +286,7 @@ function NotInRow({ row }: { row: BoardNotInRow }) {
     .join(' · ');
   return (
     <ListRow
+      className={WRAP_ROW}
       leading={<Avatar name={row.user.name} />}
       title={row.user.name}
       subtitle={<span className="tabular-nums">{when}</span>}

@@ -22,12 +22,14 @@ import {
   Skeleton,
   SkeletonGroup,
   StatusChip,
+  Tabs,
   Textarea,
   useToast,
 } from '@fs/ui';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams, useSearchParams } from 'react-router';
+import { isStepUpCancelled } from '../../auth/step-up';
 import { useShiftTemplates } from '../api/schedule';
 import {
   useDecideDevice,
@@ -42,11 +44,10 @@ import {
   useStaffLeave,
 } from '../api/staff';
 import { Meta, Section } from '../components/layout';
-import { QueryView, RowsSkeleton, useErrorText } from '../components/states';
+import { ErrorCard, QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { clock, days, duration, longDate, money, shortDate } from '../lib/format';
 import { phoneLabel } from '../lib/share';
 import { dayStatusMeta, leaveKey } from '../lib/status';
-import { isStepUpCancelled } from '../lib/step-up';
 import { useOwnerTitle } from '../shell/chrome';
 import { InviteSheet } from './InviteSheet';
 import { rupeesToPaise } from './staff-form';
@@ -89,7 +90,7 @@ function Profile({ staff }: { staff: StaffDetail }) {
   };
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       <div className="flex items-center gap-4">
         <Avatar name={staff.name} size="lg" />
         <div className="grid min-w-0">
@@ -107,26 +108,38 @@ function Profile({ staff }: { staff: StaffDetail }) {
           </Meta>
         </div>
       </div>
-      <ChipGroup
-        type="radio"
-        legend={t('owner:staff.profile.tabs.label')}
-        legendHidden
-        layout="scroll"
+      <Tabs
+        variant="underline"
+        label={t('owner:staff.profile.tabs.label')}
         value={tab}
         onValueChange={setTab}
-        options={TABS.map((k) => ({ value: k, label: t(`owner:staff.profile.tabs.${k}`) }))}
+        items={TABS.map((k) => ({
+          value: k,
+          label: t(`owner:staff.profile.tabs.${k}`),
+          content: <div className="max-w-(--container-narrow) pt-2">{tabContent(k, staff)}</div>,
+        }))}
       />
-      <div className="max-w-(--container-narrow)">
-        {tab === 'overview' ? <Overview staff={staff} /> : null}
-        {tab === 'salary' ? <SalaryTab staff={staff} /> : null}
-        {tab === 'shift' ? <ShiftTab staff={staff} /> : null}
-        {tab === 'leave' ? <LeaveTab staff={staff} /> : null}
-        {tab === 'advances' ? <AdvancesTab staff={staff} /> : null}
-        {tab === 'devices' ? <DevicesTab staff={staff} /> : null}
-        {tab === 'exit' ? <ExitTab staff={staff} /> : null}
-      </div>
     </div>
   );
+}
+
+function tabContent(tab: Tab, staff: StaffDetail) {
+  switch (tab) {
+    case 'overview':
+      return <Overview staff={staff} />;
+    case 'salary':
+      return <SalaryTab staff={staff} />;
+    case 'shift':
+      return <ShiftTab staff={staff} />;
+    case 'leave':
+      return <LeaveTab staff={staff} />;
+    case 'advances':
+      return <AdvancesTab staff={staff} />;
+    case 'devices':
+      return <DevicesTab staff={staff} />;
+    case 'exit':
+      return <ExitTab staff={staff} />;
+  }
 }
 
 function Overview({ staff }: { staff: StaffDetail }) {
@@ -368,6 +381,8 @@ function ShiftTab({ staff }: { staff: StaffDetail }) {
             .filter((x) => x.active)
             .map((x) => ({ value: x.id, label: x.name }))}
         />
+      ) : templates.isError ? (
+        <ErrorCard error={templates.error} onRetry={() => void templates.refetch()} />
       ) : (
         <Skeleton shape="block" height="5rem" />
       )}
