@@ -35,7 +35,10 @@ export function DoorCodeScreen() {
   } else if (code.data) {
     body = (
       <>
-        <QrCode value={code.data.url} label={t('owner:door.qrLabel', { name: code.data.siteName })} />
+        <QrCode
+          value={code.data.url}
+          label={t('owner:door.qrLabel', { name: code.data.siteName })}
+        />
         <p className="font-semibold text-text tabular-nums" data-testid="door-countdown">
           {left > 0 ? t('owner:door.newIn', { count: left }) : t('owner:door.refreshing')}
         </p>

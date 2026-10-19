@@ -42,8 +42,8 @@ import {
   type RosterRow,
   swapChanges,
   swapTargets,
-  weekNav,
   weeklyHours,
+  weekNav,
 } from './roster-model';
 
 const WEEK_RE = /^\d{4}-W\d{2}$/;
@@ -70,11 +70,19 @@ export function RosterScreen() {
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-1">
-          <IconButton icon="caret-left" label={t('owner:roster.prevWeek')} onClick={() => go(nav.prev)} />
+          <IconButton
+            icon="caret-left"
+            label={t('owner:roster.prevWeek')}
+            onClick={() => go(nav.prev)}
+          />
           <h2 className="min-w-44 text-center font-bold text-lg text-text" aria-live="polite">
             {t('owner:roster.week', { date: shortDate(monday) })}
           </h2>
-          <IconButton icon="caret-right" label={t('owner:roster.nextWeek')} onClick={() => go(nav.next)} />
+          <IconButton
+            icon="caret-right"
+            label={t('owner:roster.nextWeek')}
+            onClick={() => go(nav.next)}
+          />
         </div>
         <Button asChild variant="primary" icon="map-pin">
           <Link to={`/o/duties/new?date=${monday >= todayIst() ? monday : todayIst()}`}>
@@ -426,7 +434,9 @@ function CellSheet({
               layout="grid"
               disabled={change.isPending}
               value={cell.kind === 'template' ? (cell.templateId ?? '') : ''}
-              onValueChange={(id) => save([cellChange(row, date, { kind: 'template', templateId: id })])}
+              onValueChange={(id) =>
+                save([cellChange(row, date, { kind: 'template', templateId: id })])
+              }
               options={templates.map((x) => ({ value: x.id, label: x.name }))}
             />
           )}
