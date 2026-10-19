@@ -1,5 +1,27 @@
 {
   "screens": {
     "door": "Door screen"
-  }
+  },
+  "pair": {
+    "title": "Set up the door screen",
+    "lead": "Ask the owner for the 8-character code from Sites, then type it here. This phone or tablet will show the check-in code.",
+    "label": "Pairing code",
+    "submit": "Pair this screen",
+    "pairing": "Pairing…",
+    "error": {
+      "format": "The code has 8 letters and numbers. Check it and try again.",
+      "wrong": "That code did not work. It may have expired; ask for a new one.",
+      "network": "Could not reach the server. Check the internet and try again."
+    }
+  },
+  "qr": {
+    "label": "Check-in code for the Feelings app"
+  },
+  "scanHint": "Scan this with the Feelings app to check in.",
+  "rotates_one": "New code in {{count}} second",
+  "rotates_other": "New code in {{count}} seconds",
+  "clockNotSynced": "Getting the time… the code appears in a moment.",
+  "lastCheckIn": "Last check-in: {{name}} {{time}}",
+  "noCheckInYet": "No check-ins yet today.",
+  "offline": "No internet right now. The code keeps changing; check-ins are not confirmed until it is back."
 }
