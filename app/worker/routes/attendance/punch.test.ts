@@ -17,8 +17,6 @@ import {
   expectStatus,
   fixAt,
   type Harness,
-  expectNear,
-  expectStatus,
   harness,
   jpeg,
   nonce,
