@@ -2,11 +2,12 @@
  * The punch flow as the check-in sheet sees it (PRD 4.3, 4.4.4, 4.5, 4.6 B).
  *
  * WP-4 owns the real state machine (`usePunchFlow` in `app/src/lib/punch/`). The sheet renders this
- * view of it, so the UI does not depend on WP-4's internal names: `flow.ts` adapts WP-4's hook to
- * this shape, and `flow-stub.ts` drives it from fixtures in mock mode (kit, visual tests, preview
- * before the punch API lands).
+ * view of it, so the UI does not depend on WP-4's internal names: `flow-live.ts` adapts WP-4's
+ * hook to this shape, and `flow-stub.ts` drives it from fixtures in mock mode (visual tests).
  */
 import type { PunchKind, PunchRequest, PunchResult } from '@fs/contracts';
+import type { ScanError } from '../scan/ScanPanel';
+import type { PunchConfirm } from '../today/today-model';
 
 export type PunchAction = Extract<PunchKind, 'in' | 'out'>;
 
@@ -37,9 +38,12 @@ export type PunchProblem =
   | { code: 'account_inactive' }
   | { code: 'upgrade_required' }
   | { code: 'session_expired' }
-  | { code: 'unknown'; requestId: string | null }
-  /** This build has no punch module yet (before WP-4's flow is wired). */
-  | { code: 'not_ready' };
+  /** Today was out of date: already checked in, or not checked in yet. */
+  | { code: 'conflict'; checkedIn: boolean }
+  /** Offline, and this phone has no offline nonce or signed time yet (PRD 4.3.6). */
+  | { code: 'offline_unavailable' }
+  /** `reason`: WP-4's failure reason, kept for support (rendered as `data-punch-reason`). */
+  | { code: 'unknown'; requestId: string | null; reason?: string | null };
 
 export type PunchFlowState =
   | { step: 'idle' }
@@ -69,12 +73,14 @@ export type PunchFlowState =
       forApproval: boolean;
     }
   | { step: 'submitting'; kind: PunchAction }
+  /** The server asked to confirm (week off, holiday, leave day, before the earliest time). */
+  | { step: 'confirm'; kind: PunchAction; reason: PunchConfirm }
   /** The server answered: accepted, flagged (looks the same to staff), needs proof or pending. */
   | { step: 'result'; kind: PunchAction; result: PunchResult; place: PlaceFix }
   /** Saved offline; sends by itself (PRD 4.3.6). */
   | { step: 'queued'; kind: PunchAction; clientTs: number }
   /** Door QR scanner inside the sheet. */
-  | { step: 'scanning'; kind: PunchAction; error: 'expired' | 'other_site' | 'not_ours' | null }
+  | { step: 'scanning'; kind: PunchAction; error: ScanError }
   /** Sent to the owner (pending): "Urmi will check it. Your time stays 10:03." */
   | { step: 'sent'; kind: PunchAction; effectiveTs: number }
   | { step: 'problem'; kind: PunchAction; problem: PunchProblem };
@@ -88,7 +94,8 @@ export interface PunchFlowActions {
   /** From the pre-permission explainer: ask for location from this tap. */
   allowLocation(): void;
   retry(): void;
-  capture(): void;
+  /** Take the still from the live preview the sheet shows. */
+  capture(video: HTMLVideoElement | null): void;
   retake(): void;
   usePhoto(): void;
   sendWithoutPhoto(): void;

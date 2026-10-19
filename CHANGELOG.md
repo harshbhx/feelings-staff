@@ -35,6 +35,7 @@ WP-9 Time credits, engine:
 
 - The minute ledger in `@fs/engine`: entries for a day (late and early from the first minute, confirmed away time, approved overtime), the balance with carry-over, the 1x money value with one rounding, the settlement inside the 50% cap, and 9 h a day / 48 h a week warnings.
 - With Time credits on, a day owes nothing (no grace, tolerance, make-up or undertime; over-break is only tagged) and the payslip pays no overtime for it; the owner's settlement becomes one `time_credits` line. With it off, payslips are unchanged.
+- Legal overtime at 2x (setting on by default): approved overtime beyond 9 h a day or 48 h a week (`legalOtBand`) adds an `ot_legal` entry, so it counts twice in the balance and the settlement; the payroll preview tells the owner, or warns when the setting is off.
 - Presence in `@fs/engine`: away intervals from roll-call marks and step-outs (start, end at I'm back, the next Here, check-out or shift end, merge, clipping to the shift, presence and break, the 5-minute floor) and the "seems away" hint from foreground checks.
 
 WP-6, owner panel:
@@ -53,7 +54,7 @@ Docs:
 
 - The Content Security Policy no longer sends `upgrade-insecure-requests`. Every source is `'self'`, HSTS already forces HTTPS, and WebKit applies the directive to `http://localhost`, which broke the iPhone project of the CI run.
 - `CONTRIBUTING.md` now covers docs rules, labels and the PR template.
-- `docs/PRD.md` is at version 1.1 (see Appendix C).
+- `docs/PRD.md` is at version 1.3 (see Appendix C). 1.2 added Time credits and presence checks; 1.3 restores the legal overtime guardrail: the Time credits setting **Pay legal overtime at 2×** is on by default, so approved overtime beyond 9 h a day or 48 h a week counts twice in the ledger and is worth 2× when it is settled or netted against late and early minutes (PRD 7.17.7).
 - The payslip engine computes late/early, overtime pay and the off-day extra in one stage (`timeLines`), ready for Time credits to replace it. Payslips are unchanged.
 
 [Unreleased]: https://github.com/harshbhx/feelings-staff/commits/main

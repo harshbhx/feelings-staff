@@ -1,28 +1,26 @@
 /**
- * Door QR scanner UI (PRD 4.5, 5.1 Scan): rear-camera viewport with a square guide, torch where
- * supported, and "Type the code" as the manual fallback (10 characters). Decoding uses the
- * browser's BarcodeDetector where it exists (Chrome on Android); WP-4's `app/src/lib/qr/` adds the
- * jsQR worker for iPhones and replaces `detectOnce` when it lands.
+ * Door QR scanner UI (PRD 4.5, 5.1 Scan; S-06.5): rear-camera viewport with a square guide, torch
+ * where supported, and "Type the code" as the manual fallback (10 characters). Decoding is WP-4's
+ * `app/src/lib/qr/` (BarcodeDetector where the browser has it, else jsQR in a worker, so iPhones
+ * scan too); the scanner module loads only when the camera view opens.
  */
 import { Button, Field, Icon, Input } from '@fs/ui';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { QrRejectReason } from '../../../lib/punch';
+import { normaliseDoorToken, parseDoorUrl } from '../../../lib/qr';
+import type { QrScanner } from '../../../lib/qr/scanner';
 
-export type ScanError = 'expired' | 'other_site' | 'not_ours' | null;
+/** What the panel says under the viewport; `network` and `failed` come from sending the code. */
+export type ScanError = 'expired' | 'other_site' | 'not_ours' | 'network' | 'failed' | null;
 
-interface Detector {
-  detect(source: CanvasImageSource): Promise<{ rawValue: string }[]>;
-}
-type DetectorCtor = new (opts: { formats: string[] }) => Detector;
-
-/** Pull the 10-character token from a door URL `.../q/<siteId>/<token>` or a bare token. */
-export function tokenFromScan(raw: string): string | null {
-  const text = raw.trim();
-  const m = /\/q\/[^/]+\/([0-9A-Za-z]{10})\/?$/.exec(text);
-  if (m?.[1]) return m[1].toUpperCase();
-  if (/^[0-9A-Za-z]{10}$/.test(text)) return text.toUpperCase();
-  return null;
-}
+/** The server's door-code rejections (WP-4 `qr_rejected`) in the panel's words. */
+export const QR_SCAN_ERROR: Record<QrRejectReason, Exclude<ScanError, null>> = {
+  qr_expired: 'expired',
+  qr_reused: 'expired',
+  qr_other_site: 'other_site',
+  qr_invalid: 'not_ours',
+};
 
 export function ScanPanel({
   onToken,
@@ -41,79 +39,56 @@ export function ScanPanel({
   const [manual, setManual] = useState(false);
   const [code, setCode] = useState('');
   const [notOurs, setNotOurs] = useState(false);
-  const track = useRef<MediaStreamTrack | null>(null);
+  const scanner = useRef<QrScanner | null>(null);
+  const onTokenRef = useRef(onToken);
+  onTokenRef.current = onToken;
   const hintId = useId();
 
   useEffect(() => {
-    if (!camera || manual || !navigator.mediaDevices?.getUserMedia) return;
-    let stream: MediaStream | null = null;
+    const el = video.current;
+    if (!camera || manual || !el) return;
     let stopped = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const Ctor = (window as unknown as { BarcodeDetector?: DetectorCtor }).BarcodeDetector;
-    const detector = Ctor ? new Ctor({ formats: ['qr_code'] }) : null;
-
-    const loop = async () => {
-      if (stopped || !detector || !video.current) return;
-      try {
-        if (video.current.readyState >= 2) {
-          const found = await detector.detect(video.current);
-          const raw = found[0]?.rawValue;
-          if (raw) {
-            const token = tokenFromScan(raw);
-            if (token) {
-              onToken(token);
+    let found = false;
+    void import('../../../lib/qr/scanner')
+      .then(({ createScanner }) =>
+        createScanner(el, {
+          onDecode: (text) => {
+            if (stopped || found) return;
+            const parsed = parseDoorUrl(text);
+            if (!parsed.ok) {
+              setNotOurs(true);
               return;
             }
-            setNotOurs(true);
-          }
-        }
-      } catch {
-        // a frame that could not be read; keep going
-      }
-      timer = setTimeout(() => void loop(), 300);
-    };
-
-    navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 } }, audio: false })
+            // One code per scan; the parent remounts the panel (key) to scan again.
+            found = true;
+            scanner.current?.stop();
+            onTokenRef.current(parsed.token);
+          },
+        }),
+      )
       .then((s) => {
-        if (stopped) {
-          for (const tr of s.getTracks()) tr.stop();
+        if (stopped || found) {
+          s.stop();
           return;
         }
-        stream = s;
-        const tr = s.getVideoTracks()[0] ?? null;
-        track.current = tr;
-        const caps = tr?.getCapabilities?.() as
-          | (MediaTrackCapabilities & { torch?: boolean })
-          | undefined;
-        if (caps?.torch) setTorch(false);
-        if (video.current) {
-          video.current.srcObject = s;
-          void video.current.play().catch(() => undefined);
-        }
-        void loop();
+        scanner.current = s;
+        if (s.torchAvailable) setTorch(false);
       })
-      .catch(() => setDenied(true));
-
+      .catch(() => {
+        if (!stopped) setDenied(true);
+      });
     return () => {
       stopped = true;
-      if (timer) clearTimeout(timer);
-      for (const tr of stream?.getTracks() ?? []) tr.stop();
-      track.current = null;
+      scanner.current?.stop();
+      scanner.current = null;
     };
-  }, [camera, manual, onToken]);
+  }, [camera, manual]);
 
   const toggleTorch = async () => {
-    if (!track.current || torch === null) return;
+    if (!scanner.current || torch === null) return;
     const next = !torch;
-    try {
-      await track.current.applyConstraints({
-        advanced: [{ torch: next } as unknown as MediaTrackConstraintSet],
-      });
-      setTorch(next);
-    } catch {
-      setTorch(null);
-    }
+    if (await scanner.current.setTorch(next)) setTorch(next);
+    else setTorch(null);
   };
 
   const message =
@@ -123,12 +98,16 @@ export function ScanPanel({
         ? t('staff:scan.otherSite')
         : error === 'not_ours' || notOurs
           ? t('staff:scan.notOurs')
-          : denied
-            ? t('staff:scan.cameraOff')
-            : null;
+          : error === 'network'
+            ? t('errors:network')
+            : error === 'failed'
+              ? t('errors:generic')
+              : denied
+                ? t('staff:scan.cameraOff')
+                : null;
 
   if (manual) {
-    const token = tokenFromScan(code);
+    const token = normaliseDoorToken(code);
     return (
       <form
         className="flex flex-col gap-4"

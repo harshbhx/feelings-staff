@@ -381,7 +381,8 @@ export type Designation = z.infer<typeof Designation>;
 // ---- Time credits and presence (PRD 7.17, 7.18, 8.2.1) -----------------------------------------
 
 /** The four kinds of credit entry: minus for late, early and away, plus for approved overtime. */
-export const CreditKind = z.enum(['late', 'early', 'away', 'ot']);
+/** `ot_legal`: the overtime minutes beyond 9 h a day or 48 h a week, counted a second time (2x). */
+export const CreditKind = z.enum(['late', 'early', 'away', 'ot', 'ot_legal']);
 export type CreditKind = z.infer<typeof CreditKind>;
 
 /** What a credit entry points at: a punch, a presence interval or an overtime decision. */
