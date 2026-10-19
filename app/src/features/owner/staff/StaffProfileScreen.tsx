@@ -28,6 +28,7 @@ import {
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams, useSearchParams } from 'react-router';
+import { isStepUpCancelled } from '../../auth/step-up';
 import { useShiftTemplates } from '../api/schedule';
 import {
   useDecideDevice,
@@ -42,11 +43,10 @@ import {
   useStaffLeave,
 } from '../api/staff';
 import { Meta, Section } from '../components/layout';
-import { QueryView, RowsSkeleton, useErrorText } from '../components/states';
+import { ErrorCard, QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { clock, days, duration, longDate, money, shortDate } from '../lib/format';
 import { phoneLabel } from '../lib/share';
 import { dayStatusMeta, leaveKey } from '../lib/status';
-import { isStepUpCancelled } from '../lib/step-up';
 import { useOwnerTitle } from '../shell/chrome';
 import { InviteSheet } from './InviteSheet';
 import { rupeesToPaise } from './staff-form';
@@ -368,6 +368,8 @@ function ShiftTab({ staff }: { staff: StaffDetail }) {
             .filter((x) => x.active)
             .map((x) => ({ value: x.id, label: x.name }))}
         />
+      ) : templates.isError ? (
+        <ErrorCard error={templates.error} onRetry={() => void templates.refetch()} />
       ) : (
         <Skeleton shape="block" height="5rem" />
       )}

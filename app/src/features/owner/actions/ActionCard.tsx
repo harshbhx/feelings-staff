@@ -7,13 +7,13 @@ import { Avatar, Button, Field, Icon, Input, Sheet, StatusChip, Textarea, useToa
 import type { TFunction } from 'i18next';
 import { type ReactNode, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { isStepUpCancelled } from '../../auth/step-up';
 import { type Decision, useDecide } from '../api/attendance';
 import { useStaffList } from '../api/staff';
 import { MapToggle, PunchFacts, RiskReasons, SelfieCompare } from '../components/PunchEvidence';
 import { useErrorText } from '../components/states';
 import { ago, clock, dayLabel, duration, money, shortDate } from '../lib/format';
 import { leaveKey } from '../lib/status';
-import { isStepUpCancelled } from '../lib/step-up';
 import { clampOvertime, waitingDays } from './actions-model';
 
 const firstName = (name: string) => name.split(' ')[0] ?? name;

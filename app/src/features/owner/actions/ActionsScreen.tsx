@@ -7,10 +7,10 @@ import type { ActionItem, ActionsView, ActionType } from '@fs/contracts';
 import { Button, ChipGroup, useToast } from '@fs/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { isStepUpCancelled } from '../../auth/step-up';
 import { useActions, useBulkApprove } from '../api/attendance';
 import { Section, useNow } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton, useErrorText } from '../components/states';
-import { isStepUpCancelled } from '../lib/step-up';
 import { ActionCard } from './ActionCard';
 import {
   type BulkType,

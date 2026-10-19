@@ -25,6 +25,12 @@ WP-1, platform, contracts and CI (merged):
 - `Fix.accuracySpreadM` in the engine contract.
 - Extra endpoints on top of PRD 9.4: join lookup, leave preview, owner security, setup checklist, payroll preview, door device list, consents, bulk approve, staff photo, staff rehire and device revoke.
 
+WP-6, owner panel:
+
+- Owner shell, Today, Needs action, Register with day detail, and Staff (list, add and invite, profile) on phone and desktop, with loading, empty, error and offline states.
+- Owner actions that need the owner PIN use the shared step-up sheet from sign-in.
+- A screen whose server part isn't built yet says so in plain words instead of a general error, and is not retried.
+
 Docs:
 
 - Handbook: [architecture](docs/architecture.md) with diagrams, [decision records](docs/decisions/README.md) ADR-01 to ADR-16, [setup](docs/setup.md), [deploy and go-live](docs/deploy.md), [API reference](docs/api.md) with a test that fails when an endpoint is missing from it, [data model](docs/data-model.md), runbooks for [incidents](docs/runbooks/incident.md), [backup and restore](docs/runbooks/backup-restore.md), [retention purge](docs/runbooks/retention-purge.md) and [secrets](docs/runbooks/secrets.md), an [ops log](docs/ops-log.md), and guides for the [owner](docs/guides/owner.md) and [staff](docs/guides/staff.md).

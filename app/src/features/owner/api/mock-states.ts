@@ -25,7 +25,17 @@ export function held<T>(key: EndpointKey, run: () => Promise<T>): Promise<T> {
   return run();
 }
 
-/** Mock-held errors are not retried, so the error card shows at once. */
+/**
+ * Retry a failed query once, but only when trying again can help: a dropped connection or a busy
+ * server. Answers like "not found", "not allowed" or "not built yet" show their card at once, and
+ * mock-held errors are never retried so the error card shows at once in visual tests.
+ */
 export function retryUnlessHeld(key: EndpointKey) {
-  return (failures: number) => mockHold(key) === null && failures < 1;
+  return (failures: number, error: unknown) =>
+    mockHold(key) === null && failures < 1 && worthRetrying(error);
+}
+
+export function worthRetrying(error: unknown): boolean {
+  if (!(error instanceof ApiError)) return true;
+  return error.status >= 500 && error.code !== 'NOT_IMPLEMENTED';
 }

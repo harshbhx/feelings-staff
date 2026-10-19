@@ -24,13 +24,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { useMe } from '../../../api/hooks';
+import { isStepUpCancelled } from '../../auth/step-up';
 import { useDayOverride, useOwnerDay } from '../api/attendance';
 import { Meta, Section, Tag } from '../components/layout';
 import { PunchFacts, PunchMap, RiskReasons, SelfieCompare } from '../components/PunchEvidence';
 import { QueryView, useErrorText } from '../components/states';
 import { clock, dayLabel, duration, longDate, money } from '../lib/format';
 import { dayStatusMeta, leaveKey, punchStatusMeta } from '../lib/status';
-import { isStepUpCancelled } from '../lib/step-up';
 import { useOwnerTitle } from '../shell/chrome';
 import {
   auditChanges,
