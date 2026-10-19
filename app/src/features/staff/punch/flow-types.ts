@@ -6,6 +6,7 @@
  * hook to this shape, and `flow-stub.ts` drives it from fixtures in mock mode (visual tests).
  */
 import type { PunchKind, PunchRequest, PunchResult } from '@fs/contracts';
+import type { ScanError } from '../scan/ScanPanel';
 import type { PunchConfirm } from '../today/today-model';
 
 export type PunchAction = Extract<PunchKind, 'in' | 'out'>;
@@ -78,7 +79,7 @@ export type PunchFlowState =
   /** Saved offline; sends by itself (PRD 4.3.6). */
   | { step: 'queued'; kind: PunchAction; clientTs: number }
   /** Door QR scanner inside the sheet. */
-  | { step: 'scanning'; kind: PunchAction; error: 'expired' | 'other_site' | 'not_ours' | null }
+  | { step: 'scanning'; kind: PunchAction; error: ScanError }
   /** Sent to the owner (pending): "Urmi will check it. Your time stays 10:03." */
   | { step: 'sent'; kind: PunchAction; effectiveTs: number }
   | { step: 'problem'; kind: PunchAction; problem: PunchProblem };
