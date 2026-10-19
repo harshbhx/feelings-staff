@@ -46,6 +46,8 @@ export function useDoor(options: UseDoorOptions = {}) {
   const origin = options.origin ?? (typeof location === 'undefined' ? '' : location.origin);
   const [phase, setPhase] = useState<DoorPhase>('loading');
   const [pairing, setPairing] = useState<DoorPairing | null>(null);
+  const pairingRef = useRef<DoorPairing | null>(null);
+  pairingRef.current = pairing;
   const [code, setCode] = useState<DoorCode | null>(null);
   const [synced, setSynced] = useState(false);
   const [offline, setOffline] = useState(false);
@@ -71,6 +73,20 @@ export function useDoor(options: UseDoorOptions = {}) {
       clock.sync(t.serverTime);
       setSynced(true);
       setOffline(false);
+      // The owner may have rotated this device's secret: take the current one.
+      const current = pairingRef.current;
+      if (current) {
+        try {
+          const s = await api.doorSecret();
+          if (s.secret !== current.secret) {
+            const next = { ...current, secret: s.secret };
+            await storeRef.current.set(next);
+            setPairing(next);
+          }
+        } catch {
+          // Offline or not rotated: the stored secret keeps working until the next sync.
+        }
+      }
     } catch {
       setOffline(true);
     }
