@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { StaffStatusFilter } from '../api/keys';
 import { useStaffList } from '../api/staff';
-import { Meta } from '../components/layout';
+import { Meta, WRAP_ROW } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { shortDate } from '../lib/format';
 
@@ -25,7 +25,7 @@ export function StaffListScreen() {
   const full = activeCount >= MAX_ACTIVE_STAFF;
 
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
       <div className="flex flex-wrap items-end gap-3">
         <Field label={t('owner:staff.search')} labelHidden className="min-w-0 flex-1 basis-60">
           <Input
@@ -113,6 +113,7 @@ function StaffListRow({ row }: { row: StaffRow }) {
   return (
     <ListRow
       asChild
+      className={WRAP_ROW}
       leading={<Avatar name={row.name} />}
       title={row.name}
       subtitle={[row.designation, row.employeeCode].filter(Boolean).join(' · ')}

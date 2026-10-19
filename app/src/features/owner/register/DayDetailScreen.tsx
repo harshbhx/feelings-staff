@@ -81,8 +81,8 @@ function Day({ day }: { day: OwnerDayDetail }) {
           : t('owner:day.noShift');
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:items-start xl:gap-12">
-      <div className="grid gap-8">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:items-start xl:gap-12">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
         {day.locked ? <Banner icon="lock">{t('owner:day.locked')}</Banner> : null}
         <div className="flex flex-wrap items-center gap-3">
           <StatusChip status={meta.chip} label={t(meta.labelKey)} />
@@ -169,7 +169,7 @@ function Day({ day }: { day: OwnerDayDetail }) {
         </div>
       </div>
 
-      <div className="grid gap-8">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
         <Section title={t('owner:day.map')}>
           {located ? (
             <>

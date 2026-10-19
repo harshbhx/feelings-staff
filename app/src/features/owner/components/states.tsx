@@ -49,7 +49,7 @@ export function ErrorCard({ error, onRetry }: { error: unknown; onRetry?: () => 
       data-testid="owner-error"
     >
       <p className="flex items-start gap-2 font-bold text-text">
-        <Icon name="warning-circle" className="mt-1 shrink-0 text-accent" />
+        <Icon name="warning-circle" className="mt-1 size-5 shrink-0 text-accent" />
         <span>{t('owner:errors.title')}</span>
       </p>
       <p className="text-text-body">{t(errorKey(error))}</p>

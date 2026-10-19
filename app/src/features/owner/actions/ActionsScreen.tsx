@@ -89,7 +89,7 @@ function Queue({ view }: { view: ActionsView }) {
   };
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       {chips.length > 1 ? (
         <ChipGroup
           type="radio"

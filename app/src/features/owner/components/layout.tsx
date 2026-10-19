@@ -1,6 +1,12 @@
 /** Small layout pieces shared by owner screens: sections with an h2, a muted meta line, a ticking clock. */
 import { type ReactNode, useEffect, useId, useState } from 'react';
 
+/**
+ * For a ListRow whose trailing chips or buttons would squeeze the name: below about 10rem of text the
+ * trailing part moves to its own line, right-aligned, instead of breaking the name letter by letter.
+ */
+export const WRAP_ROW = 'flex-wrap [&>.fs-row__text]:basis-[10rem] [&>.fs-row__trailing]:ml-auto';
+
 export function Section({
   title,
   count,

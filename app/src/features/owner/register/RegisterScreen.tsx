@@ -48,7 +48,7 @@ export function RegisterScreen() {
   };
 
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
       <div className="flex items-center gap-2">
         <IconButton
           icon="caret-left"
@@ -98,9 +98,12 @@ function useCellText() {
     if (!c.meta) return `${name}, ${dayLabel(c.date)}: ${t('owner:register.future')}`;
     const status = t(c.meta.labelKey);
     const extra = cellDetail(c.cell).map((p) => t(p.key, p.values));
-    return [t('owner:register.dayLink', { name, date: dayLabel(c.date), status }), ...extra].join(
-      ' · ',
-    );
+    // The visible letter ("WO", "OD") is part of the name, so what you see is what is read.
+    const letter = /\w/.test(c.meta.letter) ? ` (${c.meta.letter})` : '';
+    return [
+      `${t('owner:register.dayLink', { name, date: dayLabel(c.date), status })}${letter}`,
+      ...extra,
+    ].join(' · ');
   };
 }
 
@@ -112,7 +115,7 @@ function CellMark({ c, size = 'grid' }: { c: CellModel; size?: 'grid' | 'strip' 
     <span
       className={`grid place-items-center rounded-sm ${TINT[chip]} ${size === 'grid' ? 'h-11 w-9 content-center gap-0.5' : 'h-12 w-full content-center gap-0.5'}`}
     >
-      <Icon name={icon} className={c.late && chip === 'present' ? 'text-late' : ''} />
+      <Icon name={icon} className={`size-3.5 ${c.late && chip === 'present' ? 'text-late' : ''}`} />
       <span className="font-bold text-xs leading-none">{c.meta.letter}</span>
     </span>
   );
@@ -322,9 +325,10 @@ function Strip({
 
 function totalsLine(row: RegisterRow, t: TFunction) {
   return TOTAL_COLUMNS.filter((c) => totalValue(row, c) > 0)
-    .map(
-      (c) =>
-        `${t(`owner:register.totals.${c}`)} ${c === 'otHours' ? totalValue(row, c).toFixed(1) : days(totalValue(row, c))}`,
+    .map((c) =>
+      t(`owner:register.line.${c}`, {
+        n: c === 'otHours' ? totalValue(row, c).toFixed(1) : days(totalValue(row, c)),
+      }),
     )
     .join(' · ');
 }
@@ -371,13 +375,13 @@ function PhoneList({ view, today }: { view: RegisterView; today: string }) {
                 type="button"
                 onClick={() => openPerson(row.user.id)}
                 className="flex min-h-11 items-center justify-between gap-3 text-left"
-                aria-label={t('owner:register.openMonth', { name: row.user.name })}
               >
                 <span className="grid">
                   <span className="font-bold text-text">{row.user.name}</span>
                   <span className="text-sm text-text-muted tabular-nums">{totalsLine(row, t)}</span>
                 </span>
-                <Icon name="caret-right" className="text-text-muted" />
+                <span className="sr-only">{t('owner:register.openMonth')}</span>
+                <Icon name="caret-right" className="size-5 shrink-0 text-text-muted" />
               </button>
               {strip ? <Strip row={row} strip={strip} name={row.user.name} /> : null}
             </li>
@@ -442,7 +446,10 @@ function Legend() {
               className={`inline-grid h-7 min-w-9 grid-flow-col place-items-center gap-0.5 rounded-sm px-1 ${TINT[l.chip === 'late' ? 'present' : l.chip]}`}
               aria-hidden="true"
             >
-              <Icon name={CHIP_ICON[l.chip]} className={l.chip === 'late' ? 'text-late' : ''} />
+              <Icon
+                name={CHIP_ICON[l.chip]}
+                className={`size-4 ${l.chip === 'late' ? 'text-late' : ''}`}
+              />
               <span className="font-bold text-xs">{l.letter}</span>
             </span>
             {t(l.key)}

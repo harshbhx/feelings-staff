@@ -186,11 +186,6 @@ function Tabs({ count }: { count: number }) {
             label={t(item.labelKey)}
             current={active === item.key}
             badge={item.key === 'actions' && count > 0 ? count : undefined}
-            aria-label={
-              item.key === 'actions' && count > 0
-                ? `${t(item.labelKey)}, ${t('owner:nav.openItems', { count })}`
-                : undefined
-            }
           >
             <Link to={item.to} />
           </TabBarItem>

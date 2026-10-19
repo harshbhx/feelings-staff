@@ -12,9 +12,7 @@
     "inbox": "Inbox",
     "doorCode": "Show door code",
     "settings": "Settings",
-    "label": "Owner panel",
-    "openItems_one": "{{count}} waiting",
-    "openItems_other": "{{count}} waiting"
+    "label": "Owner panel"
   },
   "screens": {
     "signIn": "Owner sign-in",
@@ -102,7 +100,10 @@
     "duplicate": "That's already there. Check the list before adding it again.",
     "rateLimited": "That was a lot of tries in a short time. Wait a minute, then try again.",
     "notReady": "This part of the app isn't switched on yet. It comes with the next update.",
-    "server": "The server had a problem with this. Try again in a moment."
+    "server": "The server had a problem with this. Try again in a moment.",
+    "screenTitle": "This screen stopped working.",
+    "screenBody": "Reload the page to try again. Nothing you saved is lost.",
+    "reload": "Reload"
   },
   "time": {
     "justNow": "just now",
@@ -410,6 +411,15 @@
       "otHours": "Overtime hours approved",
       "lop": "Unpaid days"
     },
+    "line": {
+      "present": "{{n}} present",
+      "half": "{{n}} half",
+      "absent": "{{n}} absent",
+      "leave": "{{n}} leave",
+      "lateMin": "{{n}} min late",
+      "otHours": "{{n}} h overtime",
+      "lop": "{{n}} unpaid"
+    },
     "tip": {
       "late": "Late {{min}} m",
       "in": "in {{time}}",
@@ -419,7 +429,7 @@
     "locked": "Finalised. Reopen payroll to make changes.",
     "legend": "Key",
     "week": "Week of {{date}}",
-    "openMonth": "Open {{name}}'s month",
+    "openMonth": "Open the month",
     "dayLink": "{{name}}, {{date}}: {{status}}",
     "empty": "No staff to show for this month."
   },
