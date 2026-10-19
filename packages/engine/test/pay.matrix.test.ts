@@ -1,9 +1,15 @@
 /** PRD 14.2 "Monthly pay" and "Cap and advances" rows, table-driven, plus the pay property tests. */
 import type { Adjustment, DayResult, OtRate, PayRules } from '@fs/contracts';
-import { PayslipResult as PayslipSchema } from '@fs/contracts';
+import { DEFAULT_ORG_SETTINGS, PayslipResult as PayslipSchema } from '@fs/contracts';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { advanceInstalment, divisorDays, instalmentPlan, salaryParts } from '../src/pay';
+import {
+  advanceInstalment,
+  divisorDays,
+  instalmentPlan,
+  payRulesFromSettings,
+  salaryParts,
+} from '../src/pay';
 import {
   absent,
   adj,
@@ -26,6 +32,35 @@ import {
 const rules = (over: Partial<PayRules>): PayRules => ({ ...RULES, ...over });
 
 describe('PRD 14.2 monthly pay', () => {
+  it('pay rules from settings carry the minimum wage only when enabled', () => {
+    const on = structuredClone(DEFAULT_ORG_SETTINGS);
+    on.pay.minimumWage = { ...on.pay.minimumWage, enabled: true, amountPaise: 1_234_500 };
+    expect(payRulesFromSettings(on).minimumWagePaise).toBe(1_234_500);
+    const off = structuredClone(on);
+    off.pay.minimumWage.enabled = false;
+    expect(payRulesFromSettings(off).minimumWagePaise).toBeNull();
+  });
+
+  it('a salary part that ends before the joining date has no days and no pay', () => {
+    const r = slip({
+      person: person({
+        joinDate: '2026-10-12',
+        salaryParts: [
+          { from: '2026-10-01', to: '2026-10-09', type: 'daily', amountPaise: 55_000 },
+          { from: '2026-10-10', to: '2026-10-31', type: 'monthly', amountPaise: 1_500_000 },
+        ],
+      }),
+      days: oct([], { from: '2026-10-12' }),
+    });
+    expect(amount(r, 'basic')).toBe(0);
+    expect(r.salaryType).toBe('monthly');
+  });
+
+  it('flat overtime with nothing approved adds no line', () => {
+    const r = slip({ person: person({ otRate: { mode: 'flat', paisePerHour: 15_000 } }) });
+    expect(amount(r, 'overtime')).toBe(0);
+  });
+
   it.each([
     { divisor: 'calendar', working: 27, days: 31, rate: 48_387 },
     { divisor: 'fixed30', working: 27, days: 30, rate: 50_000 },
