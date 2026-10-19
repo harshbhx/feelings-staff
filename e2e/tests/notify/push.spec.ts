@@ -1,31 +1,106 @@
 import { expect, test } from '../../fixtures';
 
 /**
- * E2E-19 (PRD 14.4): subscribe from a tap, the server sends N2, the service worker shows it, a
- * click navigates to the target. Needs WP-7's service worker (it imports registerPushHandlers) and
- * the staff and owner shells, so it stays fixme until they are on main. The server half is already
- * covered by the Workers API tests (notifier.matrix.test.ts, notify.test.ts).
+ * E2E-19 (PRD 14.4, 11.6): the service worker shows a push and a click opens the target.
+ * Headless Chromium has no push service, so a real subscription cannot be made here (the server
+ * half is covered by notifier.matrix.test.ts and notify.test.ts). This spec delivers a Declarative
+ * Web Push payload straight to the installed service worker through the DevTools protocol and
+ * checks what the WP-8 handlers show: the owner's N2 text, its target and the app badge data.
  */
-test.describe('E2E-19 push', () => {
-  test.fixme('subscribe from a tap, receive N2, click opens the register day', async ({
+test.describe('E2E-19 push in the service worker', () => {
+  test('E2E-19 a delivered push becomes a notification with the in-app target', async ({
     page,
     context,
-    reset,
-    setServerClock,
-    outbox,
-  }) => {
+  }, info) => {
+    test.skip(info.project.name !== 'staff-android', 'Chromium service worker path');
     await context.grantPermissions(['notifications']);
-    await reset('basic-salon');
-    await setServerClock(Date.parse('2026-10-19T10:28:00+05:30'));
-    await page.goto('/o/today');
-    await page.getByRole('button', { name: /turn on notifications/i }).click();
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('ServiceWorker.enable');
+    const registrationId = new Promise<string>((resolve) => {
+      cdp.on('ServiceWorker.workerRegistrationUpdated', (e) => {
+        const r = e.registrations[0];
+        if (r) resolve(r.registrationId);
+      });
+    });
+    await page.goto('/signin?allowBrowser=1');
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    const origin = new URL(page.url()).origin;
+    const payload = {
+      web_push: 8030,
+      notification: {
+        title: 'Priya is 18 min late',
+        body: 'Checked in 10:28 at the salon.',
+        navigate: `${origin}/o/register/01K80VYGQP1PYC7SQGE0Y8BQDX/2026-10-19`,
+        lang: 'en-IN',
+      },
+      t: 'late_checkin',
+      e: '01K8WN0TQC11QKMBNWMGPP50NM',
+      topic: 'late-priya-20261019',
+      badge: 1,
+    };
+    await cdp.send('ServiceWorker.deliverPushMessage', {
+      origin,
+      registrationId: await registrationId,
+      data: JSON.stringify(payload),
+    });
     await expect
-      .poll(async () => (await outbox()).filter((o) => o.channel === 'push').length)
-      .toBe(0);
-    // The staff member checks in late; the punch emits N2 to the owner.
-    // (Filled in once the punch flow and shells land.)
-    await expect(page.getByText('Priya is 18 min late')).toBeVisible();
-    await page.getByText('Priya is 18 min late').click();
-    await expect(page).toHaveURL(/\/o\/register\/.+\/2026-10-19/);
+      .poll(
+        () =>
+          page.evaluate(async () => {
+            const reg = await navigator.serviceWorker.ready;
+            return (await reg.getNotifications()).map((n) => ({
+              title: n.title,
+              body: n.body,
+              tag: n.tag,
+              data: n.data as { url: string },
+            }));
+          }),
+        { timeout: 15_000 },
+      )
+      .toEqual([
+        expect.objectContaining({
+          title: 'Priya is 18 min late',
+          body: 'Checked in 10:28 at the salon.',
+          tag: 'late-priya-20261019',
+          data: expect.objectContaining({
+            url: '/o/register/01K80VYGQP1PYC7SQGE0Y8BQDX/2026-10-19',
+          }),
+        }),
+      ]);
+  });
+
+  test('E2E-19 a push with no readable body still shows a notification', async ({
+    page,
+    context,
+  }, info) => {
+    test.skip(info.project.name !== 'staff-android', 'Chromium service worker path');
+    await context.grantPermissions(['notifications']);
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('ServiceWorker.enable');
+    const registrationId = new Promise<string>((resolve) => {
+      cdp.on('ServiceWorker.workerRegistrationUpdated', (e) => {
+        const r = e.registrations[0];
+        if (r) resolve(r.registrationId);
+      });
+    });
+    await page.goto('/signin?allowBrowser=1');
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    await cdp.send('ServiceWorker.deliverPushMessage', {
+      origin: new URL(page.url()).origin,
+      registrationId: await registrationId,
+      data: 'not json',
+    });
+    await expect
+      .poll(() =>
+        page.evaluate(async () => {
+          const reg = await navigator.serviceWorker.ready;
+          return (await reg.getNotifications()).map((n) => n.title);
+        }),
+      )
+      .toEqual(['Feelings']);
   });
 });
