@@ -44,6 +44,16 @@ declare global {
 
 const DAY_S = 24 * 60 * 60;
 
+/**
+ * Workbox declares ExpirationPlugin's hooks as `WorkboxPlugin['x']` (which includes undefined), so
+ * under exactOptionalPropertyTypes it is not assignable to WorkboxPlugin; the runtime shape is.
+ */
+function expiration(maxEntries: number, maxAgeSeconds?: number): WorkboxPlugin {
+  return new ExpirationPlugin(
+    maxAgeSeconds === undefined ? { maxEntries } : { maxEntries, maxAgeSeconds },
+  ) as unknown as WorkboxPlugin;
+}
+
 /** GET endpoints kept for offline reading (PRD 11.4). `/me/payslips` is the list only. */
 const API_CACHED =
   /^\/api\/v1\/(?:me|me\/today|me\/days(?:\/.*)?|me\/leave|me\/payslips|owner\/today|owner\/register(?:\/.*)?)$/;
@@ -96,7 +106,7 @@ const stampCachedAt: WorkboxPlugin = {
 const apiStrategy = new NetworkFirst({
   cacheName: CACHE_API,
   networkTimeoutSeconds: 3,
-  plugins: [stampCachedAt, new ExpirationPlugin({ maxEntries: 50, maxAgeSeconds: 7 * DAY_S })],
+  plugins: [stampCachedAt, expiration(50, 7 * DAY_S)],
 });
 
 async function notifyCached(url: string, cachedAt: number): Promise<void> {
@@ -122,7 +132,7 @@ registerRoute(
   ({ url, sameOrigin }) => sameOrigin && SELFIE.test(url.pathname),
   new StaleWhileRevalidate({
     cacheName: CACHE_SELFIES,
-    plugins: [new ExpirationPlugin({ maxEntries: 200, maxAgeSeconds: 7 * DAY_S })],
+    plugins: [expiration(200, 7 * DAY_S)],
   }),
 );
 
@@ -130,7 +140,7 @@ registerRoute(
   ({ url, sameOrigin }) => sameOrigin && PAYSLIP_PDF.test(url.pathname),
   new CacheFirst({
     cacheName: CACHE_PAYSLIPS,
-    plugins: [new ExpirationPlugin({ maxEntries: 24 })],
+    plugins: [expiration(24)],
   }),
 );
 
@@ -138,7 +148,7 @@ registerRoute(
   ({ url }) => url.origin === TILE_ORIGIN,
   new CacheFirst({
     cacheName: CACHE_TILES,
-    plugins: [new ExpirationPlugin({ maxEntries: 300, maxAgeSeconds: 30 * DAY_S })],
+    plugins: [expiration(300, 30 * DAY_S)],
   }),
 );
 

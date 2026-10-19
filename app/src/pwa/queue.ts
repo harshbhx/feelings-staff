@@ -136,6 +136,7 @@ let storage: QueueStorage = idbQueueStorage;
 let items: QueuedPunch[] = [];
 let loaded: Promise<void> | null = null;
 let flushing: Promise<void> | null = null;
+let explicitAfter: Promise<void> | null = null;
 let lastSyncedAt: number | null = null;
 let lastEnqueuedAt = 0;
 let api: ApiClient | null = null;
@@ -388,7 +389,15 @@ async function drain(explicit: boolean): Promise<void> {
 }
 
 function runFlush(explicit: boolean): Promise<void> {
-  if (flushing) return flushing;
+  if (flushing) {
+    if (!explicit) return flushing;
+    // An explicit flush asked during a running one runs right after it (coalesced).
+    explicitAfter ??= flushing.then(() => {
+      explicitAfter = null;
+      return runFlush(true);
+    });
+    return explicitAfter;
+  }
   const run = (async () => {
     try {
       if (loaded) await reloadQueue();
@@ -549,6 +558,7 @@ export function resetQueueForTests(next: QueueStorage = createMemoryQueueStorage
   items = [];
   loaded = null;
   flushing = null;
+  explicitAfter = null;
   lastSyncedAt = null;
   lastEnqueuedAt = 0;
   api = null;
