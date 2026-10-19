@@ -94,6 +94,14 @@ export const DoorStatus = z.object({
   serverTime: EpochMs,
 });
 export type DoorStatus = z.infer<typeof DoorStatus>;
+/** Current secret of a paired door device; the door screen reads it hourly so a rotation reaches it. */
+export const DoorSecret = z.object({
+  secret: Base64Url,
+  /** Bumps on every rotation. */
+  secretVersion: z.number().int().min(1),
+  serverTime: EpochMs,
+});
+export type DoorSecret = z.infer<typeof DoorSecret>;
 
 // ---- Public ---------------------------------------------------------------------
 

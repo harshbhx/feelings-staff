@@ -34,6 +34,7 @@ import {
 import {
   DoorPairRequest,
   DoorPairResult,
+  DoorSecret,
   DoorStatus,
   NotificationPrefs,
   NotificationsPage,
@@ -1418,6 +1419,13 @@ export const endpoints = {
     access: ['door'],
     res: DoorStatus,
     summary: 'Last check-in line',
+  }),
+  doorSecret: ep({
+    method: 'GET',
+    path: '/door/secret',
+    access: ['door'],
+    res: DoorSecret,
+    summary: 'Current secret of this door device (after the owner rotates it)',
   }),
 
   // ---- Public ------------------------------------------------------------------------------

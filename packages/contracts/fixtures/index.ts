@@ -14,6 +14,7 @@ import config from './config.json';
 import consentGive from './consentGive.json';
 import consentWithdraw from './consentWithdraw.json';
 import doorPair from './doorPair.json';
+import doorSecret from './doorSecret.json';
 import doorStatus from './doorStatus.json';
 import health from './health.json';
 import joinComplete from './joinComplete.json';
@@ -277,6 +278,7 @@ export const fixtures: Partial<Record<EndpointKey, unknown>> = {
   ownerManagersList,
   ownerManagerUpsert,
   doorPair,
+  doorSecret,
   doorStatus,
   verifyPayslip,
   testReset,
