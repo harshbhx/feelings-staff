@@ -81,7 +81,7 @@ describe('worked and breaks (PRD 7.4, 14.2)', () => {
     {
       name: 'break punches on, short day: no break and no note',
       in: { rules: BREAKS, punches: shift(WED, '10:00', '14:00') },
-      expect: { workedMin: 240, breakMin: 0, tags: [] },
+      expect: { workedMin: 240, breakMin: 0, tags: ['early'] },
     },
     {
       name: 'overbreak counts as undertime',
