@@ -20,11 +20,6 @@ const BASE = '/api/v1';
 const HEADERS = { 'X-FS-Client': '0.1.0', Origin: 'http://localhost:8787' };
 const NOV_2 = Date.parse('2026-11-02T10:00:00+05:30');
 
-test.skip(
-  ({ request: _request }, info) => info.project.name !== 'owner-desktop',
-  'API-driven; runs once',
-);
-
 let seed: TestResetResult;
 
 async function signIn(request: APIRequestContext, stepUp = false) {
