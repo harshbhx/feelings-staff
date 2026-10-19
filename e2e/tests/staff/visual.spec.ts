@@ -147,16 +147,21 @@ test.describe('staff screens', () => {
         const out: string[] = [];
         if (document.documentElement.scrollWidth > window.innerWidth + 1)
           out.push(`scrolls sideways (${document.documentElement.scrollWidth} px)`);
-        for (const el of Array.from(
-          document.querySelectorAll<HTMLElement>(
-            'button:not([disabled]), a[href]:not(p a):not(li p a), [role="tab"], [role="radio"]',
-          ),
-        )) {
-          const r = el.getBoundingClientRect();
-          if (r.width === 0 || r.height === 0) continue; // hidden
-          if (r.height < 43.5 || r.width < 43.5) {
+        // Same rules as the kit (KIT-04): chips and inputs count their drawn wrapper, small
+        // buttons extend their target 2 px above and below, links inside running text are exempt.
+        const sel =
+          'button:not([disabled]), a[href]:not(p a), input:not([type="hidden"]), [role="tab"], [role="radio"]';
+        for (const el of Array.from(document.querySelectorAll<HTMLElement>(sel))) {
+          const target =
+            el.closest('.fs-chip, .fs-input-wrap, .fs-pinpad__display') ?? (el as Element);
+          const r = target.getBoundingClientRect();
+          if (r.width <= 1 || r.height <= 1) continue; // hidden or visually hidden
+          const extra = el.matches('.fs-btn[data-size="sm"]') ? 4 : 0;
+          if (r.height + extra < 43.5 || r.width < 43.5) {
             const label = (el.getAttribute('aria-label') ?? el.textContent ?? '').trim();
-            out.push(`${el.tagName.toLowerCase()} "${label.slice(0, 30)}" ${r.width}x${r.height}`);
+            out.push(
+              `${el.tagName.toLowerCase()} "${label.slice(0, 30)}" ${Math.round(r.width)}x${Math.round(r.height)}`,
+            );
           }
         }
         return out;

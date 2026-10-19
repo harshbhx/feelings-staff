@@ -183,11 +183,14 @@ function Calendar({
                   ) : (
                     <Link
                       to={`/day/${cell.date}`}
-                      aria-label={label}
                       aria-current={cell.isToday ? 'date' : undefined}
                       className="block rounded-md no-underline"
                     >
-                      {inner}
+                      {/* Name from content, so it includes the visible day (WCAG 2.5.3). */}
+                      <span className="sr-only">{label}</span>
+                      <span aria-hidden="true" className="block">
+                        {inner}
+                      </span>
                     </Link>
                   )}
                 </td>
