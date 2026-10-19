@@ -1,6 +1,6 @@
 # Data model
 
-One D1 (SQLite) database per environment, plus one private R2 bucket. This page says what each table is for, the rules every table follows, how long data is kept and where files live. The schema itself is in [`migrations/0001_init.sql`](../migrations/0001_init.sql) (copied from PRD 8.2), [`migrations/0002_platform.sql`](../migrations/0002_platform.sql) and, once the WP-9 credits PR (https://github.com/harshbhx/feelings-staff/pull/50) is merged, `migrations/0003_time_credits_presence.sql`. When this page and a migration disagree, the migration wins; fix the page.
+One D1 (SQLite) database per environment, plus one private R2 bucket. This page says what each table is for, the rules every table follows, how long data is kept and where files live. The schema itself is in [`migrations/0001_init.sql`](../migrations/0001_init.sql) (copied from PRD 8.2), [`migrations/0002_platform.sql`](../migrations/0002_platform.sql) and [`migrations/0003_time_credits_presence.sql`](../migrations/0003_time_credits_presence.sql) (WP-9). When this page and a migration disagree, the migration wins; fix the page.
 
 Contents: [Conventions](#conventions) · [Tables](#tables) · [Platform tables (0002)](#platform-tables-0002_platformsql) · [Time credits and presence (0003)](#time-credits-and-presence-tables-0003_time_credits_presencesql) · [Retention](#retention) · [R2 layout](#r2-layout) · [Migrations](#migrations)
 

@@ -179,7 +179,7 @@ The ledger shows what was given, what was taken back each month, what was moved 
 
 Time credits keep a count of minutes for each person, in your favour or against. Every minute counts: a late arrival from the first minute, an early leave from the first minute, time spent away from the salon that you confirmed, and overtime you approved. The count is a **balance**: a plus or minus number of minutes, for example +50 or −130.
 
-The balance never cuts or pays anything by itself. It only becomes money when you settle it at payroll, and you choose how much to settle. Staff never see it: not in their app, not on their payslip and not in a ping.
+The balance never cuts or pays anything by itself. It only becomes money when you settle it at payroll, and you choose how much to settle. Only you see it: staff do not see minutes or balances in their app or in a ping, and managers do not see them either. If you settle some minutes, the payslip shows one line, **Time adjustment**, with the amount only. Time lost to a break that ran over is shown to you on the day but is not a credit and costs nothing.
 
 Why it exists: someone can arrive 10 minutes late every day (70 minutes in a week, all hidden by the 10-minute grace) and still stay 2 hours late on a busy day. Under the old rules she would get full salary and full overtime. With Time credits both stay visible and you decide.
 
