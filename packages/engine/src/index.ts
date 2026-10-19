@@ -1,8 +1,9 @@
 /**
  * @fs/engine public API (PRD 7.16). Every function is pure and deterministic.
- * Folders: schedule/, day/, pay/, leave/, money/ (WP-5); fence/, risk/ (WP-4).
+ * Folders: schedule/, day/, pay/, leave/, money/ (WP-5); fence/, risk/ (WP-4); credits/ (WP-9).
  */
 
+export * from './credits';
 export { type ComputeDayInput, computeDay, timeRulesFromSettings } from './day';
 export {
   bestFence,

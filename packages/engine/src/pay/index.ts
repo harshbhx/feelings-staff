@@ -2,6 +2,8 @@ import type {
   Adjustment,
   AdvanceSchedule,
   CarryForward,
+  CreditSettlementInput,
+  CreditSettlementResult,
   DayCounts,
   DayResult,
   Fine,
@@ -15,11 +17,13 @@ import type {
   PersonPay,
 } from '@fs/contracts';
 import { addDays, DAY_MS, daysInMonth, isoWeekOf } from '@fs/contracts';
+import { creditValue, settleCredits } from '../credits';
 import { sandwichDates } from '../leave';
 import {
   add,
   formatInr,
   formatNum,
+  formatRate,
   frac,
   fromDecimal,
   minQ,
@@ -55,7 +59,22 @@ export interface ComputePayslipInput {
   limits?: { weeklyHours: number; quarterlyOtHours: number };
   /** Overtime minutes already paid earlier in this calendar quarter, for the quarterly warning. */
   quarterOtMinBefore?: number;
+  /**
+   * Dates with Time credits on (PRD 7.17.1, `credits_on(person, date)`): no late/early deduction and
+   * no overtime pay on them; their approved overtime is a plus credit instead. Absent: none.
+   */
+  creditDays?: readonly string[];
+  /** The owner's Time credits settlement for this run (PRD 7.17.5); null or absent settles nothing. */
+  settlement?: CreditSettlementInput | null;
+  /**
+   * Legal-band overtime minutes of the month on Time credits days (`legalOtBand`) and the "Pay legal
+   * overtime at 2x" setting, for the owner's warnings (PRD 7.17.7). Absent: none.
+   */
+  legalOt?: { minutes: number; pay2x: boolean };
 }
+
+/** The payslip plus what a Time credits settlement applied (null when there was none). */
+export type PayslipWithCredits = PayslipResult & { credits: CreditSettlementResult | null };
 
 /** LOP days per status for monthly staff (PRD 7.13: A + 0.5 × H + unpaid leave + sandwich). */
 const LOP_WEIGHT: Record<PayStatus, number> = { P: 0, H: 0.5, A: 1, L: 0, LOP: 1, WO: 0, HO: 0 };
@@ -123,8 +142,13 @@ interface Capped {
  * a human formula. `carryIn.advances` is informational: the caller folds carried advances into
  * `AdvanceSchedule.duePaise`. Pre-approved overtime is paid automatically; `auto` decisions are
  * ignored so it is not counted twice.
+ *
+ * Time credits (PRD 7.13, 7.17): on `creditDays` the late/early and overtime lines are replaced by
+ * the owner's `settlement`, one `time_credits` line: a plus settlement is an earning that joins
+ * gross pay; a minus one is a cut taken first inside the 50% cap room, trimmed to whole minutes that
+ * fit. Without credit days and a settlement the payslip is exactly the one without Time credits.
  */
-export function computePayslip(input: ComputePayslipInput): PayslipResult {
+export function computePayslip(input: ComputePayslipInput): PayslipWithCredits {
   const { person, month, rules } = input;
   const D = daysInMonth(month);
   const monthStart = `${month}-01`;
@@ -156,6 +180,7 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
 
   const holidays = new Map((input.holidays ?? []).map((h) => [h.date, h]));
   const sandwich = new Set(rules.sandwich ? sandwichDates(input.days) : []);
+  const creditDays = new Set(input.creditDays ?? []);
 
   const counts: DayCounts = {
     P: 0,
@@ -204,11 +229,13 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
       part,
       offPaid: part.monthly || paidOff,
       offMode: d.dayType === 'WO' ? rules.weekOffWorked : (holiday?.workedComp ?? 'extra_pay'),
+      credits: creditDays.has(d.workDate),
     });
     const week = isoWeekOf(d.workDate);
     weekMin.set(
       week,
-      (weekMin.get(week) ?? 0) + d.workedMin + d.otPreapprovedMin + d.otCandidateMin,
+      (weekMin.get(week) ?? 0) +
+        (d.totalMin ?? d.workedMin + d.otPreapprovedMin + d.otCandidateMin),
     );
   }
 
@@ -253,6 +280,23 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
   }
 
   for (const l of time.earnings) push(l.code, 'earning', l.amountPaise, l.formula);
+
+  // Time credits settlement (PRD 7.17.5): a plus one is an earning and joins gross pay.
+  const credit = input.settlement ?? null;
+  let credits: CreditSettlementResult | null = null;
+  const creditFormula = (c: CreditSettlementInput, min: number) =>
+    `${formatRate(frac(c.rate.rDay.num, c.rate.rDay.den))} × ${min} min ÷ ${c.rate.sStd}`;
+  if (credit !== null && credit.balanceMin >= 0) {
+    credits = settleCredits({ ...credit, room: 0 });
+    if (credits.appliedMin !== 0) {
+      push(
+        'time_credits',
+        'earning',
+        credits.amountPaise,
+        creditFormula(credit, credits.appliedMin),
+      );
+    }
+  }
 
   for (const a of input.adjustments) {
     if (EARNING_KINDS.has(a.kind)) push(a.kind, 'earning', a.amountPaise, a.note, a.id);
@@ -337,6 +381,26 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
 
   const carryOut: CarryForward = { advances: [], damagePaise: 0, otherPaise: 0, fines: [] };
   let cappedPaise = 0;
+  // A minus Time credits settlement is first in the capped group (PRD 7.10 step 3, 7.17.5).
+  if (credit !== null && credit.balanceMin < 0) {
+    credits = settleCredits({ ...credit, room });
+    const cut = -credits.amountPaise;
+    const a = -credits.appliedMin;
+    const wanted = Math.min(Math.max(0, -credit.settleMin), -credit.balanceMin);
+    room -= cut;
+    cappedPaise += cut;
+    if (a > 0) {
+      const fit = a < wanted ? ` (${a} of ${wanted} min fit under the 50% limit)` : '';
+      push('time_credits', 'deduction', credits.amountPaise, `${creditFormula(credit, a)}${fit}`);
+    }
+    if (a < wanted) {
+      warn(
+        'cap_carry',
+        `${wanted - a} min of time credits stay on the balance (50% limit).`,
+        creditValue(wanted - a, credit.rate),
+      );
+    }
+  }
   for (const f of fines) {
     const r = take(f.item);
     cappedPaise += r.taken;
@@ -449,6 +513,20 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
   if (otPendingMin > 0) {
     warn('pending_overtime', `${otPendingMin} min of overtime not decided, so not paid.`);
   }
+  const legal = input.legalOt;
+  if (legal !== undefined && legal.minutes > 0) {
+    if (legal.pay2x) {
+      warn(
+        'legal_ot_2x',
+        `${legal.minutes} min of overtime beyond 9 h a day or 48 h a week count at 2×, as the law requires.`,
+      );
+    } else {
+      warn(
+        'legal_ot_shortfall',
+        `Overtime beyond 9 h a day or 48 h a week must be paid at 2× by law. ${legal.minutes} min this month count at 1×.`,
+      );
+    }
+  }
 
   const monthlyDays = parts.reduce((s, p) => s + (p.monthly ? p.days : 0), 0);
   const dailyPaid = [...paidDaily.values()].reduce((s, n) => s + n, 0);
@@ -478,5 +556,6 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
     advanceRecoveries,
     carryOut,
     warnings,
+    credits,
   };
 }
