@@ -1,0 +1,12 @@
+{
+  "id": "01K8WN0TQC11QKMBNWMGPP50NM",
+  "kind": "salon",
+  "name": "Feelings Beauty Care",
+  "lat": 22.4606479,
+  "lng": 70.0565093,
+  "radiusM": 100,
+  "maxAccuracyM": 50,
+  "active": true,
+  "validFrom": null,
+  "validTo": null
+}

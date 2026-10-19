@@ -1,0 +1,14 @@
+{
+  "id": "01K8X32X76NG0MZ0VTHDC7TS77",
+  "name": "Bridal day",
+  "segments": [
+    {
+      "start": "08:00",
+      "end": "18:00"
+    }
+  ],
+  "breakMin": 60,
+  "scheduledMin": 540,
+  "active": true,
+  "sort": 5
+}

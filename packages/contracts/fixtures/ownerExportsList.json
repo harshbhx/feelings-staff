@@ -1,0 +1,24 @@
+[
+  {
+    "id": "01K8WBQDN273MYN9832W843TZS",
+    "kind": "register",
+    "format": "csv",
+    "month": "2026-10",
+    "status": "queued",
+    "createdAt": 1792386690000,
+    "expiresAt": 1792991520000,
+    "fileUrl": null,
+    "fileName": "attendance-register-2026-10.csv"
+  },
+  {
+    "id": "01K8PRBQN29D14HT47K9AB8M30",
+    "kind": "salary_register",
+    "format": "pdf",
+    "month": "2026-09",
+    "status": "ready",
+    "createdAt": 1791176400000,
+    "expiresAt": 1791781200000,
+    "fileUrl": "/api/v1/owner/exports/01K8PRBQN29D14HT47K9AB8M30/file",
+    "fileName": "salary-register-2026-09.pdf"
+  }
+]

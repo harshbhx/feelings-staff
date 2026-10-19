@@ -1,0 +1,95 @@
+{
+  "staff": {
+    "id": "01K8T98E8PW4ZCQ7BFM9B6ZKVF",
+    "name": "Anita Joshi",
+    "phone": "+919825043313",
+    "designation": "Receptionist",
+    "status": "invited",
+    "deviceState": "none",
+    "joinDate": "2026-11-02",
+    "exitDate": null,
+    "employeeCode": "FBC-000",
+    "lang": "en",
+    "salary": {
+      "type": "monthly",
+      "amountPaise": 1200000,
+      "effectiveFrom": "2024-10-14",
+      "createdAt": 1728876600000
+    },
+    "salaryHistory": [
+      {
+        "type": "monthly",
+        "amountPaise": 1200000,
+        "effectiveFrom": "2024-10-14",
+        "createdAt": 1728876600000
+      }
+    ],
+    "defaultTemplateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+    "weekOffDow": 1,
+    "selfieRequired": null,
+    "strongMode": false,
+    "divisorOverride": null,
+    "otRateOverride": null,
+    "devices": [],
+    "leaveBalances": [
+      {
+        "code": "CL",
+        "name": "Casual leave",
+        "paid": true,
+        "balance": 7,
+        "pending": 0,
+        "nextExpiry": null,
+        "usableFrom": null
+      },
+      {
+        "code": "SL",
+        "name": "Sick leave",
+        "paid": true,
+        "balance": 7,
+        "pending": 0,
+        "nextExpiry": null,
+        "usableFrom": null
+      }
+    ],
+    "advanceBalancePaise": 0,
+    "invite": {
+      "status": "active",
+      "expiresAt": 1792559520000
+    },
+    "today": null,
+    "monthTotals": {
+      "present": 0,
+      "half": 0,
+      "absent": 0,
+      "leave": 0,
+      "lop": 0,
+      "weekOff": 0,
+      "holiday": 0,
+      "workedMin": 0,
+      "lateMin": 0,
+      "lateBillableMin": 0,
+      "earlyBillableMin": 0,
+      "otApprovedMin": 0,
+      "otPendingMin": 0
+    },
+    "consents": [
+      {
+        "kind": "privacy_notice",
+        "version": "2026-10-19",
+        "lang": "en",
+        "acceptedAt": 1728881400000,
+        "withdrawnAt": null
+      }
+    ],
+    "exitReason": "Moved to Ahmedabad with family.",
+    "minimumWageWarning": null
+  },
+  "invite": {
+    "url": "https://staff.feelingsbeautycare.in/join/K7M4QPXD",
+    "code": "K7M-4QPXD",
+    "message": "Hi Anita, this is Urmi from Feelings Beauty Care. Please join our staff app:\nhttps://staff.feelingsbeautycare.in/join/K7M4QPXD\nYour join code is K7M-4QPXD. First add the app to your home screen, then open it and type the code.\nThe link works for 48 hours.",
+    "waLink": "https://wa.me/919825043313?text=Hi%20Anita%2C%20this%20is%20Urmi%20from%20Feelings%20Beauty%20Care.%20Please%20join%20our%20staff%20app%3A%0Ahttps%3A%2F%2Fstaff.feelingsbeautycare.in%2Fjoin%2FK7M4QPXD%0AYour%20join%20code%20is%20K7M-4QPXD.%20First%20add%20the%20app%20to%20your%20home%20screen%2C%20then%20open%20it%20and%20type%20the%20code.%0AThe%20link%20works%20for%2048%20hours.",
+    "expiresAt": 1792559520000,
+    "purpose": "join"
+  }
+}

@@ -1,0 +1,349 @@
+{
+  "run": {
+    "id": "01K8QTKPY00JBH9HC76Z45ZRR1",
+    "month": "2026-10",
+    "revision": 1,
+    "status": "draft",
+    "people": 12,
+    "netPaise": 13843200,
+    "paidCount": 0,
+    "createdAt": 1793503800000,
+    "finalisedAt": null,
+    "finalisedByName": null,
+    "reopenedReason": null,
+    "engineVersion": "engine-1.0.0",
+    "preview": false
+  },
+  "blockers": [
+    {
+      "kind": "pending_punches",
+      "count": 1,
+      "defaultAction": "The pending punch is rejected and the day is counted from the other punches.",
+      "items": [
+        {
+          "user": {
+            "id": "01K808WS88WK4F356DMX0P8VSB",
+            "name": "Sejal Makwana",
+            "designation": "Makeup artist",
+            "phone": "+919726821111"
+          },
+          "workDate": "2026-10-19",
+          "refId": "01K8WWV4CQA809TT90Q3BTNPWD"
+        }
+      ]
+    },
+    {
+      "kind": "flagged_punches",
+      "count": 1,
+      "defaultAction": "The flagged punch is accepted as it is.",
+      "items": [
+        {
+          "user": {
+            "id": "01K87R133CAYV58WCHEDPSC8TQ",
+            "name": "Jinal Kotak",
+            "designation": "Beautician",
+            "phone": "+919712710010"
+          },
+          "workDate": "2026-10-19",
+          "refId": "01K8E0HZY7205R3F71MAQZJ4HX"
+        }
+      ]
+    },
+    {
+      "kind": "overtime_undecided",
+      "count": 1,
+      "defaultAction": "The overtime is not paid this month.",
+      "items": [
+        {
+          "user": {
+            "id": "01K860ABG2KZEJ0J3KGQ5S997H",
+            "name": "Dhara Gohil",
+            "designation": "Stylist",
+            "phone": "+919586588908"
+          },
+          "workDate": "2026-10-17",
+          "refId": "01K8VTH8FGTRHA0QA0Q5Y6SKRE"
+        }
+      ]
+    },
+    {
+      "kind": "regularisations_undecided",
+      "count": 1,
+      "defaultAction": "The request is rejected and the recorded times stay.",
+      "items": [
+        {
+          "user": {
+            "id": "01K87QPZMP5513SAQDEKNN2B17",
+            "name": "Hetal Dave",
+            "designation": "Nail technician",
+            "phone": "+919825366706"
+          },
+          "workDate": "2026-10-16",
+          "refId": "01K8VWCRC0M7HDDF0DF1R96HY5"
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "people": 12,
+    "grossPaise": 14339140,
+    "deductionsPaise": 495859,
+    "netPaise": 13843200,
+    "paidCount": 0
+  },
+  "lines": [
+    {
+      "user": {
+        "id": "01K86AFQDXWDHQ8238N67SVDDK",
+        "name": "Priya Solanki",
+        "designation": "Stylist",
+        "phone": "+919825011201"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 29.5,
+      "lopDays": 1.5,
+      "lateMin": 55,
+      "earlyMin": 0,
+      "otApprovedMin": 150,
+      "grossPaise": 1576882,
+      "deductionsPaise": 378137,
+      "netPaise": 1198700,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+        "name": "Neha Parmar",
+        "designation": "Beautician",
+        "phone": "+919909122302"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 19,
+      "lopDays": 1,
+      "lateMin": 21,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 838710,
+      "deductionsPaise": 50000,
+      "netPaise": 788700,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K8VQK1MQ1GQKWX6D0EBBE455",
+        "name": "Meena Chavda",
+        "designation": "Helper",
+        "phone": "+919428144504"
+      },
+      "payslipId": null,
+      "salaryType": "daily",
+      "paidDays": 26,
+      "lopDays": 0,
+      "lateMin": 0,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 1430000,
+      "deductionsPaise": 0,
+      "netPaise": 1430000,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K8RC525PJGR1P8TRDT8GBJ6Q",
+        "name": "Kajal Vyas",
+        "designation": "Makeup artist",
+        "phone": "+919724033403"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 31,
+      "lopDays": 0,
+      "lateMin": 25,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 1200000,
+      "deductionsPaise": 1577,
+      "netPaise": 1198400,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K8RTJTBRYNPS8SSG3GVVE3ED",
+        "name": "Rekha Jethwa",
+        "designation": "Mehndi artist",
+        "phone": "+919879255605"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 30.5,
+      "lopDays": 0.5,
+      "lateMin": 0,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 1400000,
+      "deductionsPaise": 22581,
+      "netPaise": 1377400,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K87QPZMP5513SAQDEKNN2B17",
+        "name": "Hetal Dave",
+        "designation": "Nail technician",
+        "phone": "+919825366706"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 31,
+      "lopDays": 0,
+      "lateMin": 12,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 1350000,
+      "deductionsPaise": 726,
+      "netPaise": 1349300,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K8CX6TF7P9TEP6QNEP3FSBY7",
+        "name": "Pooja Bhatt",
+        "designation": "Receptionist",
+        "phone": "+919913477807"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 31,
+      "lopDays": 0,
+      "lateMin": 0,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 1600000,
+      "deductionsPaise": 0,
+      "netPaise": 1600000,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K860ABG2KZEJ0J3KGQ5S997H",
+        "name": "Dhara Gohil",
+        "designation": "Stylist",
+        "phone": "+919586588908"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 31,
+      "lopDays": 0,
+      "lateMin": 18,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 1500000,
+      "deductionsPaise": 1344,
+      "netPaise": 1498700,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K88WSYSDT60NPN5ARB5CJB45",
+        "name": "Komal Rathod",
+        "designation": "Trainee",
+        "phone": "+919924699009"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 31,
+      "lopDays": 0,
+      "lateMin": 0,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 800000,
+      "deductionsPaise": 0,
+      "netPaise": 800000,
+      "warnings": ["Below the minimum wage you set"],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K87R133CAYV58WCHEDPSC8TQ",
+        "name": "Jinal Kotak",
+        "designation": "Beautician",
+        "phone": "+919712710010"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 30,
+      "lopDays": 1,
+      "lateMin": 9,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 1250000,
+      "deductionsPaise": 40771,
+      "netPaise": 1209200,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K808WS88WK4F356DMX0P8VSB",
+        "name": "Sejal Makwana",
+        "designation": "Makeup artist",
+        "phone": "+919726821111"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 31,
+      "lopDays": 0,
+      "lateMin": 14,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 1100000,
+      "deductionsPaise": 723,
+      "netPaise": 1099300,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    },
+    {
+      "user": {
+        "id": "01K8HVYPHBE17XDAAV85DMW1AY",
+        "name": "Bhumi Trivedi",
+        "designation": "Trainee",
+        "phone": "+919016932212"
+      },
+      "payslipId": null,
+      "salaryType": "monthly",
+      "paidDays": 13,
+      "lopDays": 0,
+      "lateMin": 0,
+      "earlyMin": 0,
+      "otApprovedMin": 0,
+      "grossPaise": 293548,
+      "deductionsPaise": 0,
+      "netPaise": 293500,
+      "warnings": [],
+      "paid": null,
+      "pdfStatus": null
+    }
+  ],
+  "warnings": ["Komal Rathod is below the minimum wage you set."]
+}

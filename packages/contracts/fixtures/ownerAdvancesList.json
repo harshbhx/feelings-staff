@@ -1,0 +1,70 @@
+{
+  "items": [
+    {
+      "id": "01K8D21FBSSP20BCWJAG3D88KX",
+      "user": {
+        "id": "01K86AFQDXWDHQ8238N67SVDDK",
+        "name": "Priya Solanki",
+        "designation": "Stylist",
+        "phone": "+919825011201"
+      },
+      "amountPaise": 300000,
+      "givenOn": "2026-10-03",
+      "mode": "cash",
+      "reason": "Scooter repair.",
+      "plan": "full",
+      "instalmentsN": null,
+      "firstMonth": "2026-10",
+      "status": "active",
+      "staffAck": "confirmed",
+      "staffAckAt": 1791036600000,
+      "recoveredPaise": 0,
+      "balancePaise": 300000,
+      "ledger": [],
+      "createdAt": 1791013200000
+    },
+    {
+      "id": "01K8H2Y64EZZZTJEDZNZ76R671",
+      "user": {
+        "id": "01K8VQK1MQ1GQKWX6D0EBBE455",
+        "name": "Meena Chavda",
+        "designation": "Helper",
+        "phone": "+919428144504"
+      },
+      "amountPaise": 200000,
+      "givenOn": null,
+      "mode": null,
+      "reason": "Hospital bill for my mother.",
+      "plan": "instalments",
+      "instalmentsN": 2,
+      "firstMonth": "2026-11",
+      "status": "requested",
+      "staffAck": "pending",
+      "staffAckAt": null,
+      "recoveredPaise": 0,
+      "balancePaise": 0,
+      "ledger": [],
+      "createdAt": 1792324500000
+    }
+  ],
+  "balances": [
+    {
+      "user": {
+        "id": "01K86AFQDXWDHQ8238N67SVDDK",
+        "name": "Priya Solanki",
+        "designation": "Stylist",
+        "phone": "+919825011201"
+      },
+      "balancePaise": 300000
+    },
+    {
+      "user": {
+        "id": "01K8VQK1MQ1GQKWX6D0EBBE455",
+        "name": "Meena Chavda",
+        "designation": "Helper",
+        "phone": "+919428144504"
+      },
+      "balancePaise": 0
+    }
+  ]
+}

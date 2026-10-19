@@ -1,0 +1,1398 @@
+{
+  "week": "2026-W43",
+  "dates": [
+    "2026-10-19",
+    "2026-10-20",
+    "2026-10-21",
+    "2026-10-22",
+    "2026-10-23",
+    "2026-10-24",
+    "2026-10-25"
+  ],
+  "rows": [
+    {
+      "user": {
+        "id": "01K86AFQDXWDHQ8238N67SVDDK",
+        "name": "Priya Solanki",
+        "designation": "Stylist",
+        "phone": "+919825011201"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 2880,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+        "name": "Neha Parmar",
+        "designation": "Beautician",
+        "phone": "+919909122302"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "WO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 2340,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K8RC525PJGR1P8TRDT8GBJ6Q",
+        "name": "Kajal Vyas",
+        "designation": "Makeup artist",
+        "phone": "+919724033403"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "WO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": [
+            {
+              "id": "01K8B2CMEWHA5E0KVPW53A63ZH",
+              "placeName": "Rajwadi Banquet",
+              "startTs": 1792830600000,
+              "endTs": 1792859400000
+            }
+          ]
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 2340,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K8VQK1MQ1GQKWX6D0EBBE455",
+        "name": "Meena Chavda",
+        "designation": "Helper",
+        "phone": "+919428144504"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "WO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 2340,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K8RTJTBRYNPS8SSG3GVVE3ED",
+        "name": "Rekha Jethwa",
+        "designation": "Mehndi artist",
+        "phone": "+919879255605"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "WO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 2340,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K87QPZMP5513SAQDEKNN2B17",
+        "name": "Hetal Dave",
+        "designation": "Nail technician",
+        "phone": "+919825366706"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 2880,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K8CX6TF7P9TEP6QNEP3FSBY7",
+        "name": "Pooja Bhatt",
+        "designation": "Receptionist",
+        "phone": "+919913477807"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "WO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 2340,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K860ABG2KZEJ0J3KGQ5S997H",
+        "name": "Dhara Gohil",
+        "designation": "Stylist",
+        "phone": "+919586588908"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "WO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": [
+            {
+              "id": "01K8B2CMEWHA5E0KVPW53A63ZH",
+              "placeName": "Rajwadi Banquet",
+              "startTs": 1792830600000,
+              "endTs": 1792859400000
+            }
+          ]
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 2340,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K88WSYSDT60NPN5ARB5CJB45",
+        "name": "Komal Rathod",
+        "designation": "Trainee",
+        "phone": "+919924699009"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "L",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": "CL",
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "WO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 1800,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K87R133CAYV58WCHEDPSC8TQ",
+        "name": "Jinal Kotak",
+        "designation": "Beautician",
+        "phone": "+919712710010"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "WO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 2340,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K808WS88WK4F356DMX0P8VSB",
+        "name": "Sejal Makwana",
+        "designation": "Makeup artist",
+        "phone": "+919726821111"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "WO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+          "templateName": "Full day",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 2340,
+      "over48": false
+    },
+    {
+      "user": {
+        "id": "01K8HVYPHBE17XDAAV85DMW1AY",
+        "name": "Bhumi Trivedi",
+        "designation": "Trainee",
+        "phone": "+919016932212"
+      },
+      "cells": [
+        {
+          "date": "2026-10-19",
+          "kind": "template",
+          "templateId": "01K8DZDVX2BD5EKX11TQ30HA3B",
+          "templateName": "Evening",
+          "segments": [
+            {
+              "start": "15:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-20",
+          "kind": "HO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "template",
+          "templateId": "01K8DZDVX2BD5EKX11TQ30HA3B",
+          "templateName": "Evening",
+          "segments": [
+            {
+              "start": "15:00",
+              "end": "20:00"
+            }
+          ],
+          "override": true,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "template",
+          "templateId": "01K8DZDVX2BD5EKX11TQ30HA3B",
+          "templateName": "Evening",
+          "segments": [
+            {
+              "start": "15:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "WO",
+          "templateId": null,
+          "templateName": null,
+          "segments": [],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-24",
+          "kind": "template",
+          "templateId": "01K8DZDVX2BD5EKX11TQ30HA3B",
+          "templateName": "Evening",
+          "segments": [
+            {
+              "start": "15:00",
+              "end": "20:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "template",
+          "templateId": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+          "templateName": "Sunday",
+          "segments": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ],
+          "override": false,
+          "leaveCode": null,
+          "duties": []
+        }
+      ],
+      "scheduledMin": 1380,
+      "over48": false
+    }
+  ],
+  "templates": [
+    {
+      "id": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+      "name": "Full day",
+      "segments": [
+        {
+          "start": "10:00",
+          "end": "20:00"
+        }
+      ],
+      "breakMin": 60,
+      "scheduledMin": 540,
+      "active": true,
+      "sort": 0
+    },
+    {
+      "id": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+      "name": "Sunday",
+      "segments": [
+        {
+          "start": "10:00",
+          "end": "13:00"
+        }
+      ],
+      "breakMin": 0,
+      "scheduledMin": 180,
+      "active": true,
+      "sort": 1
+    },
+    {
+      "id": "01K8ZAWHRSE2WHRC7620FKPZ9J",
+      "name": "Morning",
+      "segments": [
+        {
+          "start": "10:00",
+          "end": "15:00"
+        }
+      ],
+      "breakMin": 0,
+      "scheduledMin": 300,
+      "active": true,
+      "sort": 2
+    },
+    {
+      "id": "01K8DZDVX2BD5EKX11TQ30HA3B",
+      "name": "Evening",
+      "segments": [
+        {
+          "start": "15:00",
+          "end": "20:00"
+        }
+      ],
+      "breakMin": 0,
+      "scheduledMin": 300,
+      "active": true,
+      "sort": 3
+    },
+    {
+      "id": "01K8MMG99C3NBNXQHWM0H1KNKS",
+      "name": "Split",
+      "segments": [
+        {
+          "start": "10:00",
+          "end": "14:00"
+        },
+        {
+          "start": "17:00",
+          "end": "21:00"
+        }
+      ],
+      "breakMin": 0,
+      "scheduledMin": 480,
+      "active": true,
+      "sort": 4
+    }
+  ]
+}

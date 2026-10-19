@@ -1,0 +1,152 @@
+{
+  "date": "2026-10-19",
+  "updatedAt": 1792381200000,
+  "closed": null,
+  "firstShiftStart": "10:00",
+  "counters": {
+    "present": 0,
+    "late": 0,
+    "notInYet": 0,
+    "onLeave": 1,
+    "weekOff": 1,
+    "atVenue": 0,
+    "checkedOut": 0
+  },
+  "in": [],
+  "notIn": [
+    {
+      "user": {
+        "id": "01K86AFQDXWDHQ8238N67SVDDK",
+        "name": "Priya Solanki",
+        "designation": "Stylist",
+        "phone": "+919825011201"
+      },
+      "shiftStart": "10:00",
+      "state": "due_later",
+      "minutesLate": 0
+    },
+    {
+      "user": {
+        "id": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+        "name": "Neha Parmar",
+        "designation": "Beautician",
+        "phone": "+919909122302"
+      },
+      "shiftStart": "10:00",
+      "state": "due_later",
+      "minutesLate": 0
+    },
+    {
+      "user": {
+        "id": "01K8RC525PJGR1P8TRDT8GBJ6Q",
+        "name": "Kajal Vyas",
+        "designation": "Makeup artist",
+        "phone": "+919724033403"
+      },
+      "shiftStart": "10:00",
+      "state": "due_later",
+      "minutesLate": 0
+    },
+    {
+      "user": {
+        "id": "01K8VQK1MQ1GQKWX6D0EBBE455",
+        "name": "Meena Chavda",
+        "designation": "Helper",
+        "phone": "+919428144504"
+      },
+      "shiftStart": "10:00",
+      "state": "due_later",
+      "minutesLate": 0
+    },
+    {
+      "user": {
+        "id": "01K87QPZMP5513SAQDEKNN2B17",
+        "name": "Hetal Dave",
+        "designation": "Nail technician",
+        "phone": "+919825366706"
+      },
+      "shiftStart": "10:00",
+      "state": "due_later",
+      "minutesLate": 0
+    },
+    {
+      "user": {
+        "id": "01K8CX6TF7P9TEP6QNEP3FSBY7",
+        "name": "Pooja Bhatt",
+        "designation": "Receptionist",
+        "phone": "+919913477807"
+      },
+      "shiftStart": "10:00",
+      "state": "due_later",
+      "minutesLate": 0
+    },
+    {
+      "user": {
+        "id": "01K860ABG2KZEJ0J3KGQ5S997H",
+        "name": "Dhara Gohil",
+        "designation": "Stylist",
+        "phone": "+919586588908"
+      },
+      "shiftStart": "10:00",
+      "state": "due_later",
+      "minutesLate": 0
+    },
+    {
+      "user": {
+        "id": "01K87R133CAYV58WCHEDPSC8TQ",
+        "name": "Jinal Kotak",
+        "designation": "Beautician",
+        "phone": "+919712710010"
+      },
+      "shiftStart": "10:00",
+      "state": "due_later",
+      "minutesLate": 0
+    },
+    {
+      "user": {
+        "id": "01K808WS88WK4F356DMX0P8VSB",
+        "name": "Sejal Makwana",
+        "designation": "Makeup artist",
+        "phone": "+919726821111"
+      },
+      "shiftStart": "10:00",
+      "state": "due_later",
+      "minutesLate": 0
+    },
+    {
+      "user": {
+        "id": "01K8HVYPHBE17XDAAV85DMW1AY",
+        "name": "Bhumi Trivedi",
+        "designation": "Trainee",
+        "phone": "+919016932212"
+      },
+      "shiftStart": "15:00",
+      "state": "due_later",
+      "minutesLate": 0
+    }
+  ],
+  "out": [],
+  "away": [
+    {
+      "user": {
+        "id": "01K88WSYSDT60NPN5ARB5CJB45",
+        "name": "Komal Rathod",
+        "designation": "Trainee",
+        "phone": "+919924699009"
+      },
+      "reason": "leave",
+      "leaveCode": "CL"
+    },
+    {
+      "user": {
+        "id": "01K8RTJTBRYNPS8SSG3GVVE3ED",
+        "name": "Rekha Jethwa",
+        "designation": "Mehndi artist",
+        "phone": "+919879255605"
+      },
+      "reason": "week_off",
+      "leaveCode": null
+    }
+  ],
+  "actionsCount": 9
+}

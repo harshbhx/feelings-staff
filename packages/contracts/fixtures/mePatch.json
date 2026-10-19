@@ -1,0 +1,41 @@
+{
+  "user": {
+    "id": "01K86AFQDXWDHQ8238N67SVDDK",
+    "name": "Priya Solanki",
+    "role": "staff",
+    "status": "active",
+    "phone": "+919825011201",
+    "email": null,
+    "lang": "en",
+    "designation": "Stylist",
+    "joinDate": "2025-03-10"
+  },
+  "org": {
+    "id": "01K88WMW5DRXRGE3RMW4NF61X1",
+    "name": "Feelings Beauty Care",
+    "ownerDisplayName": "Urmi",
+    "contactPhone": "+918000661578",
+    "timezone": "Asia/Kolkata"
+  },
+  "device": {
+    "id": "01K8D7M7J8T2CCGWBT278DBM02",
+    "label": "Samsung Galaxy A34",
+    "status": "approved",
+    "approvedAt": 1741582860000
+  },
+  "permissions": [],
+  "flags": {
+    "selfieRequired": false,
+    "selfieOnCheckOut": false,
+    "strongMode": false,
+    "breakPunches": false,
+    "pinEveryPunch": true,
+    "showPayslips": true,
+    "consentsNeeded": [],
+    "ownerPinSet": false,
+    "ownerPasswordSet": false,
+    "setupIncomplete": false,
+    "stepUpUntil": null,
+    "storageTip": false
+  }
+}

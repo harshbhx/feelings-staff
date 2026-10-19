@@ -1,0 +1,48 @@
+[
+  {
+    "id": "01K88YDYR2A3AM48PYS2KVKJZG",
+    "user": {
+      "id": "01K86AFQDXWDHQ8238N67SVDDK",
+      "name": "Priya Solanki",
+      "designation": "Stylist",
+      "phone": "+919825011201"
+    },
+    "workDate": "2026-10-16",
+    "kind": "missed_in",
+    "targetPunchId": null,
+    "proposedInTs": 1792125000000,
+    "proposedOutTs": null,
+    "currentInTs": null,
+    "currentOutTs": null,
+    "placeName": null,
+    "reason": "The app was stuck on loading at the door.",
+    "status": "pending",
+    "decidedAt": null,
+    "decidedByName": null,
+    "decisionNote": null,
+    "createdAt": 1792375920000
+  },
+  {
+    "id": "01K82W5AQ8R0MJQAZ6T0HKYBCR",
+    "user": {
+      "id": "01K86AFQDXWDHQ8238N67SVDDK",
+      "name": "Priya Solanki",
+      "designation": "Stylist",
+      "phone": "+919825011201"
+    },
+    "workDate": "2026-10-12",
+    "kind": "wrong_time",
+    "targetPunchId": null,
+    "proposedInTs": null,
+    "proposedOutTs": 1791797400000,
+    "currentInTs": 1791779430000,
+    "currentOutTs": 1791795000000,
+    "placeName": null,
+    "reason": "I left at 3 pm after Urmi said I could go.",
+    "status": "approved",
+    "decidedAt": 1791866700000,
+    "decidedByName": "Urmi",
+    "decisionNote": null,
+    "createdAt": 1791813600000
+  }
+]

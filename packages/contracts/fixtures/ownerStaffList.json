@@ -1,0 +1,145 @@
+[
+  {
+    "id": "01K86AFQDXWDHQ8238N67SVDDK",
+    "name": "Priya Solanki",
+    "phone": "+919825011201",
+    "designation": "Stylist",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2025-03-10",
+    "exitDate": null,
+    "employeeCode": "FBC-003"
+  },
+  {
+    "id": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+    "name": "Neha Parmar",
+    "phone": "+919909122302",
+    "designation": "Beautician",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2026-10-12",
+    "exitDate": null,
+    "employeeCode": "FBC-013"
+  },
+  {
+    "id": "01K8RC525PJGR1P8TRDT8GBJ6Q",
+    "name": "Kajal Vyas",
+    "phone": "+919724033403",
+    "designation": "Makeup artist",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2025-06-02",
+    "exitDate": null,
+    "employeeCode": "FBC-005"
+  },
+  {
+    "id": "01K8VQK1MQ1GQKWX6D0EBBE455",
+    "name": "Meena Chavda",
+    "phone": "+919428144504",
+    "designation": "Helper",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2025-08-18",
+    "exitDate": null,
+    "employeeCode": "FBC-007"
+  },
+  {
+    "id": "01K8RTJTBRYNPS8SSG3GVVE3ED",
+    "name": "Rekha Jethwa",
+    "phone": "+919879255605",
+    "designation": "Mehndi artist",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2024-11-04",
+    "exitDate": null,
+    "employeeCode": "FBC-002"
+  },
+  {
+    "id": "01K87QPZMP5513SAQDEKNN2B17",
+    "name": "Hetal Dave",
+    "phone": "+919825366706",
+    "designation": "Nail technician",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2025-01-20",
+    "exitDate": null,
+    "employeeCode": "FBC-004"
+  },
+  {
+    "id": "01K8CX6TF7P9TEP6QNEP3FSBY7",
+    "name": "Pooja Bhatt",
+    "phone": "+919913477807",
+    "designation": "Receptionist",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2025-09-01",
+    "exitDate": null,
+    "employeeCode": "FBC-008"
+  },
+  {
+    "id": "01K860ABG2KZEJ0J3KGQ5S997H",
+    "name": "Dhara Gohil",
+    "phone": "+919586588908",
+    "designation": "Stylist",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2024-12-09",
+    "exitDate": null,
+    "employeeCode": "FBC-001"
+  },
+  {
+    "id": "01K88WSYSDT60NPN5ARB5CJB45",
+    "name": "Komal Rathod",
+    "phone": "+919924699009",
+    "designation": "Trainee",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2026-07-01",
+    "exitDate": null,
+    "employeeCode": "FBC-011"
+  },
+  {
+    "id": "01K87R133CAYV58WCHEDPSC8TQ",
+    "name": "Jinal Kotak",
+    "phone": "+919712710010",
+    "designation": "Beautician",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2025-11-17",
+    "exitDate": null,
+    "employeeCode": "FBC-009"
+  },
+  {
+    "id": "01K808WS88WK4F356DMX0P8VSB",
+    "name": "Sejal Makwana",
+    "phone": "+919726821111",
+    "designation": "Makeup artist",
+    "status": "active",
+    "deviceState": "approved",
+    "joinDate": "2026-02-16",
+    "exitDate": null,
+    "employeeCode": "FBC-012"
+  },
+  {
+    "id": "01K8HVYPHBE17XDAAV85DMW1AY",
+    "name": "Bhumi Trivedi",
+    "phone": "+919016932212",
+    "designation": "Trainee",
+    "status": "active",
+    "deviceState": "pending",
+    "joinDate": "2026-10-19",
+    "exitDate": null,
+    "employeeCode": "FBC-014"
+  },
+  {
+    "id": "01K8T98E8PW4ZCQ7BFM9B6ZKVF",
+    "name": "Anita Joshi",
+    "phone": "+919825043313",
+    "designation": "Receptionist",
+    "status": "exited",
+    "deviceState": "approved",
+    "joinDate": "2024-10-14",
+    "exitDate": "2026-09-30",
+    "employeeCode": "FBC-000"
+  }
+]

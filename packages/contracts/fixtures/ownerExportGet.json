@@ -1,0 +1,11 @@
+{
+  "id": "01K8PRBQN29D14HT47K9AB8M30",
+  "kind": "salary_register",
+  "format": "pdf",
+  "month": "2026-09",
+  "status": "ready",
+  "createdAt": 1791176400000,
+  "expiresAt": 1791781200000,
+  "fileUrl": "/api/v1/owner/exports/01K8PRBQN29D14HT47K9AB8M30/file",
+  "fileName": "salary-register-2026-09.pdf"
+}
