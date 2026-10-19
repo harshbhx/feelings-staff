@@ -5,8 +5,27 @@
  */
 
 export { computeDay } from './day';
-export { fenceCheck, haversineM } from './fence';
+export {
+  bestFence,
+  type CalibrationResult,
+  type CalibrationSample,
+  distanceBucket,
+  fenceCheck,
+  haversineM,
+  proposeCalibration,
+} from './fence';
 export { computePayslip } from './pay';
-export { riskScore } from './risk';
+export {
+  DOOR_STEP_MS,
+  doorStep,
+  doorToken,
+  isDoorTokenShape,
+  isSuspectAsn,
+  matchDoorToken,
+  outcomeForScore,
+  RISK_POINTS,
+  riskScore,
+  riskSignals,
+} from './risk';
 export { resolveSchedule } from './schedule';
 export { ENGINE_VERSION, EngineNotReady } from './version';
