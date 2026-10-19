@@ -66,7 +66,7 @@ test.describe('kit', () => {
       const out: string[] = [];
       const sel =
         'button:not(.fs-pinpad__key[data-kind="delete"]:disabled), a[href], input, textarea';
-      for (const el of document.querySelectorAll<HTMLElement>(`main ${sel}`)) {
+      for (const el of Array.from(document.querySelectorAll<HTMLElement>(`main ${sel}`))) {
         const target =
           el.closest('.fs-chip, .fs-input-wrap, .fs-pinpad__display') ?? (el as Element);
         const r = target.getBoundingClientRect();

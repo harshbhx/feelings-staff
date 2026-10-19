@@ -1,9 +1,11 @@
 import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-const root = (p: string) =>
-  readFileSync(fileURLToPath(new URL(`../../../${p}`, import.meta.url)), 'utf8');
+// happy-dom replaces the global URL, so paths are built with node:path.
+const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+const root = (p: string) => readFileSync(resolve(REPO, p), 'utf8');
 
 /** The first ```css block after `heading` in a Markdown file. */
 function cssBlock(md: string, heading: string): string {

@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -10,7 +11,7 @@ import { type DayStatus, STATUS_HAS_LETTER, StatusChip } from '../src/components
 import { renderUi } from './render';
 
 const ui = JSON.parse(
-  readFileSync(fileURLToPath(new URL('../../i18n/en/ui.json', import.meta.url)), 'utf8'),
+  readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../i18n/en/ui.json'), 'utf8'),
 ) as { status: Record<string, { word?: string; letter?: string }> };
 
 describe('Button', () => {
