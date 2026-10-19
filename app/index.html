@@ -13,6 +13,15 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <!-- Plus Jakarta Sans latin (variable, normal): the one preloaded font (PRD 11.3, 11.10). Vite
+         emits it with the same hashed URL the @font-face in @fs/ui/styles.css uses. -->
+    <link
+      rel="preload"
+      href="../packages/ui/node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <title>Feelings Staff</title>
   </head>
   <body>

@@ -1,0 +1,74 @@
+/* StatusChip (PRD 12.3): colour + icon + word on its tint. Square-ish corners so it never reads as a button. */
+@layer components {
+  .fs-status {
+    --fs-status-fg: var(--status-off);
+    --fs-status-bg: var(--status-off-bg);
+    --fs-status-icon: var(--fs-status-fg);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    min-height: 1.75rem;
+    padding: 0.2rem 0.55rem 0.2rem 0.45rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--fs-status-bg);
+    color: var(--fs-status-fg);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-strong);
+    line-height: 1.2;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    vertical-align: middle;
+  }
+
+  .fs-status__icon {
+    width: 1.15em;
+    height: 1.15em;
+    flex: none;
+    color: var(--fs-status-icon);
+  }
+
+  .fs-status[data-status="present"] {
+    --fs-status-fg: var(--status-present);
+    --fs-status-bg: var(--status-present-bg);
+  }
+
+  .fs-status[data-status="late"] {
+    --fs-status-fg: var(--status-late);
+    --fs-status-bg: var(--status-late-bg);
+  }
+
+  .fs-status[data-status="half"] {
+    --fs-status-fg: var(--status-half);
+    --fs-status-bg: var(--status-half-bg);
+  }
+
+  .fs-status[data-status="absent"] {
+    --fs-status-fg: var(--status-absent);
+    --fs-status-bg: var(--status-absent-bg);
+  }
+
+  .fs-status:is([data-status="leave"], [data-status="venue"]) {
+    --fs-status-fg: var(--status-leave);
+    --fs-status-bg: var(--status-leave-bg);
+  }
+
+  .fs-status:is([data-status="off"], [data-status="holiday"]) {
+    --fs-status-fg: var(--status-off);
+    --fs-status-bg: var(--status-off-bg);
+  }
+
+  /* Needs a look: ink text, the icon in sindoor. */
+  .fs-status[data-status="flag"] {
+    --fs-status-fg: var(--status-flag);
+    --fs-status-bg: var(--status-flag-bg);
+    --fs-status-icon: var(--accent);
+  }
+
+  /* Waiting: white with a dashed control outline. */
+  .fs-status[data-status="waiting"] {
+    --fs-status-fg: var(--ink-700);
+    --fs-status-bg: var(--bg);
+    border: 1px dashed var(--border-control);
+  }
+}

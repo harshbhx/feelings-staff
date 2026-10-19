@@ -1,0 +1,11 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "root": false,
+  "extends": "//",
+  "overrides": [
+    {
+      "includes": ["src/styles/tokens.css", "src/styles/app-tokens.css"],
+      "formatter": { "enabled": false }
+    }
+  ]
+}

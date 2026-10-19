@@ -1,0 +1,151 @@
+/* PinPad (PRD 11.11, 12.6): 3x4 grid of 64px keys over a real password input; dots fill with sindoor. */
+@layer components {
+  .fs-pinpad {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-4);
+  }
+
+  .fs-pinpad__label {
+    font-weight: var(--weight-strong);
+    color: var(--text);
+    text-align: center;
+  }
+
+  .fs-pinpad__hint {
+    margin-top: calc(var(--space-2) * -1);
+    text-align: center;
+  }
+
+  .fs-pinpad__display {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-width: 12rem;
+    min-height: 2.75rem;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-pill);
+  }
+
+  /* The real input covers the dots: tapping them opens the system keypad, typing works, and
+     password managers see a normal field. */
+  .fs-pinpad__input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: transparent;
+    caret-color: transparent;
+    font-size: 16px;
+    opacity: 0;
+  }
+
+  .fs-pinpad__display:has(.fs-pinpad__input:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .fs-pinpad__dots {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .fs-pinpad__dot {
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 1.5px solid var(--border-control);
+    border-radius: 50%;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .fs-pinpad__dot[data-filled] {
+    border-color: var(--accent);
+    background: var(--accent);
+    animation: fs-pop var(--dur-fast) var(--ease-out);
+  }
+
+  .fs-pinpad[data-invalid] .fs-pinpad__dot {
+    border-color: var(--status-absent);
+  }
+
+  .fs-pinpad .fs-field__error {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .fs-pinpad__keys {
+    display: grid;
+    grid-template-columns: repeat(3, 4rem);
+    gap: var(--space-4) var(--space-6);
+    margin-top: var(--space-2);
+  }
+
+  .fs-pinpad__key {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    padding: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+    font-size: 1.625rem;
+    font-weight: var(--weight-display);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .fs-pinpad__key:hover:not(:disabled) {
+    border-color: var(--text);
+  }
+
+  .fs-pinpad__key:active:not(:disabled) {
+    background: var(--bg-tint);
+    transform: scale(0.96);
+  }
+
+  .fs-pinpad__key[data-kind="delete"] {
+    border-color: transparent;
+    color: var(--text-muted);
+  }
+
+  .fs-pinpad__key[data-kind="delete"] > .fs-icon {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  .fs-pinpad__key:disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .fs-pinpad__key[data-kind="delete"]:disabled {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fs-pinpad__dot[data-filled] {
+      animation: none;
+    }
+
+    .fs-pinpad__key:active:not(:disabled) {
+      transform: none;
+    }
+  }
+}
