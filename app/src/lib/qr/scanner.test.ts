@@ -21,6 +21,8 @@ function fakeVideo(width = 1280, height = 720): HTMLVideoElement {
   const video = document.createElement('video');
   Object.defineProperty(video, 'videoWidth', { value: width });
   Object.defineProperty(video, 'videoHeight', { value: height });
+  // happy-dom only accepts a real MediaStream here.
+  Object.defineProperty(video, 'srcObject', { value: null, writable: true, configurable: true });
   video.play = async () => {};
   return video;
 }

@@ -69,7 +69,7 @@ export async function runSubmission(deps: SubmitDeps, input: SubmitInput): Promi
     if (sub.type === 'approval') {
       const punch = await deps.api.punchRequestApproval({
         params: { id: sub.punchId },
-        body: { note: cleanText(sub.note, 300), placeName: cleanText(sub.placeName, 120) },
+        body: { note: cleanText(sub.note, 300) ?? '', placeName: cleanText(sub.placeName, 120) },
       });
       return { type: 'SUBMIT_OK', punch };
     }

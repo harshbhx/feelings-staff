@@ -147,7 +147,7 @@ describe('geolocationPermission', () => {
   });
 
   it('answers unknown without the Permissions API (iOS) or when it throws', async () => {
-    expect(await geolocationPermission(undefined)).toBe('unknown');
+    expect(await geolocationPermission({} as Pick<Permissions, 'query'>)).toBe('unknown');
     const throwing = {
       query: async (): Promise<PermissionStatus> => {
         throw new TypeError('not supported');
