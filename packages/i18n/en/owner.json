@@ -175,7 +175,13 @@
     "accuracy": "Accuracy {{m}} m",
     "device": "Phone: {{label}}",
     "qr": "Door code scanned",
-    "score": "Risk score {{score}}"
+    "score": "Risk score {{score}}",
+    "noun": {
+      "in": "check-in",
+      "out": "check-out",
+      "break_start": "break start",
+      "break_end": "break end"
+    }
   },
   "risk": {
     "fence_uncertain": "At the edge of the salon area",
