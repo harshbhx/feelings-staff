@@ -29,7 +29,7 @@ import { staffKeys, useOwnerName, useStaffMe, useToday } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
 import { useNow } from '../lib/use-now';
 import { AwayCard, useImBack } from '../presence/AwayCard';
-import { deferNotice, noticeDeferred, usePresence } from '../presence/api';
+import { deferNotice, noticeDeferred, presenceKey, usePresence } from '../presence/api';
 import { presenceUi } from '../presence/presence-model';
 import type { FrozenSheet } from '../punch/frozen';
 import { ActionBar } from '../shell/ActionBar';
@@ -162,6 +162,8 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
 
   const onSettled = useCallback(() => {
     void qc.invalidateQueries({ queryKey: staffKeys.today });
+    // A check-out closes any open away interval on the server (PRD 7.18).
+    void qc.invalidateQueries({ queryKey: presenceKey });
   }, [qc]);
 
   const kind = frozen?.kind ?? (model.primary === 'check_out' ? 'out' : 'in');
