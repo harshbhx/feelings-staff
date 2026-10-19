@@ -31,7 +31,7 @@ export function held<T>(key: EndpointKey, run: () => Promise<T>): Promise<T> {
  * mock-held errors are never retried so the error card shows at once in visual tests.
  */
 export function retryUnlessHeld(key: EndpointKey) {
-  return (failures: number, error: unknown) =>
+  return (failures: number, error: Error) =>
     mockHold(key) === null && failures < 1 && worthRetrying(error);
 }
 
