@@ -334,6 +334,7 @@ function notEmployed(schedule: DaySchedule): DayResult {
     firstInTs: null,
     lastOutTs: null,
     open: false,
+    totalMin: 0,
   };
 }
 
@@ -408,6 +409,10 @@ export function computeDay(input: ComputeDayInput): DayResult {
   );
   tag('worked_off_day', schedule.dayType !== 'work' && hasPresence);
 
+  // Every worked minute (PRD 7.17.7 legal hours): the worked minutes plus presence outside the shift.
+  const segs = normalize(schedule.segments.map((g): Iv => [toMin(g.startTs), toMin(g.endTs)]));
+  const outside = schedule.dayType === 'work' ? total(subtract(presence.presence, segs)) : 0;
+
   return {
     version: ENGINE_VERSION,
     userId: schedule.userId,
@@ -434,5 +439,6 @@ export function computeDay(input: ComputeDayInput): DayResult {
     firstInTs: s.firstIn === null ? null : s.firstIn * MINUTE_MS,
     lastOutTs: s.lastOut === null ? null : s.lastOut * MINUTE_MS,
     open: s.openStart !== null,
+    totalMin: m.workedMin + outside,
   };
 }

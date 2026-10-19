@@ -1,11 +1,10 @@
-/* TabBar (PRD 5, 12.6, 12.9): five items, icon + label, the bindi under the active icon. */
+/* TabBar (PRD 5, 12.6, 12.9): five items, icon + label, the bindi under the active icon.
+   WP-10: a solid surface (no glass), so list text never shows through it mid-scroll. */
 @layer components {
   .fs-tabbar {
     padding-bottom: env(safe-area-inset-bottom);
     border-top: 1px solid var(--border);
-    background: var(--bg-glass);
-    backdrop-filter: saturate(1.4) blur(10px);
-    -webkit-backdrop-filter: saturate(1.4) blur(10px);
+    background: var(--tabbar-bg);
   }
 
   .fs-tabbar__list {

@@ -8,7 +8,7 @@
 | **Built and run by** | Harsh Bhanushali (GitHub `harshbhx`) |
 | **URL** | https://staff.feelingsbeautycare.in |
 | **Repository** | `harshbhx/feelings-staff` (new, private) |
-| **Version** | 1.2, 19 Oct 2026 |
+| **Version** | 1.3, 19 Oct 2026 |
 | **Status** | Ready for build. Open questions for the owner are in §17, each with the default we build if nobody answers. |
 | **Inputs** | `research/brand-and-stack.md` (brand, stack, hosting, salon location) and `research/domain.md` (competitors, anti-spoofing, push, PWA, Indian payroll law, DPDP, costs) |
 
@@ -632,7 +632,7 @@ A table (desktop) or list of cards (phone), one per person: paid days, LOP days,
 - **Change advance recovery for this month** (lower it; the rest carries forward).
 - **Recompute** after any change in attendance.
 - **Settle credits** (only when Time credits is on, §4.19.3): a step with one row per person who has a balance, a stepper for how many minutes to settle, and the money it makes. The payslip preview shows the line "Time credits: −50 min, −₹38.80" (owner copy).
-- Warnings: minimum-wage check (§7.12), weekly hours over 48 in any week, overtime above 144 h in the quarter, deductions hitting the 50% cap ("₹1,250 of the advance moves to next month"). These existing warnings are the only legal warnings with Time credits on (§7.17.7).
+- Warnings: minimum-wage check (§7.12), weekly hours over 48 in any week, overtime above 144 h in the quarter, deductions hitting the 50% cap ("₹1,250 of the advance moves to next month"). With Time credits on, also the legal overtime notice or shortfall warning of §7.17.7.
 
 #### 4.13.4 Finalise
 
@@ -805,13 +805,13 @@ Why: someone who arrives 10 minutes late every day (70 minutes in a week, all hi
 
 #### 4.19.1 Credits screen
 
-Owner → More → **Credits** (`/o/credits`). One row per active staff member: name, balance in minutes (+50 or −130), its money ("worth about ₹45" for a plus balance, "might cut around ₹96" for a minus balance, at the person's normal per-minute rate, 1×), last settlement ("Nov: −60 min, ₹44.44"), a chip with the number of away intervals still waiting for a decision. Sort by balance; filter by plus or minus. Nothing on this screen changes pay. Tap a row for the person's ledger.
+Owner → More → **Credits** (`/o/credits`). One row per active staff member: name, balance in minutes (+50 or −130), its money ("worth about ₹45" for a plus balance, "might cut around ₹96" for a minus balance, at the person's normal per-minute rate, 1× per credit; overtime beyond 9 h a day or 48 h a week counts twice, so it is worth 2×, §7.17.7), last settlement ("Nov: −60 min, ₹44.44"), a chip with the number of away intervals still waiting for a decision. Sort by balance; filter by plus or minus. Nothing on this screen changes pay. Tap a row for the person's ledger.
 
 #### 4.19.2 Person ledger
 
 `/o/credits/:userId`, and the same list under **Credits** on the staff profile.
 - Header: balance, the money, "carried over from earlier months" part, and a line "Nothing is cut or paid until you settle it at payroll."
-- Table (newest first on phone, date order on desktop): date, kind chip (late, early, away, overtime, adjusted, settled), minutes (±), running balance, source (link to the punch, the away interval or the overtime decision), who confirmed (the owner or manager who marked or confirmed it for away, the owner for overtime, "automatic" for late and early).
+- Table (newest first on phone, date order on desktop): date, kind chip (late, early, away, overtime, legal 2×, adjusted, settled), minutes (±), running balance, source (link to the punch, the away interval or the overtime decision), who confirmed (the owner or manager who marked or confirmed it for away, the owner for overtime, "automatic" for late and early).
 - Filters: kind, date range, only unsettled. **Export CSV** (§4.16, step-up, audit-logged).
 - Tapping an entry opens the day detail on that date; an entry that was adjusted shows its history (original, each adjustment with reason, who and when).
 
@@ -820,13 +820,15 @@ Owner → More → **Credits** (`/o/credits`). One row per active staff member: 
 In the payroll run (§4.13.3) the **Settle credits** step lists people with a balance as of the month end.
 - Row: balance and its money, a **stepper** (step 5 min, type an exact number, **0** and **Suggested** buttons) from 0 up to the balance, the money it makes, and "balance after". **Default 0** (nothing is settled unless the owner chooses). **Suggestion = the full balance.**
 - A minus settlement is a deduction, subject to the 50% cap (§7.10); minutes that do not fit stay on the balance, with the note "20 min stay on the balance". A plus settlement is an earning.
-- The step is editable until **Finalise** (§4.19.5). The existing payroll warnings (weekly hours over 48, minimum wage, the 50% cap) show here as everywhere else.
+- The step is editable until **Finalise** (§4.19.5). The existing payroll warnings (weekly hours over 48, minimum wage, the 50% cap) show here as everywhere else, plus the legal overtime notice or shortfall warning (§7.17.7).
 - On **Finalise** the settlement becomes the payslip line and an audit entry, and reduces the balance by that many minutes. **Reopen** voids the settlement of the old revision; the stepper comes back with the same values.
 - Unsettled credits carry over to the next month. There is no reset.
 
 #### 4.19.4 Turning it on or off
 
 Settings → Time credits. Default **on** for this salon. It starts counting from the first day of the next month (or an earlier day in the current open month if the owner picks one), because pay-rule changes apply from the next draft. Turning it off stops new entries from the first day of the next month and brings back §7.5 and §7.6 for those days; the existing balance stays visible and can still be settled.
+
+Same screen: **Pay legal overtime at 2×**, default **on** (Harsh, 19 Oct). Overtime beyond 9 h a day or 48 h a week counts twice in the ledger, so it is worth 2× when it is settled or netted against late and early minutes (§7.17.7). Changing it needs step-up and is audit-logged; it applies to every day that is not locked (the day recompute rewrites their entries). Turning it off shows the shortfall warning wherever legal overtime exists.
 
 #### 4.19.5 Everything is editable
 
@@ -998,7 +1000,7 @@ All rules live in one pure TypeScript package, `packages/engine`, with no I/O. T
 4. **Never pay for less than the time missed** (Code on Wages s.20): absence and undertime deductions are proportional. Anything disproportionate is a fine (§7.9) and is off by default.
 5. **No silent changes.** Owner overrides, approvals and rule changes are audit-logged; payroll uses a settings snapshot frozen into the run.
 6. **One rule set per org**, with per-person overrides only where the table in §7.14 says so.
-7. **Credits never cut or pay by themselves.** With Time credits on (§7.17), late, early and away minutes and approved overtime go to an owner-only ledger. Money moves only when the owner settles a balance at payroll, inside the 50% cap and with the legal overtime warning.
+7. **Credits never cut or pay by themselves.** With Time credits on (§7.17), late, early and away minutes and approved overtime go to an owner-only ledger. Money moves only when the owner settles a balance at payroll, inside the 50% cap, with overtime beyond 9 h a day or 48 h a week worth 2× (§7.17.7).
 
 ### 7.2 Time zone and work date
 
@@ -1074,7 +1076,7 @@ Then, with `grace` (default 10) and `early_tolerance` (default 15):
 - **Approval**: pre-approved minutes are approved automatically. All others need the owner's decision (approve all, approve part in 15-min steps, reject). Undecided overtime is not paid.
 - **Rate**: `ot_hourly = r_day / (S_std / 60)`; **overtime pay** = `ot_hourly × ot_multiplier × ot_min / 60` = `r_day × ot_multiplier × ot_min / S_std`. Multiplier default **2** (Code on Wages s.14). Options: 1, 1.5, 2, flat ₹ per hour, comp-off (every 4 h of approved overtime = 0.5 comp-off day), or tracked but unpaid. Picking anything below 2 shows: "Below 2× may not comply with the Code on Wages."
 - **Warnings** (never blocks): more than 48 worked hours in a Monday–Sunday week; more than 144 overtime hours in a calendar quarter.
-- **With Time credits on (§7.17)** candidates, blocks and approvals work exactly as above, but the approved minutes become plus credits instead of overtime pay, and the rate options below are not used. The existing weekly-hours warning above stays (§7.17.7).
+- **With Time credits on (§7.17)** candidates, blocks and approvals work exactly as above, but the approved minutes become plus credits instead of overtime pay, and the rate options below are not used. Approved minutes beyond 9 h a day or 48 h a week count twice, so they keep their 2× value (**Pay legal overtime at 2×**, default on, §7.17.7). The existing weekly-hours warning above stays.
 
 ### 7.7 Day status
 
@@ -1348,19 +1350,19 @@ Rule "3 lates beyond grace = ½ day". Priya has 4 such lates in October → 1 fi
 
 **Example 13: late every day, plus overtime (Harsh's case, Time credits on)**
 
-Priya, October 2026. On seven working days she checks in at 10:10 (10 minutes late, which the 10-minute grace hides). On 17 Oct she checks in at 10:10 and out at 22:10: `after` = 130, overtime candidate floor(130/15) × 15 = 120 min, and Urmi approves all of it.
+Priya, October 2026. On seven working days she checks in at 10:10 (10 minutes late, which the 10-minute grace hides). On 17 Oct she checks in at 10:10 and out at 22:10: `after` = 130, overtime candidate floor(130/15) × 15 = 120 min, and Urmi approves all of it. That day she works 720 − 60 = 660 min, 120 beyond 9 h, so with **Pay legal overtime at 2×** on (the default) the 120 approved minutes are legal overtime and count twice (§7.17.7).
 
 | | Today's rules (Time credits off) | Time credits on |
 |---|---|---|
 | Lateness | 7 × 10 min, all inside the grace, billable 0 → ₹0.00 | 7 × (−10) = **−70** (late from the first minute) |
-| Overtime | 120 min at 2× = 483.87 × 2 × 120/540 = **₹215.05** paid | **+120** (approved), nothing paid yet |
-| Balance | not kept | **+50** |
-| Money | ₹215.05 | "worth about ₹44.80" = 483.87 × 50/540 at 1× (one rounding of the net minutes; ₹107.53 − ₹62.72 would give ₹44.81) |
+| Overtime | 120 min at 2× = 483.87 × 2 × 120/540 = **₹215.05** paid | **+120** overtime (approved) and **+120** legal 2× (beyond 9 h), nothing paid yet |
+| Balance | not kept | **+170** |
+| Money | ₹215.05 | "worth about ₹152.33" = 483.87 × 170/540 at 1× per credit (one rounding of the net minutes). This is the ₹215.05 of 2× overtime less ₹62.72 for the 70 late minutes. With the setting off the balance would be +50, "worth about ₹44.80", with the shortfall warning |
 
 The owner's options at payroll:
-- **Settle 0**: nothing on the payslip; +50 carries over.
-- **Settle +50**: a payslip earning "Time credits: +50 min, +₹44.80", balance 0.
-- **Adjust**: she can also change one entry with a reason, for example +10 for a late she excused (§4.19.5). The existing payroll warnings (§7.6, §7.12) show in the preview if they apply.
+- **Settle 0**: nothing on the payslip; +170 carries over.
+- **Settle +170**: a payslip earning "Time credits: +170 min, +₹152.33", balance 0.
+- **Adjust**: she can also change one entry with a reason, for example +10 for a late she excused (§4.19.5). The existing payroll warnings (§7.6, §7.12) and the legal overtime notice (§7.17.7: "120 min of overtime beyond 9 h a day count at 2×, as the law requires") show in the preview.
 
 **Example 14: a minus month, carried over, then partly settled (Time credits on)**
 
@@ -1372,19 +1374,19 @@ The owner's options at payroll:
 | 5 Nov | in 10:10, out 19:40 | late −10, early −20 |
 | 17 Nov | Roll-call at 18:00: Urmi marks her Not here; she taps I'm back at 18:40 (counted at once, "confirmed by Urmi") | away −40 |
 | 8 other days | in 10:10 | late −80 |
-| 20 Nov | in 10:00, out 20:45; 45 min overtime approved | ot +45 |
+| 20 Nov | in 10:00, out 20:45 (585 min worked, 45 beyond 9 h); 45 min overtime approved | ot +45, legal 2× +45 |
 
-November balance: −25 − 10 − 20 − 40 − 80 + 45 = **−130** → "might cut around ₹96.30" (400 × 130/540). Today's rules would have cut 15 + 20 = 35 min (₹25.93) and paid ₹66.67 overtime.
-- November: Urmi settles **0**. November payslip: salary ₹12,000.00, no time-credits line, net **₹12,000**. (Today's rules would have cut ₹25.93 and paid ₹66.67 overtime.) The balance **−130** carries over.
-- December: two more days at 10:10 → −20; balance −130 − 20 = **−150** (carried over, no reset). Urmi settles **−100** → 400 × 100/540 = 74.07 → ₹74.07 cut. Cap: 50% × 12,000 = 6,000, absence 0 → room 6,000, fits. Payslip line "Time credits: −100 min, −₹74.07". Net: 12,000.00 − 74.07 = ₹11,925.93 → **₹11,926** (rounding +₹0.07). **−50 min** stays on the balance ("might cut around ₹37.04") for January.
-- January edit: Urmi remembers she approved the 5 Nov early leave. She adjusts that day's early entry from −20 to 0 (+20, reason "approved by Urmi"). The ledger shows the original −20, the +20 adjustment and who made it; the balance becomes **−30** ("might cut around ₹22.22").
+November balance: −25 − 10 − 20 − 40 − 80 + 45 + 45 = **−85** → "might cut around ₹62.96" (400 × 85/540). Today's rules would have cut 15 + 20 = 35 min (₹25.93) and paid ₹66.67 overtime.
+- November: Urmi settles **0**. November payslip: salary ₹12,000.00, no time-credits line, net **₹12,000**. (Today's rules would have cut ₹25.93 and paid ₹66.67 overtime.) The balance **−85** carries over.
+- December: two more days at 10:10 → −20; balance −85 − 20 = **−105** (carried over, no reset). Urmi settles **−100** at December's rate (31 days: `r_day` = 12,000/31 = ₹387.10, §7.17.4) → 387.10 × 100/540 = 71.68 → ₹71.68 cut. Cap: 50% × 12,000 = 6,000, absence 0 → room 6,000, fits. Payslip line "Time credits: −100 min, −₹71.68". Net: 12,000.00 − 71.68 = ₹11,928.32 → **₹11,928** (rounding −₹0.32). **−5 min** stays on the balance ("might cut around ₹3.58") for January.
+- January edit: Urmi remembers she approved the 5 Nov early leave. She adjusts that day's early entry from −20 to 0 (+20, reason "approved by Urmi"). The ledger shows the original −20, the +20 adjustment and who made it; the balance becomes **+15** ("worth about ₹10.75" at January's 31-day rate).
 
 **Example 15: away time, step-outs and early leave (Time credits on; short-shift valuation)**
 
-Priya on the Evening template 15:00–20:00 (`S_day` = 300, no break; `S_std` still 540).
-- 12 Nov: at the 18:00 roll-call Urmi taps Priya **Not here**. The interval starts at 18:00; Priya taps **I'm back** at 18:40. It counts at once: entry away **−40**, "confirmed by Urmi" (she can still edit the start and end). Money of the 40 minutes: 483.87 × 40/540 = ₹35.84 (not charged yet).
+Priya on the Evening template 15:00–20:00 (`S_day` = 300, no break; `S_std` still 540). November has 30 days, so `r_day` = 15,000/30 = ₹500.
+- 12 Nov: at the 18:00 roll-call Urmi taps Priya **Not here**. The interval starts at 18:00; Priya taps **I'm back** at 18:40. It counts at once: entry away **−40**, "confirmed by Urmi" (she can still edit the start and end). Money of the 40 minutes: 500 × 40/540 = ₹37.04 (not charged yet).
 - 14 Nov: Priya taps **Step out** at 16:05 with the reason Work errand and **I'm back** at 16:30 (25 min). It waits in Needs action; Urmi taps **Mark as work**: no entry. Had she tapped Confirm, −25 would have been added.
-- 13 Nov: out 19:30 → early 30 min → entry early **−30** from the first minute (tolerance does not apply). Value 483.87 × 30/540 = **₹26.88**. Today's rule would deduct r_day × 30/300 = ₹48.39: a credit minute is worth the same on every day because it uses `S_std`, like overtime (§7.6).
+- 13 Nov: out 19:30 → early 30 min → entry early **−30** from the first minute (tolerance does not apply). Value 500 × 30/540 = **₹27.78**. Today's rule would deduct r_day × 30/300 = ₹50.00: a credit minute is worth the same on every day because it uses `S_std`, like overtime (§7.6).
 - Balance from the 12 Nov away (−40) and the 13 Nov early leave (−30): −70 min.
 
 ### 7.16 Engine contract
@@ -1406,7 +1408,8 @@ riskScore(input: RiskInput): { score: number; reasons: RiskReason[]; outcome: 'a
 fenceCheck(fix: Fix, site: Site): { result: 'pass'|'uncertain'|'outside'|'approximate'; distanceM: number }
 
 // Time credits and presence (WP-9; pure, same rules as §7.17 and §7.18)
-creditEntriesForDay(day: DayResult, away: ConfirmedAway[], rules: CreditRules): CreditEntryDraft[]  // late, early, away, ot; signed minutes
+creditEntriesForDay(day: DayResult, away: ConfirmedAway[], rules: CreditRules): CreditEntryDraft[]  // late, early, away, ot, ot_legal; signed minutes
+legalOtBand(week: { workDate: WorkDate; totalMin: number; otApprovedMin: number }[]): { workDate: WorkDate; legalMin: number }[]  // one ISO week, §7.17.7; feeds CreditRules.legalOtMin
 creditBalance(entries: CreditEntry[], adjustments: CreditAdjustment[], settlements: CreditSettlement[], asOf: WorkDate): number     // signed minutes
 creditValue(minutes: number, rate: MinuteRate): number                  // signed paise, one rounding, half up; rate = { rDay: Fraction, sStd: number }
 settleCredits(input: { balanceMin: number; settleMin: number; room: number; rate: MinuteRate }):
@@ -1443,6 +1446,7 @@ Plus entry (any day, including worked off-days):
 
 ```
 ot_d        = +ot_approved_d         owner-approved overtime minutes only
+ot_legal_d  = +legal_d               the part of ot_approved_d beyond 9 h a day or 48 h a week, when "Pay legal overtime at 2×" is on (§7.17.7)
 ```
 
 Unapproved or pending overtime, and rejected overtime, give nothing. Make-up (§7.5) does not apply: staying late no longer erases lateness, because both stay visible and the owner settles them. Overtime candidates, the 30-minute threshold, 15-minute blocks and approvals are exactly §7.6.
@@ -1487,7 +1491,7 @@ A settlement is saved as a `credit_settlements` row linked to the payroll run, p
 | Late and early undertime deduction (§7.5) | Grace and tolerance, then `r_day × undertime / S_day` | Replaced: every late and early minute is a ledger entry; no automatic deduction |
 | Make-up time (§7.5) | On by default | Not used |
 | Over-break (§7.5, P1) | Counts as undertime | Shown to the owner on the day; no credits, no deduction |
-| Overtime pay (§7.6) | Automatic after approval at the chosen rate | Replaced: approved minutes are plus credits; pay only through settlement at 1× |
+| Overtime pay (§7.6) | Automatic after approval at the chosen rate | Replaced: approved minutes are plus credits; pay only through settlement at 1× per credit; minutes beyond 9 h a day or 48 h a week count twice (2×, §7.17.7) |
 | Day status, LOP, half day, absence (§7.7) | Unchanged | Unchanged |
 | Off-day work: comp-off or extra pay (§7.7) | Unchanged | Unchanged (sub-threshold minutes still become overtime candidates, which become credits when approved) |
 | Fines (§7.9), advances and the 50% cap (§7.10) | Unchanged | Cut joins the capped group, first in order |
@@ -1497,8 +1501,22 @@ A settlement is saved as a `credit_settlements` row linked to the payroll run, p
 
 #### 7.17.7 Legal guardrails (G5 and §7.1 still apply)
 
-Harsh's decision (19 Oct): hours at this salon never exceed 9 h a day or 48 h a week, so Time credits has no 2× overtime logic and no switch for it. What stays, unchanged:
-- The existing passive payroll-preview warnings, in case it ever happens: weekly hours over 48 and overtime above 144 h in a quarter (§7.6, §4.13.3), and the minimum-wage check (§7.12).
+The Code on Wages pays overtime beyond 9 h a day or 48 h a week at twice the normal rate. Harsh first decided (19 Oct, Q30) that hours here never go past those limits and dropped the 2× logic; the same evening he restored it with **Pay legal overtime at 2×**, **default on**, so the ledger never values legal overtime at 1×, also when it is netted against late and early minutes.
+
+For a day `d` with `credits_on` and the setting on, in its ISO week `w` (Monday to Sunday), with `t_d` the day's total worked minutes (in to out, less breaks; the figure the weekly-hours warning adds up) and `T(≤d)` the sum of `t` over the days of `w` up to and including `d`:
+
+```
+daily_excess_d  = max(0, t_d − 540)
+weekly_excess_d = max(0, T(≤d) − 2880) − max(0, T(<d) − 2880)     (the part of the week's excess this day adds)
+legal_d         = min( ot_approved_d , max(daily_excess_d, weekly_excess_d) )
+```
+
+`legal_d` minutes are written as a second plus entry, kind `ot_legal`, next to the `ot` entry (same source and confirmation). Each legal minute therefore counts twice, and the 1× value per credit (§7.17.4) makes it worth 2× in the estimate, the balance, any netting against minus minutes and the settlement (§7.17.5, unchanged). Only approved overtime can be legal overtime; scheduled hours never create credits. A change to one day can move the weekly excess of the later days of the same week, so the day recompute rewrites the `ot_legal` entries of the later unlocked days of that week too. Example 13 shows the effect: +50 at 1× becomes +170 with the setting on.
+
+Warnings (owner only, never blocking): with the setting on and legal minutes in the month, the Settle credits step, the payslip preview and the Finalise confirm show the notice "120 min of overtime beyond 9 h a day or 48 h a week count at 2×, as the law requires" (`legal_ot_2x`). With the setting off they show the shortfall warning "Overtime beyond 9 h a day or 48 h a week must be paid at 2× by law. 120 min this month count at 1×." (`legal_ot_shortfall`), which stays until the setting is on again. Both are stored in the payslip snapshot warnings.
+
+What stays, unchanged:
+- The existing passive payroll-preview warnings: weekly hours over 48 and overtime above 144 h in a quarter (§7.6, §4.13.3), and the minimum-wage check (§7.12).
 - The 50% deduction cap (§7.10) applies to every cut (§7.17.5).
 - A cut is proportional to time not worked (§7.1 principle 4), never a fine.
 - The CA reviews the defaults before the first real payroll (Q19).
@@ -1509,7 +1527,7 @@ Harsh's decision (19 Oct): hours at this salon never exceed 9 h a day or 48 h a 
 
 #### 7.17.9 Who sees what
 
-Only the owner. No staff endpoint returns credits, balances, ledger rows or credit values (a privacy test asserts it, §14.3); no staff notification mentions credits; managers do not see them in v1 (§10.2). The one place money from a settlement reaches staff is the payslip, where it appears as **"Time adjustment"** (an amount and "settled by Urmi for time not worked in October") without minutes, the balance or the word "credits"; the 2× overtime line is an ordinary Overtime line. The staff day detail shows late, early and overtime minutes as before. See Q27.
+Only the owner. No staff endpoint returns credits, balances, ledger rows or credit values (a privacy test asserts it, §14.3); no staff notification mentions credits; managers do not see them in v1 (§10.2). The one place money from a settlement reaches staff is the payslip, where it appears as **"Time adjustment"** (an amount and "settled by Urmi for time not worked in October") without minutes, the balance or the word "credits" (legal overtime counted at 2× is part of that amount). The staff day detail shows late, early and overtime minutes as before. See Q27.
 
 ### 7.18 Presence rules
 
@@ -2153,7 +2171,7 @@ CREATE TABLE app_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);  -- min_app_v
 New file, never an edit of `0001`. Adds the Time credits ledger and the presence tables, and a few columns. The `consents` table is rebuilt to widen its `kind` check (SQLite cannot alter a CHECK): create `consents_new`, copy, drop, rename.
 
 ```sql
--- Settings live in orgs.settings_json: timeCredits { enabled, startDate }, presence { enabled, rollCallTimes[], stepOut, foreground { enabled, intervalMin }, quietDuringBreaks }
+-- Settings live in orgs.settings_json: timeCredits { enabled, startDate, legalOt2x (default true) }, presence { enabled, rollCallTimes[], stepOut, foreground { enabled, intervalMin }, quietDuringBreaks }
 ALTER TABLE staff_profiles ADD COLUMN time_credits INTEGER CHECK (time_credits IN (0,1));    -- NULL = org default; 0 = excluded
 ALTER TABLE staff_profiles ADD COLUMN presence_enabled INTEGER CHECK (presence_enabled IN (0,1));
 ALTER TABLE shift_templates ADD COLUMN break_start TEXT;                  -- optional usual break start "HH:MM" (presence break window)
@@ -2166,8 +2184,8 @@ CREATE TABLE credit_entries (
   org_id TEXT NOT NULL REFERENCES orgs(id),
   user_id TEXT NOT NULL REFERENCES users(id),
   work_date TEXT NOT NULL,
-  kind TEXT NOT NULL CHECK (kind IN ('late','early','away','ot')),
-  minutes INTEGER NOT NULL CHECK (minutes <> 0),            -- signed: minus for late/early/away, plus for ot
+  kind TEXT NOT NULL CHECK (kind IN ('late','early','away','ot','ot_legal')),
+  minutes INTEGER NOT NULL CHECK (minutes <> 0),            -- signed: minus for late/early/away, plus for ot and ot_legal
   source_kind TEXT NOT NULL CHECK (source_kind IN ('punch','presence','ot_decision')),
   source_id TEXT NOT NULL,                                  -- punch id, away_intervals id or ot_decisions id
   confirmed_by TEXT, confirmed_at INTEGER,                  -- owner for away and ot; NULL = automatic
@@ -2185,7 +2203,7 @@ CREATE TABLE credit_adjustments (                           -- owner edits of cr
   org_id TEXT NOT NULL REFERENCES orgs(id),
   user_id TEXT NOT NULL REFERENCES users(id),
   work_date TEXT NOT NULL,
-  kind TEXT NOT NULL CHECK (kind IN ('late','early','away','ot')),
+  kind TEXT NOT NULL CHECK (kind IN ('late','early','away','ot','ot_legal')),
   delta_min INTEGER NOT NULL CHECK (delta_min <> 0),        -- signed change to that day and kind
   reason TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','void')),
@@ -3184,10 +3202,10 @@ All test runs happen in GitHub Actions (never on the 2-CPU VM). Locally, builder
 | Rounding | Line half-up at .5 paise; net rounding ±0.50; examples 1–12 of §7.15 reproduced exactly |
 | Leave | CL proration for joiners; usable-after; comp-off expiry; sandwich on/off; blackout flag; split paid/unpaid |
 | Fence and risk | PASS, UNCERTAIN, OUTSIDE, APPROXIMATE at boundaries; haversine against known pairs; every risk signal on/off; thresholds 29/30/60/61; QR override |
-| Time credits (§7.17) | Late from the first minute (grace ignored) and early from the first minute (tolerance ignored); only approved overtime is plus (pending and rejected give nothing); minus only on P days; away counted only when owner-marked or confirmed; with credits on `undertime`, `makeup` and overtime pay are 0, with credits off results equal today's; start date splits a month; balance across months and across a sign change; value `r_day × m / S_std` with one rounding, on net minutes; settlement 0, partial, full, plus and minus; 50% cap trims a cut to whole minutes and reports `stay`; reopen voids and restores; over-break shown but no credits and no deduction with credits on; adjustments survive a recompute and are included in the balance, void restores; examples 13–15 reproduced exactly |
+| Time credits (§7.17) | Late from the first minute (grace ignored) and early from the first minute (tolerance ignored); only approved overtime is plus (pending and rejected give nothing); minus only on P days; away counted only when owner-marked or confirmed; with credits on `undertime`, `makeup` and overtime pay are 0, with credits off results equal today's; start date splits a month; balance across months and across a sign change; value `r_day × m / S_std` with one rounding, on net minutes; settlement 0, partial, full, plus and minus; 50% cap trims a cut to whole minutes and reports `stay`; reopen voids and restores; over-break shown but no credits and no deduction with credits on; adjustments survive a recompute and are included in the balance, void restores; legal overtime (§7.17.7): exactly 540 min, the weekly 2,880 crossed mid-week, `min(approved, max(daily, weekly))`, a recompute moving later days of the week, setting on (`ot_legal` entries, notice) and off (no `ot_legal`, shortfall warning); examples 13–15 reproduced exactly |
 | Presence (§7.18) | Roll-call Not here starts at the slot time, continues an open interval, ends at I'm back, at a later Here, at check-out; step-out reasons and auto-close with `back_missing`; overlapping intervals merge; clipping to presence, shift segments and the break window; intervals under 5 min dropped; confirm, work and ignore; edits recompute the entry; foreground outside raises a hint but never an interval or credits; skip rules (duty, leave, H or A day, locked) |
 
-Property-based tests (fast-check) for: net = gross − deductions; deductions ≤ 50% gross unless absence alone exceeds it; day minutes never negative; `computeDay` is idempotent; balance = Σ entries − Σ settled minutes; `|applied| ≤ |settle| ≤ |balance|`; with `settle = 0` and the 2× switch off, pay equals the credits-off pay minus the automatic late, early and overtime amounts.
+Property-based tests (fast-check) for: net = gross − deductions; deductions ≤ 50% gross unless absence alone exceeds it; day minutes never negative; `computeDay` is idempotent; balance = Σ entries − Σ settled minutes; `|applied| ≤ |settle| ≤ |balance|`; with `settle = 0`, pay equals the credits-off pay minus the automatic late, early and overtime amounts; `0 ≤ legal_d ≤ ot_approved_d`.
 
 ### 14.3 API tests (Workers pool)
 
@@ -3292,7 +3310,7 @@ One low-end Android (Redmi or Realme, Chrome) and one iPhone (iOS 18 or 26): ins
 | X-03 | 1) Every response carries the headers in §10.5. 2) The retention job removes data per §8.3 (fake-clock test). 3) Rate limits return 429 with `Retry-After`. |
 | X-04 | 1) All suites in §14.1 run in Actions on every PR. 2) A failing suite blocks merge. |
 | X-05 | 1) Every same-repo PR gets a Worker Preview URL posted as a comment. 2) The preview uses the preview D1 and R2, never production. |
-| O-29 | 1) With Time credits on, each day writes entries per §7.17.2 (late and early from the first minute, only approved overtime is plus, minus only on P days). 2) The balance carries over month to month, across settlements and sign changes. 3) Value is `r_day × minutes / S_std` at 1× and examples 13–15 reproduce to the paisa. 4) The Settle credits step defaults to 0, suggests the full balance, accepts 0 up to the balance, and trims a cut to the 50% cap with the rest staying on the balance. 5) Finalise creates the `time_credits` line and an audit row and reduces the balance; reopen voids it. 6) The existing payroll warnings (weekly hours over 48, minimum wage) and the 50% cap still apply; there is no 2× switch (§7.17.7). Over-break is shown on the day but gives no credits. 7) The Credits screen, person ledger with filters and the CSV export work, for the owner only. 8) With the setting off, examples 1–12 still reproduce. 9) No staff or manager route returns credits (privacy test). 10) An entry can be adjusted with a reason, the adjustment survives a recompute, and the settlement can be edited until Finalise. |
+| O-29 | 1) With Time credits on, each day writes entries per §7.17.2 (late and early from the first minute, only approved overtime is plus, minus only on P days). 2) The balance carries over month to month, across settlements and sign changes. 3) Value is `r_day × minutes / S_std` at 1× and examples 13–15 reproduce to the paisa. 4) The Settle credits step defaults to 0, suggests the full balance, accepts 0 up to the balance, and trims a cut to the 50% cap with the rest staying on the balance. 5) Finalise creates the `time_credits` line and an audit row and reduces the balance; reopen voids it. 6) The existing payroll warnings (weekly hours over 48, minimum wage) and the 50% cap still apply; with **Pay legal overtime at 2×** on (default) approved overtime beyond 9 h a day or 48 h a week adds `ot_legal` entries and the notice, and with it off the shortfall warning shows (§7.17.7). Over-break is shown on the day but gives no credits. 7) The Credits screen, person ledger with filters and the CSV export work, for the owner only. 8) With the setting off, examples 1–12 still reproduce. 9) No staff or manager route returns credits (privacy test). 10) An entry can be adjusted with a reason, the adjustment survives a recompute, and the settlement can be edited until Finalise. |
 | O-30 | 1) Roll-calls open at the set times and N32 reaches the owner and managers with `rollcall`. 2) Everyone checked in defaults to Here; Not here starts an interval at the slot time and writes a confirmed entry at once. 3) The interval ends at I'm back, a later Here, or check-out. 4) Start and end are editable and audit-logged. 5) Pending step-outs appear in Needs action with Confirm, Mark as work and Ignore. 6) Early minutes from the first minute reach the ledger, Today and Register. 7) N36 fires for someone who may have left without checking out; **Use 16:10 as check-out** works. 8) A foreground "seems away" hint never creates an interval or credits. 9) The skip rules of §4.18.7 hold. 10) Roll-call times and marks, away interval start, end, reason and work flag, and step-out entries can all be edited, each with an audit row of old and new values. |
 | S-24 | 1) The presence consent shows once and is stored. 2) Step out takes a reason chip; I'm back records server time; a missing I'm back closes at check-out or the next Here roll-call and is flagged. 3) The "marked you away" card appears after a Not here mark and I'm back ends it. 4) My data shows roll-call marks, step-outs, away intervals with state and foreground checks, never credits. 5) The foreground check never prompts, runs only while the app is open with permission already granted, and stores no coordinates. 6) Staff get no presence push. |
 
@@ -3593,7 +3611,7 @@ These keep Harsh's defaults but change a detail because the research showed a ha
 | F7 | Payslip PDF in English and Gujarati | PDFs are rendered with **Browser Run** from HTML, because Worker PDF libraries cannot shape Gujarati script. English at launch, Gujarati in 1.1. |
 | F8 | Cloudflare Worker with crons | **Crons do not run on Worker Previews**, so previews expose test-only endpoints to trigger jobs, guarded by a token and absent in production. |
 | F9 | Location only at check-in and check-out | Time in between is found by the owner's roll-call and the staff member's own Step out button. An optional silent check runs only while the app happens to be open, never prompts, and cannot cost minutes. Browsers cannot track in the background (§11.12). |
-| F10 | Overtime paid at 2× after approval | With Time credits on (default for this salon, Harsh), approved overtime becomes plus minutes settled at 1× by the owner. Harsh says hours at this salon never exceed 9 h a day or 48 h a week, so there is no 2× logic; the existing passive warnings stay (§7.17.7). |
+| F10 | Overtime paid at 2× after approval | With Time credits on (default for this salon, Harsh), approved overtime becomes plus minutes settled by the owner; minutes beyond 9 h a day or 48 h a week count twice, so they keep their legal 2× value (**Pay legal overtime at 2×**, default on, §7.17.7). |
 
 ### 17.2 Risks
 
@@ -3611,7 +3629,7 @@ These keep Harsh's defaults but change a detail because the research showed a ha
 | Lost phone means lost device key | Medium | Staff cannot punch until approval | "I have a new phone" flow; owner approves in one tap |
 | A minor (academy trainee) is enrolled | Low | DPDP children's data rules | Required "18 or older" tick; trainees under 18 out of scope (Q21) |
 | Parallel agents drift from the contracts | Medium | Integration pain | Contracts frozen and versioned; mock client from fixtures; contract tests in CI |
-| Time credits settles overtime at 1× although the Code on Wages pays overtime beyond 9 h a day or 48 h a week at 2× | Low | Wage claim, compliance | Harsh: hours at this salon never exceed those limits (Q30). The existing passive warnings stay in the payroll preview if it ever happens (weekly hours over 48, §7.6; minimum wage, §7.12); the 50% cap applies to cuts; CA review before the first real payroll (Q19) |
+| Time credits could value overtime at 1× or net it against lateness, although the Code on Wages pays overtime beyond 9 h a day or 48 h a week at 2× | Low | Wage claim, compliance | **Pay legal overtime at 2×** is on by default: those minutes count twice in the ledger (§7.17.7); turning it off shows the shortfall warning in the Settle step, the payslip preview and the Finalise confirm; the 50% cap applies to cuts; the minimum-wage check still runs; CA review before the first real payroll (Q19) |
 | Staff cannot see why a Time adjustment was deducted (credits are owner-only, Harsh's rule) | Medium | Distrust, payslip disputes | Late, early and overtime minutes stay on the staff day screens; the owner explains a cut; step-out reasons and roll-call marks are visible to the person; Q27 asks whether the payslip line should show minutes |
 | The browser cannot see when someone leaves (§11.12) and the owner skips roll-calls | Medium | Away time goes uncounted | Roll-call defaults to Here and takes about 20 seconds, three times a day; a missed one is flagged on Today; Step out is the fallback; the foreground hint helps the owner spot someone |
 | Staff do not use Step out when they leave | High | Undercounted away time | Roll-call is the primary signal; the person sees what is marked; no penalty for honest reasons (work errand marked as work) |
@@ -3652,7 +3670,7 @@ These keep Harsh's defaults but change a detail because the research showed a ha
 | Q27 | (Harsh) Staff must not see credits, but the settlement is a payslip line. Should the staff payslip show minutes? | **Answered yes (no minutes), 19 Oct, 15:39 UTC**: staff payslip and PDF show "Time adjustment" with the amount only; minutes and credits are owner-only |
 | Q28 | (Harsh) Over-break minutes (break punches, P1) go to the ledger as minus credits? | **Answered no, 19 Oct, 15:39 UTC**: with credits on, over-break is shown to the owner on the day, gives no credits and causes no automatic deduction (§7.17.2) |
 | Q29 | (Harsh, Urmi) A staff member declines presence tracking: what then? | **Answered 19 Oct, 15:39 UTC**: declining is fine; they still work and punch and still appear in roll-call; the foreground check does not run for them |
-| Q30 | (Harsh, Urmi, CA) Should Time credits pay legally protected overtime at 2×? | **Answered no switch, 19 Oct, 15:39 UTC**: Harsh says hours never exceed 9 h a day or 48 h a week at this salon. No 2× switch; only the existing passive payroll-preview warnings stay (§7.17.7). The CA still reviews the defaults (Q19) |
+| Q30 | (Harsh, Urmi, CA) Should Time credits pay legally protected overtime at 2×? | **Yes, by default (Harsh, 19 Oct evening)**: **Pay legal overtime at 2×** is a Time credits setting, default on; overtime beyond 9 h a day or 48 h a week counts twice in the ledger, so it is worth 2× when settled or netted (§7.17.7). Earlier the same day he had said hours never exceed those limits and dropped the switch; this restores it. The CA still reviews the defaults (Q19) |
 | Q31 | Who does the roll-call, and at what times? | **Answered yes, 19 Oct, 15:39 UTC**: the owner and managers with the `rollcall` permission; 12:00, 15:00 and 18:00 (editable) |
 
 ---
@@ -3680,3 +3698,4 @@ The two research files in `research/` carry the full citations (Code on Wages 20
 | 1.0 | 19 Oct 2026 | First complete PRD for build |
 | 1.1 | 19 Oct 2026 | Build-time additions from WP-1: migration `0002_platform.sql` (`idempotency_keys`, `test_outbox`); extra endpoints (join lookup, leave preview, owner security, setup checklist, payroll preview, door device list, consents, bulk approve, staff photo, staff rehire, device revoke); `Fix.accuracySpreadM`; `upgrade-insecure-requests` dropped from the CSP (HSTS covers it, and WebKit applies it to localhost); i18n namespaces `auth`, `door` and `ui`; cap of 15 active staff (Harsh, 19 Oct); §17.3 Q16 answered (Workers Paid is active). Docs handbook added under `docs/` |
 | 1.2 | 19 Oct 2026 | Time credits and presence checks (requested by Harsh after a client discussion). Time credits (§4.19, §4.19.5, §7.17, §7.15 examples 13–15): owner-only minute ledger of late, early, away and approved-overtime minutes, balance with carry-over, a ₹ estimate at 1×, owner settlement at payroll inside the 50% cap, a payslip line, a Credits screen, ledger CSV, default on for this salon, with over-break shown but not credited and no 2× logic (Harsh: hours never exceed 9 h/day or 48 h/week). Everything is editable (§4.19.5): roll-call times and marks, away intervals, step-outs, credit entries with a reason, settlements before finalise, each audit-logged old → new. Presence (§4.18, §7.18, §11.12): manager roll-call two or three times a shift as the primary method, staff Step out / I'm back as the fallback, an optional silent foreground check as a hint only; native geofence left as P2. Data model `0003_time_credits_presence.sql` (§8.2.1), API (§9.4), notifications N32–N36, privacy (§10.2, §10.6), tests (§14), build plan WP-9 (§16), risks and Q25–Q31 answered by Harsh on 19 Oct (§17) |
+| 1.3 | 19 Oct 2026 | Examples 14 and 15 use the month's own `r_day` (December 31 days: the −100 settlement is ₹71.68; November for Priya: ₹500 a day), as §7.17.4 says. Legal overtime guardrail restored (Harsh): Time credits setting **Pay legal overtime at 2×**, default on. Approved overtime beyond 9 h a day or 48 h a week (`legal_d`, per day within the ISO week) adds an `ot_legal` entry, so those minutes count twice and are worth 2× in the estimate, netting and settlement; notice `legal_ot_2x` when on, shortfall warning `legal_ot_shortfall` when off (§7.17.7). Updated §4.13.3, §4.19, §7.1, §7.6, §7.15 examples 13 and 14 (balances +170 and −85), §7.16 (`legalOtBand`), §7.17.2, §7.17.6, §7.17.9, §8.2.1 (`ot_legal` kind, `legalOt2x` setting), §14, §17 (F10, risks, Q30) |

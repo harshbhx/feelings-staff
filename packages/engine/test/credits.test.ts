@@ -13,6 +13,7 @@ import {
   creditRate,
   creditsOn,
   creditValue,
+  legalOtBand,
   legalOvertime,
   settleCredits,
 } from '../src/credits';
@@ -25,7 +26,9 @@ import {
   OWNER,
   override,
   punch,
+  schedule,
   RULES as TIME_RULES,
+  TUE,
   WED,
 } from './fixtures';
 import {
@@ -520,6 +523,182 @@ describe('PRD 7.17.7 legal hours warnings', () => {
       { code: 'weekly_hours', period: isoWeekOf('2026-10-05'), minutes: 3_240 },
     ]);
     expect(legalOvertime(week, { dayMin: 600, weekMin: 3_240 })).toEqual([]);
+  });
+
+  it('uses every worked minute of the day when the result has it (660 for 10:10 to 22:10)', () => {
+    const day = computeDay(
+      dayInput({ punches: [punch(WED, 'in', '10:10'), punch(WED, 'out', '22:10')], rules: ON }),
+    );
+    expect(day).toMatchObject({ workedMin: 530, otCandidateMin: 120, totalMin: 660 });
+    expect(legalOvertime([day])).toEqual([{ code: 'daily_hours', period: WED, minutes: 660 }]);
+  });
+});
+
+describe('PRD 7.17.7 legal overtime at 2x', () => {
+  const band = (rows: Array<[string, number, number]>) =>
+    legalOtBand(
+      rows.map(([d, totalMin, otApprovedMin]) => ({
+        workDate: `2026-10-${d}`,
+        totalMin,
+        otApprovedMin,
+      })),
+    ).map((r) => r.legalMin);
+
+  it('totalMin: worked minutes plus presence outside the shift, after the break; all presence on an off day; 0 when not employed', () => {
+    const brk = { ...TIME_RULES, breakPunches: true };
+    const punched = computeDay(
+      dayInput({
+        rules: brk,
+        punches: [
+          punch(WED, 'in', '09:50'),
+          punch(WED, 'break_start', '14:00'),
+          punch(WED, 'break_end', '15:30'),
+          punch(WED, 'out', '20:00'),
+        ],
+      }),
+    );
+    expect(punched).toMatchObject({ workedMin: 510, totalMin: 520 });
+    const off = computeDay(
+      dayInput({
+        schedule: schedule(TUE),
+        punches: [punch(TUE, 'in', '10:00'), punch(TUE, 'out', '19:30')],
+      }),
+    );
+    expect(off).toMatchObject({ workedMin: 510, totalMin: 510 });
+    const ne = computeDay(dayInput({ schedule: { ...schedule(), dayType: 'NE' } }));
+    expect(ne.totalMin).toBe(0);
+  });
+
+  it.each([
+    { name: 'exactly 9 h: nothing', rows: [['07', 540, 30]], legal: [0] },
+    { name: 'one minute past 9 h', rows: [['07', 541, 30]], legal: [1] },
+    { name: 'example 13: 660 with 120 approved', rows: [['17', 660, 120]], legal: [120] },
+    { name: 'never more than approved', rows: [['07', 660, 60]], legal: [60] },
+    { name: 'nothing approved, nothing legal', rows: [['07', 700, 0]], legal: [0] },
+    {
+      name: 'the week crosses 48 h mid-week: the day that crosses it takes the weekly part',
+      rows: [
+        ['05', 540, 0],
+        ['06', 540, 0],
+        ['07', 540, 0],
+        ['08', 540, 0],
+        ['09', 600, 60],
+        ['10', 560, 45],
+        ['11', 300, 300],
+      ],
+      legal: [0, 0, 0, 0, 60, 45, 300],
+    },
+    {
+      name: 'max of daily and weekly, then min with approved',
+      rows: [
+        ['05', 540, 0],
+        ['06', 540, 0],
+        ['07', 540, 0],
+        ['08', 540, 0],
+        ['09', 540, 0],
+        ['10', 620, 200],
+      ],
+      legal: [0, 0, 0, 0, 0, 200],
+    },
+    {
+      name: 'weeks are separate; input order does not matter',
+      rows: [
+        ['12', 600, 60],
+        ['11', 600, 60],
+      ],
+      legal: [60, 60],
+    },
+  ])('$name', ({ rows, legal }) => {
+    expect(band(rows as Array<[string, number, number]>)).toEqual(legal);
+  });
+
+  it('limits can be changed (8 h a day, 40 h a week)', () => {
+    const d = { workDate: '2026-10-07', totalMin: 500, otApprovedMin: 60 };
+    expect(legalOtBand([d], { dayMin: 480, weekMin: 2_400 })).toEqual([
+      { workDate: '2026-10-07', legalMin: 20 },
+    ]);
+  });
+
+  it('the weekly part is exactly what the day adds past 48 h', () => {
+    // 4 x 540 = 2160, then 700 makes 2860 (daily 160), then 100 more crosses 2880 by 80.
+    expect(
+      band([
+        ['05', 540, 0],
+        ['06', 540, 0],
+        ['07', 540, 0],
+        ['08', 540, 0],
+        ['09', 700, 200],
+        ['10', 100, 100],
+      ]),
+    ).toEqual([0, 0, 0, 0, 160, 80]);
+  });
+
+  it('property: 0 <= legal <= approved; at least the daily excess; nothing when no day passes 9 h and the week stays within 48 h', () => {
+    fc.assert(
+      fc.property(
+        fc.array(
+          fc.record({ t: fc.integer({ min: 0, max: 800 }), ot: fc.integer({ min: 0, max: 300 }) }),
+          { minLength: 7, maxLength: 7 },
+        ),
+        (week) => {
+          const legal = band(
+            week.map((d, i): [string, number, number] => [`0${i + 5}`.slice(-2), d.t, d.ot]),
+          );
+          week.forEach((d, i) => {
+            const l = legal[i] as number;
+            expect(l).toBeGreaterThanOrEqual(Math.min(d.ot, Math.max(0, d.t - 540)));
+            expect(l).toBeLessThanOrEqual(d.ot);
+            expect(l).toBeGreaterThanOrEqual(0);
+          });
+          const quiet = week.every((d) => d.t <= 540) && week.reduce((n, d) => n + d.t, 0) <= 2_880;
+          if (quiet) expect(legal.every((l) => l === 0)).toBe(true);
+        },
+      ),
+    );
+  });
+
+  it('ot_legal repeats the legal part of the approved overtime, after the ot entry', () => {
+    const day = dr(WED);
+    const e = creditEntriesForDay(day, [], rules({ otApprovedMin: 120, legalOtMin: 120 }));
+    expect(e.map((x) => [x.kind, x.minutes, x.sourceId, x.confirmed])).toEqual([
+      ['ot', 120, '01J0000000000000000000D001', true],
+      ['ot_legal', 120, '01J0000000000000000000D001', true],
+    ]);
+    for (const x of e) expect(() => DraftSchema.parse(x)).not.toThrow();
+    expect(
+      creditEntriesForDay(day, [], rules({ otApprovedMin: 30, legalOtMin: 90, otSourceId: null }))
+        .filter((x) => x.kind === 'ot_legal')
+        .map((x) => [x.minutes, x.sourceId]),
+    ).toEqual([[30, '']]);
+    expect(
+      creditEntriesForDay(day, [], rules({ otApprovedMin: 30, legalOtMin: 0 })).map((x) => x.kind),
+    ).toEqual(['ot']);
+    expect(
+      creditEntriesForDay(day, [], rules({ enabled: false, otApprovedMin: 30, legalOtMin: 30 })),
+    ).toEqual([]);
+  });
+
+  it('a legal minute is worth 2x through the 1x value: +120 +120 at ₹483.87 is ₹215.05, like 2x overtime', () => {
+    expect(creditValue(240, PRIYA)).toBe(21_505);
+  });
+
+  it('payslip warnings: legal minutes at 2x (info), or a shortfall when the setting is off; never with none', () => {
+    const on = computePayslip(input({ legalOt: { minutes: 120, pay2x: true } }));
+    expect(on.warnings).toContainEqual({
+      code: 'legal_ot_2x',
+      message:
+        '120 min of overtime beyond 9 h a day or 48 h a week count at 2×, as the law requires.',
+      amountPaise: null,
+    });
+    const off = computePayslip(input({ legalOt: { minutes: 45, pay2x: false } }));
+    expect(off.warnings).toContainEqual({
+      code: 'legal_ot_shortfall',
+      message:
+        'Overtime beyond 9 h a day or 48 h a week must be paid at 2× by law. 45 min this month count at 1×.',
+      amountPaise: null,
+    });
+    const none = computePayslip(input({ legalOt: { minutes: 0, pay2x: false } }));
+    expect(none.warnings.some((w) => w.code.startsWith('legal_ot'))).toBe(false);
   });
 });
 

@@ -201,6 +201,14 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
 
       {model.lastPunch ? <LastPunch punch={model.lastPunch} /> : null}
 
+      {model.status === 'not_in' && model.dayKind === 'work' ? (
+        // Before the first tap: what checking in does with location (PRD 4.3.3), in plain words.
+        <p className="staff-card flex gap-3 text-sm text-text-muted">
+          <Icon name="map-pin" className="mt-0.5 size-5 shrink-0 text-text-muted" />
+          <span>{t('staff:punch.permission.body')}</span>
+        </p>
+      ) : null}
+
       {me.flags.storageTip ? (
         <Banner icon="lock" tone="plain">
           {t('staff:shell.storageTip', { owner })}

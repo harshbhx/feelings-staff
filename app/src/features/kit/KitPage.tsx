@@ -5,9 +5,11 @@
  */
 import {
   Avatar,
+  Badge,
   Banner,
   Bindi,
   Button,
+  Card,
   ChipGroup,
   type DayStatus,
   EmptyState,
@@ -20,9 +22,15 @@ import {
   ListRow,
   PasswordInput,
   PinPad,
+  ProgressStrip,
+  RailGroup,
+  RailItem,
+  RailNav,
   Sheet,
   Skeleton,
   SkeletonGroup,
+  SkeletonList,
+  StatChipGroup,
   StatusChip,
   TabBar,
   TabBarItem,
@@ -393,6 +401,134 @@ function Statuses() {
             <StatusChip status="venue" label="Hotel Aram" />
           </div>
         </Specimen>
+        <Specimen label="Badges (words that are not day statuses)">
+          <div className="flex flex-wrap gap-2">
+            <Badge tone="success" icon="map-pin">
+              Inside
+            </Badge>
+            <Badge tone="warning" icon="warning-circle">
+              Edge
+            </Badge>
+            <Badge tone="info" icon="navigation">
+              Hotel Aram
+            </Badge>
+            <Badge tone="neutral" icon="wifi-slash">
+              Sent later
+            </Badge>
+            <Badge tone="outline" icon="pencil-simple">
+              Added by you
+            </Badge>
+          </div>
+        </Specimen>
+      </div>
+    </Section>
+  );
+}
+
+function Stats() {
+  const [show, setShow] = useState('all');
+  return (
+    <Section
+      id="stats"
+      title="Counts and progress"
+      intro="Tappable counts filter a list; the chosen one takes its status tint. The strip says the day in words, the bar only helps scanning."
+    >
+      <div className="grid gap-8">
+        <StatChipGroup
+          legend="Show"
+          legendHidden
+          value={show}
+          onValueChange={setShow}
+          options={[
+            { value: 'all', label: 'everyone', count: 11 },
+            { value: 'in', label: 'in', count: 8, tone: 'present' },
+            { value: 'late', label: 'late', count: 3, tone: 'late' },
+            { value: 'not-in', label: 'not in yet', count: 1, tone: 'waiting', icon: 'hourglass' },
+            { value: 'leave', label: 'on leave', count: 1, tone: 'leave' },
+            { value: 'off', label: 'week off', count: 1, tone: 'off' },
+          ]}
+        />
+        <div className="grid gap-8 lg:grid-cols-2">
+          <Specimen label="Today">
+            <ProgressStrip
+              label="8 of 11 in"
+              aside="updated 10:42"
+              total={11}
+              description="8 of 11 in: 5 on time, 3 late, 1 not in yet, 2 away"
+              segments={[
+                { key: 'on-time', value: 5, tone: 'present', label: '5 on time' },
+                { key: 'late', value: 3, tone: 'late', label: '3 late' },
+                { key: 'not-in', value: 1, tone: 'waiting', label: '1 not in yet' },
+                { key: 'away', value: 2, tone: 'leave', label: '2 away' },
+              ]}
+            />
+          </Specimen>
+          <Specimen label="Month so far, no legend">
+            <ProgressStrip
+              label="13 of 26 days"
+              aside="2 h 30 m overtime"
+              total={26}
+              legend={false}
+              description="13 of 26 days: 11 present, 1 half day, 1 absent"
+              segments={[
+                { key: 'p', value: 11, tone: 'present', label: '11 present' },
+                { key: 'h', value: 1, tone: 'half', label: '1 half day' },
+                { key: 'a', value: 1, tone: 'absent', label: '1 absent' },
+              ]}
+            />
+          </Specimen>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+function Cards() {
+  return (
+    <Section
+      id="cards"
+      title="Cards"
+      intro="White, a hairline and 12 px corners, no shadow. Lists inside stay hairline rows."
+    >
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card
+          title="Not in yet"
+          description="Shift started at 10:00."
+          action={
+            <Button variant="ghost" size="sm" iconEnd="arrow-right">
+              Roster
+            </Button>
+          }
+          flush
+        >
+          <List>
+            <ListRow
+              leading={<Avatar name="Kajal Vyas" />}
+              title="Kajal Vyas"
+              subtitle="42 min past shift start"
+              meta={
+                <Badge tone="warning" icon="clock">
+                  Not in yet
+                </Badge>
+              }
+              onClick={() => undefined}
+            />
+            <ListRow
+              leading={<Avatar name="Bhumi Trivedi" />}
+              title="Bhumi Trivedi"
+              subtitle="Shift 15:00"
+              onClick={() => undefined}
+            />
+          </List>
+        </Card>
+        <div className="grid content-start gap-6">
+          <Card title="October payroll" tone="soft" footer={<span>Pay day Sat, 7 Nov</span>}>
+            <p className="text-text-body">12 payslips ready to check. Nothing is paid yet.</p>
+          </Card>
+          <Card>
+            <p className="text-text-body">A plain card with no header holds one thought.</p>
+          </Card>
+        </div>
       </div>
     </Section>
   );
@@ -427,6 +563,21 @@ function Lists() {
               title="Kajal Mehta"
               subtitle="Hotel Aram · venue duty"
               trailing={<StatusChip status="venue" />}
+              onClick={() => undefined}
+            />
+            <ListRow
+              leading={<Avatar name="Sejal Makwana" />}
+              title="Sejal Makwana"
+              subtitle="In 10:21 · 21 m so far"
+              meta={
+                <>
+                  <StatusChip status="late" label="+21 m" />
+                  <StatusChip status="waiting" label="Waiting for you" />
+                  <Badge tone="warning" icon="warning-circle">
+                    Edge
+                  </Badge>
+                </>
+              }
               onClick={() => undefined}
             />
           </List>
@@ -473,6 +624,9 @@ function States() {
       intro="Skeletons keep the final layout and breathe at most six times. Empty states are one sentence and one action."
     >
       <div className="grid gap-8 lg:grid-cols-2">
+        <Specimen label="Skeleton list (three rows with chips)">
+          <SkeletonList rows={3} trailing label="Loading the register" />
+        </Specimen>
         <Specimen label="Skeleton (loading Who's in)">
           <SkeletonGroup label="Loading who's in">
             {['a', 'b', 'c'].map((k) => (
@@ -646,8 +800,8 @@ function Navigation() {
   return (
     <Section
       id="navigation"
-      title="Tab bar"
-      intro="Five items, icon and label. The bindi marks the active one."
+      title="Navigation"
+      intro="Phones: five items, icon and a one-word label, on a solid bar. Desktop: the owner's rail with icons, the active item on a blush pill with the bindi."
     >
       <div className="grid gap-8 lg:grid-cols-2">
         <Specimen label="Staff">
@@ -664,15 +818,40 @@ function Navigation() {
             <TabBarItem href="#kit-navigation" icon="clock" label="Today" />
             <TabBarItem
               href="#kit-navigation"
-              icon="check-circle"
-              label="Needs action"
-              badge={3}
+              icon="warning-circle"
+              label="Actions"
+              badge={9}
               current
             />
             <TabBarItem href="#kit-navigation" icon="calendar-blank" label="Register" />
             <TabBarItem href="#kit-navigation" icon="users" label="Staff" />
-            <TabBarItem href="#kit-navigation" icon="gear" label="More" />
+            <TabBarItem href="#kit-navigation" icon="dots-three" label="More" />
           </TabBar>
+        </Specimen>
+        <Specimen label="Owner rail (desktop)">
+          <div className="w-60 rounded-md border border-border px-3 py-4">
+            <RailNav label="Owner rail">
+              <RailGroup>
+                <RailItem href="#kit-navigation" icon="calendar-check" label="Today" current />
+                <RailItem
+                  href="#kit-navigation"
+                  icon="warning-circle"
+                  label="Needs action"
+                  badge={9}
+                />
+                <RailItem href="#kit-navigation" icon="calendar-blank" label="Register" />
+                <RailItem href="#kit-navigation" icon="users" label="Staff" />
+              </RailGroup>
+              <RailGroup label="Money">
+                <RailItem href="#kit-navigation" icon="currency-inr" label="Payroll" />
+                <RailItem href="#kit-navigation" icon="chart-bar" label="Reports" />
+              </RailGroup>
+              <RailGroup label="Salon">
+                <RailItem href="#kit-navigation" icon="qr-code" label="Show door code" />
+                <RailItem href="#kit-navigation" icon="gear" label="Settings" />
+              </RailGroup>
+            </RailNav>
+          </div>
         </Specimen>
       </div>
     </Section>
@@ -700,6 +879,8 @@ export function KitPage() {
         <Fields />
         <Chips />
         <Statuses />
+        <Stats />
+        <Cards />
         <Lists />
         <States />
         <Overlays />

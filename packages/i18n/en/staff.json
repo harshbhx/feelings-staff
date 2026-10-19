@@ -234,6 +234,9 @@
       "account_inactive": "Your account is not active. Talk to {{owner}}.",
       "upgrade_required": "Please update the app.",
       "session_expired": "Please sign in again. Your check-in will be sent after that.",
+      "conflictIn": "You're already checked in. Today shows it now.",
+      "conflictOut": "You're not checked in yet. Today shows it now.",
+      "offline_unavailable": "You're offline, and this phone can't save a check-in yet. Connect to the internet and try again.",
       "unknown": "We couldn't complete that. Try again in a moment."
     },
     "options": {
@@ -261,8 +264,7 @@
       "send": "Send to {{owner}}"
     },
     "close": "Close",
-    "done": "Done",
-    "notReady": "Check-in isn't ready on this version yet."
+    "done": "Done"
   },
   "scan": {
     "title": "Scan door code",
