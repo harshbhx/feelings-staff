@@ -189,9 +189,14 @@ interface Presence {
 const block = (min: number, rules: TimeRules) =>
   Math.floor(min / rules.otBlockMin) * rules.otBlockMin;
 
-/** Working day: break, late/early per segment, make-up, undertime, overtime, status (PRD 7.4-7.7). */
+/**
+ * Working day: break, late/early per segment, make-up, undertime, overtime, status (PRD 7.4-7.7).
+ * With Time credits on (PRD 7.5, 7.17) grace and tolerance do not apply (billable = raw minutes),
+ * nothing is owed, so there is no make-up and no undertime, and over-break is only reported.
+ */
 function workDay(input: ComputeDayInput, p: Presence): Metrics {
   const { schedule, rules, leave } = input;
+  const credits = rules.credits === true;
   const segs = normalize(schedule.segments.map((s): Iv => [toMin(s.startTs), toMin(s.endTs)]));
   const b = takeBreak(
     total(intersect(p.presence, segs)),
@@ -218,9 +223,9 @@ function workDay(input: ComputeDayInput, p: Presence): Metrics {
     const late = Math.min(...inSeg.map((i) => i[0])) - seg[0];
     const early = seg[1] - Math.max(...inSeg.map((i) => i[1]));
     lateMin += late;
-    lateBillableMin += Math.max(0, late - rules.graceMin);
+    lateBillableMin += credits ? late : Math.max(0, late - rules.graceMin);
     earlyMin += early;
-    earlyBillableMin += early > rules.earlyToleranceMin ? early : 0;
+    earlyBillableMin += credits || early > rules.earlyToleranceMin ? early : 0;
   }
 
   // Pre-approved minutes: presence outside the segments inside a window (before, between or after).
@@ -229,7 +234,7 @@ function workDay(input: ComputeDayInput, p: Presence): Metrics {
   const afterMin = total(
     subtract(intersect(p.presence, [[lastEnd, Number.POSITIVE_INFINITY]]), p.windows),
   );
-  const owed = lateBillableMin + earlyBillableMin + b.overbreak;
+  const owed = credits ? 0 : lateBillableMin + earlyBillableMin + b.overbreak;
   const makeupCap = rules.makeupEnabled ? owed : 0;
   const fromAfter = Math.min(makeupCap, afterMin);
   const fromPre = Math.min(makeupCap - fromAfter, preMin);
@@ -337,6 +342,10 @@ function notEmployed(schedule: DaySchedule): DayResult {
  * credit and tags for one person-day (PRD 7.4-7.7). Pure and deterministic: punch order in the input
  * does not matter. Precedence for the status: NE, owner override, full-day leave, open session,
  * half-day leave, worked ratio. Undertime is charged only when the final status is P.
+ *
+ * With `rules.credits` on (PRD 7.16) the day has undertime 0 and make-up 0, the raw late and early
+ * minutes, over-break reported only (tag `overbreak`), and its overtime candidates and pre-approved
+ * minutes become plus credits when approved instead of overtime pay.
  */
 export function computeDay(input: ComputeDayInput): DayResult {
   const { schedule, rules } = input;
@@ -386,6 +395,8 @@ export function computeDay(input: ComputeDayInput): DayResult {
   );
   tag('edited', o !== null || s.counted.some((p) => p.source === 'owner'));
   tag('break_not_punched', m.notPunched);
+  // With Time credits on, over-break is shown to the owner on the day and nothing else (PRD 7.17.2).
+  tag('overbreak', rules.credits === true && m.overbreakMin > 0);
   tag('night_hours', hasPresence && (schedule.nightHours || input.preapprovals.some(isNightDuty)));
   tag(
     'flagged',

@@ -13,7 +13,7 @@ export default defineConfig({
       exclude: ['src/index.ts', 'src/**/stub.ts'],
       reporter: ['text', 'text-summary', 'json-summary'],
       thresholds: {
-        'src/{schedule,day,pay,leave,money,fence,risk}/**': full,
+        'src/{schedule,day,pay,leave,money,fence,risk,credits}/**': full,
       },
     },
   },

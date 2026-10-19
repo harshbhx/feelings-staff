@@ -17,6 +17,7 @@ const td = (day: DayResult, over: Partial<Omit<TimeDay, 'day'>> = {}): TimeDay =
   part: PRIYA,
   offPaid: true,
   offMode: 'extra_pay',
+  credits: false,
   ...over,
 });
 
