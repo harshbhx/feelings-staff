@@ -134,7 +134,7 @@ export function ErrorNote({
   children,
   requestId,
 }: {
-  id?: string;
+  id?: string | undefined;
   children: ReactNode;
   requestId?: string | undefined;
 }) {
@@ -165,7 +165,7 @@ export function ErrorFromCopy({
 }: {
   copy: ErrorCopy | null;
   text: (c: ErrorCopy) => string;
-  id?: string;
+  id?: string | undefined;
 }) {
   if (!copy) return null;
   return (

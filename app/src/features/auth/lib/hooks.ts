@@ -11,12 +11,13 @@ import { withFlags } from './flags';
 import { nextFitsRole, safeNext } from './next';
 import { readOrgContact, saveOrgContact } from './storage';
 
-export interface OwnerNames {
+/** A type alias (not an interface) so it passes as i18next interpolation values. */
+export type OwnerNames = {
   /** For the middle of a sentence: "Ask Urmi to…" / "Ask the owner to…". */
   owner: string;
   /** For the start of a sentence: "Urmi needs to…" / "The owner needs to…". */
   Owner: string;
-}
+};
 
 /**
  * The owner's display name for staff copy (PRD 5: never hard-coded). Uses the name we know from
