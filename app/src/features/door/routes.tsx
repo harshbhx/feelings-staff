@@ -1,7 +1,9 @@
-/** Door kiosk (PRD 4.5). Owner: WP-4 (logic and UI). */
+/** Door kiosk (PRD 4.5). Owner: WP-4 (logic and UI). Lazy: the QR encoder only loads here. */
 import type { RouteObject } from 'react-router';
-import { Placeholder } from '../../app/placeholder';
 
 export const doorRoutes: RouteObject[] = [
-  { path: '/door', element: <Placeholder titleKey="door:screens.door" /> },
+  {
+    path: '/door',
+    lazy: () => import('./DoorScreen').then((m) => ({ Component: m.DoorScreen })),
+  },
 ];
