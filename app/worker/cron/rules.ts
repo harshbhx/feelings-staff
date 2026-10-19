@@ -22,6 +22,7 @@ import { loadOrg } from '../lib/settings';
 import { ulid } from '../lib/ulid';
 import { inQuietHours, releaseHeld } from '../services/notifier';
 import { firstStart, lastEnd, loadPersonDays, type PersonDay } from '../services/notifier-schedule';
+import { sweepPayslipPdfs } from '../services/payslip-pdf';
 import type { Ctx } from '../services/ports';
 import { type CronCtx, once, systemCtx } from './context';
 
@@ -102,6 +103,7 @@ export async function runRules(
     ['summary', morningSummary],
     ['payroll', payrollRules],
     ['duties', dutyReminders],
+    ['payslipPdfs', async (rr) => rr.bump('payslip_pdf', await sweepPayslipPdfs(rr.ctx))],
   ];
   for (const [name, fn] of rules) {
     try {

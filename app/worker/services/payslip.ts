@@ -141,7 +141,7 @@ export async function runOfPayslip(ctx: Ctx, row: PayslipRow): Promise<RunRow> {
 
 // ---- Staff ---------------------------------------------------------------------------------------
 
-async function staffMaySee(ctx: Ctx): Promise<boolean> {
+export async function staffMaySee(ctx: Ctx): Promise<boolean> {
   return (await loadOrg(ctx)).settings.pay.showPayslipsToStaff;
 }
 
@@ -175,38 +175,6 @@ export async function myPayslip(ctx: Ctx, id: string): Promise<PayslipView> {
   if (row.user_id !== userId || !(await staffMaySee(ctx)))
     fail('NOT_FOUND', 'That payslip was not found.');
   return payslipView(ctx, row, await runOfPayslip(ctx, row));
-}
-
-// ---- PDF -----------------------------------------------------------------------------------------
-
-/** 200 with the stored PDF, 202 while it is being made; staff only get their own. */
-export async function payslipPdf(ctx: Ctx, id: string): Promise<Response> {
-  const user = ctx.user ?? fail('UNAUTHENTICATED');
-  const row = await payslipRow(ctx, id);
-  if (user.role === 'staff' && (row.user_id !== user.id || !(await staffMaySee(ctx)))) {
-    fail('NOT_FOUND', 'That payslip was not found.');
-  }
-  if (row.pdf_status === 'failed') {
-    fail('UNAVAILABLE', "The PDF couldn't be made. The online slip works.");
-  }
-  const object =
-    row.pdf_status === 'ready' && row.pdf_key ? await ctx.env.MEDIA.get(row.pdf_key) : null;
-  if (!object) {
-    return new Response(JSON.stringify({ status: 'pending' }), {
-      status: 202,
-      headers: { 'Content-Type': 'application/json; charset=utf-8', 'Retry-After': '5' },
-    });
-  }
-  const run = await runOfPayslip(ctx, row);
-  const name = `payslip-${run.month}-r${run.revision}.pdf`;
-  return new Response(object.body, {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `inline; filename="${name}"`,
-      'Cache-Control': 'private, no-store',
-    },
-  });
 }
 
 // ---- Public verify -------------------------------------------------------------------------------
