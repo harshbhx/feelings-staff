@@ -1,0 +1,12 @@
+/*
+ * Gujarati font stack (PRD 11.9): Plus Jakarta Sans first so Latin text keeps the brand face,
+ * then Noto Sans Gujarati for Gujarati glyphs. Loaded only when the language is Gujarati.
+ */
+:root:lang(gu),
+:root:lang(gu-IN) {
+  --font-body:
+    "Plus Jakarta Sans Variable", "Plus Jakarta Sans", "Noto Sans Gujarati", "Segoe UI", system-ui,
+    -apple-system, sans-serif;
+  --font-display: var(--font-body);
+  --font-sans: var(--font-body);
+}
