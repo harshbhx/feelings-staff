@@ -786,7 +786,7 @@ async function dutyStaffIds(ctx: Ctx, dutyId: string): Promise<string[]> {
 export async function patchDuty(
   ctx: Ctx,
   id: string,
-  body: Partial<DutyCreate>,
+  body: { [K in keyof DutyCreate]?: DutyCreate[K] | undefined },
 ): Promise<DutyView> {
   const row = await dutyById(ctx, id);
   if (!row || row.cancelled_at !== null) return fail('NOT_FOUND');

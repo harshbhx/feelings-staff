@@ -19,7 +19,7 @@ import { createMapsResolver, parseMapsUrl } from '../../services/maps';
 import { setServiceOverridesForTests } from '../../services/registry';
 import { fakeNotifier } from '../../test/fakes';
 import { call, callJson, sessionFor, testEnv } from '../../test/helpers';
-import { addUser, ctxAt, DAY, ist, newSalon, type Salon } from '../../test/notify-kit';
+import { addUser, ctxAt, DAY, ist, newSalon, type Salon, setSettings } from '../../test/notify-kit';
 import { setClock } from '../auth/test/kit';
 
 type Pairing = OutputOf<Endpoints['ownerDoorDeviceCreate']>;
@@ -69,11 +69,17 @@ describe('O-08 Roster', () => {
 
   it('O-08.3 more than 48 scheduled hours in a week shows a warning', async () => {
     const priya = await addUser(salon, { name: 'Priya Shah', weekOffDow: 0 });
-    const row = (await api<RosterView>('GET', '/owner/roster?week=2026-W43')).body.rows.find(
-      (r) => r.user.id === priya,
-    );
-    expect(row?.scheduledMin).toBe(6 * 540);
-    expect(row?.over48).toBe(true);
+    const week = async () =>
+      (await api<RosterView>('GET', '/owner/roster?week=2026-W43')).body.rows.find(
+        (r) => r.user.id === priya,
+      );
+    // Dussehra (20 Oct) and the Sunday week off leave five working days of 9 h.
+    expect((await week())?.scheduledMin).toBe(5 * 540);
+    expect((await week())?.over48).toBe(false);
+    await setSettings(salon, (s) => {
+      (s.overtime as Record<string, unknown>).weeklyHoursWarn = 40;
+    });
+    expect((await week())?.over48).toBe(true);
   });
 
   it('O-08.2 swapping week-offs changes both days and tells both people', async () => {
@@ -141,8 +147,8 @@ describe('O-08 Roster', () => {
       (r) => r.user.id === priya,
     );
     expect(row?.cells[4]?.kind).toBe('HO');
-    const list = await api<unknown[]>('GET', '/owner/holidays?year=2026');
-    expect(list.body).toHaveLength(1);
+    const list = await api<{ id: string }[]>('GET', '/owner/holidays?year=2026');
+    expect(list.body.map((h) => h.id)).toContain(res.body.id);
     expect((await call('DELETE', `/owner/holidays/${res.body.id}`, { cookie: owner })).status).toBe(
       204,
     );
