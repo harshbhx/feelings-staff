@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "typecheck": "pnpm -r --parallel run typecheck",
+    "typecheck": "pnpm -r --parallel --no-bail run typecheck",
     "lint": "biome ci .",
     "format": "biome check --write .",
     "check:ui": "node scripts/check-ui.mjs",
@@ -15,7 +15,7 @@
     "check:i18n": "node scripts/check-i18n.mjs",
     "check": "pnpm run lint && pnpm run check:ui && pnpm run check:arch && pnpm run check:i18n",
     "test": "pnpm -r run test",
-    "test:unit": "pnpm --filter @fs/contracts --filter @fs/engine --filter @fs/i18n --filter @fs/ui --filter @fs/templates run test",
+    "test:unit": "pnpm --no-bail --filter @fs/contracts --filter @fs/engine --filter @fs/i18n --filter @fs/ui --filter @fs/templates run test",
     "test:api": "pnpm --filter @fs/app run test:api",
     "build": "pnpm --filter @fs/app run build",
     "size": "node scripts/size-budgets.mjs",

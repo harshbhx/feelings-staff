@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { Divisor, Lang, SetupStep, SetupStepState } from './enums';
-import { HHMM, Paise } from './primitives';
+import { Divisor, SetupStep, SetupStepState } from './enums';
+import { HHMM, Lang, Paise } from './primitives';
 
 /** Overtime rate (PRD 7.6). Multipliers below 2 show a compliance warning in the UI. */
 export const OtRate = z.discriminatedUnion('mode', [

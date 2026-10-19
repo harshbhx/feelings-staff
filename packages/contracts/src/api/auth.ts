@@ -1,12 +1,13 @@
 /** System, auth, session and profile schemas (PRD 4.1, 9.4 "System and auth"). */
 import { z } from 'zod';
-import { ConsentKind, DeviceStatus, Lang, Permission, Platform, Role, UserStatus } from '../enums';
+import { ConsentKind, DeviceStatus, Permission, Platform, Role, UserStatus } from '../enums';
 import {
   Base64Url,
   Email,
   EpochMs,
   Id,
   JoinCodeInput,
+  Lang,
   OwnerPin,
   PhoneE164,
   PhoneInput,
