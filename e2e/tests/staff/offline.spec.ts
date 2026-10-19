@@ -7,7 +7,9 @@ import { expect, test } from '../../fixtures';
 
 interface FsPwaHooks {
   state(): { needRefresh: boolean; canPromptNow: boolean; upgradeRequired: boolean };
-  queue(): { items: { idempotencyKey: string }[] };
+  queue(): {
+    items: { idempotencyKey: string; status: string; lastError: unknown }[];
+  };
   applyUpdate(): Promise<void>;
   removeQueued(idempotencyKey: string): Promise<void>;
 }
@@ -353,6 +355,11 @@ test.describe('offline', () => {
     // S-09.2 back online: the queue sends it by itself; the server keeps it as an offline punch.
     await context.setOffline(false);
     await expect(page.getByText('1 check-in waiting to send')).toHaveCount(0, { timeout: 45_000 });
+    const queued = await page.evaluate(() => window.__fsPwa?.queue());
+    expect(
+      queued?.items.map((i) => ({ status: i.status, error: i.lastError })),
+      'the queue sent the punch',
+    ).toEqual([]);
     const today = await page.evaluate(async () => {
       const res = await fetch('/api/v1/me/today', { headers: { 'X-FS-Client': '0.1.0' } });
       return (await res.json()) as { punches: { kind: string; source: string; status: string }[] };
