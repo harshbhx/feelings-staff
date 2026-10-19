@@ -1,0 +1,7 @@
+/** Door kiosk (PRD 4.5). Owner: WP-4 (logic) with WP-7 (UI). */
+import type { RouteObject } from 'react-router';
+import { Placeholder } from '../../app/placeholder';
+
+export const doorRoutes: RouteObject[] = [
+  { path: '/door', element: <Placeholder titleKey="owner:screens.doorScreen" /> },
+];

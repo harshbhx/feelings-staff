@@ -1,0 +1,70 @@
+# Worker Preview per same-repo PR (PRD 15.1-15.2, X-05). Needs CLOUDFLARE_API_TOKEN and
+# CLOUDFLARE_ACCOUNT_ID repo secrets; until Harsh adds them this workflow only prints a notice.
+name: preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore: ['docs/**', '**/*.md']
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  preview:
+    name: preview
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HAS_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Skip without Cloudflare credentials
+        if: env.HAS_TOKEN != 'true'
+        run: echo "::notice::CLOUDFLARE_API_TOKEN is not set; skipping the Worker Preview (docs/deploy.md)."
+      - uses: actions/checkout@v4
+        if: env.HAS_TOKEN == 'true'
+      - uses: pnpm/action-setup@v4
+        if: env.HAS_TOKEN == 'true'
+      - uses: actions/setup-node@v4
+        if: env.HAS_TOKEN == 'true'
+        with:
+          node-version: 22
+          cache: pnpm
+      - if: env.HAS_TOKEN == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        if: env.HAS_TOKEN == 'true'
+        run: pnpm build
+      - name: Apply migrations to the preview database
+        if: env.HAS_TOKEN == 'true'
+        working-directory: app
+        run: pnpm exec wrangler d1 migrations apply fbc-staff-preview --remote -c wrangler.preview-migrations.jsonc
+      - name: Deploy the Worker Preview
+        if: env.HAS_TOKEN == 'true'
+        id: preview
+        working-directory: app
+        run: |
+          out=$(pnpm exec wrangler preview --name "pr-${{ github.event.pull_request.number }}" --json)
+          url=$(echo "$out" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s.slice(s.indexOf('{')));console.log(j.url||j.preview_url||j.previewUrl||'')})")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Smoke
+        if: env.HAS_TOKEN == 'true' && steps.preview.outputs.url != ''
+        run: |
+          curl -fsS "${{ steps.preview.outputs.url }}/api/v1/health"
+          curl -fsS -o /dev/null "${{ steps.preview.outputs.url }}/"
+      - name: Comment the Preview URL
+        if: env.HAS_TOKEN == 'true' && steps.preview.outputs.url != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          body="**Preview:** ${{ steps.preview.outputs.url }}"
+          id=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" --jq '.[] | select(.body | startswith("**Preview:**")) | .id' | head -1)
+          if [ -n "$id" ]; then gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$id" -f body="$body"; else gh pr comment ${{ github.event.pull_request.number }} --body "$body" -R ${{ github.repository }}; fi

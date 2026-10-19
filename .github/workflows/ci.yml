@@ -1,0 +1,73 @@
+# Static checks, unit + API tests, build and budgets (PRD 15.2). One job to keep Actions minutes low;
+# every check step runs even if an earlier one failed, so one push shows all problems.
+name: ci
+
+on:
+  pull_request:
+    paths-ignore: ['docs/**', '**/*.md']
+  push:
+    branches: [main]
+    paths-ignore: ['docs/**', '**/*.md']
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        if: ${{ !cancelled() }}
+        run: pnpm typecheck
+      - name: Lint (Biome)
+        if: ${{ !cancelled() }}
+        run: pnpm lint
+      - name: UI, architecture and i18n checks
+        if: ${{ !cancelled() }}
+        run: |
+          status=0
+          pnpm check:ui || status=1
+          pnpm check:arch || status=1
+          pnpm check:i18n || status=1
+          exit $status
+      - name: Unit tests (contracts, engine, ui, i18n, templates)
+        if: ${{ !cancelled() }}
+        run: pnpm test:unit
+      - name: Client unit tests
+        if: ${{ !cancelled() }}
+        run: pnpm --filter @fs/app run test
+      - name: Workers API tests
+        if: ${{ !cancelled() }}
+        run: pnpm --filter @fs/app exec vitest run --project api --coverage
+      - name: Build
+        if: ${{ !cancelled() }}
+        run: pnpm build
+      - name: Size budgets
+        if: ${{ !cancelled() }}
+        run: pnpm size
+      - name: Upload coverage and size report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-and-size
+          retention-days: 7
+          if-no-files-found: ignore
+          path: |
+            packages/*/coverage/coverage-summary.json
+            app/coverage/coverage-summary.json
+            app/dist/size-report.json

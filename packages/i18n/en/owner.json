@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "today": "Today",
+    "actions": "Needs action",
+    "register": "Register",
+    "staff": "Staff",
+    "more": "More",
+    "payroll": "Payroll",
+    "roster": "Roster",
+    "advances": "Advances",
+    "reports": "Reports",
+    "inbox": "Inbox",
+    "doorCode": "Show door code",
+    "settings": "Settings"
+  },
+  "screens": {
+    "signIn": "Owner sign-in",
+    "setup": "Set up the salon",
+    "today": "Today",
+    "actions": "Needs action",
+    "register": "Register",
+    "day": "Day detail",
+    "staff": "Staff",
+    "staffProfile": "Staff profile",
+    "addStaff": "Add staff",
+    "roster": "Roster",
+    "dutyForm": "Off-site duty",
+    "payroll": "Payroll",
+    "payrollRun": "Payroll run",
+    "payslipReview": "Payslip",
+    "advances": "Advances",
+    "reports": "Reports",
+    "doorCode": "Door code",
+    "inbox": "Inbox",
+    "settings": "Settings",
+    "audit": "Audit log",
+    "doorScreen": "Door screen",
+    "verify": "Payslip check"
+  }
+}

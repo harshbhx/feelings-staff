@@ -1,0 +1,70 @@
+# Regenerates visual baselines in the Playwright image (PRD 14.5). Manual dispatch on a PR branch.
+# The new baselines are uploaded as an artifact; with commit=true they are also pushed to the branch
+# (a push by this workflow does not trigger CI, so push any follow-up commit to re-run checks).
+name: snapshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch to update
+        required: true
+      grep:
+        description: Only update tests matching this pattern
+        required: false
+        default: ''
+      commit:
+        description: Commit the baselines to the branch
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  snapshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      CI: 'true'
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Throwaway secrets for this run
+        run: |
+          token=$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")
+          echo "::add-mask::$token"
+          echo "E2E_TOKEN=$token" >> "$GITHUB_ENV"
+          node scripts/gen-secrets.mjs --dev-vars app/.dev.vars --env local --e2e-token "$token"
+      - run: pnpm build
+      - run: |
+          for cfg in $(find app/dist -name wrangler.json -not -path '*/node_modules/*'); do cp app/.dev.vars "$(dirname "$cfg")/.dev.vars"; done
+      - name: Update baselines
+        run: pnpm --filter @fs/e2e exec playwright test --update-snapshots ${{ inputs.grep && format('--grep "{0}"', inputs.grep) || '' }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: visual-baselines
+          retention-days: 7
+          path: e2e/tests/__screenshots__
+      - name: Commit baselines
+        if: ${{ inputs.commit }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "Harsh Bhanushali"
+          git config user.email "bhanushaliharsh434@gmail.com"
+          git add e2e/tests/__screenshots__
+          git diff --cached --quiet && echo "No baseline changes" && exit 0
+          git commit -m "test(e2e): update visual baselines"
+          git push origin HEAD:${{ inputs.ref }}

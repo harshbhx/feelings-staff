@@ -1,0 +1,6 @@
+/*
+ * App stylesheet entry (owner: WP-2). WP-2 replaces this with:
+ *   tokens.css (verbatim brand copy), app-tokens.css (PRD 12.3), the locked Tailwind v4 @theme
+ *   (docs/research/brand-and-stack.md 6.3), base layer, motion and reduced-motion tiers.
+ */
+@import "tailwindcss";

@@ -1,0 +1,22 @@
+{
+  "app": {
+    "name": "Feelings Staff",
+    "shortName": "Feelings"
+  },
+  "actions": {
+    "tryAgain": "Try again",
+    "cancel": "Cancel",
+    "done": "Done",
+    "save": "Save",
+    "back": "Back"
+  },
+  "states": {
+    "loading": "Loading",
+    "offline": "You're offline. Showing what we had at {{time}}.",
+    "comingSoon": "This screen is being built."
+  },
+  "language": {
+    "en": "English",
+    "gu": "ગુજરાતી"
+  }
+}

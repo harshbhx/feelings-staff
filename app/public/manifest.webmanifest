@@ -1,0 +1,16 @@
+{
+  "id": "/",
+  "name": "Feelings Staff",
+  "short_name": "Feelings",
+  "description": "Attendance and pay for the Feelings Beauty Care team.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "categories": ["business", "productivity"],
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

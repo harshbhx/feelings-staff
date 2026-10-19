@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+.wrangler/
+.dev.vars
+.dev.vars.*
+*.log
+.DS_Store
+playwright-report/
+test-results/
+blob-report/
+.lighthouseci/
+e2e/.auth/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo

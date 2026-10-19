@@ -1,0 +1,31 @@
+{
+  "name": "@fs/templates",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Payslip and register print components, shared by screen and PDF (WP-5, PRD 4.14).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fs/contracts": "workspace:*",
+    "@fs/i18n": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "happy-dom": "21.0.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.12"
+  }
+}

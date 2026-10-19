@@ -1,0 +1,28 @@
+{
+  "nav": {
+    "today": "Today",
+    "month": "Month",
+    "requests": "Requests",
+    "payslips": "Payslips",
+    "me": "Me"
+  },
+  "screens": {
+    "invite": "Welcome to the Feelings team",
+    "join": "Join your team",
+    "waiting": "Waiting for approval",
+    "signIn": "Welcome back",
+    "today": "Today",
+    "day": "Your day",
+    "month": "Your month",
+    "requests": "Requests",
+    "leaveForm": "Ask for leave",
+    "fixForm": "Fix a day",
+    "payslips": "Payslips",
+    "payslip": "Payslip",
+    "inbox": "Inbox",
+    "me": "Me",
+    "myData": "My data",
+    "privacy": "Privacy notice",
+    "scan": "Scan door code"
+  }
+}
