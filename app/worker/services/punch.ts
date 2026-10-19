@@ -628,7 +628,7 @@ export async function createPunch(
   if (device.user_id !== user.id) return denyDevice(ctx, 'other_user', body.deviceId, owner);
   if (device.status !== 'approved') return denyDevice(ctx, device.status, body.deviceId, owner);
   const sigOk = await verifyDeviceSignature(
-    json<JsonWebKey>(device.public_jwk, {}),
+    json(device.public_jwk, {} as JsonWebKey),
     punchSigningPayload(body),
     body.signature,
   );
@@ -1138,7 +1138,7 @@ export async function proveWithDoorCode(
     );
   }
   const signed = await verifyDeviceSignature(
-    json<JsonWebKey>(device.public_jwk, {}),
+    json(device.public_jwk, {} as JsonWebKey),
     canonicalJson({ punchId: row.id, qrToken: body.qrToken }),
     body.signature,
   );
@@ -1154,7 +1154,7 @@ export async function proveWithDoorCode(
   );
   if (reused) fail('RULE_VIOLATION', DOOR_TOKEN_MESSAGES.qr_reused, { reason: 'qr_reused' });
 
-  const reasons = riskReasonsOf(row).filter((r) => r !== 'door_qr');
+  const reasons: RiskReason[] = riskReasonsOf(row).filter((r) => r !== 'door_qr');
   reasons.push('door_qr');
   const updated: PunchRow = {
     ...row,

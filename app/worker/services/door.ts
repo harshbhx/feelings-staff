@@ -16,6 +16,7 @@ import {
 } from '@fs/contracts';
 import { DOOR_STEP_MS, doorStep, doorToken, matchDoorToken } from '@fs/engine';
 import type { Context } from 'hono';
+import type { z } from 'zod';
 import type { AppEnv } from '../lib/app-env';
 import {
   decryptSecret,
@@ -276,7 +277,7 @@ export async function pairDoor(
   ctx: Ctx,
   c: Context<AppEnv>,
   rawCode: string,
-): Promise<DoorPairResult> {
+): Promise<z.infer<typeof DoorPairResult>> {
   const code = normaliseCode(rawCode, 8);
   if (!code) return fail('CODE_WRONG', "That code doesn't look right. Check it on Urmi's phone.");
   const now = ctx.now();
