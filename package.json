@@ -8,7 +8,7 @@
   },
   "scripts": {
     "typecheck": "pnpm -r --parallel --no-bail run typecheck",
-    "lint": "biome ci .",
+    "lint": "biome ci --error-on-warnings .",
     "format": "biome check --write .",
     "check:ui": "node scripts/check-ui.mjs",
     "check:arch": "node scripts/check-arch.mjs",

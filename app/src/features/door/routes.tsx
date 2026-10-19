@@ -1,4 +1,4 @@
-/** Door kiosk (PRD 4.5). Owner: WP-4 (logic) with WP-7 (UI). */
+/** Door kiosk (PRD 4.5). Owner: WP-4 (logic and UI). */
 import type { RouteObject } from 'react-router';
 import { Placeholder } from '../../app/placeholder';
 

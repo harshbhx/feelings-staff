@@ -1,5 +1,7 @@
 /**
- * Security headers on every Worker response (PRD 10.5). Static assets get the same set from
+ * Security headers on every Worker response (PRD 10.5). `upgrade-insecure-requests` is left out on
+ * purpose: every source is 'self', HSTS already forces HTTPS, and WebKit applies the upgrade to
+ * http://localhost, which breaks the CI E2E run. Static assets get the same set from
  * public/_headers; a test keeps the two in sync.
  */
 export const CSP = [
@@ -15,7 +17,6 @@ export const CSP = [
   "base-uri 'none'",
   "form-action 'self'",
   "object-src 'none'",
-  'upgrade-insecure-requests',
 ].join('; ');
 
 export const SECURITY_HEADERS: Record<string, string> = {

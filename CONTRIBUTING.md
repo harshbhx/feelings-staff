@@ -23,11 +23,11 @@ Touching another package's paths needs that owner's review. Shared files are cre
 |---|---|
 | WP-1 platform | root configs, `app/vite.config.ts`, `app/wrangler*.jsonc`, `app/worker/index.ts`, `app/worker/middleware/`, `app/worker/db/`, `app/worker/lib/`, `app/worker/seed/`, `app/worker/services/{ports,registry,audit,clock,outbox}.ts`, `app/worker/routes/{index,system}.ts`, `app/worker/routes/owner/{index,settings}.ts`, `app/worker/test-routes.ts`, `app/worker/test/` helpers, `app/src/{main,router}.tsx`, `app/src/api/`, `app/src/app/`, `packages/contracts/`, `migrations/`, `e2e/` harness, `scripts/`, `.github/` |
 | WP-2 design system | `packages/ui/`, `app/src/styles/`, `app/src/features/kit/`, `packages/i18n/*/ui.json` |
-| WP-3 auth | `app/worker/routes/auth/`, `app/worker/routes/staff/`, `app/worker/services/{auth,session,device,pin,invite,stepup}.ts`, `app/src/features/auth/`, `app/src/lib/device-key.ts`, `packages/i18n/*/auth.json` |
-| WP-4 attendance | `app/worker/routes/attendance/`, `app/worker/routes/owner/{today,actions,register,days,roster,sites,duties,door}.ts`, `app/worker/services/{punch,fence,risk,day,door,duty,leave,regularisation,maps}.ts`, `packages/engine/src/{fence,risk}/`, `app/src/lib/punch/`, `app/src/lib/geolocation.ts`, `app/src/lib/qr/`, `app/src/features/door/` (logic) |
+| WP-3 auth | `app/worker/routes/auth/`, `app/worker/routes/staff/`, `app/worker/services/{auth,session,device,pin,invite,stepup}.ts`, `app/src/features/auth/`, `app/src/lib/device-key.ts`, `app/src/lib/idb.ts` (opens the `feelings` IndexedDB with every store from PRD 11.5), `packages/i18n/*/auth.json` |
+| WP-4 attendance | `app/worker/routes/attendance/`, `app/worker/routes/owner/{today,actions,register,days,roster,sites,duties,door}.ts`, `app/worker/services/{punch,fence,risk,day,door,duty,leave,regularisation,maps}.ts`, `packages/engine/src/{fence,risk}/`, `app/src/lib/punch/`, `app/src/lib/geolocation.ts`, `app/src/lib/qr/`, `app/src/features/door/` (kiosk logic and UI), `packages/i18n/*/door.json` |
 | WP-5 engine and payroll | `packages/engine/src/{schedule,day,pay,leave,money}/`, `packages/templates/`, `app/worker/routes/payroll/`, `app/worker/services/{payroll,payslip,pdf,export,advance}.ts`, `packages/i18n/*/payslip.json` |
 | WP-6 owner panel | `app/src/features/owner/`, `app/src/features/public/`, `packages/i18n/*/owner.json` |
-| WP-7 staff app and PWA | `app/src/features/staff/`, `app/src/pwa/` (except `sw/push-handlers.ts` and `push.ts`), `app/build/pwa.ts`, `app/public/` icons and manifest, `packages/i18n/*/{common,staff,errors,door}.json`, `packages/i18n/src/` |
+| WP-7 staff app and PWA | `app/src/features/staff/`, `app/src/pwa/` (except `sw/push-handlers.ts` and `push.ts`), `app/build/pwa.ts`, `app/public/` icons and manifest, `packages/i18n/*/{common,staff,errors}.json`, `packages/i18n/src/` |
 | WP-8 notifications and jobs | `app/worker/routes/notify/`, `app/worker/services/{notifier,push,email,whatsapp}.ts`, `app/worker/cron/`, `app/src/pwa/sw/push-handlers.ts`, `app/src/pwa/push.ts`, `app/src/features/inbox/`, `scripts/r2-lifecycle.ts`, `packages/i18n/*/notify.json` |
 
 ## How the pieces connect
@@ -37,7 +37,8 @@ Touching another package's paths needs that owner's review. Shared files are cre
 - **Ports.** `app/worker/services/ports.ts` defines `Clock`, `Audit`, `Notifier`, `StepUp`, `DayService`, `PayrollService`, `PdfRenderer`, `PushSender`, `EmailSender`, `MapsResolver`, `Outbox`; `ctx.services` holds them.
 - **Client.** Screens use `useApi()` (real client, or `MockApiClient` with `VITE_API_MODE=mock`) and TanStack Query. Copy comes from `packages/i18n` (`t('staff:today.checkIn')`).
 - **E2E specs.** Each package adds its specs under `e2e/tests/<area>/` (`auth`, `attendance`, `payroll`, `owner`, `staff`, `notify`, `kit`) and names baselines with the area prefix, so packages never edit the same spec file.
-- **Tests.** Workers API tests use `app/worker/test/helpers.ts` (`resetScenario`, `sessionFor`, `call`). E2E uses `e2e/fixtures` (`reset`, `setServerClock`, `runCron`, `outbox`, `setGeo`, `checkA11y`).
+- **Tests.** Workers API tests use `app/worker/test/helpers.ts` (`resetScenario`, `sessionFor`, `call`) and the port fakes in `app/worker/test/fakes/` with `setServiceOverridesForTests` from `services/registry.ts`.
+- **Mock mode.** On localhost (CI E2E only) `?mock=1` makes the SPA use `MockApiClient` over the fixtures, with `&variant=meToday:checked-in,...` for states. Visual baselines of screens use mock mode for stable data; flow E2E uses the real API. E2E uses `e2e/fixtures` (`reset`, `setServerClock`, `runCron`, `outbox`, `setGeo`, `checkA11y`).
 
 ## Visual baselines
 

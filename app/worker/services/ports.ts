@@ -122,7 +122,8 @@ export interface EmailMessage {
 }
 
 export interface EmailSender {
-  send(msg: EmailMessage): Promise<void>;
+  /** Sends (or, with EMAIL_PROVIDER=outbox, records in the preview outbox). */
+  send(ctx: Ctx, msg: EmailMessage): Promise<void>;
 }
 
 export interface MapsResolver {

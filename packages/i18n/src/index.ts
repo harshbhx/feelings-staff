@@ -1,7 +1,7 @@
 /**
  * i18n for Feelings Staff (PRD 11.9). Keys are semantic and namespaced: `t('staff:today.checkIn')`.
- * Namespaces and owners: common, staff, errors, door (WP-7); owner (WP-6); payslip (WP-5);
- * auth (WP-3); notify (WP-8); ui (WP-2, component-level strings such as aria labels).
+ * Namespaces and owners: common, staff, errors (WP-7); owner (WP-6); payslip (WP-5); auth (WP-3);
+ * door (WP-4); notify (WP-8); ui (WP-2, component-level strings such as aria labels).
  * English is the source of truth; Gujarati falls back to English key by key.
  */
 import i18next, { type i18n as I18n } from 'i18next';
