@@ -276,6 +276,7 @@ The kiosk screen at the door.
 |---|---|---|---|---|---|---|---|
 | POST | `/door/pair` | public | no | no | body `DoorPairRequest` | `DoorPairResult` | Pair this device as the door screen |
 | GET | `/door/status` | door | no | no | - | `DoorStatus` | Last check-in line |
+| GET | `/door/secret` | door | no | no | - | `DoorSecret` | Current secret of this door device (after the owner rotates it) |
 
 ### Public
 
