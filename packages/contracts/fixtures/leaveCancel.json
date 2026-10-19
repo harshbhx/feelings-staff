@@ -1,0 +1,24 @@
+{
+  "id": "01K88X1R2EXVYPWC2RAYYVC4SA",
+  "user": {
+    "id": "01K86AFQDXWDHQ8238N67SVDDK",
+    "name": "Priya Solanki",
+    "designation": "Stylist",
+    "phone": "+919825011201"
+  },
+  "typeCode": "CL",
+  "typeName": "Casual leave",
+  "fromDate": "2026-11-02",
+  "toDate": "2026-11-02",
+  "half": "none",
+  "daysPaid": 1,
+  "daysUnpaid": 0,
+  "reason": "Cousin's engagement in Rajkot.",
+  "blackoutHit": false,
+  "status": "cancelled",
+  "decidedAt": null,
+  "decidedByName": null,
+  "decisionNote": null,
+  "cancelledAt": 1792386720000,
+  "createdAt": 1792244100000
+}

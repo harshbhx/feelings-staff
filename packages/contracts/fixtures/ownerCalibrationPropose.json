@@ -1,0 +1,14 @@
+{
+  "centre": {
+    "lat": 22.4606479,
+    "lng": 70.0565093
+  },
+  "radiusM": 100,
+  "stats": {
+    "sessions": 12,
+    "samples": 410,
+    "p95DistanceM": 41.5,
+    "medianAccuracyM": 17.3
+  },
+  "enoughData": true
+}

@@ -1,0 +1,75 @@
+// Feelings Staff: one Worker for static assets, /api/v1 and scheduled jobs (PRD ADR-01, 15.1).
+// Top level = production. `previews` = Worker Previews (per PR) and the shared preview environment.
+// Database and bucket ids: production ids are filled in at go-live (docs/deploy.md, PRD 15.4 step 3).
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "feelings-staff",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "upload_source_maps": true,
+  "observability": { "enabled": true },
+  "assets": {
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/v/*", "/q/*", "/__kit"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fbc-staff",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "../migrations"
+    }
+  ],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "fbc-staff-media" }],
+  "browser": { "binding": "BROWSER" },
+  "send_email": [{ "name": "EMAIL", "allowed_sender_addresses": ["staff@feelingsbeautycare.in"] }],
+  "ratelimits": [
+    { "name": "RL_IP", "namespace_id": "4101", "simple": { "limit": 300, "period": 60 } },
+    { "name": "RL_SESSION", "namespace_id": "4102", "simple": { "limit": 120, "period": 60 } },
+    { "name": "RL_PUNCH", "namespace_id": "4103", "simple": { "limit": 6, "period": 60 } },
+    { "name": "RL_DOOR", "namespace_id": "4104", "simple": { "limit": 12, "period": 60 } }
+  ],
+  "triggers": { "crons": ["*/5 * * * *", "30 21 * * *"] },
+  "vars": {
+    "ENV": "production",
+    "APP_ORIGIN": "https://staff.feelingsbeautycare.in",
+    "APP_VERSION": "0.1.0",
+    "MIN_APP_VERSION": "0.1.0",
+    "EMAIL_PROVIDER": "cloudflare",
+    "EMAIL_FROM": "Feelings Staff <staff@feelingsbeautycare.in>",
+    "VAPID_PUBLIC_KEY": "",
+    "VAPID_SUBJECT": "mailto:staff@feelingsbeautycare.in",
+    "OWNER_BOOTSTRAP_EMAIL": ""
+  },
+  "previews": {
+    "vars": {
+      "ENV": "preview",
+      "APP_ORIGIN": "",
+      "APP_VERSION": "0.1.0",
+      "MIN_APP_VERSION": "0.1.0",
+      "EMAIL_PROVIDER": "outbox",
+      "EMAIL_FROM": "Feelings Staff <staff@feelingsbeautycare.in>",
+      "VAPID_PUBLIC_KEY": "",
+      "VAPID_SUBJECT": "mailto:staff@feelingsbeautycare.in",
+      "OWNER_BOOTSTRAP_EMAIL": ""
+    },
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "fbc-staff-preview",
+        "database_id": "00000000-0000-0000-0000-000000000001",
+        "migrations_dir": "../migrations"
+      }
+    ],
+    "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "fbc-staff-media-preview" }],
+    "browser": { "binding": "BROWSER" },
+    "ratelimits": [
+      { "name": "RL_IP", "namespace_id": "4101", "simple": { "limit": 300, "period": 60 } },
+      { "name": "RL_SESSION", "namespace_id": "4102", "simple": { "limit": 120, "period": 60 } },
+      { "name": "RL_PUNCH", "namespace_id": "4103", "simple": { "limit": 6, "period": 60 } },
+      { "name": "RL_DOOR", "namespace_id": "4104", "simple": { "limit": 12, "period": 60 } }
+    ]
+  }
+}

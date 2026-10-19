@@ -1,0 +1,221 @@
+{
+  "events": [
+    {
+      "type": "morning_summary",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "late_checkin",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "not_in_yet",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "checkin_reminder",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "flagged_punch",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "punch_needs_approval",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "punch_decided",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "early_checkout",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "overtime_running",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "checkout_reminder",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "missed_checkouts",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "day_auto_closed",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "leave_requested",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "leave_decided",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "regularisation_requested",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "regularisation_decided",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "offsite_requested",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "duty_assigned",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "new_device",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": true
+    },
+    {
+      "type": "device_decided",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "pin_attempts",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": true
+    },
+    {
+      "type": "advance_recorded",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "advance_requested",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "payroll_draft_ready",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "payslip_ready",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "salary_unpaid",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "schedule_changed",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "holiday_announced",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "needs_action_reminder",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "weekly_digest",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "sign_in_link",
+      "push": true,
+      "whatsapp": false,
+      "email": true,
+      "locked": true
+    }
+  ]
+}

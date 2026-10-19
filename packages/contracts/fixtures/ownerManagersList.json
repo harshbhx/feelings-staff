@@ -1,0 +1,24 @@
+[
+  {
+    "user": {
+      "id": "01K8CX6TF7P9TEP6QNEP3FSBY7",
+      "name": "Pooja Bhatt",
+      "designation": "Receptionist",
+      "phone": "+919913477807"
+    },
+    "permissions": ["approve_attendance", "roster", "door"],
+    "staffIds": [
+      "01K86AFQDXWDHQ8238N67SVDDK",
+      "01K8EZTHPNQTWAVCVVCWXBXHMS",
+      "01K8RC525PJGR1P8TRDT8GBJ6Q",
+      "01K8VQK1MQ1GQKWX6D0EBBE455",
+      "01K8RTJTBRYNPS8SSG3GVVE3ED",
+      "01K87QPZMP5513SAQDEKNN2B17",
+      "01K860ABG2KZEJ0J3KGQ5S997H",
+      "01K88WSYSDT60NPN5ARB5CJB45",
+      "01K87R133CAYV58WCHEDPSC8TQ",
+      "01K808WS88WK4F356DMX0P8VSB",
+      "01K8HVYPHBE17XDAAV85DMW1AY"
+    ]
+  }
+]

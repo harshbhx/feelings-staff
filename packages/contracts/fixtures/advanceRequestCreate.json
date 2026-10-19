@@ -1,0 +1,23 @@
+{
+  "id": "01K8ZMRM8SYNZ259SE46F14SS0",
+  "user": {
+    "id": "01K86AFQDXWDHQ8238N67SVDDK",
+    "name": "Priya Solanki",
+    "designation": "Stylist",
+    "phone": "+919825011201"
+  },
+  "amountPaise": 500000,
+  "givenOn": null,
+  "mode": null,
+  "reason": "Rent deposit for a new flat.",
+  "plan": "instalments",
+  "instalmentsN": 5,
+  "firstMonth": "2026-11",
+  "status": "requested",
+  "staffAck": "pending",
+  "staffAckAt": null,
+  "recoveredPaise": 0,
+  "balancePaise": 0,
+  "ledger": [],
+  "createdAt": 1792324500000
+}

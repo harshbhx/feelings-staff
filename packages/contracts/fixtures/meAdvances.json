@@ -1,0 +1,25 @@
+[
+  {
+    "id": "01K8D21FBSSP20BCWJAG3D88KX",
+    "user": {
+      "id": "01K86AFQDXWDHQ8238N67SVDDK",
+      "name": "Priya Solanki",
+      "designation": "Stylist",
+      "phone": "+919825011201"
+    },
+    "amountPaise": 300000,
+    "givenOn": "2026-10-03",
+    "mode": "cash",
+    "reason": "Scooter repair.",
+    "plan": "full",
+    "instalmentsN": null,
+    "firstMonth": "2026-10",
+    "status": "active",
+    "staffAck": "confirmed",
+    "staffAckAt": 1791036600000,
+    "recoveredPaise": 0,
+    "balancePaise": 300000,
+    "ledger": [],
+    "createdAt": 1791013200000
+  }
+]

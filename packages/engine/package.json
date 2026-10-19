@@ -1,0 +1,23 @@
+{
+  "name": "@fs/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure rules engine: schedule, day, pay, leave (WP-5) and fence, risk (WP-4). No I/O.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@fs/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "4.1.12",
+    "fast-check": "4.10.2",
+    "typescript": "5.9.3",
+    "vitest": "4.1.12"
+  }
+}

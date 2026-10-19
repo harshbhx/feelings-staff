@@ -1,0 +1,23 @@
+{
+  "id": "01K8H2Y64EZZZTJEDZNZ76R671",
+  "user": {
+    "id": "01K8VQK1MQ1GQKWX6D0EBBE455",
+    "name": "Meena Chavda",
+    "designation": "Helper",
+    "phone": "+919428144504"
+  },
+  "amountPaise": 200000,
+  "givenOn": "2026-10-19",
+  "mode": "upi",
+  "reason": "Hospital bill for my mother.",
+  "plan": "instalments",
+  "instalmentsN": 2,
+  "firstMonth": "2026-11",
+  "status": "active",
+  "staffAck": "pending",
+  "staffAckAt": null,
+  "recoveredPaise": 0,
+  "balancePaise": 200000,
+  "ledger": [],
+  "createdAt": 1792324500000
+}

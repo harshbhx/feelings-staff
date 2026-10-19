@@ -1,0 +1,116 @@
+{
+  "balances": [
+    {
+      "code": "CL",
+      "name": "Casual leave",
+      "paid": true,
+      "balance": 5,
+      "pending": 1,
+      "nextExpiry": null,
+      "usableFrom": null
+    },
+    {
+      "code": "SL",
+      "name": "Sick leave",
+      "paid": true,
+      "balance": 6.5,
+      "pending": 0,
+      "nextExpiry": null,
+      "usableFrom": null
+    },
+    {
+      "code": "CO",
+      "name": "Comp-off",
+      "paid": true,
+      "balance": 1,
+      "pending": 0,
+      "nextExpiry": {
+        "days": 1,
+        "on": "2026-12-19"
+      },
+      "usableFrom": null
+    }
+  ],
+  "ledger": [
+    {
+      "id": "01K8Q10QREEZZMVFYKVCYN7CNE",
+      "code": "CL",
+      "entryDate": "2026-01-01",
+      "kind": "credit",
+      "days": 7,
+      "note": "Yearly credit",
+      "expiresOn": null,
+      "createdAt": 1767206100000
+    },
+    {
+      "id": "01K8SG81596KECFR4MMWJ1AHXD",
+      "code": "CL",
+      "entryDate": "2026-09-14",
+      "kind": "debit",
+      "days": -1,
+      "note": "Casual leave approved",
+      "expiresOn": null,
+      "createdAt": 1789019400000
+    },
+    {
+      "id": "01K8XRF9WVEMDMKKQ328N98C8G",
+      "code": "CO",
+      "entryDate": "2026-10-20",
+      "kind": "credit",
+      "days": 1,
+      "note": "Worked a week off",
+      "expiresOn": "2026-12-19",
+      "createdAt": 1792521300000
+    }
+  ],
+  "requests": [
+    {
+      "id": "01K88X1R2EXVYPWC2RAYYVC4SA",
+      "user": {
+        "id": "01K86AFQDXWDHQ8238N67SVDDK",
+        "name": "Priya Solanki",
+        "designation": "Stylist",
+        "phone": "+919825011201"
+      },
+      "typeCode": "CL",
+      "typeName": "Casual leave",
+      "fromDate": "2026-11-02",
+      "toDate": "2026-11-02",
+      "half": "none",
+      "daysPaid": 1,
+      "daysUnpaid": 0,
+      "reason": "Cousin's engagement in Rajkot.",
+      "blackoutHit": false,
+      "status": "pending",
+      "decidedAt": null,
+      "decidedByName": null,
+      "decisionNote": null,
+      "cancelledAt": null,
+      "createdAt": 1792244100000
+    },
+    {
+      "id": "01K88SMDS7540QDMQQA1Y3TYJ9",
+      "user": {
+        "id": "01K86AFQDXWDHQ8238N67SVDDK",
+        "name": "Priya Solanki",
+        "designation": "Stylist",
+        "phone": "+919825011201"
+      },
+      "typeCode": "CL",
+      "typeName": "Casual leave",
+      "fromDate": "2026-09-14",
+      "toDate": "2026-09-14",
+      "half": "none",
+      "daysPaid": 1,
+      "daysUnpaid": 0,
+      "reason": "Dentist appointment.",
+      "blackoutHit": false,
+      "status": "approved",
+      "decidedAt": 1789019400000,
+      "decidedByName": "Urmi",
+      "decisionNote": null,
+      "cancelledAt": null,
+      "createdAt": 1788968700000
+    }
+  ]
+}

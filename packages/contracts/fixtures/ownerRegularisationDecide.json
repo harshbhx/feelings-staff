@@ -1,0 +1,23 @@
+{
+  "id": "01K8VWCRC0M7HDDF0DF1R96HY5",
+  "user": {
+    "id": "01K87QPZMP5513SAQDEKNN2B17",
+    "name": "Hetal Dave",
+    "designation": "Nail technician",
+    "phone": "+919825366706"
+  },
+  "workDate": "2026-10-16",
+  "kind": "wrong_time",
+  "targetPunchId": null,
+  "proposedInTs": 1792125000000,
+  "proposedOutTs": null,
+  "currentInTs": 1792127052000,
+  "currentOutTs": 1792161220000,
+  "placeName": null,
+  "reason": "I was inside at 10 but my phone had no signal until 10:34.",
+  "status": "approved",
+  "decidedAt": 1792386660000,
+  "decidedByName": "Urmi",
+  "decisionNote": null,
+  "createdAt": 1792294920000
+}

@@ -1,0 +1,95 @@
+{
+  "day": {
+    "workDate": "2026-10-15",
+    "dayType": "work",
+    "status": "P",
+    "leaveCode": null,
+    "templateName": "Full day",
+    "scheduledMin": 540,
+    "workedMin": 500,
+    "lateMin": 40,
+    "lateBillableMin": 30,
+    "earlyMin": 0,
+    "earlyBillableMin": 0,
+    "undertimeMin": 0,
+    "otPreapprovedMin": 0,
+    "otCandidateMin": 0,
+    "otApprovedMin": 0,
+    "otStatus": "none",
+    "offdayCredit": 0,
+    "tags": ["late"],
+    "firstInTs": 1792041020000,
+    "lastOutTs": 1792074640000,
+    "locked": false,
+    "holidayName": null
+  },
+  "schedule": {
+    "dayType": "work",
+    "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+    "templateName": "Full day",
+    "segments": [
+      {
+        "start": "10:00",
+        "end": "20:00"
+      }
+    ],
+    "breakMin": 60,
+    "scheduledMin": 540,
+    "startTs": 1792038600000,
+    "endTs": 1792074600000,
+    "holidayName": null,
+    "leave": null,
+    "nightHours": false
+  },
+  "punches": [
+    {
+      "id": "01K897H84CYBX2G8ZSWMCBBCTQ",
+      "kind": "in",
+      "effectiveTs": 1792041020000,
+      "serverTs": 1792041020000,
+      "workDate": "2026-10-15",
+      "source": "online",
+      "status": "accepted",
+      "pendingReason": null,
+      "siteName": "Feelings Beauty Care",
+      "placeName": null,
+      "fenceResult": "pass",
+      "distanceBucket": "0-50",
+      "riskReasons": [],
+      "offsiteDutyId": null,
+      "edited": false,
+      "note": null,
+      "reviewNote": null
+    },
+    {
+      "id": "01K8YC6R0YVEGV5SKHEHKGWJQV",
+      "kind": "out",
+      "effectiveTs": 1792074640000,
+      "serverTs": 1792074640000,
+      "workDate": "2026-10-15",
+      "source": "online",
+      "status": "accepted",
+      "pendingReason": null,
+      "siteName": "Feelings Beauty Care",
+      "placeName": null,
+      "fenceResult": "pass",
+      "distanceBucket": "0-50",
+      "riskReasons": [],
+      "offsiteDutyId": null,
+      "edited": false,
+      "note": null,
+      "reviewNote": null
+    }
+  ],
+  "lines": [
+    {
+      "code": "late",
+      "label": "Late by 40 minutes",
+      "formula": "10 min grace, 30 billable: 483.87 x 30 / 540",
+      "amountPaise": -2688
+    }
+  ],
+  "edits": [],
+  "canRegularise": true,
+  "openRegularisation": null
+}

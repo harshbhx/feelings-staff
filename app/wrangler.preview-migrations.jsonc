@@ -1,0 +1,13 @@
+// Used only to apply migrations to the shared preview database (preview.yml, docs/deploy.md).
+{
+  "name": "feelings-staff",
+  "compatibility_date": "2026-10-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fbc-staff-preview",
+      "database_id": "00000000-0000-0000-0000-000000000001",
+      "migrations_dir": "../migrations"
+    }
+  ]
+}

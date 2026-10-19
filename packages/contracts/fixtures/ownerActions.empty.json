@@ -1,0 +1,14 @@
+{
+  "items": [],
+  "counts": {
+    "flagged_punch": 0,
+    "pending_punch": 0,
+    "new_device": 0,
+    "leave_request": 0,
+    "regularisation": 0,
+    "overtime": 0,
+    "offsite_request": 0,
+    "auto_closed": 0,
+    "advance_request": 0
+  }
+}

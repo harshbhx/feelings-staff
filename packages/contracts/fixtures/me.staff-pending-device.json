@@ -1,0 +1,41 @@
+{
+  "user": {
+    "id": "01K8HVYPHBE17XDAAV85DMW1AY",
+    "name": "Bhumi Trivedi",
+    "role": "staff",
+    "status": "active",
+    "phone": "+919016932212",
+    "email": null,
+    "lang": "en",
+    "designation": "Trainee",
+    "joinDate": "2026-10-19"
+  },
+  "org": {
+    "id": "01K88WMW5DRXRGE3RMW4NF61X1",
+    "name": "Feelings Beauty Care",
+    "ownerDisplayName": "Urmi",
+    "contactPhone": "+918000661578",
+    "timezone": "Asia/Kolkata"
+  },
+  "device": {
+    "id": "01K89J4A6SDGAA16C2N35MA3F9",
+    "label": "Redmi Note 13",
+    "status": "pending",
+    "approvedAt": null
+  },
+  "permissions": [],
+  "flags": {
+    "selfieRequired": false,
+    "selfieOnCheckOut": false,
+    "strongMode": false,
+    "breakPunches": false,
+    "pinEveryPunch": true,
+    "showPayslips": true,
+    "consentsNeeded": [],
+    "ownerPinSet": false,
+    "ownerPasswordSet": false,
+    "setupIncomplete": false,
+    "stepUpUntil": null,
+    "storageTip": false
+  }
+}

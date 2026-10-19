@@ -1,0 +1,76 @@
+[
+  {
+    "id": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+    "name": "Full day",
+    "segments": [
+      {
+        "start": "10:00",
+        "end": "20:00"
+      }
+    ],
+    "breakMin": 60,
+    "scheduledMin": 540,
+    "active": true,
+    "sort": 0
+  },
+  {
+    "id": "01K85A07VKYHPCSZHMN2ZRJYZ9",
+    "name": "Sunday",
+    "segments": [
+      {
+        "start": "10:00",
+        "end": "13:00"
+      }
+    ],
+    "breakMin": 0,
+    "scheduledMin": 180,
+    "active": true,
+    "sort": 1
+  },
+  {
+    "id": "01K8ZAWHRSE2WHRC7620FKPZ9J",
+    "name": "Morning",
+    "segments": [
+      {
+        "start": "10:00",
+        "end": "15:00"
+      }
+    ],
+    "breakMin": 0,
+    "scheduledMin": 300,
+    "active": true,
+    "sort": 2
+  },
+  {
+    "id": "01K8DZDVX2BD5EKX11TQ30HA3B",
+    "name": "Evening",
+    "segments": [
+      {
+        "start": "15:00",
+        "end": "20:00"
+      }
+    ],
+    "breakMin": 0,
+    "scheduledMin": 300,
+    "active": true,
+    "sort": 3
+  },
+  {
+    "id": "01K8MMG99C3NBNXQHWM0H1KNKS",
+    "name": "Split",
+    "segments": [
+      {
+        "start": "10:00",
+        "end": "14:00"
+      },
+      {
+        "start": "17:00",
+        "end": "21:00"
+      }
+    ],
+    "breakMin": 0,
+    "scheduledMin": 480,
+    "active": true,
+    "sort": 4
+  }
+]

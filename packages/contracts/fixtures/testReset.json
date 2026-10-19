@@ -1,0 +1,38 @@
+{
+  "orgId": "01K88WMW5DRXRGE3RMW4NF61X1",
+  "owner": {
+    "email": "urmi@feelingsbeautycare.in",
+    "password": "fixture-password-only",
+    "pin": "135790"
+  },
+  "staff": [
+    {
+      "id": "01K86AFQDXWDHQ8238N67SVDDK",
+      "name": "Priya Solanki",
+      "phone": "+919825011201",
+      "pin": "2468",
+      "joinCode": null
+    },
+    {
+      "id": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+      "name": "Neha Parmar",
+      "phone": "+919909122302",
+      "pin": "2468",
+      "joinCode": null
+    },
+    {
+      "id": "01K8RC525PJGR1P8TRDT8GBJ6Q",
+      "name": "Kajal Vyas",
+      "phone": "+919724033403",
+      "pin": "2468",
+      "joinCode": null
+    },
+    {
+      "id": "01K8HVYPHBE17XDAAV85DMW1AY",
+      "name": "Bhumi Trivedi",
+      "phone": "+919016932212",
+      "pin": null,
+      "joinCode": "K7M-4QPXD"
+    }
+  ]
+}

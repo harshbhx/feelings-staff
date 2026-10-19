@@ -1,0 +1,6 @@
+{
+  "generic": "We couldn't complete that. Try again in a moment.",
+  "network": "We couldn't reach the server. Check your internet and try again.",
+  "details": "Details",
+  "requestId": "Request id {{id}}"
+}

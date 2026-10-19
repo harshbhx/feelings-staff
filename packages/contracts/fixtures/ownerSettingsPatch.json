@@ -1,0 +1,103 @@
+{
+  "org": {
+    "name": "Feelings Beauty Care",
+    "address": "Om Residency, Hirji Mistry Road, near J J Tower, Jamnagar, Gujarat 361006",
+    "phone": "+918000661578",
+    "ownerDisplayName": "Urmi",
+    "logo": "bindi"
+  },
+  "settings": {
+    "attendance": {
+      "graceMin": 10,
+      "earlyToleranceMin": 15,
+      "makeupEnabled": true,
+      "presentPct": 75,
+      "halfPct": 40,
+      "breakAfterMin": 300,
+      "breakPunches": false,
+      "pinEveryPunch": true,
+      "selfieOnCheckIn": false,
+      "selfieOnCheckOut": false,
+      "strongMode": false,
+      "earliestCheckInMin": 60,
+      "closingTime": "20:00",
+      "regularisationWindowDays": 7
+    },
+    "risk": {
+      "flagAt": 30,
+      "proofAt": 60
+    },
+    "overtime": {
+      "thresholdMin": 30,
+      "blockMin": 15,
+      "rate": {
+        "mode": "multiplier",
+        "multiplier": 2
+      },
+      "weeklyHoursWarn": 48,
+      "quarterlyOtWarnHours": 144
+    },
+    "pay": {
+      "divisor": "calendar",
+      "weekOffWorked": "comp_off",
+      "offdayMultiplier": 2,
+      "sandwich": false,
+      "payDay": 5,
+      "minimumWage": {
+        "enabled": true,
+        "amountPaise": 1332500,
+        "basis": "monthly"
+      },
+      "dailyPaidHolidays": true,
+      "dailyPaidWeekOffs": false,
+      "showPayslipsToStaff": true,
+      "fines": {
+        "enabled": false,
+        "latesPerHalfDay": 3,
+        "noticeText": ""
+      }
+    },
+    "leave": {
+      "clPerYear": 7,
+      "slPerYear": 7,
+      "usableAfterDays": 90,
+      "clNoticeDays": 2,
+      "slBackdateDays": 3,
+      "compOffExpiryDays": 60,
+      "earnedLeave": false
+    },
+    "notifications": {
+      "quietHours": {
+        "enabled": true,
+        "start": "21:30",
+        "end": "08:00"
+      },
+      "summaryOnly": false,
+      "morningSummaryOffsetMin": 45,
+      "whatsappFallback": false
+    },
+    "privacy": {
+      "noticeVersion": "2026-10-19",
+      "grievanceName": "Urmi Mengar",
+      "grievancePhone": "+918000661578",
+      "locationRetentionDays": 90,
+      "selfieRetentionDays": 30
+    },
+    "app": {
+      "defaultStaffLang": "en"
+    },
+    "setup": {
+      "salon": "done",
+      "location": "done",
+      "shifts": "done",
+      "holidays": "done",
+      "pay_rules": "done",
+      "selfie": "skipped",
+      "first_staff": "done",
+      "install": "done"
+    }
+  },
+  "settingsVersion": 7,
+  "minAppVersion": "1.0.0",
+  "updatedAt": 1792062600000
+}

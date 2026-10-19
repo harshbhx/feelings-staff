@@ -1,0 +1,50 @@
+{
+  "items": [
+    {
+      "id": "01K8MR8VZ9YJBEJG59M7B6G381",
+      "type": "holiday_announced",
+      "title": "Salon closed on Tuesday",
+      "body": "Dussehra: the salon is closed on Tuesday 20 Oct. Enjoy the day with your family.",
+      "url": "/today",
+      "priority": "normal",
+      "data": null,
+      "readAt": null,
+      "createdAt": 1792328400000
+    },
+    {
+      "id": "01K8QVZFAHN7APGGN7BHHCQXJS",
+      "type": "regularisation_decided",
+      "title": "Time fix approved",
+      "body": "Urmi approved your request for 12 Oct.",
+      "url": "/day/2026-10-12",
+      "priority": "normal",
+      "data": null,
+      "readAt": 1791867900000,
+      "createdAt": 1791866700000
+    },
+    {
+      "id": "01K8MS49GH4MQV056C06PQAHCV",
+      "type": "advance_recorded",
+      "title": "Advance noted",
+      "body": "Urmi noted a ₹3,000 advance on 3 Oct. It comes out of your October pay.",
+      "url": "/advances",
+      "priority": "normal",
+      "data": null,
+      "readAt": 1791014520000,
+      "createdAt": 1791013320000
+    },
+    {
+      "id": "01K8KGJN2CNFA0BYQ8P0GTNEMS",
+      "type": "leave_decided",
+      "title": "Leave approved",
+      "body": "Urmi approved your casual leave on 14 Sep.",
+      "url": "/leave",
+      "priority": "normal",
+      "data": null,
+      "readAt": 1789020600000,
+      "createdAt": 1789019400000
+    }
+  ],
+  "nextCursor": null,
+  "unread": 1
+}

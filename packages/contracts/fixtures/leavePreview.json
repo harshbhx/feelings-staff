@@ -1,0 +1,12 @@
+{
+  "countedDays": 1,
+  "excluded": [
+    {
+      "date": "2026-11-03",
+      "reason": "week_off"
+    }
+  ],
+  "daysPaid": 1,
+  "daysUnpaid": 0,
+  "warnings": []
+}

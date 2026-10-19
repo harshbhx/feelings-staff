@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-19",
+  "serverTime": 1792386720000,
+  "schedule": {
+    "dayType": "work",
+    "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+    "templateName": "Full day",
+    "segments": [
+      {
+        "start": "10:00",
+        "end": "20:00"
+      }
+    ],
+    "breakMin": 60,
+    "scheduledMin": 540,
+    "startTs": 1792384200000,
+    "endTs": 1792420200000,
+    "holidayName": null,
+    "leave": null,
+    "nightHours": false
+  },
+  "state": "out",
+  "inSinceTs": null,
+  "punches": [
+    {
+      "id": "01K8K3XRWA6AA6YE5AQE7XZKJ7",
+      "kind": "in",
+      "effectiveTs": 1792384389000,
+      "serverTs": 1792384389000,
+      "workDate": "2026-10-19",
+      "source": "online",
+      "status": "pending",
+      "pendingReason": "needs_proof",
+      "siteName": "Feelings Beauty Care",
+      "placeName": null,
+      "fenceResult": "pass",
+      "distanceBucket": "0-50",
+      "riskReasons": ["zero_jitter", "new_device"],
+      "offsiteDutyId": null,
+      "edited": false,
+      "note": null,
+      "reviewNote": null
+    }
+  ],
+  "day": null,
+  "duty": null,
+  "earliestCheckInTs": 1792380600000,
+  "pendingCount": 1
+}

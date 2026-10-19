@@ -1,0 +1,134 @@
+{
+  "id": "01K86AFQDXWDHQ8238N67SVDDK",
+  "name": "Priya Solanki",
+  "phone": "+919825011201",
+  "designation": "Stylist",
+  "status": "active",
+  "deviceState": "approved",
+  "joinDate": "2025-03-10",
+  "exitDate": null,
+  "employeeCode": "FBC-003",
+  "lang": "en",
+  "salary": {
+    "type": "monthly",
+    "amountPaise": 1500000,
+    "effectiveFrom": "2026-04-01",
+    "createdAt": 1775014200000
+  },
+  "salaryHistory": [
+    {
+      "type": "monthly",
+      "amountPaise": 1400000,
+      "effectiveFrom": "2025-03-10",
+      "createdAt": 1741577400000
+    },
+    {
+      "type": "monthly",
+      "amountPaise": 1500000,
+      "effectiveFrom": "2026-04-01",
+      "createdAt": 1775014200000
+    }
+  ],
+  "defaultTemplateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+  "weekOffDow": 2,
+  "selfieRequired": null,
+  "strongMode": false,
+  "divisorOverride": null,
+  "otRateOverride": null,
+  "devices": [
+    {
+      "id": "01K8D7M7J8T2CCGWBT278DBM02",
+      "userId": "01K86AFQDXWDHQ8238N67SVDDK",
+      "label": "Samsung Galaxy A34",
+      "platform": "android",
+      "status": "approved",
+      "requestedAt": 1741582500000,
+      "approvedAt": 1741582860000,
+      "lastSeenAt": 1792386420000
+    }
+  ],
+  "leaveBalances": [
+    {
+      "code": "CL",
+      "name": "Casual leave",
+      "paid": true,
+      "balance": 5,
+      "pending": 1,
+      "nextExpiry": null,
+      "usableFrom": null
+    },
+    {
+      "code": "SL",
+      "name": "Sick leave",
+      "paid": true,
+      "balance": 6.5,
+      "pending": 0,
+      "nextExpiry": null,
+      "usableFrom": null
+    },
+    {
+      "code": "CO",
+      "name": "Comp-off",
+      "paid": true,
+      "balance": 1,
+      "pending": 0,
+      "nextExpiry": {
+        "days": 1,
+        "on": "2026-12-19"
+      },
+      "usableFrom": null
+    }
+  ],
+  "advanceBalancePaise": 300000,
+  "invite": null,
+  "today": {
+    "workDate": "2026-10-19",
+    "dayType": "work",
+    "status": "OPEN",
+    "leaveCode": null,
+    "templateName": "Full day",
+    "scheduledMin": 540,
+    "workedMin": 39,
+    "lateMin": 2,
+    "lateBillableMin": 0,
+    "earlyMin": 0,
+    "earlyBillableMin": 0,
+    "undertimeMin": 0,
+    "otPreapprovedMin": 0,
+    "otCandidateMin": 0,
+    "otApprovedMin": 0,
+    "otStatus": "none",
+    "offdayCredit": 0,
+    "tags": [],
+    "firstInTs": 1792384337000,
+    "lastOutTs": null,
+    "locked": false,
+    "holidayName": null
+  },
+  "monthTotals": {
+    "present": 13,
+    "half": 1,
+    "absent": 1,
+    "leave": 0,
+    "lop": 0,
+    "weekOff": 2,
+    "holiday": 1,
+    "workedMin": 6333,
+    "lateMin": 100,
+    "lateBillableMin": 52,
+    "earlyBillableMin": 0,
+    "otApprovedMin": 150,
+    "otPendingMin": 0
+  },
+  "consents": [
+    {
+      "kind": "privacy_notice",
+      "version": "2026-10-19",
+      "lang": "en",
+      "acceptedAt": 1741582200000,
+      "withdrawnAt": null
+    }
+  ],
+  "exitReason": null,
+  "minimumWageWarning": null
+}

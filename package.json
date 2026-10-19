@@ -1,0 +1,28 @@
+{
+  "name": "feelings-staff",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.7",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r --parallel --no-bail run typecheck",
+    "lint": "biome ci --error-on-warnings .",
+    "format": "biome check --write .",
+    "check:ui": "node scripts/check-ui.mjs",
+    "check:arch": "node scripts/check-arch.mjs",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "check": "pnpm run lint && pnpm run check:ui && pnpm run check:arch && pnpm run check:i18n",
+    "test": "pnpm -r run test",
+    "test:unit": "pnpm --no-bail --filter @fs/contracts --filter @fs/engine --filter @fs/i18n --filter @fs/ui --filter @fs/templates run test",
+    "test:api": "pnpm --filter @fs/app run test:api",
+    "build": "pnpm --filter @fs/app run build",
+    "size": "node scripts/size-budgets.mjs",
+    "e2e": "pnpm --filter @fs/e2e run test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "typescript": "5.9.3"
+  }
+}
