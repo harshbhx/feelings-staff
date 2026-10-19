@@ -8,7 +8,7 @@
 | **Built and run by** | Harsh Bhanushali (GitHub `harshbhx`) |
 | **URL** | https://staff.feelingsbeautycare.in |
 | **Repository** | `harshbhx/feelings-staff` (new, private) |
-| **Version** | 1.0, 19 Oct 2026 |
+| **Version** | 1.1, 19 Oct 2026 |
 | **Status** | Ready for build. Open questions for the owner are in §17, each with the default we build if nobody answers. |
 | **Inputs** | `research/brand-and-stack.md` (brand, stack, hosting, salon location) and `research/domain.md` (competitors, anti-spoofing, push, PWA, Indian payroll law, DPDP, costs) |
 
@@ -3117,3 +3117,4 @@ The two research files in `research/` carry the full citations (Code on Wages 20
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 19 Oct 2026 | First complete PRD for build |
+| 1.1 | 19 Oct 2026 | Build-time additions from WP-1: migration `0002_platform.sql` (`idempotency_keys`, `test_outbox`); extra endpoints (join lookup, leave preview, owner security, setup checklist, payroll preview, door device list, consents, bulk approve, staff photo, staff rehire, device revoke); `Fix.accuracySpreadM`; `upgrade-insecure-requests` dropped from the CSP (HSTS covers it, and WebKit applies it to localhost); i18n namespaces `auth`, `door` and `ui`; cap of 15 active staff (Harsh, 19 Oct); §17.3 Q16 answered (Workers Paid is active). Docs handbook added under `docs/` |
