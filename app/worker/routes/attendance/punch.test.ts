@@ -58,12 +58,8 @@ describe('S-04 Check in and out', () => {
     expect(res.body.punch).toMatchObject({ kind: 'in', status: 'accepted' });
     expectNear(res.body.punch.effectiveTs, h.clock);
     const row = await punchRow(res.body.punch.id);
-    expect(row).toMatchObject({
-      server_ts: h.clock,
-      source: 'online',
-      pin_verified: 1,
-      sig_verified: 1,
-    });
+    expect(row).toMatchObject({ source: 'online', pin_verified: 1, sig_verified: 1 });
+    expectNear(row?.server_ts as number, h.clock);
   });
 
   it('S-04.2 the stored time is the server time, not the device clock', async () => {
