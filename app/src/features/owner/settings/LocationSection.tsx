@@ -20,6 +20,7 @@ import {
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
+import type { z } from 'zod';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { ownerKeys } from '../api/keys';
 import { useOwnerMutation } from '../api/query';
@@ -164,7 +165,7 @@ export function Calibrate({ site }: { site: SiteView }) {
     );
   };
 
-  const p: CalibrationProposal | undefined = proposal.data;
+  const p: z.infer<typeof CalibrationProposal> | undefined = proposal.data;
   const differs =
     p?.enoughData &&
     (p.radiusM !== site.radiusM ||
@@ -295,7 +296,7 @@ function useDoorMutations() {
   };
 }
 
-function DeviceRow({ device: d }: { device: DoorDeviceView }) {
+function DeviceRow({ device: d }: { device: z.infer<typeof DoorDeviceView> }) {
   const { t } = useTranslation();
   const fb = useFeedback();
   const m = useDoorMutations();
