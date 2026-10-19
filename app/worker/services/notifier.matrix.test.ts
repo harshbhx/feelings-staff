@@ -1,5 +1,5 @@
 /**
- * PRD 6 notification matrix, one fake-clock test per row (N1-N31): recipient, channel, timing and
+ * PRD 6 notification matrix, one fake-clock test per row (N1-N37): recipient, channel, timing and
  * copy. Covers S-15.1 (every event writes an inbox row for the right recipient) and O-17.1.
  */
 
@@ -552,6 +552,16 @@ const rows: Row[] = [
     body: 'The legal deadline is the 7th.',
   },
   {
+    n: 37,
+    type: 'payslip_pdf_failed',
+    at: ist('12:00', '2026-11-02'),
+    event: () => ({ type: 'payslip_pdf_failed', runId: 'RUN1', month: '2026-10', failedCount: 1 }),
+    to: (w) => [w.owner],
+    push: true,
+    title: "1 payslip PDF couldn't be made",
+    body: 'The online slip works.',
+  },
+  {
     n: 27,
     type: 'schedule_changed',
     at: ist('14:00'),
@@ -673,6 +683,6 @@ describe('PRD 6 matrix: inbox rows, push, timing and copy', () => {
     expect([...covered].sort()).toEqual([...all].sort());
     // The contract's event union has one schema per type.
     const sample: NotifyEvent['type'][] = all as NotifyEvent['type'][];
-    expect(sample).toHaveLength(31);
+    expect(sample).toHaveLength(32);
   });
 });

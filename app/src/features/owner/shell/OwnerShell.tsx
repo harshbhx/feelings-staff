@@ -11,13 +11,12 @@ import { type CSSProperties, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { useMe } from '../../../api/hooks';
+import { StepUpProvider } from '../../auth/step-up';
 import { InboxBell } from '../../inbox';
 import { openActionCount } from '../actions/actions-model';
 import { useActions } from '../api/attendance';
 import { ownerKeys } from '../api/keys';
 import { clock } from '../lib/format';
-import { StepUpProvider } from '../lib/step-up';
-import { StepUpSheet } from '../lib/step-up-sheet';
 import { ChromeProvider, useScreenChrome } from './chrome';
 import {
   iosBannerSeen,
@@ -40,7 +39,7 @@ export function OwnerShell() {
   useAppBadge(count);
   return (
     <ToastProvider bottomOffset="var(--owner-toast-offset)">
-      <StepUpProvider renderSheet={(p) => <StepUpSheet {...p} />}>
+      <StepUpProvider>
         <ChromeProvider>
           <div
             style={SHELL_VARS}
@@ -187,11 +186,6 @@ function Tabs({ count }: { count: number }) {
             label={t(item.labelKey)}
             current={active === item.key}
             badge={item.key === 'actions' && count > 0 ? count : undefined}
-            aria-label={
-              item.key === 'actions' && count > 0
-                ? `${t(item.labelKey)}, ${t('owner:nav.openItems', { count })}`
-                : undefined
-            }
           >
             <Link to={item.to} />
           </TabBarItem>

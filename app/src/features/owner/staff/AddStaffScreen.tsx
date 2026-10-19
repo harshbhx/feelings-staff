@@ -8,12 +8,12 @@ import { Banner, Button, ChipGroup, Field, Input, Skeleton, SkeletonGroup, useTo
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
+import { isStepUpCancelled } from '../../auth/step-up';
 import { useShiftTemplates } from '../api/schedule';
 import { useSettings } from '../api/settings';
 import { useCreateStaff, useRehire } from '../api/staff';
 import { ErrorCard } from '../components/states';
 import { money, shortDate } from '../lib/format';
-import { isStepUpCancelled } from '../lib/step-up';
 import { InviteSheet } from './InviteSheet';
 import {
   belowMinimumWage,

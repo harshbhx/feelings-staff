@@ -16,6 +16,7 @@ import type { Env } from '../env';
 import { hashPassword, hashPin, PASSWORD_ITERATIONS, randomToken } from '../lib/crypto';
 import { ulid } from '../lib/ulid';
 import { seedDemo } from './demo';
+import { seedPayrollOctober } from './payroll-october';
 
 export const TEST_OWNER = {
   email: 'owner@feelings.test',
@@ -253,6 +254,9 @@ export async function seedScenario(
     const demo = await seedDemo(s, base);
     return { orgId: base.orgId, owner, staff: demo.staff };
   }
-  // payroll-october adds the October fixture month on top (integration seed, phase C).
+  if (scenario === 'payroll-october') {
+    // October 2026 punches, blockers and an October draft run (see seed/payroll-october.ts).
+    return { orgId: base.orgId, owner, staff: await seedPayrollOctober(s, base) };
+  }
   return { orgId: base.orgId, owner, staff: [] };
 }

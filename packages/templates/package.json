@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@fs/contracts": "workspace:*",
-    "@fs/i18n": "workspace:*"
+    "@fs/i18n": "workspace:*",
+    "uqr": "0.1.3"
   },
   "peerDependencies": {
     "react": "^19",

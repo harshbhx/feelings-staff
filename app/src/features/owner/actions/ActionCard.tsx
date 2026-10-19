@@ -7,13 +7,13 @@ import { Avatar, Button, Field, Icon, Input, Sheet, StatusChip, Textarea, useToa
 import type { TFunction } from 'i18next';
 import { type ReactNode, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { isStepUpCancelled } from '../../auth/step-up';
 import { type Decision, useDecide } from '../api/attendance';
 import { useStaffList } from '../api/staff';
 import { MapToggle, PunchFacts, RiskReasons, SelfieCompare } from '../components/PunchEvidence';
 import { useErrorText } from '../components/states';
 import { ago, clock, dayLabel, duration, money, shortDate } from '../lib/format';
 import { leaveKey } from '../lib/status';
-import { isStepUpCancelled } from '../lib/step-up';
 import { clampOvertime, waitingDays } from './actions-model';
 
 const firstName = (name: string) => name.split(' ')[0] ?? name;
@@ -187,7 +187,7 @@ function Body({ item }: { item: ActionItem }) {
             </p>
           ) : null}
           <p className="flex items-center gap-2 text-sm text-text-muted">
-            <Icon name="lock" />
+            <Icon name="lock" className="size-5 shrink-0" />
             {t('owner:actions.device.approveHint')}
           </p>
         </>
@@ -213,7 +213,7 @@ function Body({ item }: { item: ActionItem }) {
           </p>
           {r.blackoutHit ? (
             <p className="flex items-start gap-2 text-sm text-late">
-              <Icon name="warning-circle" className="mt-0.5 shrink-0" />
+              <Icon name="warning-circle" className="mt-0.5 size-5 shrink-0" />
               {t('owner:actions.leave.blackout')}
             </p>
           ) : null}
@@ -649,7 +649,7 @@ export function Stepper({
         disabled={value <= min}
         onClick={() => onChange(Math.max(min, value - step))}
       >
-        <Icon name="minus" />
+        <Icon name="minus" className="size-5" />
       </button>
       <output className="min-w-16 text-center font-bold text-text tabular-nums" aria-live="polite">
         {format(value)}
@@ -661,7 +661,7 @@ export function Stepper({
         disabled={value >= max}
         onClick={() => onChange(Math.min(max, value + step))}
       >
-        <Icon name="plus" />
+        <Icon name="plus" className="size-5" />
       </button>
     </span>
   );

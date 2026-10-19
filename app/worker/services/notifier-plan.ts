@@ -120,6 +120,7 @@ export const EVENT_META: Record<NotifyEventType, EventMeta> = {
   payroll_draft_ready: OWNER('payroll'),
   payslip_ready: STAFF(),
   salary_unpaid: OWNER('payroll'),
+  payslip_pdf_failed: OWNER(null),
   schedule_changed: STAFF(),
   holiday_announced: STAFF(),
   needs_action_reminder: OWNER(null, false),
@@ -225,6 +226,7 @@ export function planFor(e: NotifyEvent): Plan {
     case 'advance_requested':
     case 'payroll_draft_ready':
     case 'salary_unpaid':
+    case 'payslip_pdf_failed':
     case 'needs_action_reminder':
       return p({});
   }
@@ -542,6 +544,13 @@ export function render(e: NotifyEvent, rc: RenderCtx): Rendered {
           month: monthName(e.month, lang),
         }),
         body: t('n.salary_unpaid.body'),
+        url: `/o/payroll/${e.runId}`,
+        data: { runId: e.runId, month: e.month },
+      };
+    case 'payslip_pdf_failed':
+      return {
+        title: t('n.payslip_pdf_failed.title', { count: e.failedCount }),
+        body: t('n.payslip_pdf_failed.body'),
         url: `/o/payroll/${e.runId}`,
         data: { runId: e.runId, month: e.month },
       };

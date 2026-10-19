@@ -48,7 +48,7 @@ export function RegisterScreen() {
   };
 
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
       <div className="flex items-center gap-2">
         <IconButton
           icon="caret-left"
@@ -112,8 +112,10 @@ function CellMark({ c, size = 'grid' }: { c: CellModel; size?: 'grid' | 'strip' 
     <span
       className={`grid place-items-center rounded-sm ${TINT[chip]} ${size === 'grid' ? 'h-11 w-9 content-center gap-0.5' : 'h-12 w-full content-center gap-0.5'}`}
     >
-      <Icon name={icon} className={c.late && chip === 'present' ? 'text-late' : ''} />
-      <span className="font-bold text-xs leading-none">{c.meta.letter}</span>
+      <Icon name={icon} className={`size-3.5 ${c.late && chip === 'present' ? 'text-late' : ''}`} />
+      <span className="font-bold text-xs leading-none" aria-hidden="true">
+        {c.meta.letter}
+      </span>
     </span>
   );
 }
@@ -161,7 +163,7 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
   };
 
   return (
-    <div className="max-h-[calc(100dvh-14rem)] overflow-auto rounded-md border border-border">
+    <div className="relative max-h-[calc(100dvh-14rem)] overflow-auto rounded-md border border-border">
       <table className="border-separate border-spacing-0 text-sm">
         <caption className="sr-only">
           {t('owner:register.caption', { month: monthLabel(view.month) })}
@@ -235,11 +237,11 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
                         tabIndex={active ? 0 : -1}
                         onFocus={() => setFocus([r, c])}
                         onKeyDown={(e) => move(e, r, c)}
-                        aria-label={label}
                         title={label}
                         className="relative inline-block rounded-sm"
                       >
                         <CellMark c={m} />
+                        <span className="sr-only">{label}</span>
                         {m.flagged || m.pending || m.edited ? (
                           <span
                             aria-hidden="true"
@@ -294,10 +296,10 @@ function Strip({
               {d.meta ? (
                 <Link
                   to={`/o/register/${row.user.id}/${d.date}`}
-                  aria-label={cellText(name, d)}
                   className="relative block rounded-sm"
                 >
                   <CellMark c={d} size="strip" />
+                  <span className="sr-only">{cellText(name, d)}</span>
                   {d.flagged || d.pending || d.edited ? (
                     <span
                       aria-hidden="true"
@@ -322,9 +324,10 @@ function Strip({
 
 function totalsLine(row: RegisterRow, t: TFunction) {
   return TOTAL_COLUMNS.filter((c) => totalValue(row, c) > 0)
-    .map(
-      (c) =>
-        `${t(`owner:register.totals.${c}`)} ${c === 'otHours' ? totalValue(row, c).toFixed(1) : days(totalValue(row, c))}`,
+    .map((c) =>
+      t(`owner:register.line.${c}`, {
+        n: c === 'otHours' ? totalValue(row, c).toFixed(1) : days(totalValue(row, c)),
+      }),
     )
     .join(' · ');
 }
@@ -371,13 +374,13 @@ function PhoneList({ view, today }: { view: RegisterView; today: string }) {
                 type="button"
                 onClick={() => openPerson(row.user.id)}
                 className="flex min-h-11 items-center justify-between gap-3 text-left"
-                aria-label={t('owner:register.openMonth', { name: row.user.name })}
               >
                 <span className="grid">
                   <span className="font-bold text-text">{row.user.name}</span>
                   <span className="text-sm text-text-muted tabular-nums">{totalsLine(row, t)}</span>
                 </span>
-                <Icon name="caret-right" className="text-text-muted" />
+                <span className="sr-only">{t('owner:register.openMonth')}</span>
+                <Icon name="caret-right" className="size-5 shrink-0 text-text-muted" />
               </button>
               {strip ? <Strip row={row} strip={strip} name={row.user.name} /> : null}
             </li>
@@ -442,7 +445,10 @@ function Legend() {
               className={`inline-grid h-7 min-w-9 grid-flow-col place-items-center gap-0.5 rounded-sm px-1 ${TINT[l.chip === 'late' ? 'present' : l.chip]}`}
               aria-hidden="true"
             >
-              <Icon name={CHIP_ICON[l.chip]} className={l.chip === 'late' ? 'text-late' : ''} />
+              <Icon
+                name={CHIP_ICON[l.chip]}
+                className={`size-4 ${l.chip === 'late' ? 'text-late' : ''}`}
+              />
               <span className="font-bold text-xs">{l.letter}</span>
             </span>
             {t(l.key)}
