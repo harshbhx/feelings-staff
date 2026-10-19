@@ -98,7 +98,8 @@ export function useImBack() {
         });
       },
       onError: (err) => {
-        key.current = null;
+        // No answer (offline, dropped reply): keep the key so a retry cannot repeat the action.
+        if (!isApiError(err, 'UNAVAILABLE')) key.current = null;
         toast({
           tone: 'error',
           title: isApiError(err, 'UNAVAILABLE')

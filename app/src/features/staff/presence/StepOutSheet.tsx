@@ -60,7 +60,8 @@ export function StepOutSheet({
             {
               onSuccess: close,
               onError: (err) => {
-                key.current = null;
+                // No answer (offline, dropped reply): keep the key so a retry cannot repeat it.
+                if (!isApiError(err, 'UNAVAILABLE')) key.current = null;
                 toast({
                   tone: 'error',
                   title: isApiError(err, 'UNAVAILABLE')
