@@ -24,6 +24,7 @@ import {
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
+import { useMe } from '../../../api/hooks';
 import { isStepUpCancelled } from '../../auth/step-up';
 import {
   useAddAdjustment,
@@ -75,7 +76,12 @@ function Review({ slip, runId }: { slip: OwnerPayslipView; runId: string }) {
   const draft = slip.status === 'draft';
   const statusChip =
     slip.status === 'draft' ? 'waiting' : slip.status === 'final' ? 'present' : 'off';
-  const creditsLine = slip.result.lines.find((l) => l.code === 'time_credits');
+  // Time credits are owner only (PRD 7.17.9): a manager with payroll never sees the line or its link.
+  const me = useMe();
+  const creditsLine =
+    me.data?.user.role === 'owner'
+      ? slip.result.lines.find((l) => l.code === 'time_credits')
+      : undefined;
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] xl:items-start xl:gap-12">
