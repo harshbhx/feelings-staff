@@ -75,8 +75,18 @@ const STAFF_PIN = '4826';
 const STAFF_PHONE = '9824099123';
 
 /** Today's date in IST at `hh:mm` IST, as epoch ms. */
+/** Seeded holidays (app/worker/seed): a check-in on one of them asks "Check in anyway?". */
+const SEEDED_HOLIDAYS = new Set(['2026-10-20', '2026-11-08']);
+
+/** Today at hh:mm IST, moved forward past seeded holidays and Sundays (the day shift is Mon-Sat). */
 function todayAtIst(hhmm: string): number {
-  const date = new Date(Date.now() + 5.5 * 3_600_000).toISOString().slice(0, 10);
+  let at = Date.now() + 5.5 * 3_600_000;
+  for (let i = 0; i < 7; i += 1) {
+    const day = new Date(at);
+    if (!SEEDED_HOLIDAYS.has(day.toISOString().slice(0, 10)) && day.getUTCDay() !== 0) break;
+    at += 24 * 3_600_000;
+  }
+  const date = new Date(at).toISOString().slice(0, 10);
   return Date.parse(`${date}T${hhmm}:00+05:30`);
 }
 
