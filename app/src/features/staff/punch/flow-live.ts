@@ -134,7 +134,7 @@ function resultView(live: LiveState, r: PunchFlowResult, c: ViewContext): PunchF
     case 'failed':
       if (r.reason === 'offline_unavailable') return problem({ code: 'offline_unavailable' });
       if (r.reason === 'device_key') return problem({ code: 'device_revoked' });
-      return problem({ code: 'unknown', requestId: null });
+      return problem({ code: 'unknown', requestId: null, reason: r.reason });
   }
 }
 

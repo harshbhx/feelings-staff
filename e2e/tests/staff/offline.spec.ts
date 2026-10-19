@@ -196,6 +196,39 @@ function offlineReady(page: Page): Promise<boolean> {
   });
 }
 
+/** What the offline store holds, for a failure message (no secrets: counts and key shape only). */
+function storeSummary(page: Page): Promise<string> {
+  return page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const req = indexedDB.open('feelings');
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    const all = (store: string) =>
+      new Promise<unknown[]>((resolve, reject) => {
+        const req = db.transaction(store).objectStore(store).getAll();
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    const [prefs, nonces, anchors, queued] = await Promise.all([
+      all('prefs'),
+      all('offlineNonces'),
+      all('timeAnchor'),
+      all('pendingPunches'),
+    ]);
+    db.close();
+    const shape = (v: unknown) =>
+      v && typeof v === 'object' ? Object.keys(v as object).join(',') : typeof v;
+    return JSON.stringify({
+      online: navigator.onLine,
+      prefs: prefs.map(shape),
+      nonces: nonces.map(shape),
+      anchors: anchors.map(shape),
+      queued: queued.length,
+    });
+  });
+}
+
 /** Everything in `pendingPunches`, as text, to look for a plaintext PIN. */
 function queuedText(page: Page): Promise<string> {
   return page.evaluate(async () => {
@@ -305,7 +338,13 @@ test.describe('offline', () => {
     await sheet.getByRole('button', { name: 'Check in', exact: true }).click();
 
     // S-09.1 stored on the phone and shown as waiting.
-    await expect(sheet.getByText('Saved on your phone')).toBeVisible({ timeout: 20_000 });
+    const saved = sheet.getByText('Saved on your phone');
+    const problem = sheet.locator('[data-punch-step="problem"]');
+    await expect(saved.or(problem)).toBeVisible({ timeout: 20_000 });
+    if (await problem.isVisible()) {
+      const why = await problem.getAttribute('data-punch-reason');
+      throw new Error(`offline check-in failed: ${why}; store: ${await storeSummary(page)}`);
+    }
     await sheet.getByRole('button', { name: 'Done' }).click();
     await expect(page.getByText('1 check-in waiting to send')).toBeVisible();
     // S-09.4 no plaintext PIN in IndexedDB.

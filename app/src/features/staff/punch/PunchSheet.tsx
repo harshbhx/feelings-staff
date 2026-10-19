@@ -192,6 +192,11 @@ export function PunchSheet({
         <div
           className="flex flex-col gap-4"
           data-punch-step={local.view === 'flow' ? state.step : local.view}
+          data-punch-reason={
+            state.step === 'problem' && state.problem.code === 'unknown'
+              ? (state.problem.reason ?? undefined)
+              : undefined
+          }
         >
           {local.view === 'confirm' ? (
             <ConfirmView a={args} reason={local.reason} />
@@ -599,7 +604,7 @@ function Success({
       />
       <p className="staff-bignum flex items-end gap-1.5" aria-hidden="true">
         {time}
-        <Bindi size="success" land={!frozen} className="mb-[0.22em]" />
+        <Bindi size="success" land={!frozen} className="mb-1" />
       </p>
       <p className="text-lg font-bold text-text" role="status">
         {headline}

@@ -42,7 +42,8 @@ export type PunchProblem =
   | { code: 'conflict'; checkedIn: boolean }
   /** Offline, and this phone has no offline nonce or signed time yet (PRD 4.3.6). */
   | { code: 'offline_unavailable' }
-  | { code: 'unknown'; requestId: string | null };
+  /** `reason`: WP-4's failure reason, kept for support (rendered as `data-punch-reason`). */
+  | { code: 'unknown'; requestId: string | null; reason?: string | null };
 
 export type PunchFlowState =
   | { step: 'idle' }
