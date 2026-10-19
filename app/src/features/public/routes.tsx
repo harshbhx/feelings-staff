@@ -1,7 +1,9 @@
-/** Public pages: payslip verify (PRD 4.14). Owner: WP-6. */
+/** Public pages: payslip verify (PRD 4.14, `/v/:token`). Owner: WP-6. Lazy, outside every shell. */
 import type { RouteObject } from 'react-router';
-import { Placeholder } from '../../app/placeholder';
 
 export const publicRoutes: RouteObject[] = [
-  { path: '/v/:token', element: <Placeholder titleKey="owner:screens.verify" /> },
+  {
+    path: '/v/:token',
+    lazy: () => import('./VerifyScreen').then((m) => ({ Component: m.VerifyScreen })),
+  },
 ];
