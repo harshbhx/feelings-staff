@@ -1,0 +1,90 @@
+/* Card (PRD 12.5, WP-10): white, hairline, 12 px corners, no shadow. Lists inside stay hairline rows. */
+@layer components {
+  .fs-card {
+    display: grid;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+  }
+
+  .fs-card[data-tone="soft"] {
+    border-color: var(--border-strong);
+    background: var(--bg-soft);
+  }
+
+  .fs-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--card-pad) var(--card-pad) 0;
+  }
+
+  .fs-card__titles {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .fs-card__title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-strong);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: var(--text);
+  }
+
+  .fs-card__desc {
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .fs-card__action {
+    flex: none;
+    margin-block: -0.375rem;
+  }
+
+  .fs-card__body {
+    min-width: 0;
+    padding: var(--card-pad);
+  }
+
+  .fs-card__header + .fs-card__body {
+    padding-top: var(--space-3);
+  }
+
+  .fs-card[data-flush] > .fs-card__body {
+    padding: 0;
+  }
+
+  .fs-card[data-flush] > .fs-card__header + .fs-card__body {
+    padding-top: var(--space-2);
+  }
+
+  /* Rows in a flush card line up with the card's padding; the hover tint stays inside the card. */
+  .fs-card[data-flush] .fs-row {
+    padding-inline: var(--card-pad);
+  }
+
+  .fs-card[data-flush] .fs-row[data-interactive]:hover {
+    box-shadow: none;
+  }
+
+  .fs-card[data-flush] .fs-list__item:last-child .fs-row[data-interactive] {
+    border-radius: 0 0 calc(var(--radius-md) - 1px) calc(var(--radius-md) - 1px);
+  }
+
+  .fs-card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--card-pad);
+    border-top: 1px solid var(--border);
+    font-size: var(--text-sm);
+    color: var(--text-body);
+  }
+}
