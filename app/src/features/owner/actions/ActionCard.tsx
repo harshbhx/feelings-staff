@@ -4,6 +4,7 @@
  */
 import type { ActionItem, OwnerPunchView } from '@fs/contracts';
 import { Avatar, Button, Field, Icon, Input, Sheet, StatusChip, Textarea, useToast } from '@fs/ui';
+import type { TFunction } from 'i18next';
 import { type ReactNode, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type Decision, useDecide } from '../api/attendance';
@@ -90,7 +91,7 @@ export function ActionCard({
   );
 }
 
-type T = (k: string, o?: Record<string, unknown>) => string;
+type T = TFunction;
 
 function punchKind(p: OwnerPunchView, t: T) {
   return t(`owner:punch.noun.${p.kind}`);

@@ -4,6 +4,7 @@
  */
 import { formatDuration, formatRupees, istDate, istTime } from '@fs/contracts';
 import { formatDate, formatMonth } from '@fs/i18n';
+import type { TFunction } from 'i18next';
 
 /** `10:02` in IST, whatever the device's time zone. */
 export const clock = (ts: number): string => istTime(ts);
@@ -46,11 +47,7 @@ export function days(n: number): string {
 }
 
 /** "Just now", "2 min ago", "3 h ago", or the date for older events. */
-export function ago(
-  ts: number,
-  now: number,
-  t: (k: string, o?: Record<string, unknown>) => string,
-) {
+export function ago(ts: number, now: number, t: TFunction) {
   const min = Math.max(0, Math.floor((now - ts) / 60_000));
   if (min < 1) return t('owner:time.justNow');
   if (min < 60) return t('owner:time.minAgo', { count: min });

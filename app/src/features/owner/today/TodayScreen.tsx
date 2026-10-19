@@ -15,6 +15,7 @@ import {
   SkeletonGroup,
   StatusChip,
 } from '@fs/ui';
+import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -215,7 +216,7 @@ function Board({ board }: { board: TodayBoard }) {
   );
 }
 
-function placeTag(row: BoardInRow, t: (k: string) => string) {
+function placeTag(row: BoardInRow, t: TFunction) {
   switch (row.place) {
     case 'venue':
       return <StatusChip status="venue" label={row.placeName ?? t('owner:place.venue')} />;

@@ -6,6 +6,7 @@
 import type { RegisterView } from '@fs/contracts';
 import { istDate, weekday } from '@fs/contracts';
 import { Banner, Button, ChipGroup, Icon, IconButton, Skeleton, SkeletonGroup } from '@fs/ui';
+import type { TFunction } from 'i18next';
 import { type KeyboardEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
@@ -319,7 +320,7 @@ function Strip({
   );
 }
 
-function totalsLine(row: RegisterRow, t: (k: string, o?: Record<string, unknown>) => string) {
+function totalsLine(row: RegisterRow, t: TFunction) {
   return TOTAL_COLUMNS.filter((c) => totalValue(row, c) > 0)
     .map(
       (c) =>
