@@ -63,6 +63,12 @@ const SCREENS: Screen[] = [
     endpoint: 'ownerStaffGet',
     ready: (page) => page.locator('#owner-main').getByRole('tablist'),
   },
+  {
+    name: 'roster',
+    path: '/o/roster?week=2026-W43',
+    endpoint: 'ownerRosterGet',
+    ready: (page) => shown(page, 'Priya Solanki'),
+  },
 ];
 
 /**
@@ -76,7 +82,7 @@ async function openOwner(page: Page, path: string, variants: string[] = [], sett
     route.abort(),
   );
   const variant = ['me:owner', ...variants].join(',');
-  await page.goto(`${path}?mock=1&variant=${variant}`);
+  await page.goto(`${path}${path.includes('?') ? '&' : '?'}mock=1&variant=${variant}`);
   // The shell and its landmarks must be there: a crash page can never become a baseline.
   await expect(page.getByRole('main')).toBeVisible();
   await expect(page.getByTestId('owner-title')).toBeVisible();
@@ -149,5 +155,82 @@ test.describe('owner visual', () => {
     await noCrash(page);
     await expect(page).toHaveScreenshot('owner-actions-empty.png');
     await checkA11y();
+  });
+
+  test('OWN-V duty: off-site duty form, axe clean', async ({ page, checkA11y }) => {
+    await openOwner(page, '/o/duties/new?date=2026-10-24');
+    await expect(page.getByRole('button', { name: 'Save duty' })).toBeVisible();
+    await expect(shown(page, 'Kajal')).toBeVisible();
+    await noCrash(page);
+    await expect(page).toHaveScreenshot('owner-duty.png', { fullPage: true });
+    await checkA11y();
+  });
+
+  test('OWN-V door: the phone shows the door code with its countdown', async ({
+    page,
+    checkA11y,
+  }) => {
+    await openOwner(page, '/o/door-code');
+    await expect(page.getByTestId('door-qr')).toBeVisible();
+    await expect(page.getByTestId('door-countdown')).toHaveText('New code in 30 s');
+    await noCrash(page);
+    await expect(page).toHaveScreenshot('owner-door.png');
+    await checkA11y();
+  });
+
+  test('OWN-V door: offline says the code needs the internet', async ({ page, context }) => {
+    await openOwner(page, '/o/door-code');
+    await expect(page.getByTestId('door-qr')).toBeVisible();
+    await context.setOffline(true);
+    await expect(page.getByText('The door code needs the internet on this phone.')).toBeVisible();
+    await noCrash(page);
+    await expect(page).toHaveScreenshot('owner-door-offline.png');
+  });
+
+  test('OWN-V more: grouped list with one-line hints, axe clean', async ({ page, checkA11y }) => {
+    await openOwner(page, '/o/more');
+    await expect(shown(page, 'Month-end salaries and payslips')).toBeVisible();
+    await noCrash(page);
+    await expect(page).toHaveScreenshot('owner-more.png', { fullPage: true });
+    await checkA11y();
+  });
+});
+
+/** The public payslip check (`/v/:token`): outside every shell, no sign-in. */
+async function openVerify(page: Page, token: string, variants: string[] = []) {
+  await page.clock.setFixedTime(VISUAL_NOW);
+  const variant = variants.length > 0 ? `&variant=${variants.join(',')}` : '';
+  await page.goto(`/v/${token}?mock=1${variant}`);
+  await expect(page.getByRole('heading', { level: 1, name: 'Payslip check' })).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+}
+
+test.describe('payslip verify page', () => {
+  test.beforeEach(({ page: _page }, info) => {
+    test.skip(!OWNER_PROJECTS.has(info.project.name), 'public page at 390 and 1280');
+  });
+
+  test('OWN-V verify: a valid payslip shows only the allowed fields (O-14.3)', async ({
+    page,
+    checkA11y,
+  }) => {
+    await openVerify(page, 'VFY01K8PRIYAOCT2026R1');
+    await expect(page.getByTestId('verify-result')).toBeVisible();
+    await expect(page.getByText('Priya S.')).toBeVisible();
+    await expect(page).toHaveScreenshot('owner-verify.png');
+    await checkA11y();
+  });
+
+  test('OWN-V verify: a malformed link is not valid', async ({ page, checkA11y }) => {
+    await openVerify(page, 'nope');
+    await expect(page.getByTestId('verify-invalid')).toBeVisible();
+    await expect(page).toHaveScreenshot('owner-verify-invalid.png');
+    await checkA11y();
+  });
+
+  test('OWN-V verify: loading keeps the layout', async ({ page }) => {
+    await openVerify(page, 'VFY01K8PRIYAOCT2026R1', ['verifyPayslip:loading']);
+    await expect(page.locator('.fs-skeleton').first()).toBeVisible();
+    await expect(page).toHaveScreenshot('owner-verify-loading.png');
   });
 });

@@ -93,7 +93,7 @@ Grouped as in PRD 8.2.
 | Table | What it is for |
 |---|---|
 | `push_subscriptions` | Web Push endpoints per device; deleted at once when the push service says 404 or 410. |
-| `notifications` | The inbox, and the source of truth for all channels: type (N1 to N31), copy, target URL, priority, topic, batch key, push status and open time. |
+| `notifications` | The inbox, and the source of truth for all channels: type (N1 to N37), copy, target URL, priority, topic, batch key, push status and open time. |
 | `notification_prefs` | Per-person, per-event channel switches. |
 | `consents` | Privacy notice, selfie, night work and fines notice, with the version, language, acceptance and withdrawal times. |
 | `audit_log` | Append-only record of changes, security events, data access and exports, with before and after JSON, actor, reason, IP HMAC and request id. |

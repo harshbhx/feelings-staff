@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "description": "Shared zod schemas, types, error codes, the endpoint table and the ApiClient interface (contracts-v1).",
   "exports": {
     ".": "./src/index.ts",

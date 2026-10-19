@@ -71,7 +71,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       `ENV=${env}`,
       'EMAIL_PROVIDER=outbox',
       'APP_ORIGIN=',
-      ...Object.entries(s).map(([k, v]) => `${k}=${JSON.stringify(v)}`),
+      // Single quotes: dotenv keeps the value literal. Double quotes would keep the `\"` escapes
+      // of the JSON values (PUNCH_ENC_PRIVATE_JWK, VAPID_PRIVATE_JWK), which then fail to parse.
+      ...Object.entries(s).map(([k, v]) => `${k}='${v}'`),
     ];
     writeFileSync(devVars, `${lines.join('\n')}\n`, { mode: 0o600 });
     console.info(`Wrote ${devVars} (${Object.keys(s).length} throwaway secrets).`);
