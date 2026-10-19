@@ -6,7 +6,7 @@
 import { applyDocumentLang } from '@fs/i18n/fonts';
 import { ToastProvider } from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { Suspense, useEffect, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router';
 import { useApi } from '../../../api/provider';
@@ -16,17 +16,28 @@ import { startPwa } from '../../../pwa/register';
 import { ensurePersisted } from '../../../pwa/storage';
 import { staffKeys, useStaffMe } from '../api';
 import { browserAllowed } from '../install/allow-browser';
-import { InstallGate } from '../install/InstallGate';
+// Catches `beforeinstallprompt` from the first moment, before the lazy gate chunk arrives.
+import '../install/prompt';
 import { currentInstallContext } from '../install/platform';
 import '../staff.css';
 import { ScreenFallback } from './ScreenFallback';
 import { StaffTabBar } from './StaffTabBar';
 import { UpdateToast, UpgradeOverlay } from './UpdatePrompts';
 
+/** Only a browser tab ever shows it (with the QR encoder for computers), so it is its own chunk. */
+const InstallGate = lazy(() =>
+  import('../install/InstallGate').then((m) => ({ default: m.InstallGate })),
+);
+
 export function StaffShell() {
   const context = useMemo(currentInstallContext, []);
   const allowed = context === 'standalone' || browserAllowed();
-  if (!allowed) return <InstallGate context={context} url={`${window.location.origin}/`} />;
+  if (!allowed)
+    return (
+      <Suspense fallback={null}>
+        <InstallGate context={context} url={`${window.location.origin}/`} />
+      </Suspense>
+    );
   return <StaffApp standalone={context === 'standalone'} />;
 }
 

@@ -4,29 +4,24 @@
  * Check in / Check out button in the bottom action bar.
  */
 import type { PunchView, TodayView } from '@fs/contracts';
-import { isApiError } from '@fs/contracts';
 import {
   Banner,
   Bindi,
   Button,
   type DayStatus,
-  Field,
   Icon,
   type IconName,
   List,
   ListRow,
-  Sheet,
   Skeleton,
   SkeletonGroup,
   StatusChip,
-  Textarea,
-  useToast,
 } from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
-import { mockChoice, useApi } from '../../../api/provider';
+import { mockChoice } from '../../../api/provider';
 import { useQueue } from '../../../pwa/queue';
 import { staffKeys, useOwnerName, useStaffMe, useToday } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
@@ -47,6 +42,9 @@ import {
 const PRELOAD_SHEET_MS = 1500;
 const loadPunchSheet = () => import('../punch/PunchSheet');
 const PunchSheetHost = lazy(() => loadPunchSheet().then((m) => ({ default: m.PunchSheetHost })));
+const SendNoteSheet = lazy(() =>
+  import('./SendNoteSheet').then((m) => ({ default: m.SendNoteSheet })),
+);
 
 export function TodayScreen() {
   const { t } = useTranslation();
@@ -410,12 +408,9 @@ function WaitingProof({ punch }: { punch: PunchView }) {
   const { t } = useTranslation();
   const owner = useOwnerName();
   const fmt = useFmt();
-  const api = useApi();
-  const qc = useQueryClient();
-  const toast = useToast();
   const [open, setOpen] = useState(false);
-  const [note, setNote] = useState('');
-  const [busy, setBusy] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  if (open && !mounted) setMounted(true);
   return (
     <div className="staff-card staff-card--soft flex flex-col gap-3">
       <p>{t('staff:today.waitingProof', { time: fmt.clock(punch.effectiveTs), owner })}</p>
@@ -424,49 +419,11 @@ function WaitingProof({ punch }: { punch: PunchView }) {
           {t('staff:today.sendToOwner', { owner })}
         </Button>
       </div>
-      <Sheet open={open} onOpenChange={setOpen} title={t('staff:punch.note.title', { owner })}>
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setBusy(true);
-            try {
-              await api.punchRequestApproval({
-                params: { id: punch.id },
-                body: { note: note.trim(), placeName: null },
-              });
-              setOpen(false);
-              toast({
-                title: t('staff:punch.sent.body', { owner, time: fmt.clock(punch.effectiveTs) }),
-              });
-              void qc.invalidateQueries({ queryKey: staffKeys.today });
-            } catch (err) {
-              toast({
-                tone: 'error',
-                title: isApiError(err, 'UNAVAILABLE') ? t('errors:network') : t('errors:generic'),
-              });
-            } finally {
-              setBusy(false);
-            }
-          }}
-        >
-          <Field
-            label={t('staff:punch.note.label', { owner })}
-            hint={t('staff:punch.note.hint')}
-            optional
-          >
-            <Textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              maxLength={300}
-              rows={3}
-            />
-          </Field>
-          <Button type="submit" block loading={busy}>
-            {t('staff:punch.note.send', { owner })}
-          </Button>
-        </form>
-      </Sheet>
+      {mounted ? (
+        <Suspense fallback={null}>
+          <SendNoteSheet punch={punch} open={open} onOpenChange={setOpen} />
+        </Suspense>
+      ) : null}
     </div>
   );
 }

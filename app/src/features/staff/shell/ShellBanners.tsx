@@ -3,12 +3,14 @@
  * on screen, check-ins waiting to send, and a failed queue item ("Tap to see why").
  */
 import { Banner, Button } from '@fs/ui';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOfflineState } from '../../../pwa/offline';
 import { useQueue } from '../../../pwa/queue';
 import { useFmt } from '../lib/format';
-import { QueueSheet } from './QueueSheet';
+
+/** Opened from a banner only, so it is its own chunk. */
+const QueueSheet = lazy(() => import('./QueueSheet').then((m) => ({ default: m.QueueSheet })));
 
 export function ShellBanners({ dataAt }: { dataAt?: number | undefined }) {
   const { t } = useTranslation();
@@ -16,6 +18,8 @@ export function ShellBanners({ dataAt }: { dataAt?: number | undefined }) {
   const offline = useOfflineState();
   const queue = useQueue();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  if (open && !mounted) setMounted(true);
 
   const showOffline = !offline.online || offline.cachedAt !== null;
   const shownAt = offline.cachedAt ?? dataAt ?? null;
@@ -52,7 +56,11 @@ export function ShellBanners({ dataAt }: { dataAt?: number | undefined }) {
           {t('staff:shell.queued', { count: queue.waiting })}
         </Banner>
       ) : null}
-      <QueueSheet open={open} onOpenChange={setOpen} />
+      {mounted ? (
+        <Suspense fallback={null}>
+          <QueueSheet open={open} onOpenChange={setOpen} />
+        </Suspense>
+      ) : null}
     </>
   );
 }
