@@ -11,7 +11,10 @@
     "reports": "Reports",
     "inbox": "Inbox",
     "doorCode": "Show door code",
-    "settings": "Settings"
+    "settings": "Settings",
+    "label": "Owner panel",
+    "openItems_one": "{{count}} waiting",
+    "openItems_other": "{{count}} waiting"
   },
   "screens": {
     "signIn": "Owner sign-in",
@@ -36,5 +39,779 @@
     "audit": "Audit log",
     "doorScreen": "Door screen",
     "verify": "Payslip check"
+  },
+  "shell": {
+    "back": "Back",
+    "skip": "Skip to content",
+    "offline": "You're offline. Showing what we had at {{time}}.",
+    "offlineNoData": "You're offline. Some things need the internet.",
+    "needsInternet": "This needs the internet.",
+    "iosBanner": "Add this app to your Home Screen to get alerts.",
+    "iosBannerHow": "Tap Share, then Add to Home Screen.",
+    "dismiss": "Dismiss",
+    "setupBanner": "Setup isn't finished yet.",
+    "setupBannerAction": "Finish setup"
+  },
+  "common": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "close": "Close",
+    "done": "Done",
+    "edit": "Edit",
+    "remove": "Remove",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "copy": "Copy",
+    "copied": "Copied",
+    "share": "Share",
+    "retry": "Try again",
+    "details": "Details",
+    "requestId": "Request id {{id}}",
+    "loading": "Loading",
+    "prev": "Previous",
+    "next": "Next",
+    "reason": "Reason",
+    "reasonHint": "Staff see this reason.",
+    "note": "Note",
+    "noteHint": "Optional",
+    "selected_one": "{{count}} selected",
+    "selected_other": "{{count}} selected",
+    "clearSelection": "Clear selection",
+    "everyone": "Everyone",
+    "updated": "Updated {{time}}",
+    "today": "Today",
+    "noPhone": "No phone number",
+    "minutes": "{{count}} min",
+    "photoMissing": "Photo not available",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "errors": {
+    "title": "We couldn't load this.",
+    "network": "We couldn't reach the server. Check your internet and try again.",
+    "generic": "We couldn't complete that. Try again in a moment.",
+    "forbidden": "You don't have access to this. Ask Urmi.",
+    "notFound": "We couldn't find this. It may have been removed.",
+    "monthLocked": "This month is finalised. Reopen payroll to change it.",
+    "alreadyDecided": "Someone already decided this one.",
+    "saveFailed": "Couldn't save. Check your internet and try again.",
+    "conflict": "This changed in the meantime. We've reloaded it."
+  },
+  "time": {
+    "justNow": "just now",
+    "minAgo_one": "{{count}} min ago",
+    "minAgo_other": "{{count}} min ago",
+    "hAgo_one": "{{count}} h ago",
+    "hAgo_other": "{{count}} h ago",
+    "waitingDays": "Waiting {{count}} days"
+  },
+  "status": {
+    "P": "Present",
+    "H": "Half day",
+    "A": "Absent",
+    "L": "Leave",
+    "LOP": "Unpaid leave",
+    "WO": "Week off",
+    "HO": "Holiday",
+    "NE": "Not scheduled",
+    "OPEN": "Still in",
+    "OD": "At a venue",
+    "late": "Late",
+    "flagged": "Needs a look",
+    "pending": "Waiting",
+    "rejected": "Rejected",
+    "edited": "Edited by {{name}}",
+    "offline": "Offline",
+    "autoClosed": "Auto-closed"
+  },
+  "leave": {
+    "CL": "Casual leave",
+    "SL": "Sick leave",
+    "EL": "Earned leave",
+    "CO": "Comp-off",
+    "LOP": "Unpaid leave"
+  },
+  "place": {
+    "inside": "Inside",
+    "edge": "Edge",
+    "venue": "Venue",
+    "offline": "Offline",
+    "owner": "Added by you"
+  },
+  "punch": {
+    "in": "Check in",
+    "out": "Check out",
+    "break_start": "Break start",
+    "break_end": "Break end",
+    "source": {
+      "online": "Phone",
+      "offline": "Offline",
+      "owner": "Added by owner",
+      "auto": "Auto check-out"
+    },
+    "fence": {
+      "pass": "Inside the salon area",
+      "uncertain": "At the edge of the salon area",
+      "outside": "Outside the salon area",
+      "approximate": "Approximate location",
+      "none": "No location"
+    },
+    "pendingReason": {
+      "needs_proof": "Couldn't confirm the location; no door code scanned",
+      "outside_fence": "Outside the salon area; sent to you",
+      "selfie_missing": "No photo taken",
+      "offsite_unplanned": "Says she is at a venue",
+      "duty_approval": "Duty needs your approval",
+      "strong_mode": "Door code required",
+      "too_early": "Before the earliest check-in time",
+      "late_sync": "Sent late from offline",
+      "offline_window": "Offline for too long",
+      "consent_withdrawn": "Location consent withdrawn"
+    },
+    "distance": "{{m}} m from the centre",
+    "accuracy": "Accuracy {{m}} m",
+    "device": "Phone: {{label}}",
+    "qr": "Door code scanned",
+    "score": "Risk score {{score}}",
+    "noun": {
+      "in": "check-in",
+      "out": "check-out",
+      "break_start": "break start",
+      "break_end": "break end"
+    }
+  },
+  "risk": {
+    "fence_uncertain": "At the edge of the salon area",
+    "zero_jitter": "Location didn't move at all, which fake-GPS apps do",
+    "replayed_point": "Exactly the same spot as an earlier check-in",
+    "impossible_jump": "Too far from the last check-in for the time between them",
+    "network_suspect": "Internet looks like a VPN or from outside India",
+    "device_tz": "Phone's time zone isn't India",
+    "clock_skew": "Phone's clock is off by more than 5 minutes",
+    "new_device": "New phone, approved less than a day ago",
+    "offline": "Checked in while offline",
+    "salon_network": "On the salon's internet",
+    "door_qr": "Scanned the door code",
+    "offsite_duty": "Inside the venue for a duty",
+    "none": "Nothing unusual"
+  },
+  "stepUp": {
+    "title": "Enter your owner PIN",
+    "body": "This change needs your PIN. It stays unlocked for 10 minutes.",
+    "label": "Owner PIN",
+    "hint": "6 digits",
+    "sixDigits": "Your owner PIN has 6 digits.",
+    "wrong": "Wrong PIN. Try again.",
+    "locked": "Too many wrong tries. Sign in with your email link to unlock.",
+    "confirm": "Continue",
+    "checking": "Checking…"
+  },
+  "today": {
+    "title": "Today",
+    "dateUpdated": "{{date}} · updated {{time}}",
+    "headline": {
+      "in_one": "{{count}} in",
+      "in_other": "{{count}} in",
+      "late_one": "{{count}} late",
+      "late_other": "{{count}} late",
+      "notInYet_one": "{{count}} not in yet",
+      "notInYet_other": "{{count}} not in yet",
+      "onLeave_one": "{{count}} on leave",
+      "onLeave_other": "{{count}} on leave",
+      "atVenue_one": "{{count}} at a venue",
+      "atVenue_other": "{{count}} at a venue"
+    },
+    "counters": {
+      "label": "Filter the board",
+      "present": "Present",
+      "late": "Late",
+      "notInYet": "Not in yet",
+      "onLeave": "On leave",
+      "weekOff": "Week off",
+      "atVenue": "At a venue"
+    },
+    "filtered": "Showing {{label}} only.",
+    "showAll": "Show everyone",
+    "needsAction_one": "{{count}} thing needs your OK",
+    "needsAction_other": "{{count}} things need your OK",
+    "needsActionCta": "Open Needs action",
+    "sections": {
+      "in": "Who's in",
+      "notIn": "Not in yet",
+      "dueLater": "Due later",
+      "out": "Checked out",
+      "away": "Not working today"
+    },
+    "row": {
+      "inAt": "In {{time}}",
+      "outAt": "Out {{time}}",
+      "lateBy": "+{{min}} m",
+      "lateLabel": "Late by {{min}} min",
+      "soFar": "{{duration}} so far",
+      "worked": "{{duration}} worked",
+      "shiftAt": "Shift {{time}}",
+      "lateNow": "{{min}} min past shift start",
+      "flagged": "Needs a look",
+      "pending": "Waiting for you",
+      "callName": "Call {{name}}",
+      "whatsappName": "WhatsApp {{name}}",
+      "away": {
+        "leave": "On leave",
+        "week_off": "Week off",
+        "holiday": "Holiday"
+      }
+    },
+    "closed": "Salon closed today ({{name}}).",
+    "before": "No one is due yet. First shift starts at {{time}}.",
+    "beforeNoShift": "No one is due yet today.",
+    "emptyFilter": "No one in this group right now.",
+    "nobodyIn": "No one has checked in yet."
+  },
+  "payroll": {
+    "_helper": "fs-wp6-payroll-screens"
+  },
+  "actions": {
+    "title": "Needs action",
+    "allClear": "All clear. Nothing waiting.",
+    "filterLabel": "Show",
+    "all": "All",
+    "types": {
+      "flagged_punch": "Check-ins to look at",
+      "pending_punch": "Waiting for approval",
+      "new_device": "New phones",
+      "leave_request": "Leave",
+      "regularisation": "Fix a day",
+      "overtime": "Overtime",
+      "offsite_request": "At a venue",
+      "auto_closed": "Auto-closed days",
+      "advance_request": "Advance requests"
+    },
+    "select": "Select {{name}}",
+    "approveSelected_one": "Approve {{count}} selected",
+    "approveSelected_other": "Approve {{count}} selected",
+    "bulkDone_one": "{{count}} approved.",
+    "bulkDone_other": "{{count}} approved.",
+    "bulkSomeFailed": "{{done}} approved, {{failed}} couldn't be approved. They're still in the list.",
+    "decided": "Done. {{name}} will be told.",
+    "flagged": {
+      "title": "Check {{name}}'s {{kind}}",
+      "at": "{{kind}} at {{time}}, {{date}}",
+      "looksFine": "Looks fine",
+      "reject": "Reject check-in",
+      "rejectTitle": "Reject {{name}}'s check-in?",
+      "rejectBody": "The day is worked out again without it, and {{name}} is told why."
+    },
+    "pending": {
+      "title": "{{name}} needs approval",
+      "why": "Why it's waiting: {{reason}}"
+    },
+    "device": {
+      "title": "New phone for {{name}}",
+      "line": "{{label}} · asked {{ago}}",
+      "replaces": "This replaces {{label}}. The old phone stops working.",
+      "approveHint": "Approving needs your PIN."
+    },
+    "leave": {
+      "title": "{{name}} asked for leave",
+      "dates": "{{range}} · {{type}}",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "unpaid": "{{count}} unpaid",
+      "balanceAfter": "{{balance}} left after this",
+      "blackout": "One of these days is a no-leave day.",
+      "reason": "“{{reason}}”"
+    },
+    "fix": {
+      "title": "{{name}} asked to fix {{date}}",
+      "kind": {
+        "missed_in": "Forgot to check in",
+        "missed_out": "Forgot to check out",
+        "wrong_time": "Wrong time",
+        "offsite_unplanned": "Was at a venue"
+      },
+      "recorded": "Recorded",
+      "proposed": "Asked for",
+      "inOut": "in {{in}} · out {{out}}",
+      "none": "none"
+    },
+    "overtime": {
+      "title": "{{name}} worked late on {{date}}",
+      "minutes": "{{duration}} after the shift",
+      "shiftEnd": "Shift ended {{time}}",
+      "preapproved": "{{duration}} pre-approved by a venue duty",
+      "approveAll": "Approve all",
+      "approvePart": "Approve part",
+      "partLabel": "Minutes to approve",
+      "partHint": "In 15-minute blocks",
+      "approveMinutes": "Approve {{duration}}",
+      "decrease": "15 minutes less",
+      "increase": "15 minutes more"
+    },
+    "offsite": {
+      "title": "{{name}} checked in at a venue",
+      "place": "“{{place}}”",
+      "distance": "{{km}} km from the salon",
+      "approveOpen": "Approve and let others check in here",
+      "openTitle": "Who else can check in here today?",
+      "openHint": "A venue duty for today is made with this point as the centre and a 200 m circle.",
+      "openConfirm": "Approve and open"
+    },
+    "autoClosed": {
+      "title": "{{name}}'s day was closed at {{time}}",
+      "line": "{{date}} · in {{in}}, no check-out",
+      "keep": "Keep {{time}}",
+      "change": "Change time",
+      "changeTitle": "When did {{name}} leave?",
+      "changeLabel": "Check-out time",
+      "save": "Save time"
+    },
+    "advance": {
+      "title": "{{name}} asked for an advance",
+      "amount": "{{amount}} · {{plan}}",
+      "planFull": "recover in one go",
+      "planInstalments": "recover in {{count}} parts",
+      "open": "Already owes {{amount}}"
+    },
+    "reject": {
+      "title": "Reject this?",
+      "reasonLabel": "Reason",
+      "reasonHint": "{{name}} sees this reason.",
+      "confirm": "Reject"
+    },
+    "map": {
+      "label": "Map of the check-in and the salon circle",
+      "open": "Show on map",
+      "selfie": "Photo at check-in",
+      "compare": "Compare with the joining photo",
+      "enrolled": "Joining photo"
+    }
+  },
+  "settings": {
+    "_helper": "fs-wp6-settings-screens"
+  },
+  "register": {
+    "title": "Register",
+    "monthLabel": "Month",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "caption": "Attendance for {{month}}",
+    "staffColumn": "Staff",
+    "totals": {
+      "present": "P",
+      "half": "H",
+      "absent": "A",
+      "leave": "L",
+      "lateMin": "Late min",
+      "otHours": "OT h",
+      "lop": "LOP"
+    },
+    "totalsLong": {
+      "present": "Present days",
+      "half": "Half days",
+      "absent": "Absent days",
+      "leave": "Leave days",
+      "lateMin": "Late minutes",
+      "otHours": "Overtime hours approved",
+      "lop": "Unpaid days"
+    },
+    "tip": {
+      "late": "Late {{min}} m",
+      "in": "in {{time}}",
+      "out": "out {{time}}"
+    },
+    "future": "Not yet",
+    "locked": "Finalised. Reopen payroll to make changes.",
+    "legend": "Key",
+    "week": "Week of {{date}}",
+    "openMonth": "Open {{name}}'s month",
+    "dayLink": "{{name}}, {{date}}: {{status}}",
+    "empty": "No staff to show for this month."
+  },
+  "day": {
+    "title": "{{name}} · {{date}}",
+    "shift": "Shift",
+    "shiftLine": "{{name}} · {{times}}",
+    "noShift": "No shift",
+    "timeline": "Punches",
+    "noPunches": "No punches on this day.",
+    "noPunchesAbsent": "No punches. Marked absent at 02:00.",
+    "map": "Where",
+    "mapPending": "Loading the map…",
+    "mapNone": "No location for this day.",
+    "evidence": "Checks",
+    "pinOk": "PIN checked",
+    "sigOk": "Phone key checked",
+    "selfie": "Photo",
+    "selfieDeleted": "Photo deleted after 30 days",
+    "noSelfie": "No photo for this day.",
+    "computed": "How the day counts",
+    "worked": "Worked",
+    "scheduled": "Scheduled",
+    "late": "Late",
+    "early": "Left early",
+    "overtime": "Overtime",
+    "overtimePending": "{{duration}} waiting for your OK",
+    "statusLine": "Counts as",
+    "payEffect": "Pay effect",
+    "edit": "Edit day",
+    "audit": "History",
+    "noAudit": "No changes to this day.",
+    "auditLine": "{{who}} on {{date}}: {{what}}",
+    "auditReason": "Reason: “{{reason}}”",
+    "locked": "This month is finalised. Reopen payroll to edit this day.",
+    "venue": "Venue duty: {{place}}",
+    "override": {
+      "title": "Edit {{name}}'s day",
+      "status": "Day counts as",
+      "keepStatus": "Work it out from the punches",
+      "leaveType": "Leave type",
+      "punches": "Punches",
+      "addIn": "Add check-in",
+      "addOut": "Add check-out",
+      "time": "Time",
+      "deletePunch": "Remove this punch",
+      "restorePunch": "Keep this punch",
+      "removed": "Will be removed",
+      "reasonLabel": "Why are you changing it?",
+      "reasonHint": "Required. {{name}} sees “Edited by Urmi” with your reason.",
+      "reasonMissing": "Add a reason.",
+      "nothingChanged": "Change the status or a punch first.",
+      "save": "Save changes",
+      "saved": "Day updated."
+    }
+  },
+  "advances": {
+    "_helper": "fs-wp6-payroll-screens"
+  },
+  "staff": {
+    "title": "Staff",
+    "add": "Add staff",
+    "search": "Search by name or phone",
+    "filterLabel": "Show",
+    "filters": {
+      "active": "Active",
+      "invited": "Invited",
+      "exited": "Left",
+      "all": "All"
+    },
+    "statusWord": {
+      "invited": "Invited",
+      "active": "Active",
+      "suspended": "Paused",
+      "exited": "Left"
+    },
+    "device": {
+      "none": "No phone yet",
+      "pending": "Phone waiting for you",
+      "approved": "Phone approved"
+    },
+    "leftOn": "Left {{date}}",
+    "count_one": "{{count}} person",
+    "count_other": "{{count}} people",
+    "empty": "Add your first staff member.",
+    "emptyFilter": "No one matches.",
+    "capReached": "You have {{count}} active staff, the most this app allows. Mark someone as left to add a new person.",
+    "form": {
+      "title": "Add staff",
+      "name": "Full name",
+      "phone": "Mobile number",
+      "phoneHint": "Indian mobile, 10 digits",
+      "designation": "Role",
+      "designationOther": "Which role?",
+      "joinDate": "Joining date",
+      "salaryType": "Paid",
+      "monthly": "Monthly",
+      "daily": "Daily",
+      "salary": "Salary",
+      "salaryHintMonthly": "Rupees a month",
+      "salaryHintDaily": "Rupees a day",
+      "template": "Usual shift",
+      "weekOff": "Weekly off",
+      "noWeekOff": "None",
+      "lang": "App language",
+      "selfie": "Photo on check-in",
+      "selfieInherit": "Same as the salon ({{value}})",
+      "on": "On",
+      "off": "Off",
+      "adult": "{{name}} is 18 or older",
+      "adultHint": "The app is only for adults.",
+      "submit": "Save and invite",
+      "submitting": "Saving…",
+      "belowMinimum": "{{amount}} is below the minimum wage you set ({{minimum}} a {{basis}}). You can still save.",
+      "duplicate": "This number already belongs to {{name}}.",
+      "duplicateAction": "Edit {{name}} instead",
+      "rehire": "{{name}} left on {{date}}.",
+      "rehireUnknownDate": "{{name}} worked here before.",
+      "rehireAction": "Rehire {{name}}",
+      "rehired": "{{name}} is back. Share the new invite.",
+      "errors": {
+        "name": "Add the name.",
+        "phone": "Enter a 10-digit Indian mobile number.",
+        "designation": "Pick a role.",
+        "salary": "Enter the salary in rupees.",
+        "template": "Pick the usual shift.",
+        "adult": "Confirm the person is 18 or older."
+      }
+    },
+    "invite": {
+      "title": "Invite {{name}}",
+      "body": "Send this to {{name}} on WhatsApp. The link works for 48 hours.",
+      "code": "Join code",
+      "expires": "Works until {{time}}, {{date}}",
+      "share": "Share invite",
+      "whatsapp": "Send on WhatsApp",
+      "copy": "Copy message",
+      "copied": "Message copied.",
+      "done": "Done",
+      "pinReset": "PIN reset for {{name}}",
+      "pinResetBody": "{{name}} opens this link and sets a new PIN. Her phone stays approved."
+    },
+    "profile": {
+      "tabs": {
+        "label": "Profile sections",
+        "overview": "Overview",
+        "salary": "Salary",
+        "shift": "Shift",
+        "leave": "Leave",
+        "advances": "Advances",
+        "devices": "Phones",
+        "exit": "Exit"
+      },
+      "joined": "Joined {{date}}",
+      "code": "Code {{code}}",
+      "today": "Today",
+      "noToday": "Nothing recorded today.",
+      "month": "This month",
+      "monthLine": "{{present}} present · {{half}} half · {{absent}} absent · {{late}} min late",
+      "openRegister": "Open this month",
+      "salaryNow": "{{amount}} a {{basis}} from {{date}}",
+      "salaryHistory": "Earlier",
+      "changeSalary": "Change salary",
+      "salaryForm": {
+        "title": "Change {{name}}'s salary",
+        "amount": "New salary",
+        "from": "From",
+        "fromHint": "Pay from this date uses the new amount.",
+        "save": "Save salary",
+        "needsPin": "Saving needs your PIN."
+      },
+      "divisor": "Days to divide by",
+      "divisorDefault": "Salon default",
+      "divisors": {
+        "calendar": "Days in the month",
+        "fixed30": "Always 30",
+        "fixed26": "Always 26",
+        "working": "Working days"
+      },
+      "shiftNow": "Usual shift: {{name}}",
+      "weekOffNow": "Weekly off: {{day}}",
+      "strongMode": "Door code every check-in",
+      "strongModeHint": "When on, {{name}} must scan the door code to check in.",
+      "balances": "Balances",
+      "balanceLine": "{{balance}} left",
+      "pendingLine": "{{count}} asked",
+      "ledger": "Leave history",
+      "adjust": "Adjust balance",
+      "adjustForm": {
+        "title": "Adjust {{name}}'s leave",
+        "type": "Leave type",
+        "days": "Days",
+        "daysHint": "Use a minus sign to take days away. Half days are fine.",
+        "note": "Why",
+        "save": "Save"
+      },
+      "advanceBalance": "Owes {{amount}}",
+      "noAdvance": "No advance open.",
+      "giveAdvance": "Give an advance",
+      "devicesNone": "No phone yet. Share the invite to get started.",
+      "deviceApproved": "Approved {{date}}",
+      "devicePending": "Waiting since {{date}}",
+      "deviceRevoke": "Remove phone",
+      "deviceRevokeTitle": "Remove {{label}}?",
+      "deviceRevokeBody": "{{name}} can't check in from it any more. Removing needs your PIN.",
+      "resendInvite": "Re-send invite",
+      "resendHint": "The old code stops working.",
+      "resetPin": "Reset PIN",
+      "resetPinHint": "{{name}} gets a link to set a new PIN.",
+      "inviteState": {
+        "active": "Invite sent, works until {{date}}",
+        "expired": "Invite expired",
+        "used": "Joined"
+      },
+      "exit": {
+        "title": "Mark {{name}} as left",
+        "body": "{{name}} stops getting shifts, her phone stops working, and the next payroll pays her up to the last day.",
+        "lastDay": "Last working day",
+        "reason": "Reason",
+        "confirm": "Mark as left",
+        "needsPin": "This needs your PIN.",
+        "done": "{{name}} is marked as left.",
+        "already": "{{name}} left on {{date}}.",
+        "rehire": "Rehire {{name}}"
+      },
+      "consents": "Consents",
+      "consent": {
+        "privacy_notice": "Privacy notice",
+        "selfie": "Photo on check-in",
+        "night_work": "Night work",
+        "fines_notice": "Fines notice"
+      },
+      "consentLine": "Given {{date}}"
+    }
+  },
+  "setup": {
+    "_helper": "fs-wp6-settings-screens"
+  },
+  "roster": {
+    "title": "Roster",
+    "week": "Week of {{date}}",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week",
+    "caption": "Shifts for the week of {{date}}",
+    "staffColumn": "Staff",
+    "hoursColumn": "Hours",
+    "hours": "{{hours}} h",
+    "over48": "{{name}} · {{hours}} h this week, over 48.",
+    "over48Short": "Over 48 h",
+    "addDuty": "Add off-site duty",
+    "cell": {
+      "WO": "Week off",
+      "HO": "Holiday",
+      "L": "Leave",
+      "NE": "Not working",
+      "no_shift": "No shift",
+      "changed": "Changed"
+    },
+    "edit": {
+      "title": "{{name}} · {{date}}",
+      "useTemplate": "Shift",
+      "weekOff": "Make it the week off",
+      "noShift": "No shift",
+      "reset": "Back to usual",
+      "swap": "Swap week off with…",
+      "swapTitle": "Swap {{name}}'s week off",
+      "swapBody": "{{date}} becomes a work day. Pick the day that becomes the week off.",
+      "swapConfirm": "Swap",
+      "saved": "Roster updated. {{name}} is told.",
+      "duties": "Venue duties"
+    },
+    "dutyLine": "{{place}} · {{times}}",
+    "dutiesTitle": "Off-site duties this week",
+    "noDuties": "No off-site duties this week.",
+    "cancelDuty": "Cancel duty",
+    "cancelDutyTitle": "Cancel the duty at {{place}}?",
+    "cancelDutyBody": "The staff on it are told."
+  },
+  "duty": {
+    "title": "Off-site duty",
+    "staff": "Who's going",
+    "date": "Date",
+    "start": "Starts",
+    "end": "Ends",
+    "nextDay": "Ends the next day",
+    "night": "Part of this is night work (before 06:00 or after 21:00).",
+    "place": "Place name",
+    "placeHint": "For example Hotel Aram, Jamnagar",
+    "location": "Location",
+    "useCurrent": "Use my current location",
+    "pickOnMap": "Pick on map",
+    "pasteLink": "Paste a Google Maps link",
+    "linkLabel": "Google Maps link",
+    "readLink": "Read link",
+    "reading": "Reading…",
+    "linkProblem": "We couldn't read a location from that link. Pick it on the map instead.",
+    "locating": "Finding you… {{m}} m accuracy",
+    "locateFailed": "We couldn't get your location. Pick it on the map instead.",
+    "locationSet": "Location set ({{source}})",
+    "source": {
+      "current": "your phone",
+      "map": "map",
+      "link": "Google Maps link"
+    },
+    "mapHint": "Tap the map to place the venue.",
+    "radius": "Circle size",
+    "radiusValue": "{{m}} m",
+    "radiusLess": "25 m smaller",
+    "radiusMore": "25 m bigger",
+    "mode": "Check-in rule",
+    "modes": {
+      "geofence": "Inside the venue circle",
+      "anywhere": "Anywhere",
+      "approval": "Needs my approval"
+    },
+    "modeHints": {
+      "geofence": "They can check in only near the venue.",
+      "anywhere": "Location is recorded, no circle. For home visits.",
+      "approval": "Every check-in waits for your OK."
+    },
+    "overtime": "Count hours outside the shift as overtime",
+    "overtimeHint": "Duty time outside their usual shift is approved overtime.",
+    "note": "Note for staff",
+    "summary": "Venue duty for {{names}} · {{date}} {{times}} · {{place}}",
+    "save": "Save duty",
+    "saving": "Saving…",
+    "saved": "Duty saved. {{names}} will get a reminder.",
+    "errors": {
+      "staff": "Pick at least one person.",
+      "date": "Pick the date.",
+      "times": "Start and end can't be the same.",
+      "place": "Add the place name.",
+      "location": "Set the location."
+    }
+  },
+  "reports": {
+    "_helper": "fs-wp6-payroll-screens"
+  },
+  "door": {
+    "title": "Door code",
+    "lead": "Staff scan this with the Feelings app to check in.",
+    "newIn_one": "New code in {{count}} s",
+    "newIn_other": "New code in {{count}} s",
+    "refreshing": "Getting a new code…",
+    "site": "{{name}}",
+    "qrLabel": "Door code for {{name}}",
+    "done": "Done",
+    "offline": "You're offline. The door code needs the internet on this phone.",
+    "help": "A photo of this code works for up to a minute, so staff still need their PIN and their own phone."
+  },
+  "security": {
+    "_helper": "fs-wp6-settings-screens"
+  },
+  "more": {
+    "title": "More",
+    "groups": {
+      "money": "Money",
+      "people": "People and days",
+      "salon": "Salon"
+    },
+    "hints": {
+      "payroll": "Month-end salaries and payslips",
+      "advances": "Money given ahead of salary",
+      "reports": "Registers and CSV files",
+      "roster": "Who works when, venue duties",
+      "inbox": "Every alert in one place",
+      "doorCode": "Use this phone as the door screen",
+      "settings": "Rules, holidays, security"
+    }
+  },
+  "audit": {
+    "_helper": "fs-wp6-settings-screens"
+  },
+  "verify": {
+    "title": "Payslip check",
+    "valid": "Valid",
+    "validLine": "This payslip was issued by {{org}}.",
+    "name": "Staff",
+    "month": "Month",
+    "net": "Net pay",
+    "revision": "Revision",
+    "superseded": "Replaced by a newer revision",
+    "supersededLine": "This payslip was replaced. Ask for the latest one.",
+    "invalid": "This payslip link isn't valid.",
+    "invalidLine": "Check the link, or ask the salon for a new payslip.",
+    "footer": "Checked with Feelings Staff."
   }
 }

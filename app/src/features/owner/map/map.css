@@ -1,0 +1,64 @@
+/* Owner map (lazy chunk with Leaflet): the fence circle in sindoor at 8 % fill, the pin is a bindi
+   (PRD 12.6 MapView, 12.9). Colours come from the brand tokens only. */
+.owner-map {
+  isolation: isolate;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+
+.owner-map .leaflet-container {
+  font: inherit;
+  background: var(--bg-soft);
+}
+
+.owner-map .owner-fence {
+  stroke: var(--accent);
+  stroke-width: 2;
+  fill: var(--accent);
+  fill-opacity: 0.08;
+}
+
+.owner-map .owner-fence-old {
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  fill: none;
+}
+
+.owner-map .owner-accuracy {
+  stroke: var(--ink-700);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  fill: var(--ink-700);
+  fill-opacity: 0.04;
+}
+
+.owner-map .owner-pin {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--white);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--border-strong);
+}
+
+.owner-map .owner-centre {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--maroon-800);
+}
+
+.owner-map .leaflet-control-attribution {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  background: var(--bg-glass);
+}
+
+.owner-map .leaflet-control-attribution a {
+  color: var(--text-body);
+}

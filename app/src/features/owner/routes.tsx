@@ -1,36 +1,134 @@
 /**
- * Owner panel routes under /o (PRD 5.2). Owner: WP-6. Children render inside the owner shell
- * (bottom tabs on phones, left rail from 64rem). WP-6 replaces the placeholders.
+ * Owner panel routes under /o (PRD 5.2). Owner: WP-6.
+ *
+ * Every screen is its own lazy chunk (PRD 11.10: each owner route chunk <= 120 KB gzip), and the
+ * shell is lazy too, so nothing here adds to the staff app's initial bundle. `handle.titleKey` is the
+ * header title while a screen loads; screens may set a more specific title themselves.
  */
+import { lazy, Suspense } from 'react';
 import type { RouteObject } from 'react-router';
-import { Placeholder } from '../../app/placeholder';
-import { InboxScreen } from '../inbox';
+
+export interface OwnerRouteHandle {
+  titleKey: string;
+  /** Detail screens show a back button to this path on phones. */
+  back?: string;
+}
+
+const h = (titleKey: string, back?: string): { handle: OwnerRouteHandle } => ({
+  handle: back ? { titleKey, back } : { titleKey },
+});
 
 export const ownerRoutes: RouteObject[] = [
-  { path: 'today', element: <Placeholder titleKey="owner:screens.today" /> },
-  { path: 'setup', element: <Placeholder titleKey="owner:screens.setup" /> },
-  { path: 'actions', element: <Placeholder titleKey="owner:screens.actions" /> },
-  { path: 'register', element: <Placeholder titleKey="owner:screens.register" /> },
-  { path: 'register/:userId/:date', element: <Placeholder titleKey="owner:screens.day" /> },
-  { path: 'staff', element: <Placeholder titleKey="owner:screens.staff" /> },
-  { path: 'staff/new', element: <Placeholder titleKey="owner:screens.addStaff" /> },
-  { path: 'staff/:id', element: <Placeholder titleKey="owner:screens.staffProfile" /> },
-  { path: 'roster', element: <Placeholder titleKey="owner:screens.roster" /> },
-  { path: 'duties/new', element: <Placeholder titleKey="owner:screens.dutyForm" /> },
-  { path: 'payroll', element: <Placeholder titleKey="owner:screens.payroll" /> },
-  { path: 'payroll/:runId', element: <Placeholder titleKey="owner:screens.payrollRun" /> },
+  {
+    path: 'today',
+    ...h('owner:screens.today'),
+    lazy: () => import('./today/TodayScreen').then((m) => ({ Component: m.TodayScreen })),
+  },
+  {
+    path: 'setup',
+    ...h('owner:screens.setup'),
+    lazy: () => import('./setup/SetupScreen').then((m) => ({ Component: m.SetupScreen })),
+  },
+  {
+    path: 'actions',
+    ...h('owner:screens.actions'),
+    lazy: () => import('./actions/ActionsScreen').then((m) => ({ Component: m.ActionsScreen })),
+  },
+  {
+    path: 'register',
+    ...h('owner:screens.register'),
+    lazy: () => import('./register/RegisterScreen').then((m) => ({ Component: m.RegisterScreen })),
+  },
+  {
+    path: 'register/:userId/:date',
+    ...h('owner:screens.day', '/o/register'),
+    lazy: () =>
+      import('./register/DayDetailScreen').then((m) => ({ Component: m.DayDetailScreen })),
+  },
+  {
+    path: 'staff',
+    ...h('owner:screens.staff'),
+    lazy: () => import('./staff/StaffListScreen').then((m) => ({ Component: m.StaffListScreen })),
+  },
+  {
+    path: 'staff/new',
+    ...h('owner:screens.addStaff', '/o/staff'),
+    lazy: () => import('./staff/AddStaffScreen').then((m) => ({ Component: m.AddStaffScreen })),
+  },
+  {
+    path: 'staff/:id',
+    ...h('owner:screens.staffProfile', '/o/staff'),
+    lazy: () =>
+      import('./staff/StaffProfileScreen').then((m) => ({ Component: m.StaffProfileScreen })),
+  },
+  {
+    path: 'roster',
+    ...h('owner:screens.roster'),
+    lazy: () => import('./roster/RosterScreen').then((m) => ({ Component: m.RosterScreen })),
+  },
+  {
+    path: 'duties/new',
+    ...h('owner:screens.dutyForm', '/o/roster'),
+    lazy: () => import('./roster/DutyFormScreen').then((m) => ({ Component: m.DutyFormScreen })),
+  },
+  {
+    path: 'payroll',
+    ...h('owner:screens.payroll'),
+    lazy: () =>
+      import('./payroll/PayrollListScreen').then((m) => ({ Component: m.PayrollListScreen })),
+  },
+  {
+    path: 'payroll/:runId',
+    ...h('owner:screens.payrollRun', '/o/payroll'),
+    lazy: () =>
+      import('./payroll/PayrollRunScreen').then((m) => ({ Component: m.PayrollRunScreen })),
+  },
   {
     path: 'payroll/:runId/:userId',
-    element: <Placeholder titleKey="owner:screens.payslipReview" />,
+    ...h('owner:screens.payslipReview'),
+    lazy: () =>
+      import('./payroll/PayslipReviewScreen').then((m) => ({ Component: m.PayslipReviewScreen })),
   },
-  { path: 'advances', element: <Placeholder titleKey="owner:screens.advances" /> },
-  { path: 'reports', element: <Placeholder titleKey="owner:screens.reports" /> },
-  { path: 'door-code', element: <Placeholder titleKey="owner:screens.doorCode" /> },
-  { path: 'inbox', element: <InboxScreen /> },
-  { path: 'more', element: <Placeholder titleKey="owner:nav.more" /> },
-  { path: 'settings/*', element: <Placeholder titleKey="owner:screens.settings" /> },
-  { path: 'settings/audit', element: <Placeholder titleKey="owner:screens.audit" /> },
+  {
+    path: 'advances',
+    ...h('owner:screens.advances'),
+    lazy: () => import('./advances/AdvancesScreen').then((m) => ({ Component: m.AdvancesScreen })),
+  },
+  {
+    path: 'reports',
+    ...h('owner:screens.reports'),
+    lazy: () => import('./reports/ReportsScreen').then((m) => ({ Component: m.ReportsScreen })),
+  },
+  {
+    path: 'door-code',
+    ...h('owner:screens.doorCode'),
+    lazy: () => import('./door/DoorCodeScreen').then((m) => ({ Component: m.DoorCodeScreen })),
+  },
+  {
+    path: 'inbox',
+    ...h('owner:screens.inbox'),
+    lazy: () => import('../inbox').then((m) => ({ Component: m.InboxScreen })),
+  },
+  {
+    path: 'more',
+    ...h('owner:nav.more'),
+    lazy: () => import('./more/MoreScreen').then((m) => ({ Component: m.MoreScreen })),
+  },
+  {
+    // Settings sections, Security and the audit log route inside SettingsRoutes (/o/settings/*).
+    path: 'settings/*',
+    ...h('owner:screens.settings'),
+    lazy: () => import('./settings/SettingsRoutes').then((m) => ({ Component: m.SettingsRoutes })),
+  },
 ];
 
-/** Layout around owner routes. WP-6 builds it. */
-export { Outlet as OwnerShell } from 'react-router';
+const LazyShell = lazy(() => import('./shell/OwnerShell').then((m) => ({ default: m.OwnerShell })));
+
+/** Layout around owner routes: bottom tabs on phones, left rail from 64rem, header with the bell. */
+export function OwnerShell() {
+  return (
+    <Suspense fallback={null}>
+      <LazyShell />
+    </Suspense>
+  );
+}
