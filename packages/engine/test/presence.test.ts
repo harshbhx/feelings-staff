@@ -155,6 +155,17 @@ describe('PRD 14.2 presence: roll-call intervals', () => {
     ]);
   });
 
+  it('only accepted and flagged punches count: a rejected check-out does not end it', () => {
+    const punches = [
+      punch(WED, 'in', '10:00', { status: 'flagged' }),
+      punch(WED, 'out', '17:00', { status: 'rejected' }),
+      punch(WED, 'out', '19:00'),
+    ];
+    expect(briefs({ rollCalls: [mark(1, '16:00')], punches })).toEqual([
+      expect.objectContaining({ to: '19:00', minutes: 180, endReason: 'check_out' }),
+    ]);
+  });
+
   it('ends at check-out, at auto-close, or at the end of the shift segment', () => {
     expect(
       briefs({ rollCalls: [mark(1, '15:00')], punches: shift(WED, '10:00', '17:30') }),

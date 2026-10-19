@@ -278,12 +278,17 @@ function at(ts: number | undefined, reason: AwayEndReason): Closer | null {
 function hints(checks: readonly PresenceCheck[], d: Day): SeemsAway[] {
   const inside = (ts: number) =>
     total(subtract(intersect(intersect([[toMin(ts), toMin(ts) + 1]], d.segs), d.span), d.brk)) > 0;
-  let hint: SeemsAway | null = null;
+  let since: number | null = null;
+  let lastCheckTs = 0;
   for (const c of [...checks].sort((a, b) => a.ts - b.ts)) {
     if (c.result === 'no_fix' || !inside(c.ts)) continue;
-    if (c.result === 'outside') hint = { sinceTs: hint?.sinceTs ?? c.ts, lastCheckTs: c.ts };
-    else hint = null;
+    if (c.result !== 'outside') since = null;
+    else {
+      if (since === null) since = c.ts;
+      lastCheckTs = c.ts;
+    }
   }
-  const h: SeemsAway | null = hint;
-  return h === null || d.outs.some((o) => o.ts > h.sinceTs) ? [] : [h];
+  if (since === null) return [];
+  const sinceTs = since;
+  return d.outs.some((o) => o.ts > sinceTs) ? [] : [{ sinceTs, lastCheckTs }];
 }
