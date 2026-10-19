@@ -29,6 +29,7 @@ import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { clock, dayLabel, duration } from '../lib/format';
 import { telLink, waLink } from '../lib/share';
 import { leaveKey } from '../lib/status';
+import { AwayNowSection } from '../rollcall/AwayNow';
 import { RollCallCard } from '../rollcall/RollCallCard';
 import {
   type BoardAwayRow,
@@ -151,6 +152,7 @@ function Board({ board }: { board: TodayBoard }) {
 
   const side = (
     <>
+      {filter === null ? <AwayNowSection /> : null}
       {s.notIn.length > 0 ? (
         <Section title={t('owner:today.sections.notIn')} count={s.notIn.length}>
           <List>

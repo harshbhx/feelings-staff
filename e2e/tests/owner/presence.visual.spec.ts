@@ -37,6 +37,22 @@ test.describe('owner presence', () => {
     await expect(page).toHaveURL(new RegExp(`${ROLL_CALL}$`));
   });
 
+  test('OWN-PRES O-30 Today: away now, since when and why, with Edit times', async ({
+    page,
+    checkA11y,
+  }) => {
+    await openOwner(page, '/o/today', ['ownerAwayList:open']);
+    const away = page.getByTestId('today-away-now');
+    await expect(away).toContainText('Dhara Gohil');
+    await expect(away).toContainText('Stepped out at 10:24');
+    await expect(away).toContainText('Lunch outside');
+    await noCrash(page);
+    await expect(page).toHaveScreenshot('owner-today-away.png', { fullPage: true });
+    await checkA11y();
+    await away.getByRole('button', { name: 'Edit times' }).click();
+    await expect(page.getByRole('dialog').getByLabel('Back at')).toHaveValue('');
+  });
+
   test('OWN-PRES O-30 Today: a missed roll-call says it is not done', async ({ page }) => {
     await openOwner(page, '/o/today', ['ownerToday:roll-call-missed']);
     await expect(page.getByTestId('today-roll-call')).toContainText('Roll-call at 10:00 not done');

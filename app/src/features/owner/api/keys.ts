@@ -57,6 +57,7 @@ export const ownerKeys = {
     ['owner', 'audit', f.entity ?? '', f.category ?? '', f.from ?? '', f.to ?? ''] as const,
   managers: () => ['owner', 'managers'] as const,
   rollCallsAll: () => ['owner', 'roll-calls'] as const,
+  awayOpen: () => ['owner', 'away', 'open'] as const,
   rollCalls: () => ['owner', 'roll-calls', 'today'] as const,
   rollCall: (id: string) => ['owner', 'roll-calls', 'one', id] as const,
 };

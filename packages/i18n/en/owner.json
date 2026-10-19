@@ -1851,6 +1851,11 @@
         "on": "No checks and no away minutes inside the break.",
         "off": "Breaks count like the rest of the shift."
       }
+    },
+    "awayNow": {
+      "title": "Away now",
+      "since": "Stepped out at {{time}}",
+      "marked": "Not here at {{time}}, marked by {{name}}"
     }
   }
 }

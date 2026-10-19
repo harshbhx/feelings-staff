@@ -44,8 +44,24 @@ export function useRollCall(id: string) {
   });
 }
 
+/** Open away intervals for Today's "Away now" (owner only: managers get 403 here). */
+export function useAwayNow(enabled: boolean) {
+  const api = useApi();
+  return useQuery({
+    ...ownerQuery('ownerAwayList', ownerKeys.awayOpen(), () =>
+      api.ownerAwayList({ query: { state: 'open' } }),
+    ),
+    enabled,
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
+    select: (list: AwayIntervalView[]) =>
+      list.filter((a) => a.state === 'open' && a.endTs === null),
+  });
+}
+
 const afterPresence = () => [
   ownerKeys.today(),
+  ownerKeys.awayOpen(),
   ownerKeys.rollCallsAll(),
   ownerKeys.actionsAll(),
   ownerKeys.registerAll(),
