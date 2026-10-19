@@ -1,7 +1,16 @@
 /** Notifications, push, door device, public verify and test-only schemas. */
 import { z } from 'zod';
 import { NotificationPriority, NotifyEventType } from '../enums';
-import { Base64Url, Cursor, EpochMs, Id, Paise, paginated, YearMonth } from '../primitives';
+import {
+  Base64Url,
+  Cursor,
+  EpochMs,
+  Id,
+  Paise,
+  paginated,
+  WorkDate,
+  YearMonth,
+} from '../primitives';
 
 export const NotificationView = z.object({
   id: Id,
@@ -127,9 +136,14 @@ export const TestResetResult = z.object({
 export type TestResetResult = z.infer<typeof TestResetResult>;
 export const TestClockRequest = z.object({ nowMs: EpochMs.nullable() });
 export const TestClockResult = z.object({ nowMs: EpochMs, fake: z.boolean() });
+/**
+ * Run a scheduled job now. `recompute-day` (test-only, added in contracts 1.1) recomputes every
+ * person-day of `date` through DayService; the demo seed uses it to build history day by day.
+ */
 export const TestCronRequest = z.object({
-  job: z.enum(['rules', 'nightly']),
+  job: z.enum(['rules', 'nightly', 'recompute-day']),
   at: EpochMs.optional(),
+  date: WorkDate.optional(),
 });
 export const TestCronResult = z.object({
   job: z.string(),

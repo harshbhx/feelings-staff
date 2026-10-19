@@ -15,6 +15,7 @@ import {
 import type { Env } from '../env';
 import { hashPassword, hashPin, PASSWORD_ITERATIONS, randomToken } from '../lib/crypto';
 import { ulid } from '../lib/ulid';
+import { seedDemo } from './demo';
 
 export const TEST_OWNER = {
   email: 'owner@feelings.test',
@@ -246,10 +247,12 @@ export async function seedScenario(
     };
   }
   const base = await seedBasicSalon(s);
-  // payroll-october and demo add staff, attendance and payroll on top (integration seed, phase C).
-  return {
-    orgId: base.orgId,
-    owner: { email: TEST_OWNER.email, password: TEST_OWNER.password, pin: TEST_OWNER.pin },
-    staff: [],
-  };
+  const owner = { email: TEST_OWNER.email, password: TEST_OWNER.password, pin: TEST_OWNER.pin };
+  if (scenario === 'demo') {
+    // Raw data only; scripts/seed-demo.mjs then runs the nightly job per day and the payroll flow.
+    const demo = await seedDemo(s, base);
+    return { orgId: base.orgId, owner, staff: demo.staff };
+  }
+  // payroll-october adds the October fixture month on top (integration seed, phase C).
+  return { orgId: base.orgId, owner, staff: [] };
 }
