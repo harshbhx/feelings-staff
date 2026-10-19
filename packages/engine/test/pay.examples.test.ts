@@ -55,7 +55,7 @@ describe('PRD 7.15 worked examples, to the paisa', () => {
     { u: 20, paise: 1_792 },
   ])('example 2: $u billable minutes cost $paise paise', ({ u, paise }) => {
     const r = slip({ days: oct([dr('2026-10-07', { undertimeMin: u, lateBillableMin: u })]) });
-    expect(amount(r, 'undertime')).toBe(-paise);
+    expect(amount(r, 'undertime')).toBe(0 - paise);
   });
 
   it('example 2: the month total is rounded once (37 min -> ₹33.15)', () => {

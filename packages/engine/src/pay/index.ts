@@ -181,10 +181,10 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
     paidDays: 0,
     lopDays: 0,
   };
-  const lop = new Map<number, { part: Part; days: number }>();
+  const lop = new Map<string, { part: Part; days: number }>();
   const paidDaily = new Map<number, number>();
   const ut = new Map<string, { rate: Q; sDay: number; min: number }>();
-  const ot = new Map<number, { rate: Q; min: number }>();
+  const ot = new Map<string, { rate: Q; min: number }>();
   const off = new Map<string, { rate: Q; factor: Q; text: string; credit: number }>();
   const weekMin = new Map<string, number>();
   let lateBillableMin = 0;
