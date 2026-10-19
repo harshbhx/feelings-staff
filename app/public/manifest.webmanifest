@@ -12,5 +12,49 @@
   "lang": "en-IN",
   "dir": "ltr",
   "categories": ["business", "productivity"],
-  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/icons/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Check in",
+      "url": "/?action=punch",
+      "icons": [{ "src": "/icons/sc-checkin-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Today (owner)",
+      "url": "/o/today",
+      "icons": [{ "src": "/icons/sc-today-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screens/staff-today-390.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Check in from the salon"
+    },
+    {
+      "src": "/screens/owner-register-1280.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Monthly register"
+    }
+  ]
 }

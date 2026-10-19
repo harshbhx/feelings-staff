@@ -1,1 +1,210 @@
-{}
+{
+  "n": {
+    "morning_summary": {
+      "title": "Today at {{time}}",
+      "body": "{{present}} in · {{late}} late · {{notInYet}} not in yet · {{onLeave}} on leave",
+      "waiting_one": "1 request is waiting more than 2 days.",
+      "waiting_other": "{{count}} requests are waiting more than 2 days."
+    },
+    "late_checkin": {
+      "title": "{{name}} is {{min}} min late",
+      "body": "Checked in {{time}}",
+      "bodyAt": "Checked in {{time}} at {{place}}",
+      "merged_title_other": "{{count}} people are late",
+      "merged_item": "{{name}} {{min}} m"
+    },
+    "not_in_yet": {
+      "title": "{{name}} hasn't checked in",
+      "body": "Shift started {{shiftStart}}. Tap to call or WhatsApp."
+    },
+    "checkin_reminder": {
+      "title": "Your shift started at {{shiftStart}}",
+      "body": "Tap to check in."
+    },
+    "flagged_punch": {
+      "titleIn": "Check {{name}}'s check-in",
+      "titleOut": "Check {{name}}'s check-out",
+      "body": "{{reasons}}",
+      "bodyNone": "Tap to review.",
+      "merged_title_other": "{{count}} punches need a look",
+      "reason": {
+        "fence_uncertain": "Edge of the fence",
+        "zero_jitter": "Location looks fixed",
+        "replayed_point": "Same location as before",
+        "impossible_jump": "Moved too far, too fast",
+        "network_suspect": "Unusual network",
+        "device_tz": "Phone time zone differs",
+        "clock_skew": "Phone clock is off",
+        "new_device": "New phone",
+        "offline": "Sent offline",
+        "salon_network": "On the salon network",
+        "door_qr": "Door code scanned",
+        "offsite_duty": "Venue duty"
+      }
+    },
+    "punch_needs_approval": {
+      "title": "{{name}} needs approval",
+      "bodyDistance": "Checked in {{distance}} m from {{place}}",
+      "bodyNoDistance": "Checked in at {{place}}",
+      "bodyNote": "{{base}}: '{{note}}'",
+      "bodyPlain": "Checked in and waiting for you."
+    },
+    "punch_decided": {
+      "approvedIn": "Your check-in at {{time}} was approved",
+      "approvedOut": "Your check-out at {{time}} was approved",
+      "rejectedIn": "{{owner}} didn't accept your {{time}} check-in",
+      "rejectedOut": "{{owner}} didn't accept your {{time}} check-out"
+    },
+    "early_checkout": {
+      "title": "{{name}} left at {{time}}",
+      "body": "{{duration}} before the shift ends",
+      "merged_title_other": "{{count}} people left early",
+      "merged_item": "{{name}} {{time}}"
+    },
+    "overtime_running": {
+      "title": "{{name}} is still working",
+      "body": "Shift ended {{shiftEnd}}. Approve overtime later in Needs action."
+    },
+    "checkout_reminder": {
+      "title": "Still at work?",
+      "body": "Check out when you leave."
+    },
+    "missed_checkouts": {
+      "title_one": "{{name}} hasn't checked out",
+      "title_other": "{{count}} people haven't checked out",
+      "body": "{{names}}"
+    },
+    "day_auto_closed": {
+      "title": "We closed your day at {{time}}",
+      "body": "If you left later, tell {{owner}}."
+    },
+    "leave_requested": {
+      "title": "{{name}} asked for leave",
+      "body": "{{range}} · {{type}}",
+      "bodyReason": "{{range}} · {{type}} · '{{reason}}'",
+      "type": {
+        "CL": "casual",
+        "SL": "sick",
+        "EL": "earned",
+        "CO": "comp-off",
+        "LOP": "unpaid"
+      }
+    },
+    "leave_decided": {
+      "approved": "Your leave for {{range}} is approved",
+      "rejected": "Your leave for {{range}} wasn't approved"
+    },
+    "regularisation_requested": {
+      "title": "{{name}} asked to fix {{date}}",
+      "missed_in": "Forgot to check in. Came at {{time}}.",
+      "missed_out": "Forgot to check out. Left at {{time}}.",
+      "wrong_time": "Wants to correct the time.",
+      "offsite_unplanned": "Was at a venue.",
+      "merged_title_other": "{{count}} fixes were asked for",
+      "merged_item": "{{name}} {{date}}"
+    },
+    "regularisation_decided": {
+      "approved": "Your fix for {{date}} is approved",
+      "rejected": "Your fix for {{date}} wasn't approved"
+    },
+    "offsite_requested": {
+      "title": "{{name}} checked in at a venue",
+      "body": "'{{place}}'. Approve?"
+    },
+    "duty_assigned": {
+      "title": "Venue duty {{when}} {{start}}–{{end}}",
+      "titleCancelled": "Venue duty cancelled",
+      "bodyCancelled": "{{when}} · {{place}}",
+      "body": "{{place}}",
+      "today": "today",
+      "tomorrow": "tomorrow",
+      "on": "on {{date}}"
+    },
+    "new_device": {
+      "title": "New phone for {{name}}",
+      "body": "Approve it before they can check in."
+    },
+    "device_decided": {
+      "approvedTitle": "Your phone is approved",
+      "approvedBody": "You can check in now.",
+      "rejectedTitle": "Your phone wasn't approved",
+      "rejectedBody": "Talk to {{owner}} if this is a mistake."
+    },
+    "pin_attempts": {
+      "title": "Several wrong PIN tries on {{name}}'s account",
+      "body": "{{count}} wrong tries in 24 hours."
+    },
+    "advance_recorded": {
+      "title": "{{owner}} recorded an advance of {{amount}}",
+      "body": "Recovery: {{summary}}. Is this right?"
+    },
+    "advance_requested": {
+      "title": "{{name}} asked for an advance",
+      "body": "{{amount}} · '{{reason}}'"
+    },
+    "payroll_draft_ready": {
+      "title": "{{month}} payroll is ready to check",
+      "body_one": "1 thing needs a look first.",
+      "body_other": "{{count}} things need a look first.",
+      "bodyNone": "Nothing is blocking it."
+    },
+    "payslip_ready": {
+      "title": "Your {{month}} payslip is ready"
+    },
+    "salary_unpaid": {
+      "title_one": "1 salary for {{month}} is not marked paid",
+      "title_other": "{{count}} salaries for {{month}} are not marked paid",
+      "body": "The legal deadline is the 7th."
+    },
+    "holiday_announced": {
+      "title": "Salon closed on {{date}} for {{name}}"
+    },
+    "needs_action_reminder": {
+      "title_one": "1 request is waiting more than 2 days",
+      "title_other": "{{count}} requests are waiting more than 2 days",
+      "body": "Open Needs action to clear them."
+    },
+    "weekly_digest": {
+      "title": "Last week: {{onTime}}% on time, {{overtime}} overtime approved, {{leaves}} leave.",
+      "body": "Your weekly summary for the week starting {{week}}."
+    },
+    "held_summary": {
+      "title_one": "1 alert while you were away",
+      "title_other": "{{count}} alerts while you were away",
+      "more": "and {{count}} more"
+    },
+    "fallback": {
+      "title": "Feelings",
+      "body": "Open the app to see what changed."
+    }
+  },
+  "email": {
+    "signin": {
+      "subject": "Your Feelings Staff sign-in code: {{code}}",
+      "intro": "Use this code or the link below to sign in to Feelings Staff.",
+      "code": "Your code: {{code}}",
+      "link": "Or open this link: {{url}}",
+      "valid": "Both work for 15 minutes and only once.",
+      "ignore": "If you did not ask for this, you can ignore this email.",
+      "button": "Sign in to Feelings Staff"
+    },
+    "digest": {
+      "footer": "You get this every Monday. Turn it off in Settings."
+    }
+  },
+  "inbox": {
+    "title": "Inbox",
+    "today": "Today",
+    "earlier": "Earlier",
+    "markAllRead": "Mark all read",
+    "loadMore": "Load more",
+    "unread": "Unread",
+    "emptyTitle": "Nothing here yet",
+    "emptyBody": "Reminders and updates from the salon will show up here.",
+    "errorTitle": "We couldn't load your inbox",
+    "errorBody": "Check your connection and try again.",
+    "bell": "Inbox",
+    "bellUnread_one": "Inbox, {{count}} unread",
+    "bellUnread_other": "Inbox, {{count}} unread"
+  }
+}

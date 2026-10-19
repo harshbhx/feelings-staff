@@ -8,7 +8,7 @@
  *   expect(notifier.events.map((e) => e.type)).toContain('new_device');
  *   setServiceOverridesForTests(null);
  */
-import type { DayResult, NotifyEvent, PayrollRunView } from '@fs/contracts';
+import type { DayResult, NotifyEvent, PayrollRunView, PushPayload } from '@fs/contracts';
 import type {
   DayService,
   EmailMessage,
@@ -17,7 +17,9 @@ import type {
   Notifier,
   PayrollService,
   PdfRenderer,
+  PushOpts,
   PushSender,
+  PushSub,
 } from '../../services/ports';
 
 export function fakeNotifier(): Notifier & { events: NotifyEvent[] } {
@@ -40,15 +42,28 @@ export function fakeEmail(): EmailSender & { sent: EmailMessage[] } {
   };
 }
 
-export function fakePush(status = 201): PushSender & { sent: unknown[] } {
-  const sent: unknown[] = [];
+/**
+ * Push sender that records every call (with its Urgency/TTL/Topic options). `status` is the answer
+ * to every send; pass a list to answer call by call (the last one repeats), e.g. `[429, 201]`.
+ */
+export function fakePush(
+  status: number | number[] = 201,
+): PushSender & { sent: { sub: PushSub; payload: PushPayload; opts: PushOpts }[] } {
+  const sent: { sub: PushSub; payload: PushPayload; opts: PushOpts }[] = [];
+  const answers = Array.isArray(status) ? status : [status];
   return {
     sent,
-    async send(sub, payload) {
-      sent.push({ sub, payload });
-      return status < 300
-        ? { ok: true, status }
-        : { ok: false, status, gone: status === 404 || status === 410 };
+    async send(sub, payload, opts) {
+      sent.push({ sub, payload, opts });
+      const code = answers[Math.min(sent.length - 1, answers.length - 1)] ?? 201;
+      return code < 300
+        ? { ok: true, status: code }
+        : {
+            ok: false,
+            status: code,
+            gone: code === 404 || code === 410,
+            ...(code === 429 ? { retryAfterSec: 0 } : {}),
+          };
     },
   };
 }
