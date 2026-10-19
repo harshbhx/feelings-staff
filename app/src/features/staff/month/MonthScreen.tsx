@@ -89,14 +89,15 @@ function Totals({ totals, fmt }: { totals: MonthTotals; fmt: Fmt }) {
   ].filter((x): x is string => x !== null);
   return (
     <ul className="flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-text tabular">
+      {/* The dot trails each item, so a wrapped line never starts with one. */}
       {parts.map((p, i) => (
         <li key={p} className="flex items-center gap-3">
-          {i > 0 ? (
+          {p}
+          {i < parts.length - 1 ? (
             <span aria-hidden="true" className="text-text-muted">
               ·
             </span>
           ) : null}
-          {p}
         </li>
       ))}
     </ul>

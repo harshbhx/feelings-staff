@@ -95,7 +95,12 @@
     flex: 1;
   }
 
+  /* Fixed to the bottom under the action bar; the kit's TabBar draws the hairline and glass. */
   .staff-tabbar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 30;
     max-width: 30rem;
     margin-inline: auto;
   }

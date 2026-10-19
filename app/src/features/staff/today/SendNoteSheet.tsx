@@ -68,7 +68,7 @@ export function SendNoteSheet({
             rows={3}
           />
         </Field>
-        <Button type="submit" block loading={busy}>
+        <Button variant="primary" type="submit" block loading={busy}>
           {t('staff:punch.note.send', { owner })}
         </Button>
       </form>

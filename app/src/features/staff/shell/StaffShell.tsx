@@ -12,7 +12,6 @@ import { Outlet } from 'react-router';
 import { useApi } from '../../../api/provider';
 import { saveLang } from '../../../app/i18n';
 import { onQueueEvent, startQueue } from '../../../pwa/queue';
-import { startPwa } from '../../../pwa/register';
 import { ensurePersisted } from '../../../pwa/storage';
 import { staffKeys, useStaffMe } from '../api';
 import { browserAllowed } from '../install/allow-browser';
@@ -57,7 +56,7 @@ function StaffApp({ standalone }: { standalone: boolean }) {
   );
 }
 
-/** Start the service worker, the offline queue and storage persistence; keep the language in sync. */
+/** Offline queue, storage persistence and language sync (main.tsx starts the service worker). */
 function useStaffBoot(standalone: boolean) {
   const api = useApi();
   const qc = useQueryClient();
@@ -65,7 +64,6 @@ function useStaffBoot(standalone: boolean) {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    startPwa();
     const stop = startQueue(api);
     const off = onQueueEvent((e) => {
       if (e.type === 'synced') void qc.invalidateQueries({ queryKey: staffKeys.all });

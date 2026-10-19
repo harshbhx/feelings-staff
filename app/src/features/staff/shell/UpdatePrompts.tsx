@@ -34,6 +34,7 @@ export function UpgradeOverlay() {
         <h1 id="fs-upgrade-title">{t('staff:shell.upgradeTitle')}</h1>
         <p>{t('staff:shell.upgradeBody')}</p>
         <Button
+          variant="primary"
           block
           icon="arrows-clockwise"
           onClick={() => {

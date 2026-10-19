@@ -70,6 +70,7 @@ function AndroidInstall() {
   if (prompt.available && !prompt.snoozed) {
     return (
       <Button
+        variant="primary"
         block
         icon="plus"
         loading={busy}
@@ -168,6 +169,7 @@ function OpenElsewhere({ message, url }: { message: string; url: string }) {
       <p className="text-sm text-text-muted">{t('staff:install.iosOtherHint')}</p>
       <p className="staff-card break-all text-sm tabular">{url}</p>
       <Button
+        variant="primary"
         block
         onClick={async () => {
           try {

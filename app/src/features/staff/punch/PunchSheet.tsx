@@ -265,6 +265,7 @@ function ConfirmView({ a, reason }: { a: StepArgs; reason: PunchConfirm }) {
       ) : null}
       <Footer>
         <Button
+          variant="primary"
           block
           icon="sign-in"
           onClick={() => {
@@ -294,7 +295,12 @@ function FlowView({ a }: { a: StepArgs }) {
           <p className="text-lg font-bold text-text">{t('staff:punch.permission.title')}</p>
           <Lead icon="map-pin">{t('staff:punch.permission.body')}</Lead>
           <Footer>
-            <Button block icon="navigation" onClick={a.flow.actions.allowLocation}>
+            <Button
+              variant="primary"
+              block
+              icon="navigation"
+              onClick={a.flow.actions.allowLocation}
+            >
               {t('staff:punch.permission.allow')}
             </Button>
           </Footer>
@@ -411,7 +417,7 @@ function CameraStep({ a, s }: { a: StepArgs; s: Extract<PunchFlowState, { step: 
       <Footer>
         {reviewing ? (
           <>
-            <Button block icon="check-circle" onClick={a.flow.actions.usePhoto}>
+            <Button variant="primary" block icon="check-circle" onClick={a.flow.actions.usePhoto}>
               {t('staff:punch.camera.use')}
             </Button>
             <Button
@@ -425,7 +431,7 @@ function CameraStep({ a, s }: { a: StepArgs; s: Extract<PunchFlowState, { step: 
           </>
         ) : (
           <>
-            <Button block icon="camera" onClick={a.flow.actions.capture}>
+            <Button variant="primary" block icon="camera" onClick={a.flow.actions.capture}>
               {t('staff:punch.camera.shutter')}
             </Button>
             {s.tooDark && s.darkTries >= 2 ? (
@@ -488,6 +494,7 @@ function PinStep({
       </p>
       <Footer>
         <Button
+          variant="primary"
           block
           icon={a.kind === 'out' ? 'sign-out' : 'sign-in'}
           disabled={pin.length < 4 && !submitting}
@@ -516,7 +523,7 @@ function ResultStep({ a, s }: { a: StepArgs; s: Extract<PunchFlowState, { step: 
           {t('staff:punch.needsProof.time', { time: fmt.clock(r.punch.effectiveTs) })}
         </p>
         <Footer>
-          <Button block icon="qr-code" onClick={a.flow.actions.scanDoorCode}>
+          <Button variant="primary" block icon="qr-code" onClick={a.flow.actions.scanDoorCode}>
             {t('staff:punch.options.scanDoor')}
           </Button>
           <Button
@@ -692,7 +699,7 @@ function ProblemStep({ a, p }: { a: StepArgs; p: PunchProblem }) {
     </Button>
   );
   const noPhoto = (
-    <Button key="nophoto" block onClick={act.sendWithoutPhoto}>
+    <Button variant="primary" key="nophoto" block onClick={act.sendWithoutPhoto}>
       {t('staff:punch.options.sendWithoutPhoto', { owner })}
     </Button>
   );
@@ -763,7 +770,13 @@ function ProblemStep({ a, p }: { a: StepArgs; p: PunchProblem }) {
     case 'upgrade_required':
       message = t('staff:punch.problem.upgrade_required');
       options = [
-        <Button key="update" block icon="arrows-clockwise" onClick={() => void applyUpdate()}>
+        <Button
+          variant="primary"
+          key="update"
+          block
+          icon="arrows-clockwise"
+          onClick={() => void applyUpdate()}
+        >
           {t('staff:punch.options.updateNow')}
         </Button>,
       ];
@@ -771,7 +784,7 @@ function ProblemStep({ a, p }: { a: StepArgs; p: PunchProblem }) {
     case 'session_expired':
       message = t('staff:punch.problem.session_expired');
       options = [
-        <Button key="signin" block onClick={() => navigate('/signin?next=%2F')}>
+        <Button variant="primary" key="signin" block onClick={() => navigate('/signin?next=%2F')}>
           {t('staff:punch.options.signIn')}
         </Button>,
       ];
@@ -801,6 +814,7 @@ function FixItView({ a, topic }: { a: StepArgs; topic: FixItTopic }) {
       <FixItGuide topic={topic} />
       <Footer>
         <Button
+          variant="primary"
           block
           icon="arrows-clockwise"
           onClick={() => {
@@ -844,7 +858,7 @@ function VenueForm({ onSend }: { onSend: (place: string, note: string) => void }
       <Field label={t('staff:punch.venue.note', { owner })} optional>
         <Textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} rows={3} />
       </Field>
-      <Button type="submit" block icon="map-pin" disabled={!place.trim()}>
+      <Button variant="primary" type="submit" block icon="map-pin" disabled={!place.trim()}>
         {t('staff:punch.venue.send', { owner })}
       </Button>
     </form>
@@ -870,7 +884,7 @@ function NoteForm({ onSend }: { onSend: (note: string) => void }) {
       >
         <Textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} rows={3} />
       </Field>
-      <Button type="submit" block>
+      <Button variant="primary" type="submit" block>
         {t('staff:punch.note.send', { owner })}
       </Button>
     </form>

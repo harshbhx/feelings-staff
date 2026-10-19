@@ -18,7 +18,7 @@ interface Screen {
 }
 
 const h1 = (name: string | RegExp) => (page: Page) => page.getByRole('heading', { level: 1, name });
-const alert = (page: Page) => page.getByRole('alert');
+const alert = (text: string) => (page: Page) => page.getByRole('alert').filter({ hasText: text });
 
 const SCREENS: Screen[] = [
   { name: 'today', path: '/', ready: h1(/Good morning, Priya/) },
@@ -38,17 +38,31 @@ const SCREENS: Screen[] = [
     variant: 'meToday:pending-proof',
     ready: h1(/Good morning/),
   },
-  { name: 'today-error', path: '/', variant: 'meToday:error', ready: alert },
+  {
+    name: 'today-error',
+    path: '/',
+    variant: 'meToday:error',
+    ready: alert("We couldn't load today."),
+  },
   { name: 'month', path: '/month', ready: h1('Your month') },
-  { name: 'month-error', path: '/month', variant: 'meDays:error', ready: alert },
+  {
+    name: 'month-error',
+    path: '/month',
+    variant: 'meDays:error',
+    ready: alert("We couldn't load this month."),
+  },
   { name: 'day', path: '/day/2026-10-15', ready: h1(/15 Oct/) },
   { name: 'requests-leave', path: '/requests', ready: h1('Requests') },
   { name: 'requests-fixes', path: '/requests?tab=fixes', ready: h1('Requests') },
   { name: 'scan', path: '/scan', ready: h1('Scan door code') },
-  { name: 'fixit-location', path: '/fix/location', ready: h1(/./) },
-  { name: 'fixit-precise', path: '/fix/precise', ready: h1(/./) },
-  { name: 'fixit-camera', path: '/fix/camera', ready: h1(/./) },
-  { name: 'fixit-notifications', path: '/fix/notifications', ready: h1(/./) },
+  { name: 'fixit-location', path: '/fix/location', ready: h1(/^Location is off for this app/) },
+  {
+    name: 'fixit-precise',
+    path: '/fix/precise',
+    ready: h1(/^Your phone is sharing only an approximate location/),
+  },
+  { name: 'fixit-camera', path: '/fix/camera', ready: h1(/^Camera is off for this app/) },
+  { name: 'fixit-notifications', path: '/fix/notifications', ready: h1(/^Notifications are off/) },
 ];
 
 /** Check-in sheet states (PRD 4.3.2-4.3.6), frozen with `?sheet=<state>` in mock mode. */

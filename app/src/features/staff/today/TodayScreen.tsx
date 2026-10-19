@@ -209,11 +209,12 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
 
       <ActionBar>
         {model.primary === 'scan' ? (
-          <Button block icon="qr-code" onClick={() => navigate('/scan')}>
+          <Button variant="primary" block icon="qr-code" onClick={() => navigate('/scan')}>
             {t('staff:today.scanDoor')}
           </Button>
         ) : (
           <Button
+            variant="primary"
             block
             icon={model.primary === 'check_out' ? 'sign-out' : 'sign-in'}
             onClick={() => setSheetOpen(true)}

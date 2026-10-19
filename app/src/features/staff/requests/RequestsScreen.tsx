@@ -59,7 +59,7 @@ export function RequestsScreen() {
         {tab === 'leave' ? <LeaveTab /> : <FixesTab />}
       </main>
       <ActionBar>
-        <Button block icon="plus" asChild>
+        <Button variant="primary" block icon="plus" asChild>
           <Link to={tab === 'leave' ? '/requests/leave' : '/requests/fix'}>
             {tab === 'leave' ? t('staff:requests.askLeave') : t('staff:requests.fixDay')}
           </Link>
