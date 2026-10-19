@@ -8,23 +8,35 @@ interface Shown {
   data: { url: string };
 }
 
-/** Notifications the service worker is showing, read inside the worker (a page read crashes the headless page). */
+type Spied = { __shown?: Shown[] };
+
+/**
+ * Record what the worker passes to `showNotification` instead of displaying it: reading real
+ * notifications back crashes the headless Chromium renderer in the CI image.
+ */
+async function spyOnNotifications(context: BrowserContext): Promise<void> {
+  await expect.poll(() => context.serviceWorkers().length).toBeGreaterThan(0);
+  await context.serviceWorkers()[0]?.evaluate(() => {
+    const g = self as unknown as Spied;
+    g.__shown = [];
+    ServiceWorkerRegistration.prototype.showNotification = async function record(
+      title: string,
+      options?: NotificationOptions,
+    ) {
+      g.__shown?.push({
+        title,
+        body: options?.body ?? '',
+        tag: options?.tag ?? '',
+        data: options?.data as { url: string },
+      });
+    };
+  });
+}
+
 async function shown(context: BrowserContext): Promise<Shown[]> {
   const worker = context.serviceWorkers()[0];
   if (!worker) return [];
-  return worker.evaluate(async () => {
-    const reg = (
-      self as unknown as {
-        registration: { getNotifications(): Promise<Shown[]> };
-      }
-    ).registration;
-    return (await reg.getNotifications()).map((n) => ({
-      title: n.title,
-      body: n.body,
-      tag: n.tag,
-      data: n.data,
-    }));
-  });
+  return worker.evaluate(() => (self as unknown as Spied).__shown ?? []);
 }
 
 /**
@@ -53,6 +65,7 @@ test.describe('E2E-19 push in the service worker', () => {
     await page.evaluate(async () => {
       await navigator.serviceWorker.ready;
     });
+    await spyOnNotifications(context);
     const origin = new URL(page.url()).origin;
     const payload = {
       web_push: 8030,
@@ -104,6 +117,7 @@ test.describe('E2E-19 push in the service worker', () => {
     await page.evaluate(async () => {
       await navigator.serviceWorker.ready;
     });
+    await spyOnNotifications(context);
     await cdp.send('ServiceWorker.deliverPushMessage', {
       origin: new URL(page.url()).origin,
       registrationId: await registrationId,
