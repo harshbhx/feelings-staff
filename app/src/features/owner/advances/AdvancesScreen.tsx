@@ -99,11 +99,13 @@ function AdvanceRow({ advance: a }: { advance: AdvanceView }) {
   const { t } = useTranslation();
   const first = firstName(a.user.name);
   const lines = [
-    t('owner:advances.line', {
-      amount: money(a.amountPaise),
-      date: a.givenOn ? shortDate(a.givenOn) : '–',
-      mode: a.mode ? t(`owner:payroll.run.modes.${a.mode}`) : '–',
-    }),
+    a.givenOn && a.mode
+      ? t('owner:advances.line', {
+          amount: money(a.amountPaise),
+          date: shortDate(a.givenOn),
+          mode: t(`owner:payroll.run.modes.${a.mode}`),
+        })
+      : t('owner:advances.asked', { amount: money(a.amountPaise) }),
     a.plan === 'full'
       ? t('owner:advances.planLine.full', { month: monthLabel(a.firstMonth) })
       : t('owner:advances.planLine.instalments', {

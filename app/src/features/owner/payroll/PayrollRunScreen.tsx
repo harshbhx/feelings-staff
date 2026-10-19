@@ -100,7 +100,9 @@ function RunBody({ view }: { view: PayrollRunView }) {
               <Warning key={text}>{text}</Warning>
             ))}
             {lineWarnings.map((x) => (
-              <Warning key={`${x.who}-${x.text}`}>{x.text}</Warning>
+              <Warning key={`${x.who}-${x.text}`}>
+                {t('owner:payroll.run.personWarning', { name: x.who, text: x.text })}
+              </Warning>
             ))}
           </ul>
         </Section>

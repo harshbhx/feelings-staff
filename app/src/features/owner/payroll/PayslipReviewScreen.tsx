@@ -256,7 +256,9 @@ function Adjustments({ slip, runId }: { slip: OwnerPayslipView; runId: string })
           ))}
         </ul>
       ) : null}
-      <AddSheet slip={slip} runId={runId} />
+      <div>
+        <AddSheet slip={slip} runId={runId} />
+      </div>
     </Section>
   );
 }

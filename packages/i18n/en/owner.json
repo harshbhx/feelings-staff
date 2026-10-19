@@ -350,7 +350,8 @@
       },
       "reopened": "Reopened as revision {{n}}.",
       "finalised": "{{month}} is finalised. Payslips are being made.",
-      "preview": "This is the month so far. It becomes a draft on the 1st."
+      "preview": "This is the month so far. It becomes a draft on the 1st.",
+      "personWarning": "{{name}}: {{text}}"
     },
     "slip": {
       "title": "{{name}} · {{month}}",
@@ -669,7 +670,8 @@
     "errors": {
       "person": "Pick the person.",
       "amount": "Enter the amount in rupees."
-    }
+    },
+    "asked": "Asked for {{amount}}, not given yet"
   },
   "staff": {
     "title": "Staff",
