@@ -522,7 +522,440 @@
     }
   },
   "settings": {
-    "_helper": "fs-wp6-settings-screens"
+    "saved": "Saved.",
+    "needsPin": "Saving this asks for your owner PIN.",
+    "undo": "Undo changes",
+    "sections": {
+      "salon": {
+        "title": "Salon",
+        "hint": "Name, address, phone and logo"
+      },
+      "location": {
+        "title": "Location and door",
+        "hint": "The salon circle, calibration and door devices"
+      },
+      "shifts": {
+        "title": "Shifts and roster",
+        "hint": "Shift times and breaks"
+      },
+      "holidays": {
+        "title": "Holidays and no-leave days",
+        "hint": "This year's holidays and days without leave"
+      },
+      "attendance": {
+        "title": "Attendance rules",
+        "hint": "Grace, half days, PIN, selfie, strong mode"
+      },
+      "pay": {
+        "title": "Pay rules",
+        "hint": "Days in a month, overtime, off days, pay day"
+      },
+      "leave": {
+        "title": "Leave policy",
+        "hint": "Quotas, notice and comp-off"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "hint": "Quiet hours and summaries"
+      },
+      "people": {
+        "title": "People and roles",
+        "hint": "Managers and what each may do"
+      },
+      "privacy": {
+        "title": "Data and privacy",
+        "hint": "What is kept and who to ask"
+      },
+      "security": {
+        "title": "Security",
+        "hint": "Email, password, PIN, signed-in devices"
+      },
+      "app": {
+        "title": "App",
+        "hint": "Staff language and payslips"
+      },
+      "audit": {
+        "title": "Audit log",
+        "hint": "Who changed what, and why"
+      }
+    },
+    "units": {
+      "min": "min",
+      "pct": "%",
+      "days": "days",
+      "m": "m",
+      "h": "h"
+    },
+    "f": {
+      "grace": {
+        "label": "Grace",
+        "what": "Grace: {{value}} min. Late arrivals within {{value}} min aren't counted."
+      },
+      "early": {
+        "label": "Early-leave tolerance",
+        "what": "Leaving up to {{value}} min early isn't counted."
+      },
+      "makeup": {
+        "label": "Make-up time",
+        "what": "Staying late the same day makes up for coming in late."
+      },
+      "present": {
+        "label": "Full day from",
+        "what": "A day counts as present at {{value}}% of the shift."
+      },
+      "half": {
+        "label": "Half day from",
+        "what": "A day counts as a half day at {{value}}% of the shift; less is absent."
+      },
+      "breakAfter": {
+        "label": "Unpaid break after",
+        "what": "After {{value}} min of work, the shift's unpaid break is taken off."
+      },
+      "breakPunches": {
+        "label": "Break check-out and check-in",
+        "what": "Staff mark their break in the app instead of the fixed break."
+      },
+      "pinEvery": {
+        "label": "PIN on every check-in",
+        "what": "Staff type their PIN each time, not only on a new day."
+      },
+      "selfieIn": {
+        "label": "Selfie on check-in",
+        "what": "A photo with each check-in, kept for 30 days."
+      },
+      "selfieOut": {
+        "label": "Selfie on check-out",
+        "what": "A photo with each check-out too."
+      },
+      "strong": {
+        "label": "Strong mode for everyone",
+        "what": "Staff must scan the door code to check in. Needs your PIN."
+      },
+      "earliest": {
+        "label": "Check-in opens",
+        "what": "Check-in opens {{value}} min before the shift starts."
+      },
+      "closing": {
+        "label": "Closing time",
+        "what": "Open check-ins are closed at {{value}} if nobody checks out."
+      },
+      "fixWindow": {
+        "label": "Time to ask for a fix",
+        "what": "Staff can ask to fix a day up to {{value}} days back."
+      },
+      "flagAt": {
+        "label": "Look at a check-in from",
+        "what": "A check-in with risk {{value}} or more comes to Needs action. Needs your PIN."
+      },
+      "proofAt": {
+        "label": "Ask for proof from",
+        "what": "From risk {{value}} staff must scan the door code or wait for you. Needs your PIN."
+      },
+      "divisor": {
+        "label": "Days in a month for pay",
+        "what": "Salary per day is worked out on {{value}}.",
+        "options": {
+          "calendar": "the month's days",
+          "fixed30": "30 days",
+          "fixed26": "26 days",
+          "working": "working days"
+        }
+      },
+      "otThreshold": {
+        "label": "Overtime starts after",
+        "what": "Work more than {{value}} min past the shift before it counts as overtime."
+      },
+      "otBlock": {
+        "label": "Overtime counted in",
+        "what": "Overtime is counted in blocks of {{value}} min.",
+        "options": {
+          "15": "15 min",
+          "30": "30 min",
+          "60": "1 hour"
+        }
+      },
+      "otRate": {
+        "label": "Overtime pay",
+        "what": "Overtime is paid as {{value}}."
+      },
+      "weekly": {
+        "label": "Weekly hours warning",
+        "what": "You're warned when someone is rostered over {{value}} h in a week."
+      },
+      "quarterly": {
+        "label": "Overtime warning per quarter",
+        "what": "You're warned when overtime passes {{value}} h in a quarter."
+      },
+      "offday": {
+        "label": "Working on a week off or holiday",
+        "what": "They get {{value}}.",
+        "options": {
+          "comp_off": "a day off later",
+          "extra_pay": "extra pay"
+        }
+      },
+      "offdayRate": {
+        "label": "Extra pay for an off day",
+        "what": "An off day worked is paid at {{value}}.",
+        "options": {
+          "1": "1x a day",
+          "1_5": "1.5x a day",
+          "2": "2x a day"
+        }
+      },
+      "sandwich": {
+        "label": "Sandwich rule",
+        "what": "A week off between two leave days counts as leave."
+      },
+      "payDay": {
+        "label": "Pay by",
+        "what": "If salaries aren't marked paid by day {{value}} of the month, you get a reminder."
+      },
+      "minWage": {
+        "label": "Minimum wage check",
+        "what": "Payslips below the minimum wage get a warning."
+      },
+      "minWageAmount": {
+        "label": "Minimum wage in rupees",
+        "what": "Below ₹{{value}} gets a warning."
+      },
+      "minWageBasis": {
+        "label": "Minimum wage is",
+        "what": "The minimum is {{value}}.",
+        "options": {
+          "monthly": "per month",
+          "daily": "per day"
+        }
+      },
+      "dailyHolidays": {
+        "label": "Daily-paid staff: paid holidays",
+        "what": "Staff paid by the day are paid for holidays."
+      },
+      "dailyWeekOffs": {
+        "label": "Daily-paid staff: paid week offs",
+        "what": "Staff paid by the day are paid for week offs."
+      },
+      "cl": {
+        "label": "Casual leave a year",
+        "what": "{{value}} days of casual leave a year."
+      },
+      "sl": {
+        "label": "Sick leave a year",
+        "what": "{{value}} days of sick leave a year."
+      },
+      "usableAfter": {
+        "label": "Leave usable after",
+        "what": "New staff can take paid leave after {{value}} days."
+      },
+      "clNotice": {
+        "label": "Notice for casual leave",
+        "what": "Casual leave is asked {{value}} days ahead."
+      },
+      "slBackdate": {
+        "label": "Sick leave asked later",
+        "what": "Sick leave can be asked up to {{value}} days after."
+      },
+      "compOff": {
+        "label": "Comp-off lasts",
+        "what": "A day off earned for working an off day lasts {{value}} days."
+      },
+      "earned": {
+        "label": "Earned leave",
+        "what": "Staff earn leave for days worked."
+      },
+      "quiet": {
+        "label": "Quiet hours",
+        "what": "No alerts at night, except a new phone waiting for you."
+      },
+      "quietStart": {
+        "label": "Quiet from",
+        "what": "Quiet from {{value}}."
+      },
+      "quietEnd": {
+        "label": "Quiet until",
+        "what": "Alerts held overnight arrive at {{value}}."
+      },
+      "summaryOnly": {
+        "label": "Summaries only",
+        "what": "One morning and one evening summary instead of each alert."
+      },
+      "morning": {
+        "label": "Morning summary",
+        "what": "The morning summary comes {{value}} min after the first shift starts."
+      },
+      "lang": {
+        "label": "Staff app language",
+        "what": "New staff see the app in {{value}}.",
+        "options": {
+          "en": "English",
+          "gu": "Gujarati"
+        }
+      },
+      "payslips": {
+        "label": "Show payslips to staff",
+        "what": "Staff see their payslip in the app once you finalise."
+      },
+      "grievanceName": {
+        "label": "Contact for privacy questions",
+        "what": "Staff are told to ask this person."
+      },
+      "grievancePhone": {
+        "label": "Their phone",
+        "what": "Shown in the privacy notice."
+      }
+    },
+    "ot": {
+      "x2": "2x pay",
+      "x1_5": "1.5x pay",
+      "x1": "1x pay",
+      "comp_off": "time off later",
+      "unpaid": "not paid",
+      "flat": "a fixed rate"
+    },
+    "salon": {
+      "name": "Salon name",
+      "address": "Address",
+      "addressHint": "Shown on payslips.",
+      "phone": "Salon phone",
+      "owner": "Your name for staff",
+      "ownerHint": "Staff see \"{{name}}\" in the app, as in \"Send to {{name}}\".",
+      "logo": "Logo on payslips",
+      "logoHint": "The bindi mark or the Feelings wordmark.",
+      "logos": {
+        "bindi": "Bindi",
+        "wordmark": "Wordmark"
+      },
+      "timezone": "Time zone: India (Asia/Kolkata). It can't be changed.",
+      "errors": {
+        "name": "Add the salon name.",
+        "owner": "Add the name staff see."
+      }
+    },
+    "privacy": {
+      "kept": "What is kept",
+      "location": "Check-in locations: {{days}} days, then only the distance band stays.",
+      "selfies": "Selfies: {{days}} days.",
+      "payroll": "Attendance, payslips and the audit log: 8 years, as the law asks.",
+      "notice": "Privacy notice version {{version}}."
+    },
+    "location": {
+      "title": "Salon circle",
+      "map": "Map of {{name}} with the check-in circle",
+      "pin": "Pin {{lat}}, {{lng}}",
+      "radius": "Circle size",
+      "radiusWhat": "Check-ins within {{value}} m of the pin count as inside the salon.",
+      "accuracy": "Location must be within",
+      "accuracyWhat": "Locations less sure than {{value}} m ask the phone to try again.",
+      "strongNote": "Strong mode and when check-in opens are in"
+    },
+    "calibrate": {
+      "title": "Calibrate at the counter",
+      "how": "Stand at the counter and tap Calibrate. Do it on 2 or 3 days, ideally with an Android phone and an iPhone.",
+      "start": "Calibrate ({{s}} s)",
+      "waiting": "Finding you…",
+      "live": "{{m}} m accuracy · {{count}} readings",
+      "stop": "Stop",
+      "denied": "Location is blocked for this site. Allow it in the browser settings, then try again.",
+      "noFix": "This phone couldn't get a location. Step near a window and try again.",
+      "stored": "Saved. Do it again on another day.",
+      "more_one": "{{count}} session so far. One more on another day, then we suggest a circle.",
+      "more_other": "{{count}} sessions so far. One more on another day, then we suggest a circle.",
+      "proposal": "Suggested circle: {{radius}} m from {{sessions}} sessions (95% of readings within {{p95}} m).",
+      "compare": "The current circle and the suggested one",
+      "legend": "Dashed: current. Solid: suggested.",
+      "use": "Use this",
+      "keep": "Keep current",
+      "same": "The suggested circle is the one you have."
+    },
+    "door": {
+      "title": "Door devices",
+      "what": "An old phone or tablet at the door shows a code staff scan to check in.",
+      "none": "No door device yet. Your phone can show the code from More.",
+      "seen": "Last seen {{date}} {{time}}",
+      "status": {
+        "pairing": "Waiting to pair",
+        "active": "Working",
+        "revoked": "Removed"
+      },
+      "rotate": "New key",
+      "rotated": "New key set. Old codes stop working now.",
+      "remove": "Remove",
+      "pair": "Pair a door device",
+      "pairWhat": "Give it a name, then type the code on the device at staff.feelingsbeautycare.in/door.",
+      "codeHow": "On the door device, open staff.feelingsbeautycare.in/door and type this code.",
+      "getCode": "Get pairing code",
+      "codeUntil": "Works until {{time}}.",
+      "label": "Name",
+      "labelHint": "For example Reception tablet",
+      "removeTitle": "Remove {{name}}?",
+      "removeBody": "It stops showing the door code. Pair it again to use it."
+    },
+    "shifts": {
+      "what": "Shift times staff are rostered on. Breaks are unpaid.",
+      "line": "{{times}} · {{brk}} min break · {{paid}} paid",
+      "notUsed": "Not used",
+      "add": "Add a shift",
+      "stop": "Stop using",
+      "use": "Use again",
+      "name": "Name",
+      "from": "From",
+      "to": "To",
+      "removePart": "Remove this part",
+      "addPart": "Add a part (split shift)",
+      "break": "Unpaid break",
+      "breakWhat": "{{value}} min of the shift is unpaid break.",
+      "errors": {
+        "name": "Add a name.",
+        "times": "Each part needs a start before its end, in order."
+      }
+    },
+    "holidays": {
+      "prevYear": "Previous year",
+      "nextYear": "Next year",
+      "title": "Holidays",
+      "none": "No holidays for this year yet.",
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "comp": {
+        "comp_off": "worked: a day off later",
+        "extra_pay": "worked: extra pay",
+        "both": "worked: both"
+      },
+      "add": "Add a holiday",
+      "date": "Date",
+      "name": "Name",
+      "paidLabel": "Paid holiday",
+      "paidWhat": "Staff are paid for this day without working.",
+      "ifWorked": "If someone works that day"
+    },
+    "blackouts": {
+      "title": "No-leave days",
+      "what": "Leave asked for these days gets a warning, so you can say no.",
+      "none": "No no-leave days marked.",
+      "date": "Date",
+      "note": "Note",
+      "add": "Add no-leave day"
+    },
+    "people": {
+      "what": "A manager can approve and plan for you. Each change needs your PIN.",
+      "none": "No managers. You approve everything.",
+      "add": "Make someone a manager",
+      "addWhat": "They use the same app and see the owner screens they're allowed.",
+      "person": "Who",
+      "may": "They may",
+      "perms": {
+        "approve_attendance": "Approve check-ins",
+        "approve_leave": "Approve leave",
+        "approve_overtime": "Approve overtime",
+        "offsite": "Set venue duties",
+        "roster": "Change the roster",
+        "door": "Show the door code",
+        "staff": "See staff",
+        "payroll": "Run payroll",
+        "exports": "Download reports"
+      },
+      "removeTitle": "Remove {{name}} as a manager?"
+    }
   },
   "register": {
     "title": "Register",
@@ -851,7 +1284,81 @@
     }
   },
   "setup": {
-    "_helper": "fs-wp6-settings-screens"
+    "lead": "A few quick things, then you're ready.",
+    "ready": "You're ready. Change any of this later in Settings.",
+    "progress": "{{done}} of {{total}} done",
+    "continue": "Next: {{step}}",
+    "toToday": "Go to Today",
+    "skip": "Skip for now",
+    "state": {
+      "done": "Done",
+      "skipped": "Skipped",
+      "todo": "To do"
+    },
+    "location": {
+      "circle": "Check-ins within {{m}} m of the pin count as inside the salon."
+    },
+    "install": {
+      "enable": "Turn on alerts",
+      "state": {
+        "unsupported": "This browser can't show alerts. Open the app in Chrome on Android or from the Home Screen on iPhone.",
+        "needs-install": "On iPhone, add the app to the Home Screen first: Share, then Add to Home Screen. Then open it from there.",
+        "default": "Turn on alerts to hear about late staff, new phones and leave requests.",
+        "denied": "Alerts are blocked for this app. Allow them in the phone's settings.",
+        "granted-subscribed": "Alerts are on for this phone.",
+        "granted-unsubscribed": "Alerts are allowed but not set up on this phone yet."
+      }
+    },
+    "steps": {
+      "salon": {
+        "title": "Salon details",
+        "hint": "Name, address, phone",
+        "lead": "Check the salon's name, address and phone. They go on payslips.",
+        "done": "Looks right"
+      },
+      "location": {
+        "title": "Salon location",
+        "hint": "The check-in circle",
+        "lead": "Staff can check in inside this circle. Calibrate at the counter for a better circle, or keep it.",
+        "done": "Looks right"
+      },
+      "shifts": {
+        "title": "Shifts",
+        "hint": "Opening hours and shift times",
+        "lead": "Five shifts are ready. Change the times or add your own.",
+        "done": "These are right"
+      },
+      "holidays": {
+        "title": "Holidays",
+        "hint": "This year's holidays",
+        "lead": "National holidays and five festivals are added. Fix the dates or add more.",
+        "done": "These are right"
+      },
+      "pay_rules": {
+        "title": "Pay rules",
+        "hint": "Overtime, off days, pay day",
+        "lead": "These are the usual rules for a salon. Change what's different for you.",
+        "done": "Use these"
+      },
+      "selfie": {
+        "title": "Selfie on check-in",
+        "hint": "Off unless you want it",
+        "lead": "A photo with each check-in makes it harder to check in for someone else. Off by default.",
+        "done": "Done"
+      },
+      "first_staff": {
+        "title": "Your first staff member",
+        "hint": "Add someone and send the invite",
+        "lead": "Add one person and send the invite on WhatsApp. Add the rest any time.",
+        "done": "Done"
+      },
+      "install": {
+        "title": "This phone",
+        "hint": "Install and turn on alerts",
+        "lead": "Keep Feelings on this phone's Home Screen and turn on alerts.",
+        "done": "Done"
+      }
+    }
   },
   "roster": {
     "title": "Roster",
@@ -1022,7 +1529,35 @@
     "help": "A photo of this code works for up to a minute, so staff still need their PIN and their own phone."
   },
   "security": {
-    "_helper": "fs-wp6-settings-screens"
+    "email": "Sign-in email",
+    "emailHint": "Sign-in links and codes come here.",
+    "pin": "Owner PIN",
+    "pinWhat": "6 digits. It unlocks payroll, salary, phones and the circle for 10 minutes.",
+    "currentPin": "Current PIN",
+    "newPin": "New PIN",
+    "pinAgain": "New PIN again",
+    "setPin": "Set PIN",
+    "changePin": "Change PIN",
+    "pinSix": "The PIN has 6 digits.",
+    "pinMismatch": "The two PINs don't match.",
+    "currentPinNeeded": "Type your current PIN.",
+    "pinWrong": "That PIN isn't right.",
+    "password": "Password",
+    "passwordSet": "You can sign in with your password and PIN when the email doesn't arrive.",
+    "passwordWhat": "Set a password to sign in when the email link doesn't arrive.",
+    "pinFirst": "Set your owner PIN first.",
+    "newPassword": "New password",
+    "passwordHint": "10 characters or more.",
+    "passwordLength": "Use 10 characters or more.",
+    "pinToConfirm": "Your owner PIN",
+    "setPassword": "Set password",
+    "changePassword": "Change password",
+    "sessions": "Signed in on",
+    "sessionLine": "Since {{since}} · last used {{seen}}",
+    "thisDevice": "This device",
+    "signOutOthers": "Sign out other devices",
+    "signOutTitle": "Sign out other devices?",
+    "signOutBody": "Every other phone and computer signed in as you is signed out now."
   },
   "more": {
     "title": "More",
@@ -1042,7 +1577,112 @@
     }
   },
   "audit": {
-    "_helper": "fs-wp6-settings-screens"
+    "filter": "Show",
+    "categories": {
+      "all": "Everything",
+      "change": "Changes",
+      "security": "Security",
+      "access": "Who looked",
+      "export": "Downloads"
+    },
+    "from": "From",
+    "to": "To",
+    "empty": "Nothing here for these dates.",
+    "more": "Show older",
+    "reason": "Reason: “{{reason}}”",
+    "actors": {
+      "user": "Someone",
+      "system": "The app",
+      "door": "Door device"
+    },
+    "actions": {
+      "advance_cancel": "Advance cancelled",
+      "advance_create": "Advance given",
+      "advance_request": "Advance asked for",
+      "advance_update": "Advance changed",
+      "auth_logout": "Signed out",
+      "auth_magic_requested": "Sign-in link sent",
+      "auth_owner_login": "Owner signed in",
+      "auth_pin_locked": "PIN locked after wrong tries",
+      "auth_sign_out_others": "Other devices signed out",
+      "auth_signature_invalid": "Phone check failed",
+      "auth_staff_login": "Staff signed in",
+      "auth_step_up": "Owner PIN entered",
+      "blackout_create": "Busy day added",
+      "blackout_delete": "Busy day removed",
+      "consent_give": "Consent given",
+      "consent_withdraw": "Consent withdrawn",
+      "day_override": "Day edited",
+      "device_enrol": "New phone",
+      "device_revoke": "Phone removed",
+      "door_device_paired": "Door device paired",
+      "door_device_pairing_started": "Door pairing started",
+      "door_device_revoke": "Door device removed",
+      "door_device_rotate": "Door key changed",
+      "duty_cancel": "Venue duty cancelled",
+      "duty_create": "Venue duty added",
+      "duty_update": "Venue duty changed",
+      "holiday_create": "Holiday added",
+      "holiday_delete": "Holiday removed",
+      "holiday_update": "Holiday changed",
+      "invite_create": "Invite sent",
+      "join_code_wrong": "Wrong join code",
+      "leave_adjust": "Leave balance changed",
+      "leave_annual_credit": "Yearly leave added",
+      "leave_cancel": "Leave cancelled",
+      "leave_cancel_day": "Leave day cancelled",
+      "leave_comp_off_expire": "Comp-off expired",
+      "leave_request": "Leave asked for",
+      "manager_remove": "Manager removed",
+      "manager_upsert": "Manager set",
+      "notification_prefs_update": "Alert settings changed",
+      "org_setup": "Salon set up",
+      "org_update": "Salon details changed",
+      "payroll_adjustment_add": "Added to a payslip",
+      "payroll_adjustment_delete": "Removed from a payslip",
+      "payroll_advance_recovery": "Advance recovery changed",
+      "payroll_draft": "Payroll draft made",
+      "payroll_finalise": "Payroll finalised",
+      "payroll_mark_paid": "Marked paid",
+      "payroll_recompute": "Payroll recomputed",
+      "payroll_reopen": "Payroll reopened",
+      "punch_approve_and_open": "Venue opened for others",
+      "punch_auto_close": "Day closed without check-out",
+      "punch_auto_close_change": "Closing time changed",
+      "punch_auto_close_keep": "Closing time kept",
+      "punch_create": "Check-in or check-out",
+      "punch_create_owner": "Check-in added by you",
+      "punch_delete": "Check-in removed",
+      "punch_denied": "Check-in refused",
+      "punch_edit": "Check-in edited",
+      "punch_proof": "Door code scanned",
+      "punch_request_approval": "Sent for approval",
+      "punch_supersede": "Check-in replaced",
+      "push_subscribe": "Alerts turned on",
+      "push_unsubscribe": "Alerts turned off",
+      "regularisation_cancel": "Fix request cancelled",
+      "regularisation_request": "Fix asked for",
+      "retention_purge": "Old data deleted",
+      "roster_change": "Roster changed",
+      "salary_change": "Salary changed",
+      "settings_update": "Settings changed",
+      "shift_template_create": "Shift added",
+      "shift_template_deactivate": "Shift stopped",
+      "shift_template_update": "Shift changed",
+      "site_calibration_samples": "Calibration saved",
+      "site_update": "Salon circle changed",
+      "staff_create": "Staff added",
+      "staff_exit": "Marked as left",
+      "staff_rehire": "Rehired",
+      "staff_update": "Staff details changed",
+      "user_update_self": "Own details changed",
+      "device_approve": "Phone approved",
+      "device_reject": "Phone rejected",
+      "export_create": "File made",
+      "auth_sign_in": "Signed in",
+      "attendance_auto_close": "Day closed without check-out"
+    },
+    "removed": "{{value}} (removed)"
   },
   "verify": {
     "title": "Payslip check",
