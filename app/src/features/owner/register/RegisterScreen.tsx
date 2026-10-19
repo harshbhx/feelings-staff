@@ -163,7 +163,7 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
   };
 
   return (
-    <div className="max-h-[calc(100dvh-14rem)] overflow-auto rounded-md border border-border">
+    <div className="relative max-h-[calc(100dvh-14rem)] overflow-auto rounded-md border border-border">
       <table className="border-separate border-spacing-0 text-sm">
         <caption className="sr-only">
           {t('owner:register.caption', { month: monthLabel(view.month) })}

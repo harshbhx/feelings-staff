@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { StaffStatusFilter } from '../api/keys';
 import { useStaffList } from '../api/staff';
-import { Meta, WRAP_ROW } from '../components/layout';
+import { CHIPS_WRAP, Meta, WRAP_ROW } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { shortDate } from '../lib/format';
 
@@ -50,6 +50,7 @@ export function StaffListScreen() {
         legend={t('owner:staff.filterLabel')}
         legendHidden
         layout="scroll"
+        className={CHIPS_WRAP}
         value={filter}
         onValueChange={(v) => setFilter(v as StaffStatusFilter)}
         options={FILTERS.map((f) => ({ value: f, label: t(`owner:staff.filters.${f}`) }))}

@@ -153,7 +153,7 @@ function Day({ day }: { day: OwnerDayDetail }) {
                       <span className="text-sm text-text-muted">{l.formula}</span>
                     </span>
                     {l.amountPaise !== null ? (
-                      <span className="font-semibold text-text tabular-nums">
+                      <span className="whitespace-nowrap font-semibold text-text tabular-nums">
                         {money(l.amountPaise)}
                       </span>
                     ) : null}

@@ -49,6 +49,8 @@ export default function LeafletMap({
       attributionControl: true,
       scrollWheelZoom: false,
     });
+    // Credit OpenStreetMap only: Leaflet's default prefix adds a flag icon outside the brand.
+    m.attributionControl.setPrefix(false);
     L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(m);
     layer.current = L.layerGroup().addTo(m);
     m.on('click', (e: L.LeafletMouseEvent) =>

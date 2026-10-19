@@ -1,0 +1,29 @@
+/*
+ * Owner layout helpers on top of the kit (no colours here, only layout).
+ * Plain selectors on purpose: Tailwind turns the "__" of BEM class names inside arbitrary variants
+ * into spaces, so `[&>.fs-row__text]` would never match.
+ */
+
+/* A ListRow whose trailing chips or buttons would squeeze the name: below about 10rem of text the
+   trailing part moves to its own line, right-aligned, instead of breaking the name letter by letter. */
+.owner-wrap-row {
+  flex-wrap: wrap;
+}
+
+.owner-wrap-row > .fs-row__text {
+  flex-basis: 10rem;
+}
+
+.owner-wrap-row > .fs-row__trailing {
+  margin-left: auto;
+}
+
+/* Filter chips: one swipeable row on phones, wrapped lines from 64rem where there is room. */
+@media (min-width: 64rem) {
+  .owner-chips-wrap .fs-chip-group__items[data-layout="scroll"] {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+}

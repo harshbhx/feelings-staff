@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { useActions, useBulkApprove } from '../api/attendance';
-import { Section, useNow } from '../components/layout';
+import { CHIPS_WRAP, Section, useNow } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { ActionCard } from './ActionCard';
 import {
@@ -96,6 +96,7 @@ function Queue({ view }: { view: ActionsView }) {
           legend={t('owner:actions.filterLabel')}
           legendHidden
           layout="scroll"
+          className={CHIPS_WRAP}
           value={filter ?? 'all'}
           onValueChange={(v) => setFilter(v === 'all' ? null : (v as ActionType))}
           options={[

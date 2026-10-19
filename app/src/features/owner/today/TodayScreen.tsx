@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useTodayBoard } from '../api/attendance';
-import { Meta, Section, Tag, useNow, WRAP_ROW } from '../components/layout';
+import { CHIPS_WRAP, Meta, Section, Tag, useNow, WRAP_ROW } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { clock, dayLabel, duration } from '../lib/format';
 import { telLink, waLink } from '../lib/share';
@@ -167,7 +167,7 @@ function Board({ board }: { board: TodayBoard }) {
             {headlineParts(board).map((p, i) => (
               <span key={p.key}>
                 {i > 0 ? <span className="text-text-muted"> · </span> : null}
-                {t(p.key, { count: p.count })}
+                <span className="whitespace-nowrap">{t(p.key, { count: p.count })}</span>
               </span>
             ))}
           </p>
@@ -177,7 +177,7 @@ function Board({ board }: { board: TodayBoard }) {
       {board.actionsCount > 0 ? (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-md border border-border bg-bg-soft px-4 py-3">
           <Icon name="warning-circle" className="size-6 shrink-0 text-accent" />
-          <p className="min-w-0 flex-1 font-bold text-text">
+          <p className="min-w-0 flex-1 basis-48 font-bold text-text">
             {t('owner:today.needsAction', { count: board.actionsCount })}
           </p>
           <Button asChild variant="primary" size="sm" iconEnd="arrow-right">
@@ -191,7 +191,7 @@ function Board({ board }: { board: TodayBoard }) {
         legend={t('owner:today.counters.label')}
         legendHidden
         layout="scroll"
-        className="xl:[&_.fs-chip-group__items]:mx-0 xl:[&_.fs-chip-group__items]:flex-wrap xl:[&_.fs-chip-group__items]:overflow-visible xl:[&_.fs-chip-group__items]:px-0"
+        className={CHIPS_WRAP}
         options={options}
         value={filter ?? 'all'}
         onValueChange={(v) => setFilter(v === 'all' ? null : (v as CounterKey))}
