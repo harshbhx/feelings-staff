@@ -17,6 +17,7 @@ import {
   Input,
   PinPad,
   Sheet,
+  StatusChip,
   Textarea,
 } from '@fs/ui';
 import {
@@ -191,6 +192,11 @@ export function PunchSheet({
         <div
           className="flex flex-col gap-4"
           data-punch-step={local.view === 'flow' ? state.step : local.view}
+          data-punch-reason={
+            state.step === 'problem' && state.problem.code === 'unknown'
+              ? (state.problem.reason ?? undefined)
+              : undefined
+          }
         >
           {local.view === 'confirm' ? (
             <ConfirmView a={args} reason={local.reason} />
@@ -324,6 +330,8 @@ function FlowView({ a }: { a: StepArgs }) {
       );
     case 'camera':
       return <CameraStep a={a} s={s} />;
+    case 'confirm':
+      return <ConfirmView a={a} reason={s.reason} />;
     case 'pin':
     case 'submitting':
       return <PinStep a={a} s={s} />;
@@ -431,7 +439,12 @@ function CameraStep({ a, s }: { a: StepArgs; s: Extract<PunchFlowState, { step: 
           </>
         ) : (
           <>
-            <Button variant="primary" block icon="camera" onClick={a.flow.actions.capture}>
+            <Button
+              variant="primary"
+              block
+              icon="camera"
+              onClick={() => a.flow.actions.capture(video.current)}
+            >
               {t('staff:punch.camera.shutter')}
             </Button>
             {s.tooDark && s.darkTries >= 2 ? (
@@ -584,9 +597,14 @@ function Success({
       : t('staff:punch.successSalonNoDistance');
   return (
     <div className="flex flex-col items-start gap-3 py-2" data-success="">
-      <Bindi size="success" land={!frozen} />
-      <p className="staff-bignum" aria-hidden="true">
+      {/* Status is colour + icon + word (PRD 12.11); the bindi lands once as the time's full stop (12.9). */}
+      <StatusChip
+        status="present"
+        label={kind === 'out' ? t('staff:today.status.done') : t('staff:today.status.in')}
+      />
+      <p className="staff-bignum flex items-end gap-1.5" aria-hidden="true">
         {time}
+        <Bindi size="success" land={!frozen} className="mb-1" />
       </p>
       <p className="text-lg font-bold text-text" role="status">
         {headline}
@@ -789,9 +807,15 @@ function ProblemStep({ a, p }: { a: StepArgs; p: PunchProblem }) {
         </Button>,
       ];
       break;
-    case 'not_ready':
-      message = t('staff:punch.notReady');
-      options = [call, closeBtn];
+    case 'conflict':
+      message = p.checkedIn
+        ? t('staff:punch.problem.conflictIn')
+        : t('staff:punch.problem.conflictOut');
+      options = [closeBtn];
+      break;
+    case 'offline_unavailable':
+      message = t('staff:punch.problem.offline_unavailable');
+      options = [retry(true), closeBtn];
       break;
     default:
       message = t('staff:punch.problem.unknown');
