@@ -60,7 +60,8 @@ async function api<T>(
 
 const priya = () => seed.staff.find((s) => s.name === 'Priya Shah')?.id ?? '';
 
-test.beforeEach(async ({ reset, setServerClock, request }) => {
+test.beforeEach(async ({ reset, setServerClock, request }, testInfo) => {
+  test.skip(testInfo.project.name !== 'owner-desktop', 'API-driven; runs once');
   seed = await reset('payroll-october');
   await setServerClock(NOV_2);
   await signIn(request, true);
