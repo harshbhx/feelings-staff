@@ -2,6 +2,7 @@
  * Test-only endpoints (PRD 9.4): reset + seed, fake clock, run a cron job, read the outbox.
  * Refused in production and without a matching X-E2E-Token (lib/api.ts answers 404). Owner: WP-1.
  */
+import { istDate } from '@fs/contracts';
 import { runJob } from './cron';
 import { json } from './db';
 import { applyMigrations, wipeAll } from './db/schema';
@@ -34,6 +35,17 @@ export const handlers: Handlers = {
 
   async testCron({ body }, ctx) {
     const at = body.at ?? ctx.now();
+    if (body.job === 'recompute-day') {
+      const date = body.date ?? istDate(at);
+      if (!ctx.orgId) return { job: body.job, at, summary: { date, people: 0 } };
+      const people = await ctx.db.all<{ user_id: string }>(
+        `SELECT p.user_id FROM staff_profiles p JOIN users u ON u.id = p.user_id
+          WHERE p.org_id = ?org AND u.status IN ('active', 'invited') AND p.join_date <= ?`,
+        date,
+      );
+      for (const p of people) await ctx.services.days.recompute(ctx, p.user_id, date);
+      return { job: body.job, at, summary: { date, people: people.length } };
+    }
     const summary = await runJob(body.job, ctx.env, at);
     return { job: body.job, at, summary };
   },
