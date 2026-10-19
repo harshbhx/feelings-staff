@@ -253,6 +253,8 @@ function stripCredits(view: PayslipView, owner: string | null): PayslipView {
         l.code === 'time_credits'
           ? {
               ...l,
+              // The line code is an ordinary adjustment for staff: no "credits" in the payload.
+              code: l.kind === 'deduction' ? 'other_deduction' : 'other_earning',
               label: 'Time adjustment',
               formula:
                 l.kind === 'deduction'
