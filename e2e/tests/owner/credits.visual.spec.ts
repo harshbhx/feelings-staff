@@ -63,13 +63,13 @@ test.describe('owner credits visual', () => {
     checkA11y,
   }) => {
     await openOwner(page, `/o/credits/${JINAL}`);
+    await noCrash(page);
     await page.getByRole('button', { name: 'Adjust minutes' }).click();
     const sheet = page.getByRole('dialog');
     await expect(sheet.getByRole('button', { name: 'Save adjustment' })).toBeDisabled();
     await sheet.getByLabel('Minutes', { exact: true }).fill('10');
     await sheet.getByLabel('Reason', { exact: true }).fill('Bus strike, she called ahead');
     await expect(sheet.getByRole('button', { name: 'Save adjustment' })).toBeEnabled();
-    await noCrash(page);
     await expect(page).toHaveScreenshot('owner-credits-adjust.png');
     await checkA11y();
   });
@@ -79,6 +79,7 @@ test.describe('owner credits visual', () => {
     checkA11y,
   }) => {
     await openOwner(page, `/o/credits/${JINAL}`);
+    await noCrash(page);
     await page
       .getByRole('button', { name: /Early on .*\b5 Oct/ })
       .filter({ visible: true })
@@ -87,7 +88,6 @@ test.describe('owner credits visual', () => {
     const sheet = page.getByRole('dialog');
     await expect(sheet.getByText('Approved by Urmi')).toBeVisible();
     await expect(sheet.getByRole('button', { name: 'Void' })).toBeVisible();
-    await noCrash(page);
     await expect(page).toHaveScreenshot('owner-credits-entry.png');
     await checkA11y();
     await sheet.getByRole('button', { name: 'Void' }).click();
@@ -155,9 +155,13 @@ test.describe('owner credits flows on the fixtures', () => {
     await expect(jinal.getByLabel('Minutes to settle for Jinal Kotak')).toHaveValue('150');
     await expect(jinal.getByTestId('settle-money')).toHaveText('about −₹111.11');
     await expect(jinal.getByText('Not saved yet')).toBeVisible();
-    // The stepper never passes the balance; 0 clears it.
-    await jinal.getByRole('button', { name: '5 min more' }).click();
-    await expect(jinal.getByLabel('Minutes to settle for Jinal Kotak')).toHaveValue('150');
+    // The stepper never passes the balance (+ stays focusable but disabled); 0 clears it.
+    await expect(jinal.getByRole('button', { name: '5 min more' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    await jinal.getByRole('button', { name: '5 min less' }).click();
+    await expect(jinal.getByLabel('Minutes to settle for Jinal Kotak')).toHaveValue('145');
     await jinal.getByRole('button', { name: 'Settle 0' }).click();
     await expect(jinal.getByLabel('Minutes to settle for Jinal Kotak')).toHaveValue('0');
     await expect(page.getByRole('button', { name: 'Save settlements' })).toBeEnabled();
@@ -175,10 +179,11 @@ test.describe('owner credits flows on the fixtures', () => {
 
   test('O-29.7 the Credits list filters plus or minus and opens the ledger', async ({ page }) => {
     await openOwner(page, '/o/credits');
-    await page.getByText('plus', { exact: true }).click();
+    // The radio covers the whole chip.
+    await page.getByRole('radio', { name: /plus/ }).click();
     await expect(shown(page, 'Neha Parmar')).toBeVisible();
     await expect(page.locator('#owner-main').getByText('Jinal Kotak')).toHaveCount(0);
-    await page.getByText('everyone', { exact: true }).click();
+    await page.getByRole('radio', { name: /everyone/ }).click();
     await shown(page, 'Jinal Kotak').click();
     await expect(page).toHaveURL(new RegExp(`/o/credits/${JINAL}`));
     await expect(page.getByTestId('credits-balance')).toBeVisible();

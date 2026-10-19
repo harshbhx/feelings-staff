@@ -1862,8 +1862,8 @@
       "openReports": "Open Reports"
     },
     "settle": {
-      "title": "Settle credits for {{month}}",
-      "lead": "Choose how many minutes to settle for each person. Nothing is settled unless you choose, and what you leave stays on the balance.",
+      "title": "Settle credits",
+      "lead": "{{month}} payroll. Choose how many minutes to settle for each person. Nothing is settled unless you choose, and what you leave stays on the balance.",
       "balance": "Balance {{min}} min",
       "toCut": "Minutes to cut",
       "toPay": "Minutes to pay",

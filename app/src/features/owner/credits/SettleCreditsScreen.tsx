@@ -54,7 +54,7 @@ function Settle({ view, rows }: { view: PayrollRunView; rows: CreditsSettleRow[]
   const toast = useToast();
   const errorText = useErrorText();
   const month = monthLabel(view.run.month);
-  useOwnerTitle(t('owner:credits.settle.title', { month }), `/o/payroll/${view.run.id}`);
+  useOwnerTitle(t('owner:credits.settle.title'), `/o/payroll/${view.run.id}`);
   const overview = useCreditsOverview();
   const settle = useSettleCredit(view.run.id);
   const [drafts, setDrafts] = useState<Record<string, number>>({});
@@ -88,7 +88,9 @@ function Settle({ view, rows }: { view: PayrollRunView; rows: CreditsSettleRow[]
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       {editable ? (
-        <Meta className="max-w-(--container-narrow)">{t('owner:credits.settle.lead')}</Meta>
+        <Meta className="max-w-(--container-narrow)">
+          {t('owner:credits.settle.lead', { month })}
+        </Meta>
       ) : (
         <Banner icon="lock">{t('owner:credits.settle.finalised')}</Banner>
       )}
@@ -162,7 +164,7 @@ function SettleRow({
 
   return (
     <li
-      className="grid gap-4 border-border border-t py-5 first:border-t-0 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,15rem)] xl:items-start xl:gap-8"
+      className="grid gap-4 border-border border-t py-5 first:border-t-0 xl:grid-cols-[minmax(0,1fr)_18rem_minmax(0,15rem)] xl:items-start xl:gap-8"
       data-testid="settle-row"
     >
       <div className="grid gap-0.5">

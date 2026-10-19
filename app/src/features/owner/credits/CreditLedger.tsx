@@ -173,7 +173,7 @@ function Filters({
             }))}
           />
         </Field>
-        <Field label={t('owner:credits.ledger.from')} className="xl:w-44">
+        <Field label={t('owner:credits.ledger.from')} className="min-w-0 xl:w-44">
           <Input
             type="date"
             value={value.from ?? ''}
@@ -181,7 +181,7 @@ function Filters({
             onChange={(e) => onChange({ ...value, from: e.target.value || undefined })}
           />
         </Field>
-        <Field label={t('owner:credits.ledger.to')} className="xl:w-44">
+        <Field label={t('owner:credits.ledger.to')} className="min-w-0 xl:w-44">
           <Input
             type="date"
             value={value.to ?? ''}
@@ -315,7 +315,7 @@ function LedgerTable({
               <th
                 key={c}
                 scope="col"
-                className={`${TH} ${right.has(c) ? 'text-right' : 'text-left'}`}
+                className={`${TH} whitespace-nowrap ${right.has(c) ? 'text-right' : 'text-left'}`}
               >
                 {c === 'edit' ? (
                   <span className="sr-only">{t('owner:credits.ledger.col.edit')}</span>
@@ -351,8 +351,8 @@ function LedgerTable({
               <td className={`${TD} text-right font-semibold text-text-body tabular-nums`}>
                 {signedMin(r.runningBalanceMin)}
               </td>
-              <td className={`${TD} text-text-body`}>{words.source(r)}</td>
-              <td className={`${TD} text-text-body`}>{words.confirmed(r)}</td>
+              <td className={`${TD} whitespace-nowrap text-text-body`}>{words.source(r)}</td>
+              <td className={`${TD} whitespace-nowrap text-text-body`}>{words.confirmed(r)}</td>
               <td className={`${TD} text-right`}>
                 {canAdjust(r) ? (
                   <Button size="sm" variant="ghost" icon="pencil-simple" onClick={() => onEdit(r)}>
