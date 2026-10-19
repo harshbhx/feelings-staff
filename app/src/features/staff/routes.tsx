@@ -4,7 +4,7 @@
  */
 import { lazy } from 'react';
 import type { RouteObject } from 'react-router';
-import { Placeholder } from '../../app/placeholder';
+import { WithNamespaces } from '../../app/i18n';
 import { InboxScreen } from '../inbox';
 import { browserAllowed } from './install/allow-browser';
 import { TodayScreen } from './today/TodayScreen';
@@ -16,6 +16,25 @@ const DayScreen = lazy(() => import('./month/DayScreen').then((m) => ({ default:
 const RequestsScreen = lazy(() =>
   import('./requests/RequestsScreen').then((m) => ({ default: m.RequestsScreen })),
 );
+const LeaveFormScreen = lazy(() =>
+  import('./requests/LeaveFormScreen').then((m) => ({ default: m.LeaveFormScreen })),
+);
+const FixFormScreen = lazy(() =>
+  import('./requests/FixFormScreen').then((m) => ({ default: m.FixFormScreen })),
+);
+const PayslipsScreen = lazy(() =>
+  import('./payslips/PayslipsScreen').then((m) => ({ default: m.PayslipsScreen })),
+);
+const PayslipScreen = lazy(() =>
+  import('./payslips/PayslipScreen').then((m) => ({ default: m.PayslipScreen })),
+);
+const MeScreen = lazy(() => import('./me/MeScreen').then((m) => ({ default: m.MeScreen })));
+const MyDataScreen = lazy(() =>
+  import('./me/MyDataScreen').then((m) => ({ default: m.MyDataScreen })),
+);
+const PrivacyScreen = lazy(() =>
+  import('./me/PrivacyScreen').then((m) => ({ default: m.PrivacyScreen })),
+);
 const ScanScreen = lazy(() => import('./scan/ScanScreen').then((m) => ({ default: m.ScanScreen })));
 const FixItScreen = lazy(() =>
   import('./fixit/FixItScreen').then((m) => ({ default: m.FixItScreen })),
@@ -25,19 +44,29 @@ const FixItScreen = lazy(() =>
 // redirects and the query is lost). Non-production hosts only; see install/allow-browser.ts.
 if (typeof window !== 'undefined') browserAllowed();
 
+const PAYSLIP_NS = ['payslip'] as const;
+
 export const staffRoutes: RouteObject[] = [
   { index: true, element: <TodayScreen /> },
   { path: 'month', element: <MonthScreen /> },
   { path: 'day/:date', element: <DayScreen /> },
   { path: 'requests', element: <RequestsScreen /> },
-  { path: 'requests/leave', element: <Placeholder titleKey="staff:screens.leaveForm" /> },
-  { path: 'requests/fix', element: <Placeholder titleKey="staff:screens.fixForm" /> },
-  { path: 'payslips', element: <Placeholder titleKey="staff:screens.payslips" /> },
-  { path: 'payslips/:id', element: <Placeholder titleKey="staff:screens.payslip" /> },
+  { path: 'requests/leave', element: <LeaveFormScreen /> },
+  { path: 'requests/fix', element: <FixFormScreen /> },
+  { path: 'payslips', element: <PayslipsScreen /> },
+  {
+    // The payslip view uses the `payslip` catalog (days, rate, leave balances); not a staff-start one.
+    path: 'payslips/:id',
+    element: (
+      <WithNamespaces ns={PAYSLIP_NS}>
+        <PayslipScreen />
+      </WithNamespaces>
+    ),
+  },
   { path: 'inbox', element: <InboxScreen /> },
-  { path: 'me', element: <Placeholder titleKey="staff:screens.me" /> },
-  { path: 'me/data', element: <Placeholder titleKey="staff:screens.myData" /> },
-  { path: 'me/privacy', element: <Placeholder titleKey="staff:screens.privacy" /> },
+  { path: 'me', element: <MeScreen /> },
+  { path: 'me/data', element: <MyDataScreen /> },
+  { path: 'me/privacy', element: <PrivacyScreen /> },
   { path: 'scan', element: <ScanScreen /> },
   { path: 'fix/:topic', element: <FixItScreen /> },
 ];
