@@ -42,5 +42,6 @@ Docs:
 - The Content Security Policy no longer sends `upgrade-insecure-requests`. Every source is `'self'`, HSTS already forces HTTPS, and WebKit applies the directive to `http://localhost`, which broke the iPhone project of the CI run.
 - `CONTRIBUTING.md` now covers docs rules, labels and the PR template.
 - `docs/PRD.md` is at version 1.1 (see Appendix C).
+- The payslip engine computes late/early, overtime pay and the off-day extra in one stage (`timeLines`), ready for Time credits to replace it. Payslips are unchanged.
 
 [Unreleased]: https://github.com/harshbhx/feelings-staff/commits/main
