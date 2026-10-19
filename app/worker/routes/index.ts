@@ -7,6 +7,7 @@ import { handlers as credits } from './credits';
 import { handlers as notify } from './notify';
 import { handlers as owner } from './owner';
 import { handlers as payroll } from './payroll';
+import { handlers as presence } from './presence';
 import { handlers as staff } from './staff';
 import { handlers as system } from './system';
 
@@ -18,6 +19,7 @@ export const allHandlers = mergeHandlers(
   owner,
   payroll,
   credits,
+  presence,
   notify,
   testRoutes,
 );
