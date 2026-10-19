@@ -11,7 +11,7 @@ import {
   type ActionsView,
   ActionType,
   addDays,
-  type BulkDecideResult,
+  type BulkDecideResult as BulkDecideResultSchema,
   DAY_MS,
   istDate,
   istStartOfDay,
@@ -677,6 +677,8 @@ export async function decideAutoClose(
 }
 
 // ---- Bulk -----------------------------------------------------------------------------------------
+
+type BulkDecideResult = z.infer<typeof BulkDecideResultSchema>;
 
 type BulkBody = {
   type:

@@ -3,18 +3,22 @@
  * who has left, computed from the same day engine as everything else. Owner: WP-4.
  */
 import {
-  type BoardAwayRow,
+  type BoardAwayRow as BoardAwayRowSchema,
   type BoardInRow,
   type BoardNotInRow,
   istDate,
   istTime,
-  type PlaceBadge,
+  type PlaceBadge as PlaceBadgeSchema,
   type TodayBoard,
 } from '@fs/contracts';
+import type { z } from 'zod';
 import { computeFrom, loadDayData, personBrief } from './day';
 import { actionsCount } from './owner-actions';
 import type { Ctx } from './ports';
 import type { PunchRow } from './punch';
+
+type PlaceBadge = z.infer<typeof PlaceBadgeSchema>;
+type BoardAwayRow = z.infer<typeof BoardAwayRowSchema>;
 
 function placeOf(p: PunchRow): PlaceBadge {
   if (p.source === 'owner') return 'owner';

@@ -5,7 +5,7 @@
  */
 import type {
   ActionsView,
-  BulkDecideResult,
+  BulkDecideResult as BulkDecideResultSchema,
   Endpoints,
   OutputOf,
   OwnerDayDetail,
@@ -14,12 +14,14 @@ import type {
   TodayBoard,
 } from '@fs/contracts';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import type { z } from 'zod';
 import { setServiceOverridesForTests } from '../../services/registry';
 import { fakeNotifier } from '../../test/fakes';
 import { callJson, sessionFor, testEnv } from '../../test/helpers';
-import { addPunch, addUser, DAY, ist, newSalon, type Salon } from '../../test/notify-kit';
+import { addPunch, addUser, ctxAt, DAY, ist, newSalon, type Salon } from '../../test/notify-kit';
 import { setClock } from '../auth/test/kit';
 
+type BulkDecideResult = z.infer<typeof BulkDecideResultSchema>;
 type OvertimeResult = OutputOf<Endpoints['ownerOvertimeDecide']>;
 
 let salon: Salon;
@@ -52,6 +54,11 @@ async function setStatus(punchId: string, status: string, reason: string | null 
   await testEnv.DB.prepare('UPDATE punches SET status = ?2, pending_reason = ?3 WHERE id = ?1')
     .bind(punchId, status, reason)
     .run();
+}
+
+async function recompute(userId: string) {
+  const ctx = await ctxAt(salon, ist('22:00'));
+  await ctx.services.days.recompute(ctx, userId, DAY);
 }
 
 const get = <T>(path: string) => callJson<T>('GET', path, { cookie: owner });
@@ -190,6 +197,7 @@ describe('O-04 Needs action', () => {
     await addPunch(salon, priya, 'in', ist('10:00'));
     await addPunch(salon, priya, 'out', ist('21:00'));
     await setClock(ist('22:00'));
+    await recompute(priya);
     const first = await post<unknown>(`/owner/days/${priya}/${DAY}/auto-close`, { keep: true });
     expect(first.status).toBe(409);
     const list = await get<ActionsView>('/owner/actions?type=overtime');
@@ -217,6 +225,7 @@ describe('O-04 Needs action', () => {
       source: 'auto',
       status: 'flagged',
     });
+    await setClock(ist('22:00'));
     const list = await get<ActionsView>('/owner/actions?type=auto_closed');
     expect(list.body.items).toHaveLength(1);
     expect(list.body.items[0]).toMatchObject({
@@ -266,7 +275,7 @@ describe('O-05 Register and day detail', () => {
   });
 
   it('O-05.3 an unknown person is not found', async () => {
-    const res = await get<unknown>(`/owner/days/not-a-user/${DAY}`);
+    const res = await get<unknown>(`/owner/days/01JAAAAAAAAAAAAAAAAAAAAAAA/${DAY}`);
     expect(res.status).toBe(404);
   });
 });
