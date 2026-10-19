@@ -1,0 +1,24 @@
+{
+  "rows": [
+    {
+      "userId": "01K87R133CAYV58WCHEDPSC8TQ",
+      "name": "Jinal Kotak",
+      "balanceMin": -150,
+      "suggestedMin": -150,
+      "settleMin": -100,
+      "appliedMin": -100,
+      "amountPaise": -7407,
+      "stayMin": -50
+    },
+    {
+      "userId": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+      "name": "Neha Parmar",
+      "balanceMin": 50,
+      "suggestedMin": 50,
+      "settleMin": 0,
+      "appliedMin": 0,
+      "amountPaise": 0,
+      "stayMin": 50
+    }
+  ]
+}

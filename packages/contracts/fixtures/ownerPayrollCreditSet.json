@@ -1,0 +1,35 @@
+{
+  "settlement": {
+    "id": "01K8WP9SETT100000000000000",
+    "userId": "01K87R133CAYV58WCHEDPSC8TQ",
+    "payrollRunId": "01K8QTKPY00JBH9HC76Z45ZRR1",
+    "month": "2026-10",
+    "balanceMin": -150,
+    "settleMin": -100,
+    "appliedMin": -100,
+    "amountPaise": -7407,
+    "rate": {
+      "rDay": {
+        "num": 1200000,
+        "den": 30
+      },
+      "sStd": 540
+    },
+    "warnings": [],
+    "status": "draft",
+    "decidedBy": "01K894PPK418TJT35A8CDEANDV",
+    "decidedAt": 1792386720000,
+    "note": null
+  },
+  "lines": [
+    {
+      "code": "time_credits",
+      "label": "Time credits: -100 min",
+      "formula": "400.00 x 100 / 540 min",
+      "amountPaise": -7407,
+      "kind": "deduction",
+      "refId": "01K8WP9SETT100000000000000"
+    }
+  ],
+  "warnings": []
+}

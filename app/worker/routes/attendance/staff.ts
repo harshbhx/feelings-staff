@@ -228,6 +228,7 @@ export const handlers: Handlers = {
           deletesOn: istDate(p.server_ts + selfieDays * DAY_MS),
           url: `/api/v1/me/punches/${p.id}/selfie`,
         })),
+      presence: [],
       consents: consents.map((x) => ({
         kind: x.kind,
         version: x.version,

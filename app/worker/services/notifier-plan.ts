@@ -121,6 +121,11 @@ export const EVENT_META: Record<NotifyEventType, EventMeta> = {
   payslip_ready: STAFF(),
   salary_unpaid: OWNER('payroll'),
   payslip_pdf_failed: OWNER(null),
+  roll_call_due: OWNER('rollcall'),
+  roll_call_missed: OWNER(null, false),
+  staff_stepped_out: OWNER(null, false),
+  away_to_confirm: OWNER(null),
+  left_without_checkout: OWNER(null),
   schedule_changed: STAFF(),
   holiday_announced: STAFF(),
   needs_action_reminder: OWNER(null, false),
@@ -175,6 +180,15 @@ export function planFor(e: NotifyEvent): Plan {
     case 'early_checkout':
     case 'regularisation_requested':
       return p({ batchable: true });
+    case 'roll_call_due':
+      return p({ batchable: true, workDate: e.workDate });
+    case 'roll_call_missed':
+      return p({ workDate: e.workDate });
+    case 'staff_stepped_out':
+      return p({ workDate: e.workDate });
+    case 'away_to_confirm':
+    case 'left_without_checkout':
+      return p({ batchable: true, workDate: e.workDate });
     case 'overtime_running':
       return p({ topic: topicFor('ot', e.userId, e.workDate), workDate: e.workDate });
     case 'checkout_reminder':
@@ -546,6 +560,51 @@ export function render(e: NotifyEvent, rc: RenderCtx): Rendered {
         body: t('n.salary_unpaid.body'),
         url: `/o/payroll/${e.runId}`,
         data: { runId: e.runId, month: e.month },
+      };
+    case 'roll_call_due':
+      return {
+        title: t('n.roll_call_due.title'),
+        body: t('n.roll_call_due.body'),
+        url: `/o/roll-call/${e.rollCallId}`,
+        data: { rollCallId: e.rollCallId, workDate: e.workDate },
+      };
+    case 'roll_call_missed':
+      return {
+        title: t('n.roll_call_missed.title', { time: e.slotTime }),
+        body: t('n.roll_call_missed.body'),
+        url: `/o/roll-call/${e.rollCallId}`,
+        data: { rollCallId: e.rollCallId, workDate: e.workDate },
+      };
+    case 'staff_stepped_out':
+      return {
+        title: t('n.staff_stepped_out.title', { name: e.name }),
+        body: t('n.staff_stepped_out.body', {
+          reason: t(`n.staff_stepped_out.reason.${e.reason}`),
+          time: hhmm(e.startTs),
+        }),
+        url: '/o/today',
+        data: { userId: e.userId, awayId: e.awayId, workDate: e.workDate },
+      };
+    case 'away_to_confirm':
+      return {
+        title: t('n.away_to_confirm.title', {
+          name: e.name,
+          start: hhmm(e.startTs),
+          end: hhmm(e.endTs),
+        }),
+        body: t('n.away_to_confirm.body', {
+          minutes: e.minutes,
+          reason: t(`n.away_to_confirm.reason.${e.reason ?? 'other'}`),
+        }),
+        url: '/o/actions',
+        data: { userId: e.userId, awayId: e.awayId, workDate: e.workDate },
+      };
+    case 'left_without_checkout':
+      return {
+        title: t('n.left_without_checkout.title', { name: e.name }),
+        body: t('n.left_without_checkout.body', { time: hhmm(e.awaySinceTs) }),
+        url: '/o/today',
+        data: { userId: e.userId, workDate: e.workDate },
       };
     case 'payslip_pdf_failed':
       return {

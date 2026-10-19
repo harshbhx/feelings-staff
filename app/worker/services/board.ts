@@ -138,6 +138,7 @@ export async function todayBoard(ctx: Ctx): Promise<TodayBoard> {
     notIn,
     out: outRows,
     away,
+    rollCall: null,
     actionsCount: await actionsCount(ctx),
   };
 }

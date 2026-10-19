@@ -1,0 +1,30 @@
+{
+  "rollCalls": [
+    {
+      "workDate": "2026-10-19",
+      "slotTime": "12:00",
+      "mark": "here"
+    }
+  ],
+  "away": [
+    {
+      "id": "01K8WP9AWAY200000000000000",
+      "workDate": "2026-10-19",
+      "source": "step_out",
+      "reason": "errand",
+      "markedByName": null,
+      "staffNote": null,
+      "startTs": 1792382520000,
+      "endTs": 1792384020000,
+      "awayMin": 25,
+      "state": "waiting"
+    }
+  ],
+  "checks": [
+    {
+      "ts": 1792384620000,
+      "result": "inside",
+      "distanceBucket": "0-50"
+    }
+  ]
+}

@@ -500,6 +500,11 @@
       "changeLabel": "Check-out time",
       "save": "Save time"
     },
+    "away": {
+      "title": "{{name}} stepped out {{start}}–{{end}}",
+      "line_one": "1 minute away. Confirm, mark as work or ignore.",
+      "line_other": "{{count}} minutes away. Confirm, mark as work or ignore."
+    },
     "advance": {
       "title": "{{name}} asked for an advance",
       "amount": "{{amount}} · {{plan}}",

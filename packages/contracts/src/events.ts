@@ -4,8 +4,8 @@
  * the owner (and managers with the matching permission), staff events go to `userId`/`userIds`.
  */
 import { z } from 'zod';
-import { LeaveCode, PunchKind, RegularisationKind, RiskReason } from './enums';
-import { Email, EpochMs, HHMM, Id, Paise, WorkDate, YearMonth } from './primitives';
+import { AwayReason, LeaveCode, PunchKind, RegularisationKind, RiskReason } from './enums';
+import { Email, EpochMs, HHMM, Id, Minutes, Paise, WorkDate, YearMonth } from './primitives';
 
 const Base = z.object({ orgId: Id, at: EpochMs });
 const Person = { userId: Id, name: z.string() };
@@ -183,6 +183,43 @@ export const NotifyEvent = z.discriminatedUnion('type', [
     runId: Id,
     month: YearMonth,
     failedCount: z.number().int(),
+  }),
+  // Presence (PRD 6, N32 to N36). None of them mentions credits, minutes of credit or rupees.
+  Base.extend({
+    type: z.literal('roll_call_due'),
+    rollCallId: Id,
+    workDate: WorkDate,
+    slotTime: HHMM,
+  }),
+  Base.extend({
+    type: z.literal('roll_call_missed'),
+    rollCallId: Id,
+    workDate: WorkDate,
+    slotTime: HHMM,
+  }),
+  Base.extend({
+    type: z.literal('staff_stepped_out'),
+    ...Person,
+    awayId: Id,
+    workDate: WorkDate,
+    startTs: EpochMs,
+    reason: AwayReason,
+  }),
+  Base.extend({
+    type: z.literal('away_to_confirm'),
+    ...Person,
+    awayId: Id,
+    workDate: WorkDate,
+    startTs: EpochMs,
+    endTs: EpochMs,
+    minutes: Minutes,
+    reason: AwayReason.nullable(),
+  }),
+  Base.extend({
+    type: z.literal('left_without_checkout'),
+    ...Person,
+    workDate: WorkDate,
+    awaySinceTs: EpochMs,
   }),
   Base.extend({
     type: z.literal('schedule_changed'),

@@ -36,6 +36,11 @@ import mePatch from './mePatch.json';
 import mePayslip from './mePayslip.json';
 import mePayslips_empty from './mePayslips.empty.json';
 import mePayslips from './mePayslips.json';
+import mePresence from './mePresence.json';
+import mePresence_markedAway from './mePresence.marked-away.json';
+import mePresence_steppedOut from './mePresence.stepped-out.json';
+import mePresenceAwayNote from './mePresenceAwayNote.json';
+import mePresenceHistory from './mePresenceHistory.json';
 import meRegularisations from './meRegularisations.json';
 import meToday_checkedIn from './meToday.checked-in.json';
 import meToday_checkedOut from './meToday.checked-out.json';
@@ -63,10 +68,18 @@ import ownerAdvanceRecovery from './ownerAdvanceRecovery.json';
 import ownerAdvancesList from './ownerAdvancesList.json';
 import ownerAudit from './ownerAudit.json';
 import ownerAutoCloseDecide from './ownerAutoCloseDecide.json';
+import ownerAwayDecide from './ownerAwayDecide.json';
+import ownerAwayList from './ownerAwayList.json';
+import ownerAwayPatch from './ownerAwayPatch.json';
 import ownerBlackoutCreate from './ownerBlackoutCreate.json';
 import ownerBlackoutList from './ownerBlackoutList.json';
 import ownerCalibrationPropose from './ownerCalibrationPropose.json';
 import ownerCalibrationSamples from './ownerCalibrationSamples.json';
+import ownerCreditAdjustmentCreate from './ownerCreditAdjustmentCreate.json';
+import ownerCreditAdjustmentPatch from './ownerCreditAdjustmentPatch.json';
+import ownerCreditAdjustmentVoid from './ownerCreditAdjustmentVoid.json';
+import ownerCreditLedger from './ownerCreditLedger.json';
+import ownerCredits from './ownerCredits.json';
 import ownerDay from './ownerDay.json';
 import ownerDayOverride from './ownerDayOverride.json';
 import ownerDeviceDecide from './ownerDeviceDecide.json';
@@ -93,6 +106,8 @@ import ownerOffsiteDecide from './ownerOffsiteDecide.json';
 import ownerOvertimeDecide from './ownerOvertimeDecide.json';
 import ownerPassword from './ownerPassword.json';
 import ownerPayrollCreate from './ownerPayrollCreate.json';
+import ownerPayrollCreditSet from './ownerPayrollCreditSet.json';
+import ownerPayrollCredits from './ownerPayrollCredits.json';
 import ownerPayrollFinalise from './ownerPayrollFinalise.json';
 import ownerPayrollGet_finalised from './ownerPayrollGet.finalised.json';
 import ownerPayrollGet from './ownerPayrollGet.json';
@@ -104,9 +119,13 @@ import ownerPayrollReopen from './ownerPayrollReopen.json';
 import ownerPayrollRuns from './ownerPayrollRuns.json';
 import ownerPayslipMarkPaid from './ownerPayslipMarkPaid.json';
 import ownerPayslipPreview from './ownerPayslipPreview.json';
+import ownerPresenceDay from './ownerPresenceDay.json';
 import ownerPunchReview from './ownerPunchReview.json';
 import ownerRegister from './ownerRegister.json';
 import ownerRegularisationDecide from './ownerRegularisationDecide.json';
+import ownerRollCallGet from './ownerRollCallGet.json';
+import ownerRollCallSubmit from './ownerRollCallSubmit.json';
+import ownerRollCalls from './ownerRollCalls.json';
 import ownerRosterGet from './ownerRosterGet.json';
 import ownerRosterPut from './ownerRosterPut.json';
 import ownerSecurityGet from './ownerSecurityGet.json';
@@ -136,6 +155,9 @@ import ownerToday_beforeFirstShift from './ownerToday.before-first-shift.json';
 import ownerToday_holiday from './ownerToday.holiday.json';
 import ownerToday from './ownerToday.json';
 import ownerVerify from './ownerVerify.json';
+import presenceBack from './presenceBack.json';
+import presenceCheck from './presenceCheck.json';
+import presenceStepOut from './presenceStepOut.json';
 import punchCreate_flagged from './punchCreate.flagged.json';
 import punchCreate from './punchCreate.json';
 import punchCreate_needsProof from './punchCreate.needs-proof.json';
@@ -158,6 +180,27 @@ import time from './time.json';
 import verifyPayslip from './verifyPayslip.json';
 
 export const fixtures: Partial<Record<EndpointKey, unknown>> = {
+  ownerCredits,
+  ownerCreditLedger,
+  ownerCreditAdjustmentCreate,
+  ownerCreditAdjustmentPatch,
+  ownerCreditAdjustmentVoid,
+  ownerPayrollCredits,
+  ownerPayrollCreditSet,
+  ownerRollCalls,
+  ownerRollCallGet,
+  ownerRollCallSubmit,
+  ownerAwayList,
+  ownerAwayPatch,
+  ownerAwayDecide,
+  ownerPresenceDay,
+  mePresence,
+  presenceStepOut,
+  presenceBack,
+  mePresenceAwayNote,
+  presenceCheck,
+  mePresenceHistory,
+
   health,
   config,
   time,
@@ -314,6 +357,10 @@ export const variants: Partial<Record<EndpointKey, Record<string, unknown>>> = {
   },
   mePayslips: {
     empty: mePayslips_empty,
+  },
+  mePresence: {
+    'stepped-out': mePresence_steppedOut,
+    'marked-away': mePresence_markedAway,
   },
   notificationsList: {
     empty: notificationsList_empty,

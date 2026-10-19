@@ -86,6 +86,20 @@
     "app": {
       "defaultStaffLang": "en"
     },
+    "timeCredits": {
+      "enabled": true,
+      "startDate": "2026-11-01"
+    },
+    "presence": {
+      "enabled": true,
+      "rollCallTimes": ["12:00", "15:00", "18:00"],
+      "stepOut": true,
+      "foreground": {
+        "enabled": false,
+        "intervalMin": 30
+      },
+      "quietDuringBreaks": true
+    },
     "setup": {
       "salon": "done",
       "location": "done",

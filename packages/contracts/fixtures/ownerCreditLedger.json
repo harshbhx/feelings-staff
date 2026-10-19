@@ -1,0 +1,83 @@
+{
+  "items": [
+    {
+      "date": "2026-10-03",
+      "kind": "late",
+      "minutes": -25,
+      "adjustedMin": 0,
+      "runningBalanceMin": -25,
+      "source": {
+        "kind": "punch",
+        "id": "01K8WP9PNCH100000000000000"
+      },
+      "history": []
+    },
+    {
+      "date": "2026-10-05",
+      "kind": "early",
+      "minutes": -20,
+      "adjustedMin": 20,
+      "runningBalanceMin": -25,
+      "source": {
+        "kind": "punch",
+        "id": "01K8WP9PNCH200000000000000"
+      },
+      "history": [
+        {
+          "kind": "original",
+          "minutes": -20,
+          "reason": null,
+          "by": null,
+          "at": 1791906720000,
+          "adjustmentId": null
+        },
+        {
+          "kind": "adjustment",
+          "minutes": 20,
+          "reason": "Approved by Urmi",
+          "by": {
+            "id": "01K894PPK418TJT35A8CDEANDV",
+            "name": "Urmi Mengar"
+          },
+          "at": 1792383120000,
+          "adjustmentId": "01K8WP9ADJ0000000000000000"
+        }
+      ]
+    },
+    {
+      "date": "2026-10-16",
+      "kind": "ot",
+      "minutes": 45,
+      "adjustedMin": 0,
+      "runningBalanceMin": 20,
+      "source": {
+        "kind": "ot_decision",
+        "id": "01K8WP9XTD1000000000000000"
+      },
+      "confirmedBy": {
+        "id": "01K894PPK418TJT35A8CDEANDV",
+        "name": "Urmi Mengar"
+      },
+      "history": []
+    },
+    {
+      "date": "2026-10-17",
+      "kind": "away",
+      "minutes": -40,
+      "adjustedMin": 0,
+      "runningBalanceMin": -20,
+      "source": {
+        "kind": "presence",
+        "id": "01K8WP9AWAY100000000000000"
+      },
+      "confirmedBy": {
+        "id": "01K894PPK418TJT35A8CDEANDV",
+        "name": "Urmi Mengar"
+      },
+      "history": []
+    }
+  ],
+  "nextCursor": null,
+  "balanceMin": -20,
+  "estimatePaise": -1481
+}

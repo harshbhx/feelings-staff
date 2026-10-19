@@ -1,0 +1,55 @@
+{
+  "rollCalls": [
+    {
+      "rollCallId": "01K8WP9RC10000000000000000",
+      "slotTime": "12:00",
+      "mark": "not_here",
+      "markedBy": {
+        "id": "01K894PPK418TJT35A8CDEANDV",
+        "name": "Urmi Mengar"
+      },
+      "markedAt": 1792384920000
+    }
+  ],
+  "away": [
+    {
+      "id": "01K8WP9AWAY200000000000000",
+      "user": {
+        "id": "01K87R133CAYV58WCHEDPSC8TQ",
+        "name": "Jinal Kotak",
+        "designation": "Beautician",
+        "phone": "+919712710010"
+      },
+      "workDate": "2026-10-19",
+      "source": "step_out",
+      "reason": "errand",
+      "reasonNote": null,
+      "staffNote": "Bank for the salon",
+      "startTs": 1792382520000,
+      "endTs": 1792384020000,
+      "minutes": 25,
+      "state": "confirmed",
+      "endReason": "back",
+      "backMissing": false,
+      "rollCallId": null,
+      "openedBy": {
+        "id": "01K87R133CAYV58WCHEDPSC8TQ",
+        "name": "Jinal Kotak"
+      },
+      "decidedBy": {
+        "id": "01K894PPK418TJT35A8CDEANDV",
+        "name": "Urmi Mengar"
+      },
+      "decidedAt": 1792386720000,
+      "editedAt": null
+    }
+  ],
+  "checks": [
+    {
+      "id": "01K8WP9CHK1000000000000000",
+      "ts": 1792384620000,
+      "result": "inside",
+      "distanceBucket": "0-50"
+    }
+  ]
+}
