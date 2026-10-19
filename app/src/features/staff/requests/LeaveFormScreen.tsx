@@ -5,7 +5,17 @@
  * confirmation. One idempotency key per opening: a second tap or a retry is the same request.
  */
 import type { LeaveRequestCreate } from '@fs/contracts';
-import { Button, Checkbox, ChipGroup, Field, Icon, Input, Textarea, useToast } from '@fs/ui';
+import {
+  Button,
+  Checkbox,
+  ChipGroup,
+  Field,
+  Icon,
+  Input,
+  SkeletonList,
+  Textarea,
+  useToast,
+} from '@fs/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
