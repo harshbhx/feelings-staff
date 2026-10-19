@@ -2177,7 +2177,6 @@ ALTER TABLE staff_profiles ADD COLUMN presence_enabled INTEGER CHECK (presence_e
 ALTER TABLE shift_templates ADD COLUMN break_start TEXT;                  -- optional usual break start "HH:MM" (presence break window)
 ALTER TABLE attendance_days ADD COLUMN away_min INTEGER NOT NULL DEFAULT 0;   -- confirmed away minutes of the day
 ALTER TABLE attendance_days ADD COLUMN total_min INTEGER NOT NULL DEFAULT 0;  -- every worked minute of the day, in and out of the shift, after breaks (DayResult.totalMin, t_d of §7.17.7)
-ALTER TABLE attendance_days ADD COLUMN total_min INTEGER NOT NULL DEFAULT 0;  -- every worked minute of the day (DayResult.totalMin, the legal band's t_d)
 -- consents.kind gains 'presence_checks' (table rebuilt); the manager permission list gains 'rollcall'
 
 -- Time credits (owner only; never exposed on a staff route) ----------------
