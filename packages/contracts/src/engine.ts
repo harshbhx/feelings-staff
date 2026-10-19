@@ -196,6 +196,11 @@ export const DayResult = z.object({
   lastOutTs: EpochMs.nullable(),
   /** True while an `in` has no matching `out`. */
   open: z.boolean(),
+  /**
+   * Every worked minute of the day, inside and outside the shift, after the break (PRD 7.17.7 legal
+   * hours: 10:10 to 22:10 with a 60-min break is 660). Absent on results stored before engine 0.4.
+   */
+  totalMin: Minutes.optional(),
 });
 export type DayResult = z.infer<typeof DayResult>;
 
@@ -303,6 +308,10 @@ export const PayslipWarning = z.object({
     'absence_over_cap',
     'ot_multiplier_low',
     'pending_overtime',
+    /** Owner only: legal-band overtime counted at 2x through Time credits (PRD 7.17.7). */
+    'legal_ot_2x',
+    /** Owner only: legal-band overtime counted at 1x because "Pay legal overtime at 2x" is off. */
+    'legal_ot_shortfall',
   ]),
   message: z.string(),
   amountPaise: Paise.nullable(),
@@ -441,6 +450,11 @@ export const CreditRules = z.object({
   earlySourceId: z.string().nullable(),
   /** The overtime decision (`ot_decisions.id`), or the preapproval or duty id (ot entry source). */
   otSourceId: z.string().nullable(),
+  /**
+   * Legal-band minutes of the day (`legalOtBand`, PRD 7.17.7), at most `otApprovedMin`: they give
+   * an extra `ot_legal` entry. 0 or absent when "Pay legal overtime at 2x" is off.
+   */
+  legalOtMin: Minutes.optional(),
 });
 export type CreditRules = z.infer<typeof CreditRules>;
 

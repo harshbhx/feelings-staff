@@ -88,7 +88,8 @@
     },
     "timeCredits": {
       "enabled": true,
-      "startDate": "2026-11-01"
+      "startDate": "2026-11-01",
+      "legalOt2x": true
     },
     "presence": {
       "enabled": true,
