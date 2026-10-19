@@ -11,7 +11,7 @@ import { useAudit } from '../api/settings';
 import { CHIPS_WRAP, Meta } from '../components/layout';
 import { Empty, ErrorCard, RowsSkeleton } from '../components/states';
 import { clock, shortDate, todayIst } from '../lib/format';
-import { describeChange } from './audit-model';
+import { actionWords, describeChange } from './audit-model';
 
 const CATEGORIES: (AuditCategory | 'all')[] = ['all', 'change', 'security', 'access', 'export'];
 
@@ -97,7 +97,9 @@ function AuditRow({ entry: e }: { entry: AuditEntryView }) {
       <p className="flex flex-wrap items-baseline justify-between gap-x-3">
         <span className="font-bold text-text">
           {who} ·{' '}
-          {t(`owner:audit.actions.${e.action.replaceAll('.', '_')}`, { defaultValue: e.action })}
+          {t(`owner:audit.actions.${e.action.replaceAll('.', '_')}`, {
+            defaultValue: actionWords(e.action),
+          })}
         </span>
         <span className="text-sm text-text-muted tabular-nums">
           {shortDate(todayIst(e.createdAt))} {clock(e.createdAt)}
@@ -107,8 +109,12 @@ function AuditRow({ entry: e }: { entry: AuditEntryView }) {
         <ul className="grid gap-0.5 text-sm text-text-body">
           {change.map((c) => (
             <li key={c.key} className="break-words">
-              <span className="text-text-muted">{c.key}: </span>
-              {c.before ?? '–'} → {c.after ?? '–'}
+              {c.key ? <span className="text-text-muted">{c.key}: </span> : null}
+              {c.before === null
+                ? c.after
+                : c.after === null
+                  ? t('owner:audit.removed', { value: c.before })
+                  : `${c.before} → ${c.after}`}
             </li>
           ))}
         </ul>

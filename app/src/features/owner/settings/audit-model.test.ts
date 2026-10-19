@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { describeChange } from './audit-model';
+import { actionWords, describeChange, fieldName } from './audit-model';
 
 describe('Audit log rows (O-18)', () => {
   it('O-18.1 lists only the fields that changed, before and after', () => {
@@ -15,6 +15,14 @@ describe('Audit log rows (O-18)', () => {
     expect(describeChange({ name: 'Diwali' }, null)).toEqual([
       { key: 'name', before: 'Diwali', after: null },
     ]);
+  });
+
+  it('money and times read in words, field names without code suffixes', () => {
+    const [money] = describeChange(null, { amountPaise: 300000 });
+    expect(money?.key).toBe('amount');
+    expect(money?.after).toContain('3,000');
+    expect(fieldName('blockMin')).toBe('block min');
+    expect(actionWords('device.approve')).toBe('Device approve');
   });
 
   it('nested values read as short text, never raw JSON', () => {

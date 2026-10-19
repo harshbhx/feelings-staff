@@ -109,7 +109,7 @@ function PinForm({ pinSet }: { pinSet: boolean }) {
       <form noValidate onSubmit={submit} className="grid gap-4">
         <Meta>{t('owner:security.pinWhat')}</Meta>
         {pinSet ? (
-          <Field label={t('owner:security.currentPin')}>
+          <Field label={t('owner:security.currentPin')} className="max-w-60">
             <Input
               type="password"
               inputMode="numeric"
@@ -120,7 +120,7 @@ function PinForm({ pinSet }: { pinSet: boolean }) {
             />
           </Field>
         ) : null}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:max-w-md sm:grid-cols-2">
           <Field label={t('owner:security.newPin')} error={tried && problem ? problem : undefined}>
             <Input
               type="password"

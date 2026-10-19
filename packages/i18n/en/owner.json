@@ -1434,8 +1434,14 @@
       "staff_exit": "Marked as left",
       "staff_rehire": "Rehired",
       "staff_update": "Staff details changed",
-      "user_update_self": "Own details changed"
-    }
+      "user_update_self": "Own details changed",
+      "device_approve": "Phone approved",
+      "device_reject": "Phone rejected",
+      "export_create": "File made",
+      "auth_sign_in": "Signed in",
+      "attendance_auto_close": "Day closed without check-out"
+    },
+    "removed": "{{value}} (removed)"
   },
   "verify": {
     "title": "Payslip check",
