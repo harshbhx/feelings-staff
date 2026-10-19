@@ -75,11 +75,18 @@ function useStaffBoot(standalone: boolean) {
     void Promise.all([
       import('../../../lib/punch/adapters'),
       import('../../../lib/punch/resign'),
-    ]).then(([adapters, resign]) => {
-      if (cancelled) return;
-      setResigner(resign.createPunchResigner({ api, getSigner: adapters.deviceSigner }));
-      stopQueue = startQueue(api);
-    });
+    ]).then(
+      ([adapters, resign]) => {
+        if (cancelled) return;
+        setResigner(resign.createPunchResigner({ api, getSigner: adapters.deviceSigner }));
+        stopQueue = startQueue(api);
+      },
+      () => {
+        // A chunk that will not load (stale hash after a deploy) must not strand queued punches:
+        // flush without the re-signer; a 409 NONCE_INVALID then stays queued for the next start.
+        if (!cancelled) stopQueue = startQueue(api);
+      },
+    );
     return () => {
       cancelled = true;
       off();

@@ -21,10 +21,14 @@ const restListeners = new Set<() => void>();
 function loadRestPaths(): void {
   if (restLoading) return;
   restLoading = true;
-  void import('./paths-rest').then((m) => {
-    restPaths = m.REST_ICON_PATHS as unknown as RestPaths;
-    for (const l of restListeners) l();
-  });
+  void import('./paths-rest')
+    .then((m) => {
+      restPaths = m.REST_ICON_PATHS as unknown as RestPaths;
+      for (const l of restListeners) l();
+    })
+    .catch(() => {
+      restLoading = false; // let the next Icon mount try again
+    });
 }
 
 function subscribeRestPaths(listener: () => void): () => void {

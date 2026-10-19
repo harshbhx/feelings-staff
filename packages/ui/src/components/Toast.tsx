@@ -1,4 +1,5 @@
 import {
+  Component,
   createContext,
   lazy,
   type ReactNode,
@@ -24,6 +25,17 @@ export interface ToastInput {
   action?: ToastAction | undefined;
   /** Milliseconds before it closes; default 5000, longer with an action. */
   duration?: number | undefined;
+}
+
+/** A failed chunk fetch (offline before the service worker is ready, or a stale hash after a deploy) must not take the whole app down: toasts just do not show. */
+class ToastLayerBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  override state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  override render() {
+    return this.state.failed ? null : this.props.children;
+  }
 }
 
 // Radix Toast lives in its own chunk; it loads right after first paint, not with the entry.
@@ -60,15 +72,17 @@ export function ToastProvider({ children, bottomOffset, className }: ToastProvid
   return (
     <>
       <ToastContext.Provider value={show}>{children}</ToastContext.Provider>
-      <Suspense fallback={null}>
-        <ToastLayer
-          current={current}
-          open={open}
-          onOpenChange={setOpen}
-          bottomOffset={bottomOffset}
-          className={className}
-        />
-      </Suspense>
+      <ToastLayerBoundary>
+        <Suspense fallback={null}>
+          <ToastLayer
+            current={current}
+            open={open}
+            onOpenChange={setOpen}
+            bottomOffset={bottomOffset}
+            className={className}
+          />
+        </Suspense>
+      </ToastLayerBoundary>
     </>
   );
 }
