@@ -321,8 +321,8 @@ test.describe('offline', () => {
 
     // Server time: today at 10:05 IST, inside a Full day shift (10:00-20:00).
     const serverNow = todayAtIst('10:05');
-    await setServerClock(serverNow);
     const seeded = await reset('basic-salon');
+    await setServerClock(serverNow); // after reset, which clears the test clock
     const owner = await signInOwner(request, seeded.owner);
     const staff = await owner.addStaff(serverNow);
 
