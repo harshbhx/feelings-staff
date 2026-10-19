@@ -3,7 +3,7 @@
 -- Two tables are rebuilt because SQLite cannot alter a CHECK: consents (kind gains 'presence_checks')
 -- and challenges (purpose gains 'presence', the nonce of a foreground check).
 
--- Settings live in orgs.settings_json: timeCredits { enabled, startDate }, presence { enabled, rollCallTimes[], stepOut, foreground { enabled, intervalMin }, quietDuringBreaks }
+-- Settings live in orgs.settings_json: timeCredits { enabled, startDate, legalOt2x (default true) }, presence { enabled, rollCallTimes[], stepOut, foreground { enabled, intervalMin }, quietDuringBreaks }
 ALTER TABLE staff_profiles ADD COLUMN time_credits INTEGER CHECK (time_credits IN (0,1));    -- NULL = org default; 0 = excluded
 ALTER TABLE staff_profiles ADD COLUMN presence_enabled INTEGER CHECK (presence_enabled IN (0,1));
 ALTER TABLE shift_templates ADD COLUMN break_start TEXT;                  -- optional usual break start "HH:MM" (presence break window)
@@ -16,7 +16,7 @@ CREATE TABLE credit_entries (
   org_id TEXT NOT NULL REFERENCES orgs(id),
   user_id TEXT NOT NULL REFERENCES users(id),
   work_date TEXT NOT NULL,
-  kind TEXT NOT NULL CHECK (kind IN ('late','early','away','ot')),
+  kind TEXT NOT NULL CHECK (kind IN ('late','early','away','ot','ot_legal')),
   minutes INTEGER NOT NULL CHECK (minutes <> 0),            -- signed: minus for late/early/away, plus for ot
   source_kind TEXT NOT NULL CHECK (source_kind IN ('punch','presence','ot_decision')),
   source_id TEXT NOT NULL,                                  -- punch id, away_intervals id or ot_decisions id
@@ -35,7 +35,7 @@ CREATE TABLE credit_adjustments (                           -- owner edits of cr
   org_id TEXT NOT NULL REFERENCES orgs(id),
   user_id TEXT NOT NULL REFERENCES users(id),
   work_date TEXT NOT NULL,
-  kind TEXT NOT NULL CHECK (kind IN ('late','early','away','ot')),
+  kind TEXT NOT NULL CHECK (kind IN ('late','early','away','ot','ot_legal')),
   delta_min INTEGER NOT NULL CHECK (delta_min <> 0),        -- signed change to that day and kind
   reason TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','void')),
