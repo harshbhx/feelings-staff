@@ -13,7 +13,7 @@ const PAGES = [
   { name: 'settings-salon', path: '/o/settings/salon', ready: 'Salon name' },
   { name: 'settings-location', path: '/o/settings/location', ready: 'Calibrate at the counter' },
   { name: 'settings-shifts', path: '/o/settings/shifts', ready: 'Full day' },
-  { name: 'settings-holidays', path: '/o/settings/holidays', ready: 'Busy days' },
+  { name: 'settings-holidays', path: '/o/settings/holidays', ready: 'No-leave days' },
   { name: 'settings-security', path: '/o/settings/security', ready: 'Owner PIN' },
   { name: 'settings-audit', path: '/o/settings/audit', ready: 'Everything' },
   { name: 'setup', path: '/o/setup', ready: 'Salon details' },

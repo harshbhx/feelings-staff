@@ -397,12 +397,12 @@
         "hint": "The salon circle, calibration and door devices"
       },
       "shifts": {
-        "title": "Shifts",
+        "title": "Shifts and roster",
         "hint": "Shift times and breaks"
       },
       "holidays": {
-        "title": "Holidays and busy days",
-        "hint": "This year's holidays and blackout days"
+        "title": "Holidays and no-leave days",
+        "hint": "This year's holidays and days without leave"
       },
       "attendance": {
         "title": "Attendance rules",
@@ -417,12 +417,12 @@
         "hint": "Quotas, notice and comp-off"
       },
       "notifications": {
-        "title": "Alerts",
+        "title": "Notifications",
         "hint": "Quiet hours and summaries"
       },
       "people": {
-        "title": "Managers",
-        "hint": "Who else can approve and what"
+        "title": "People and roles",
+        "hint": "Managers and what each may do"
       },
       "privacy": {
         "title": "Data and privacy",
@@ -789,12 +789,12 @@
       "ifWorked": "If someone works that day"
     },
     "blackouts": {
-      "title": "Busy days",
+      "title": "No-leave days",
       "what": "Leave asked for these days gets a warning, so you can say no.",
-      "none": "No busy days marked.",
+      "none": "No no-leave days marked.",
       "date": "Date",
       "note": "Note",
-      "add": "Add busy day"
+      "add": "Add no-leave day"
     },
     "people": {
       "what": "A manager can approve and plan for you. Each change needs your PIN.",
@@ -1096,7 +1096,7 @@
     }
   },
   "setup": {
-    "lead": "Eight quick things, then you're ready.",
+    "lead": "A few quick things, then you're ready.",
     "ready": "You're ready. Change any of this later in Settings.",
     "progress": "{{done}} of {{total}} done",
     "continue": "Next: {{step}}",
