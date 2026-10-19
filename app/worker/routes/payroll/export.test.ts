@@ -40,7 +40,9 @@ async function csv(kind: string, extra: Record<string, unknown> = {}): Promise<s
   const res = await call('GET', `/owner/exports/${view.id}/file`, { cookie: owner });
   expect(res.status).toBe(200);
   expect(res.headers.get('Content-Type')).toBe('text/csv; charset=utf-8');
-  expect(res.headers.get('Content-Disposition')).toContain(`${kind.replace('_', '-')}-2026-10.csv`);
+  expect(res.headers.get('Content-Disposition')).toContain(
+    `${kind.replace('_', '-')}-${extra.month ?? '2026-10'}.csv`,
+  );
   const bytes = new Uint8Array(await res.clone().arrayBuffer());
   expect([...bytes.slice(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
   return (await res.text())
