@@ -763,15 +763,22 @@ describe('O-29.12 legal overtime at 2x (PRD 7.17.7, example 13: +170)', () => {
     expect((await entries()).filter((r) => r.kind === 'ot_legal')).toEqual([]);
     for (const d of ['2026-10-05', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10'])
       await recompute(d);
-    expect((await entries()).filter((r) => r.kind === 'ot_legal')).toEqual([
-      expect.objectContaining({ work_date: '2026-10-11', minutes: 180 }),
-    ]);
+    const all = await entries();
+    const days = await testEnv.DB.prepare(
+      'SELECT work_date, worked_min, ot_approved_min, status FROM attendance_days WHERE user_id = ?1 ORDER BY work_date',
+    )
+      .bind(priya.id)
+      .all();
+    expect(
+      all.filter((r) => r.kind === 'ot_legal'),
+      JSON.stringify({ all, days: days.results }),
+    ).toEqual([expect.objectContaining({ work_date: '2026-10-11', minutes: 180 })]);
   });
 
   it('O-29.12 the guardrail switch needs step-up', async () => {
     const res = await call('PATCH', '/owner/settings', {
       cookie: owner,
-      body: { settings: { timeCredits: { legalOt2x: false } } },
+      body: { settings: { timeCredits: { legalOt2x: true } } },
     });
     expect(res.status).toBe(403);
   });
