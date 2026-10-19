@@ -11,14 +11,14 @@ const b64url = (b: ArrayBuffer | Uint8Array) =>
     .replace(/=+$/, '');
 
 async function keys() {
-  const vapid = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+  const vapid = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
     'sign',
-  ]);
+  ])) as CryptoKeyPair;
   const jwk = await crypto.subtle.exportKey('jwk', vapid.privateKey);
-  const device = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, [
+  const device = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, [
     'deriveBits',
-  ]);
-  const p256dh = b64url(await crypto.subtle.exportKey('raw', device.publicKey));
+  ])) as CryptoKeyPair;
+  const p256dh = b64url((await crypto.subtle.exportKey('raw', device.publicKey)) as ArrayBuffer);
   const auth = b64url(crypto.getRandomValues(new Uint8Array(16)));
   return { jwk, p256dh, auth };
 }
