@@ -2,6 +2,8 @@
  * Punch flow library (PRD 4.3-4.6). Owner: WP-4. UI-free: WP-7's check-in sheet renders on top.
  * The state machine and every state/transition are documented in `state.ts`.
  */
+
+export { appPunchQueue, deviceSigner, idbPunchStore } from './adapters';
 export {
   browserSelfieCamera,
   type CameraErrorKind,
@@ -73,3 +75,11 @@ export {
   resultForPunch,
   type Submission,
 } from './state';
+export { runSubmission, type SubmitDeps, type SubmitInput } from './submit';
+export {
+  flowNeeds,
+  type PunchFlags,
+  type PunchFlow,
+  type PunchFlowOptions,
+  usePunchFlow,
+} from './use-punch-flow';
