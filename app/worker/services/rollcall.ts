@@ -140,7 +140,7 @@ interface Present {
 }
 
 /** Who was checked in at the slot time: not on leave, not on a venue duty, presence not excluded. */
-async function checkedInAt(ctx: Ctx, date: string, slotTs: number): Promise<Present[]> {
+export async function checkedInAt(ctx: Ctx, date: string, slotTs: number): Promise<Present[]> {
   const data = await loadDayData(ctx, null, date, date);
   const out: Present[] = [];
   for (const p of data.people.values()) {
