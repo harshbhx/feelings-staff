@@ -9,7 +9,14 @@ import { json } from '../db';
 import { sha256Hex } from '../lib/crypto';
 import { fail } from '../lib/errors';
 import type { RunRow } from './payroll-calc';
-import { type PayslipRow, payslipRow, payslipView, runOfPayslip, staffMaySee } from './payslip';
+import {
+  type PayslipRow,
+  payslipRow,
+  payslipView,
+  runOfPayslip,
+  staffMaySee,
+  staffSafePayslip,
+} from './payslip';
 import { renderHtml } from './pdf';
 import type { Ctx } from './ports';
 
@@ -37,7 +44,8 @@ const watermarkFor = (run: RunRow) =>
 
 /** Render one payslip and store it; the row becomes `ready`. Throws when rendering fails. */
 export async function renderPayslipPdf(ctx: Ctx, row: PayslipRow, run: RunRow): Promise<void> {
-  const view = payslipView(ctx, row, run);
+  // The PDF goes to the staff member: the settlement shows as "Time adjustment" only (PRD 7.17.9).
+  const view = await staffSafePayslip(ctx, payslipView(ctx, row, run));
   const bytes = await ctx.services.pdf.render(
     'payslip',
     { view, watermark: watermarkFor(run) },
@@ -131,7 +139,10 @@ export async function payslipFallbackHtml(ctx: Ctx, row: PayslipRow): Promise<st
   return renderHtml(
     {
       template: 'payslip',
-      data: { view: payslipView(ctx, row, run), watermark: watermarkFor(run) },
+      data: {
+        view: await staffSafePayslip(ctx, payslipView(ctx, row, run)),
+        watermark: watermarkFor(run),
+      },
     },
     'en',
     true,

@@ -21,6 +21,7 @@ import { json } from '../db';
 import { fail } from '../lib/errors';
 import { loadOrg } from '../lib/settings';
 import { ulid } from '../lib/ulid';
+import { creditsLedgerTable } from './credits';
 import { jsonList } from './day';
 import { calcRun, monthEnd, monthStart, type PersonCalc } from './payroll-calc';
 import { type PayslipRow, snapshotOf } from './payslip';
@@ -542,6 +543,7 @@ async function table(ctx: Ctx, kind: ExportKind, p: Params): Promise<Table> {
       };
     }
     case 'credits_ledger':
+      return creditsLedgerTable(ctx, p);
     case 'presence_log':
       return fail('NOT_IMPLEMENTED', 'This report is not ready yet.');
     case 'audit': {
@@ -703,6 +705,8 @@ export async function createExport(
   }
   if (body.kind === 'audit' && user.role !== 'owner')
     fail('FORBIDDEN', 'Only the owner can export the audit log.');
+  if (body.kind === 'credits_ledger' && user.role !== 'owner')
+    fail('FORBIDDEN', 'Only the owner can export the credits ledger.');
   const recent = await ctx.db.first<{ n: number }>(
     'SELECT COUNT(*) AS n FROM exports WHERE org_id = ?org AND created_at > ?',
     ctx.now() - HOUR_MS,
@@ -725,7 +729,7 @@ export async function createExport(
     }),
     ctx.services.audit.stmt(ctx, {
       category: 'export',
-      action: 'export.create',
+      action: body.kind === 'credits_ledger' ? 'credits.export' : 'export.create',
       entity: 'export',
       entityId: id,
       after: { kind: body.kind, format: body.format, ...params },
