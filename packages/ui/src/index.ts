@@ -82,10 +82,8 @@ export { Stepper, type StepperProps } from './components/Stepper';
 export { TabBar, TabBarItem, type TabBarItemProps, type TabBarProps } from './components/TabBar';
 export { type TabItem, Tabs, type TabsProps } from './components/Tabs';
 export {
-  Toast,
   type ToastAction,
   type ToastInput,
-  type ToastProps,
   ToastProvider,
   type ToastProviderProps,
   type ToastTone,
