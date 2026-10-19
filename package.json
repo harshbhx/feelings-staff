@@ -19,6 +19,7 @@
     "test:api": "pnpm --filter @fs/app run test:api",
     "build": "pnpm --filter @fs/app run build",
     "size": "node scripts/size-budgets.mjs",
+    "gen:routes": "node scripts/gen-client-routes.mjs",
     "e2e": "pnpm --filter @fs/e2e run test"
   },
   "devDependencies": {
