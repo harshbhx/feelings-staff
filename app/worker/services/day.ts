@@ -148,7 +148,7 @@ interface PreapprovalRow {
   end_ts: number;
 }
 
-interface OtDecisionRow {
+export interface OtDecisionRow {
   user_id: string;
   work_date: string;
   candidate_min: number;
