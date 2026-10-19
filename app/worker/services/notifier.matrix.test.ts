@@ -1,5 +1,5 @@
 /**
- * PRD 6 notification matrix, one fake-clock test per row (N1-N32): recipient, channel, timing and
+ * PRD 6 notification matrix, one fake-clock test per row (N1-N37): recipient, channel, timing and
  * copy. Covers S-15.1 (every event writes an inbox row for the right recipient) and O-17.1.
  */
 
@@ -552,7 +552,7 @@ const rows: Row[] = [
     body: 'The legal deadline is the 7th.',
   },
   {
-    n: 32,
+    n: 37,
     type: 'payslip_pdf_failed',
     at: ist('12:00', '2026-11-02'),
     event: () => ({ type: 'payslip_pdf_failed', runId: 'RUN1', month: '2026-10', failedCount: 1 }),
