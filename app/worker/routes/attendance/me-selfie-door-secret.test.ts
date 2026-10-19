@@ -38,8 +38,8 @@ describe('S-16 My own selfie', () => {
   });
 
   it('S-16.1 nobody else can open it, and a deleted selfie is gone', async () => {
-    const { id } = await withSelfie();
     const other = await addPhone(h.salon, h.owner, { name: 'Neha Parmar' });
+    const { id } = await withSelfie();
     const stranger = await call('GET', `/me/punches/${id}/selfie`, { cookie: other.cookie });
     expect(stranger.status).toBe(404);
     await testEnv.DB.prepare('UPDATE punches SET selfie_deleted_at = ?2 WHERE id = ?1')
