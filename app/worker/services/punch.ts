@@ -344,8 +344,10 @@ async function sessionDeviceId(ctx: Ctx, userId: string): Promise<string> {
   return d?.id ?? '';
 }
 
-export async function issueNonces(ctx: Ctx, purpose: 'punch' | 'offline') {
+export async function issueNonces(ctx: Ctx, purpose: 'punch' | 'offline' | 'presence') {
   const user = ctx.user ?? fail('UNAUTHENTICATED');
+  // Presence nonces arrive with the presence API (WP-9), which also widens challenges.purpose.
+  if (purpose === 'presence') fail('NOT_IMPLEMENTED');
   const now = ctx.now();
   const deviceId = await sessionDeviceId(ctx, user.id);
   const timeSig = await signTime(ctx.env.TIME_SIGNING_KEY, now, deviceId);
