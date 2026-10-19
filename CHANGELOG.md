@@ -52,7 +52,7 @@ Docs:
 
 - The Content Security Policy no longer sends `upgrade-insecure-requests`. Every source is `'self'`, HSTS already forces HTTPS, and WebKit applies the directive to `http://localhost`, which broke the iPhone project of the CI run.
 - `CONTRIBUTING.md` now covers docs rules, labels and the PR template.
-- `docs/PRD.md` is at version 1.1 (see Appendix C).
+- `docs/PRD.md` is at version 1.3 (see Appendix C). 1.2 added Time credits and presence checks; 1.3 restores the legal overtime guardrail: the Time credits setting **Pay legal overtime at 2×** is on by default, so approved overtime beyond 9 h a day or 48 h a week counts twice in the ledger and is worth 2× when it is settled or netted against late and early minutes (PRD 7.17.7).
 - The payslip engine computes late/early, overtime pay and the off-day extra in one stage (`timeLines`), ready for Time credits to replace it. Payslips are unchanged.
 
 [Unreleased]: https://github.com/harshbhx/feelings-staff/commits/main
