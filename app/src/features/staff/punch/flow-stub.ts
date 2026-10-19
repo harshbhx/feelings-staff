@@ -204,31 +204,3 @@ export function usePunchFlowStub(): PunchFlow {
   const busy = state.step === 'submitting';
   return { state, actions, busy };
 }
-
-/** Outside mock mode, until WP-4's `usePunchFlow` is wired: say so instead of faking a punch. */
-export function usePunchFlowNotReady(): PunchFlow {
-  const [state, setState] = useState<PunchFlowState>({ step: 'idle' });
-  const actions = useMemo<PunchFlowActions>(() => {
-    const noop = () => {};
-    return {
-      start(kind) {
-        setState({ step: 'problem', kind, problem: { code: 'not_ready' } });
-      },
-      allowLocation: noop,
-      retry: noop,
-      capture: noop,
-      retake: noop,
-      usePhoto: noop,
-      sendWithoutPhoto: noop,
-      submitPin: noop,
-      scanDoorCode: noop,
-      submitDoorCode: noop,
-      sendToOwner: noop,
-      atVenue: noop,
-      close() {
-        setState({ step: 'idle' });
-      },
-    };
-  }, []);
-  return { state, actions, busy: false };
-}
