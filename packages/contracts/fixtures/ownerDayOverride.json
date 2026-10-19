@@ -1,0 +1,130 @@
+{
+  "user": {
+    "id": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+    "name": "Neha Parmar",
+    "designation": "Beautician",
+    "phone": "+919909122302"
+  },
+  "day": {
+    "workDate": "2026-10-19",
+    "dayType": "work",
+    "status": "OPEN",
+    "leaveCode": null,
+    "templateName": "Full day",
+    "scheduledMin": 540,
+    "workedMin": 13,
+    "lateMin": 28,
+    "lateBillableMin": 18,
+    "earlyMin": 0,
+    "earlyBillableMin": 0,
+    "undertimeMin": 0,
+    "otPreapprovedMin": 0,
+    "otCandidateMin": 0,
+    "otApprovedMin": 0,
+    "otStatus": "none",
+    "offdayCredit": 0,
+    "tags": ["late", "edited"],
+    "firstInTs": 1792385921000,
+    "lastOutTs": null,
+    "locked": false,
+    "holidayName": null
+  },
+  "schedule": {
+    "dayType": "work",
+    "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+    "templateName": "Full day",
+    "segments": [
+      {
+        "start": "10:00",
+        "end": "20:00"
+      }
+    ],
+    "breakMin": 60,
+    "scheduledMin": 540,
+    "startTs": 1792384200000,
+    "endTs": 1792420200000,
+    "holidayName": null,
+    "leave": null,
+    "nightHours": false
+  },
+  "punches": [
+    {
+      "id": "01K8N252559E8M5WQBDE5CG0HM",
+      "kind": "in",
+      "effectiveTs": 1792385921000,
+      "serverTs": 1792385921000,
+      "workDate": "2026-10-19",
+      "source": "online",
+      "status": "accepted",
+      "pendingReason": null,
+      "siteName": "Feelings Beauty Care",
+      "placeName": null,
+      "fenceResult": "pass",
+      "distanceBucket": "0-50",
+      "riskReasons": [],
+      "offsiteDutyId": null,
+      "edited": true,
+      "note": null,
+      "reviewNote": null,
+      "lat": 22.46068,
+      "lng": 70.05654,
+      "accuracyM": 14,
+      "distanceM": 9,
+      "samplesN": 5,
+      "riskScore": 0,
+      "qrVerified": false,
+      "pinVerified": true,
+      "sigVerified": true,
+      "selfieUrl": null,
+      "selfieDeletedAt": null,
+      "deviceLabel": "Oppo A78",
+      "ipCountry": "IN",
+      "clientTs": 1792385919800,
+      "reviewedByName": null,
+      "reviewedAt": null
+    }
+  ],
+  "site": {
+    "id": "01K8WN0TQC11QKMBNWMGPP50NM",
+    "kind": "salon",
+    "name": "Feelings Beauty Care",
+    "lat": 22.4606479,
+    "lng": 70.0565093,
+    "radiusM": 100,
+    "maxAccuracyM": 50,
+    "active": true,
+    "validFrom": null,
+    "validTo": null
+  },
+  "duty": null,
+  "lines": [
+    {
+      "code": "late",
+      "label": "Late by 28 minutes",
+      "formula": "10 min grace, 18 billable: 419.35 x 18 / 540",
+      "amountPaise": -1398
+    }
+  ],
+  "enrolledPhotoUrl": "/api/v1/owner/staff/01K8EZTHPNQTWAVCVVCWXBXHMS/photo",
+  "audit": [
+    {
+      "id": "01K8J7Q3PDMT9QSWTK4CAE2EK4",
+      "category": "change",
+      "actorType": "user",
+      "actorId": "01K894PPK418TJT35A8CDEANDV",
+      "actorName": "Urmi",
+      "action": "day.override",
+      "entity": "attendance_day",
+      "entityId": "01K8CHP18ZK28TGV9GRC2CJAY1",
+      "before": {
+        "status": "OPEN"
+      },
+      "after": {
+        "status": "P"
+      },
+      "reason": "Her bus broke down, she told me at 10:15.",
+      "createdAt": 1792386600000
+    }
+  ],
+  "locked": false
+}

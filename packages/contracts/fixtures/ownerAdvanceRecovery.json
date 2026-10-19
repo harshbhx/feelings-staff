@@ -1,0 +1,164 @@
+{
+  "id": null,
+  "runId": "01K8QTKPY00JBH9HC76Z45ZRR1",
+  "revision": 1,
+  "status": "draft",
+  "month": "2026-10",
+  "org": {
+    "name": "Feelings Beauty Care",
+    "address": "Om Residency, Hirji Mistry Road, near J J Tower, Jamnagar, Gujarat 361006"
+  },
+  "person": {
+    "id": "01K86AFQDXWDHQ8238N67SVDDK",
+    "name": "Priya Solanki",
+    "employeeCode": "FBC-003",
+    "designation": "Stylist",
+    "joinDate": "2025-03-10"
+  },
+  "result": {
+    "version": "engine-1.0.0",
+    "userId": "01K86AFQDXWDHQ8238N67SVDDK",
+    "month": "2026-10",
+    "salaryType": "monthly",
+    "daysInMonth": 31,
+    "employedDays": 31,
+    "divisorDays": 31,
+    "dailyRatePaise": 48387,
+    "counts": {
+      "P": 24,
+      "H": 1,
+      "A": 1,
+      "L": 0,
+      "LOP": 0,
+      "WO": 4,
+      "HO": 1,
+      "NE": 0,
+      "paidDays": 29.5,
+      "lopDays": 1.5
+    },
+    "lateBillableMin": 52,
+    "earlyBillableMin": 0,
+    "otApprovedMin": 150,
+    "otPendingMin": 0,
+    "compOffEarned": 0,
+    "lines": [
+      {
+        "code": "salary",
+        "label": "Monthly salary",
+        "formula": "15,000.00 for 31 days",
+        "amountPaise": 1500000,
+        "kind": "earning",
+        "refId": null
+      },
+      {
+        "code": "overtime",
+        "label": "Overtime",
+        "formula": "483.87 x 2 x 150 / 540 min",
+        "amountPaise": 26882,
+        "kind": "earning",
+        "refId": null
+      },
+      {
+        "code": "incentive",
+        "label": "Incentive",
+        "formula": "Added by Urmi: festive bridal bookings",
+        "amountPaise": 50000,
+        "kind": "earning",
+        "refId": "01K8VGR9VBVMBTBEZH7NX821HQ"
+      },
+      {
+        "code": "lop",
+        "label": "Unpaid days",
+        "formula": "1.5 days x 15,000 / 31",
+        "amountPaise": -72581,
+        "kind": "deduction",
+        "refId": null
+      },
+      {
+        "code": "undertime",
+        "label": "Late and early",
+        "formula": "483.87 x 47 / 540 + 483.87 x 5 / 180, rounded once",
+        "amountPaise": -5556,
+        "kind": "deduction",
+        "refId": null
+      },
+      {
+        "code": "advance_recovery",
+        "label": "Advance recovery",
+        "formula": "3,000.00 advance given 3 Oct, recovered in full",
+        "amountPaise": -300000,
+        "kind": "deduction",
+        "refId": "01K8D21FBSSP20BCWJAG3D88KX"
+      },
+      {
+        "code": "rounding",
+        "label": "Rounding",
+        "formula": "To the nearest rupee",
+        "amountPaise": -45,
+        "kind": "rounding",
+        "refId": null
+      }
+    ],
+    "grossPaise": 1576882,
+    "deductionsPaise": 378137,
+    "netBeforeRoundingPaise": 1198745,
+    "roundingPaise": -45,
+    "netPaise": 1198700,
+    "advanceRecoveries": [
+      {
+        "advanceId": "01K8D21FBSSP20BCWJAG3D88KX",
+        "duePaise": 300000,
+        "recoveredPaise": 300000,
+        "carriedPaise": 0
+      }
+    ],
+    "carryOut": {
+      "advances": [],
+      "damagePaise": 0,
+      "otherPaise": 0,
+      "fines": []
+    },
+    "warnings": []
+  },
+  "paid": null,
+  "pdfStatus": "pending",
+  "pdfUrl": null,
+  "verifyUrl": null,
+  "leaveBalances": [
+    {
+      "code": "CL",
+      "name": "Casual leave",
+      "balance": 5
+    },
+    {
+      "code": "SL",
+      "name": "Sick leave",
+      "balance": 6.5
+    },
+    {
+      "code": "CO",
+      "name": "Comp-off",
+      "balance": 1
+    }
+  ],
+  "generatedAt": 1793710260000,
+  "adjustments": [
+    {
+      "id": "01K8VGR9VBVMBTBEZH7NX821HQ",
+      "kind": "incentive",
+      "amountPaise": 50000,
+      "note": "Festive bridal bookings",
+      "createdAt": 1793601600000
+    }
+  ],
+  "advances": [
+    {
+      "advanceId": "01K8D21FBSSP20BCWJAG3D88KX",
+      "duePaise": 300000,
+      "recoverPaise": 300000,
+      "balancePaise": 0
+    }
+  ],
+  "shareText": "Hi Priya, your October 2026 payslip from Feelings Beauty Care is ready. Net pay ₹11,987.",
+  "waLink": "https://wa.me/919825011201?text=Hi%20Priya%2C%20your%20October%202026%20payslip%20from%20Feelings%20Beauty%20Care%20is%20ready.%20Net%20pay%20%E2%82%B911%2C987."
+}

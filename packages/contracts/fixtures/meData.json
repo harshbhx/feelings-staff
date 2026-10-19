@@ -1,0 +1,56 @@
+{
+  "punches": [
+    {
+      "id": "01K81VRKV5DKSM9VAM6NJH2ZFE",
+      "kind": "in",
+      "effectiveTs": 1792384337000,
+      "fenceResult": "pass",
+      "distanceBucket": "0-50",
+      "placeName": null,
+      "siteName": "Feelings Beauty Care",
+      "locationKept": true,
+      "locationDeletesOn": "2027-01-17"
+    },
+    {
+      "id": "01K80BPECQYKNQV4P2291MJ00E",
+      "kind": "out",
+      "effectiveTs": 1792170065000,
+      "fenceResult": "pass",
+      "distanceBucket": "0-50",
+      "placeName": null,
+      "siteName": "Feelings Beauty Care",
+      "locationKept": true,
+      "locationDeletesOn": "2027-01-14"
+    },
+    {
+      "id": "01K8JXX79RYEFH82QHCZ5GA639",
+      "kind": "in",
+      "effectiveTs": 1789187493000,
+      "fenceResult": "pass",
+      "distanceBucket": "0-50",
+      "placeName": null,
+      "siteName": "Feelings Beauty Care",
+      "locationKept": false,
+      "locationDeletesOn": null
+    }
+  ],
+  "selfies": [],
+  "consents": [
+    {
+      "kind": "privacy_notice",
+      "version": "2026-10-19",
+      "lang": "en",
+      "acceptedAt": 1741582200000,
+      "withdrawnAt": null
+    }
+  ],
+  "retention": {
+    "locationDays": 90,
+    "selfieDays": 30,
+    "wageYears": 8
+  },
+  "grievance": {
+    "name": "Urmi Mengar",
+    "phone": "+918000661578"
+  }
+}

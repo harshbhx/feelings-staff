@@ -1,0 +1,14 @@
+{
+  "nonces": [
+    {
+      "nonce": "Hq7xT2mP9vR4tN8bCkZ3yL0sGwE5aD1u",
+      "expiresAt": 1792516320000
+    },
+    {
+      "nonce": "Wp2dN6hR1vT8yK4mQ9cLx3sGzE7aB0uJ",
+      "expiresAt": 1792516320000
+    }
+  ],
+  "serverTime": 1792386720000,
+  "timeSig": "MEQCIB8mT0yL4hR9sGwE5aZc6uJ1oKfXbN3iDpV8tYqMAiB2lC7eAzS4gUxW0jOkF9nBvT6yPdLmQ1sR3cHk5vQ"
+}

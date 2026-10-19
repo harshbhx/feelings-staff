@@ -1,0 +1,23 @@
+{
+  "id": "01K88YDYR2A3AM48PYS2KVKJZG",
+  "user": {
+    "id": "01K86AFQDXWDHQ8238N67SVDDK",
+    "name": "Priya Solanki",
+    "designation": "Stylist",
+    "phone": "+919825011201"
+  },
+  "workDate": "2026-10-16",
+  "kind": "missed_in",
+  "targetPunchId": null,
+  "proposedInTs": 1792125000000,
+  "proposedOutTs": null,
+  "currentInTs": null,
+  "currentOutTs": null,
+  "placeName": null,
+  "reason": "The app was stuck on loading at the door.",
+  "status": "cancelled",
+  "decidedAt": null,
+  "decidedByName": null,
+  "decisionNote": null,
+  "createdAt": 1792375920000
+}

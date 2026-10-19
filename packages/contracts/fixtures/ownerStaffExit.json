@@ -1,0 +1,93 @@
+{
+  "id": "01K8T98E8PW4ZCQ7BFM9B6ZKVF",
+  "name": "Anita Joshi",
+  "phone": "+919825043313",
+  "designation": "Receptionist",
+  "status": "exited",
+  "deviceState": "approved",
+  "joinDate": "2024-10-14",
+  "exitDate": "2026-09-30",
+  "employeeCode": "FBC-000",
+  "lang": "en",
+  "salary": {
+    "type": "monthly",
+    "amountPaise": 1200000,
+    "effectiveFrom": "2024-10-14",
+    "createdAt": 1728876600000
+  },
+  "salaryHistory": [
+    {
+      "type": "monthly",
+      "amountPaise": 1200000,
+      "effectiveFrom": "2024-10-14",
+      "createdAt": 1728876600000
+    }
+  ],
+  "defaultTemplateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+  "weekOffDow": 1,
+  "selfieRequired": null,
+  "strongMode": false,
+  "divisorOverride": null,
+  "otRateOverride": null,
+  "devices": [
+    {
+      "id": "01K8FRHWPJGNH3XXWKNQZDF6CY",
+      "userId": "01K8T98E8PW4ZCQ7BFM9B6ZKVF",
+      "label": "Samsung Galaxy A34",
+      "platform": "android",
+      "status": "approved",
+      "requestedAt": 1741582500000,
+      "approvedAt": 1741582860000,
+      "lastSeenAt": 1792386420000
+    }
+  ],
+  "leaveBalances": [
+    {
+      "code": "CL",
+      "name": "Casual leave",
+      "paid": true,
+      "balance": 7,
+      "pending": 0,
+      "nextExpiry": null,
+      "usableFrom": null
+    },
+    {
+      "code": "SL",
+      "name": "Sick leave",
+      "paid": true,
+      "balance": 7,
+      "pending": 0,
+      "nextExpiry": null,
+      "usableFrom": null
+    }
+  ],
+  "advanceBalancePaise": 0,
+  "invite": null,
+  "today": null,
+  "monthTotals": {
+    "present": 0,
+    "half": 0,
+    "absent": 0,
+    "leave": 0,
+    "lop": 0,
+    "weekOff": 0,
+    "holiday": 0,
+    "workedMin": 0,
+    "lateMin": 0,
+    "lateBillableMin": 0,
+    "earlyBillableMin": 0,
+    "otApprovedMin": 0,
+    "otPendingMin": 0
+  },
+  "consents": [
+    {
+      "kind": "privacy_notice",
+      "version": "2026-10-19",
+      "lang": "en",
+      "acceptedAt": 1728881400000,
+      "withdrawnAt": null
+    }
+  ],
+  "exitReason": "Moved to Ahmedabad with family.",
+  "minimumWageWarning": null
+}

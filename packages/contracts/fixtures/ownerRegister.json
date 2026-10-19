@@ -1,0 +1,4059 @@
+{
+  "month": "2026-10",
+  "dates": [
+    "2026-10-01",
+    "2026-10-02",
+    "2026-10-03",
+    "2026-10-04",
+    "2026-10-05",
+    "2026-10-06",
+    "2026-10-07",
+    "2026-10-08",
+    "2026-10-09",
+    "2026-10-10",
+    "2026-10-11",
+    "2026-10-12",
+    "2026-10-13",
+    "2026-10-14",
+    "2026-10-15",
+    "2026-10-16",
+    "2026-10-17",
+    "2026-10-18",
+    "2026-10-19",
+    "2026-10-20",
+    "2026-10-21",
+    "2026-10-22",
+    "2026-10-23",
+    "2026-10-24",
+    "2026-10-25",
+    "2026-10-26",
+    "2026-10-27",
+    "2026-10-28",
+    "2026-10-29",
+    "2026-10-30",
+    "2026-10-31"
+  ],
+  "rows": [
+    {
+      "user": {
+        "id": "01K86AFQDXWDHQ8238N67SVDDK",
+        "name": "Priya Solanki",
+        "designation": "Stylist",
+        "phone": "+919825011201"
+      },
+      "cells": [
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1790829080000,
+          "outTs": 1790865040000,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791001640000,
+          "outTs": 1791037840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1791088280000,
+          "outTs": 1791099040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1791174680000,
+          "outTs": 1791210640000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 25,
+          "inTs": 1791348920000,
+          "outTs": 1791383440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 12,
+          "inTs": 1791434540000,
+          "outTs": 1791469840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791520040000,
+          "outTs": 1791555640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1791606680000,
+          "outTs": 1791642640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 15,
+          "inTs": 1791693920000,
+          "outTs": 1791703840000,
+          "future": false
+        },
+        {
+          "status": "H",
+          "dayType": "work",
+          "tags": ["early"],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791779240000,
+          "outTs": 1791797440000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "A",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 40,
+          "inTs": 1792041020000,
+          "outTs": 1792074640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["ot"],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1792125080000,
+          "outTs": 1792170040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1792211480000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792297640000,
+          "outTs": 1792308640000,
+          "future": false
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1792384337000,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 13,
+        "half": 1,
+        "absent": 1,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 2,
+        "holiday": 1,
+        "workedMin": 6333,
+        "lateMin": 100,
+        "lateBillableMin": 52,
+        "earlyBillableMin": 0,
+        "otApprovedMin": 150,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+        "name": "Neha Parmar",
+        "designation": "Beautician",
+        "phone": "+919909122302"
+      },
+      "cells": [
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791779240000,
+          "outTs": 1791815440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791865640000,
+          "outTs": 1791901840000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792038620000,
+          "outTs": 1792074640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792124840000,
+          "outTs": 1792161040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792211420000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1792297940000,
+          "outTs": 1792308640000,
+          "future": false
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 28,
+          "inTs": 1792385921000,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 6,
+        "half": 0,
+        "absent": 0,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 1,
+        "holiday": 0,
+        "workedMin": 2900,
+        "lateMin": 30,
+        "lateBillableMin": 18,
+        "earlyBillableMin": 0,
+        "otApprovedMin": 0,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K8RC525PJGR1P8TRDT8GBJ6Q",
+        "name": "Kajal Vyas",
+        "designation": "Makeup artist",
+        "phone": "+919724033403"
+      },
+      "cells": [
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791001760000,
+          "outTs": 1791037840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791087980000,
+          "outTs": 1791099040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791174560000,
+          "outTs": 1791210640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 3,
+          "inTs": 1791261200000,
+          "outTs": 1791297040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791347180000,
+          "outTs": 1791383440000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 29,
+          "inTs": 1791521960000,
+          "outTs": 1791556240000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791606380000,
+          "outTs": 1791642640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791692780000,
+          "outTs": 1791703840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1791779540000,
+          "outTs": 1791815440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791865700000,
+          "outTs": 1791901840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791952220000,
+          "outTs": 1791988240000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1792125080000,
+          "outTs": 1792161040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792211240000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1792297940000,
+          "outTs": 1792308640000,
+          "future": false
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 14,
+        "half": 0,
+        "absent": 0,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 3,
+        "holiday": 1,
+        "workedMin": 6466,
+        "lateMin": 37,
+        "lateBillableMin": 19,
+        "earlyBillableMin": 0,
+        "otApprovedMin": 0,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K8VQK1MQ1GQKWX6D0EBBE455",
+        "name": "Meena Chavda",
+        "designation": "Helper",
+        "phone": "+919428144504"
+      },
+      "cells": [
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["early"],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1790828960000,
+          "outTs": 1790863840000,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 29,
+          "inTs": 1791003560000,
+          "outTs": 1791037840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791088220000,
+          "outTs": 1791099040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late", "early"],
+          "leaveCode": null,
+          "lateMin": 24,
+          "inTs": 1791176060000,
+          "outTs": 1791209440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791260840000,
+          "outTs": 1791297040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791347300000,
+          "outTs": 1791383440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 3,
+          "inTs": 1791434000000,
+          "outTs": 1791469840000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791606320000,
+          "outTs": 1791642640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["early"],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791692960000,
+          "outTs": 1791702640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791779120000,
+          "outTs": 1791815440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 23,
+          "inTs": 1791867200000,
+          "outTs": 1791901840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1791952340000,
+          "outTs": 1791988240000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1792038680000,
+          "outTs": 1792074640000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792211120000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792297760000,
+          "outTs": 1792308640000,
+          "future": false
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792383912000,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 15,
+        "half": 0,
+        "absent": 0,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 2,
+        "holiday": 1,
+        "workedMin": 6947,
+        "lateMin": 82,
+        "lateBillableMin": 46,
+        "earlyBillableMin": 60,
+        "otApprovedMin": 0,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K8RTJTBRYNPS8SSG3GVVE3ED",
+        "name": "Rekha Jethwa",
+        "designation": "Mehndi artist",
+        "phone": "+919879255605"
+      },
+      "cells": [
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1790828900000,
+          "outTs": 1790865040000,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791001700000,
+          "outTs": 1791037840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 3,
+          "inTs": 1791088400000,
+          "outTs": 1791099040000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791260780000,
+          "outTs": 1791297040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 3,
+          "inTs": 1791347600000,
+          "outTs": 1791383440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791433640000,
+          "outTs": 1791469840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791519920000,
+          "outTs": 1791556240000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791606380000,
+          "outTs": 1791642640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1791693080000,
+          "outTs": 1791703840000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791865760000,
+          "outTs": 1791901840000,
+          "future": false
+        },
+        {
+          "status": "H",
+          "dayType": "work",
+          "tags": ["early"],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791952040000,
+          "outTs": 1791970240000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792038380000,
+          "outTs": 1792074640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792124720000,
+          "outTs": 1792161040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 16,
+          "inTs": 1792212380000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792297700000,
+          "outTs": 1792308640000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 14,
+        "half": 1,
+        "absent": 0,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 3,
+        "holiday": 1,
+        "workedMin": 6792,
+        "lateMin": 23,
+        "lateBillableMin": 6,
+        "earlyBillableMin": 0,
+        "otApprovedMin": 0,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K87QPZMP5513SAQDEKNN2B17",
+        "name": "Hetal Dave",
+        "designation": "Nail technician",
+        "phone": "+919825366706"
+      },
+      "cells": [
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1790829020000,
+          "outTs": 1790865040000,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791001700000,
+          "outTs": 1791037840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["early"],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791087980000,
+          "outTs": 1791097840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791174500000,
+          "outTs": 1791210640000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791347120000,
+          "outTs": 1791383440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791433820000,
+          "outTs": 1791469840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791520220000,
+          "outTs": 1791556240000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791606620000,
+          "outTs": 1791642640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791692960000,
+          "outTs": 1791703840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 3,
+          "inTs": 1791779600000,
+          "outTs": 1791815440000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1791952340000,
+          "outTs": 1791988240000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792038380000,
+          "outTs": 1792074640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["early"],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792124900000,
+          "outTs": 1792159840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 20,
+          "inTs": 1792212620000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792297820000,
+          "outTs": 1792308640000,
+          "future": false
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 9,
+          "inTs": 1792384770000,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 15,
+        "half": 0,
+        "absent": 0,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 2,
+        "holiday": 1,
+        "workedMin": 7007,
+        "lateMin": 34,
+        "lateBillableMin": 10,
+        "earlyBillableMin": 40,
+        "otApprovedMin": 0,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K8CX6TF7P9TEP6QNEP3FSBY7",
+        "name": "Pooja Bhatt",
+        "designation": "Receptionist",
+        "phone": "+919913477807"
+      },
+      "cells": [
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1790828840000,
+          "outTs": 1790865040000,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 24,
+          "inTs": 1791003260000,
+          "outTs": 1791037840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791087980000,
+          "outTs": 1791099040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791174560000,
+          "outTs": 1791210640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791260960000,
+          "outTs": 1791297040000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791433520000,
+          "outTs": 1791469840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 3,
+          "inTs": 1791520400000,
+          "outTs": 1791556240000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791606620000,
+          "outTs": 1791642640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791692900000,
+          "outTs": 1791703840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791779420000,
+          "outTs": 1791815440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791865580000,
+          "outTs": 1791901840000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1792038740000,
+          "outTs": 1792074640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792124960000,
+          "outTs": 1792161040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1792211480000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["early"],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1792297940000,
+          "outTs": 1792307440000,
+          "future": false
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792384085000,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 15,
+        "half": 0,
+        "absent": 0,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 2,
+        "holiday": 1,
+        "workedMin": 7032,
+        "lateMin": 32,
+        "lateBillableMin": 14,
+        "earlyBillableMin": 20,
+        "otApprovedMin": 0,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K860ABG2KZEJ0J3KGQ5S997H",
+        "name": "Dhara Gohil",
+        "designation": "Stylist",
+        "phone": "+919586588908"
+      },
+      "cells": [
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791001820000,
+          "outTs": 1791037840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1791088340000,
+          "outTs": 1791099040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791174320000,
+          "outTs": 1791210640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791261020000,
+          "outTs": 1791297040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1791347480000,
+          "outTs": 1791383440000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791520100000,
+          "outTs": 1791556240000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["early"],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1791606680000,
+          "outTs": 1791641440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791693020000,
+          "outTs": 1791703840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791779240000,
+          "outTs": 1791815440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791865520000,
+          "outTs": 1791901840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1791952340000,
+          "outTs": 1791988240000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1792125080000,
+          "outTs": 1792161040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1792211480000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["early"],
+          "leaveCode": null,
+          "lateMin": 1,
+          "inTs": 1792297880000,
+          "outTs": 1792307440000,
+          "future": false
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 5,
+          "inTs": 1792384552000,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 14,
+        "half": 0,
+        "absent": 0,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 3,
+        "holiday": 1,
+        "workedMin": 6482,
+        "lateMin": 14,
+        "lateBillableMin": 0,
+        "earlyBillableMin": 40,
+        "otApprovedMin": 0,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K88WSYSDT60NPN5ARB5CJB45",
+        "name": "Komal Rathod",
+        "designation": "Trainee",
+        "phone": "+919924699009"
+      },
+      "cells": [
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1790828840000,
+          "outTs": 1790865040000,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 3,
+          "inTs": 1791002000000,
+          "outTs": 1791037840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791088220000,
+          "outTs": 1791099040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791174560000,
+          "outTs": 1791210640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1791261140000,
+          "outTs": 1791297040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 16,
+          "inTs": 1791348380000,
+          "outTs": 1791383440000,
+          "future": false
+        },
+        {
+          "status": "L",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": "CL",
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 27,
+          "inTs": 1791608240000,
+          "outTs": 1791642640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791692780000,
+          "outTs": 1791703840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 22,
+          "inTs": 1791780740000,
+          "outTs": 1791815440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["ot"],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791865580000,
+          "outTs": 1791904540000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791951980000,
+          "outTs": 1791988240000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792038440000,
+          "outTs": 1792074640000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 3,
+          "inTs": 1792211600000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792297520000,
+          "outTs": 1792308640000,
+          "future": false
+        },
+        {
+          "status": "L",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": "CL",
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 14,
+        "half": 0,
+        "absent": 0,
+        "leave": 2,
+        "lop": 0,
+        "weekOff": 2,
+        "holiday": 1,
+        "workedMin": 6476,
+        "lateMin": 73,
+        "lateBillableMin": 35,
+        "earlyBillableMin": 0,
+        "otApprovedMin": 45,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K87R133CAYV58WCHEDPSC8TQ",
+        "name": "Jinal Kotak",
+        "designation": "Beautician",
+        "phone": "+919712710010"
+      },
+      "cells": [
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1790828720000,
+          "outTs": 1790865040000,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791001760000,
+          "outTs": 1791037840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791088160000,
+          "outTs": 1791099040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791174440000,
+          "outTs": 1791210640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791260840000,
+          "outTs": 1791297040000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791433820000,
+          "outTs": 1791469840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791520040000,
+          "outTs": 1791556240000,
+          "future": false
+        },
+        {
+          "status": "A",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791692780000,
+          "outTs": 1791703840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 18,
+          "inTs": 1791780500000,
+          "outTs": 1791815440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791865640000,
+          "outTs": 1791901840000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792038320000,
+          "outTs": 1792074640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792125020000,
+          "outTs": 1792161040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792211360000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792297820000,
+          "outTs": 1792308640000,
+          "future": false
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": ["late", "flagged"],
+          "leaveCode": null,
+          "lateMin": 15,
+          "inTs": 1792385103000,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 14,
+        "half": 0,
+        "absent": 1,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 2,
+        "holiday": 1,
+        "workedMin": 6517,
+        "lateMin": 33,
+        "lateBillableMin": 13,
+        "earlyBillableMin": 0,
+        "otApprovedMin": 0,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K808WS88WK4F356DMX0P8VSB",
+        "name": "Sejal Makwana",
+        "designation": "Makeup artist",
+        "phone": "+919726821111"
+      },
+      "cells": [
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791001700000,
+          "outTs": 1791037840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 18,
+          "inTs": 1791089300000,
+          "outTs": 1791099040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791174380000,
+          "outTs": 1791210640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 26,
+          "inTs": 1791262580000,
+          "outTs": 1791297040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["early"],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791347240000,
+          "outTs": 1791382240000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 2,
+          "inTs": 1791520340000,
+          "outTs": 1791556240000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791606320000,
+          "outTs": 1791642640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 28,
+          "inTs": 1791694700000,
+          "outTs": 1791703840000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1791779300000,
+          "outTs": 1791815440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late", "early"],
+          "leaveCode": null,
+          "lateMin": 25,
+          "inTs": 1791867320000,
+          "outTs": 1791900640000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 3,
+          "inTs": 1791952400000,
+          "outTs": 1791988240000,
+          "future": false
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792124780000,
+          "outTs": 1792161040000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": 1792211240000,
+          "outTs": 1792247440000,
+          "future": false
+        },
+        {
+          "status": "P",
+          "dayType": "work",
+          "tags": ["late"],
+          "leaveCode": null,
+          "lateMin": 19,
+          "inTs": 1792298960000,
+          "outTs": 1792308640000,
+          "future": false
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": ["late", "pending"],
+          "leaveCode": null,
+          "lateMin": 21,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 14,
+        "half": 0,
+        "absent": 0,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 3,
+        "holiday": 1,
+        "workedMin": 6362,
+        "lateMin": 142,
+        "lateBillableMin": 77,
+        "earlyBillableMin": 40,
+        "otApprovedMin": 0,
+        "otPendingMin": 0
+      }
+    },
+    {
+      "user": {
+        "id": "01K8HVYPHBE17XDAAV85DMW1AY",
+        "name": "Bhumi Trivedi",
+        "designation": "Trainee",
+        "phone": "+919016932212"
+      },
+      "cells": [
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "NE",
+          "dayType": "NE",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": false
+        },
+        {
+          "status": "HO",
+          "dayType": "HO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "WO",
+          "dayType": "WO",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        },
+        {
+          "status": "OPEN",
+          "dayType": "work",
+          "tags": [],
+          "leaveCode": null,
+          "lateMin": 0,
+          "inTs": null,
+          "outTs": null,
+          "future": true
+        }
+      ],
+      "totals": {
+        "present": 0,
+        "half": 0,
+        "absent": 0,
+        "leave": 0,
+        "lop": 0,
+        "weekOff": 0,
+        "holiday": 0,
+        "workedMin": 0,
+        "lateMin": 0,
+        "lateBillableMin": 0,
+        "earlyBillableMin": 0,
+        "otApprovedMin": 0,
+        "otPendingMin": 0
+      }
+    }
+  ],
+  "locked": false
+}

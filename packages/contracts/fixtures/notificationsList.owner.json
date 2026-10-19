@@ -1,0 +1,72 @@
+{
+  "items": [
+    {
+      "id": "01K8WA7PBM7JEGS42P2PKMPC4R",
+      "type": "morning_summary",
+      "title": "Good morning",
+      "body": "8 in, 1 not in yet, 1 on leave and 1 on week off.",
+      "url": "/o/today",
+      "priority": "normal",
+      "data": null,
+      "readAt": null,
+      "createdAt": 1792386720000
+    },
+    {
+      "id": "01K8EXZ3H9VT5FXN6G3CEJBTGG",
+      "type": "late_checkin",
+      "title": "Neha is late",
+      "body": "Neha checked in at 10:28, 28 minutes after her shift started.",
+      "url": "/o/today",
+      "priority": "normal",
+      "data": null,
+      "readAt": null,
+      "createdAt": 1792385981000
+    },
+    {
+      "id": "01K8ENR6ZDP8EP3MXT3HH35SKY",
+      "type": "flagged_punch",
+      "title": "Jinal's check-in needs a look",
+      "body": "She was 94 m from the salon with a weak signal.",
+      "url": "/o/actions",
+      "priority": "high",
+      "data": null,
+      "readAt": null,
+      "createdAt": 1792385163000
+    },
+    {
+      "id": "01K87D4WGBCWR9PD60A2FJE2DC",
+      "type": "punch_needs_approval",
+      "title": "Sejal's check-in is waiting for you",
+      "body": "She is about 400 m away and says the shutter is jammed.",
+      "url": "/o/actions",
+      "priority": "high",
+      "data": null,
+      "readAt": null,
+      "createdAt": 1792385564000
+    },
+    {
+      "id": "01K8TDVWMSJQ7F1VYXXMEGM3QT",
+      "type": "new_device",
+      "title": "Bhumi added a new phone",
+      "body": "Redmi Note 13. Approve it so she can check in.",
+      "url": "/o/actions",
+      "priority": "high",
+      "data": null,
+      "readAt": null,
+      "createdAt": 1792386000000
+    },
+    {
+      "id": "01K8QXQ6AM037AMRATAD7FCQBT",
+      "type": "not_in_yet",
+      "title": "Kajal isn't in yet",
+      "body": "Her shift started at 10:00.",
+      "url": "/o/today",
+      "priority": "normal",
+      "data": null,
+      "readAt": null,
+      "createdAt": 1792386000000
+    }
+  ],
+  "nextCursor": null,
+  "unread": 6
+}

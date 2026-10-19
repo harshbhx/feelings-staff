@@ -1,0 +1,35 @@
+[
+  {
+    "id": "01K8QTKPY00JBH9HC76Z45ZRR1",
+    "month": "2026-10",
+    "revision": 1,
+    "status": "draft",
+    "people": 12,
+    "netPaise": 13843200,
+    "paidCount": 0,
+    "createdAt": 1793503800000,
+    "finalisedAt": null
+  },
+  {
+    "id": "01K8SC2HCAM6BXY5V269QZTQWP",
+    "month": "2026-09",
+    "revision": 1,
+    "status": "finalised",
+    "people": 11,
+    "netPaise": 14061200,
+    "paidCount": 11,
+    "createdAt": 1790825400000,
+    "finalisedAt": 1791029700000
+  },
+  {
+    "id": "01K81VRTMFWRVBWGKH05753X5G",
+    "month": "2026-08",
+    "revision": 1,
+    "status": "finalised",
+    "people": 11,
+    "netPaise": 14215000,
+    "paidCount": 11,
+    "createdAt": 1788233400000,
+    "finalisedAt": 1788439200000
+  }
+]

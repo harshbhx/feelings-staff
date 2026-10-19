@@ -1,0 +1,14 @@
+{
+  "id": "01K8ZAWHRSE2WHRC7620FKPZ9J",
+  "name": "Morning",
+  "segments": [
+    {
+      "start": "10:00",
+      "end": "14:30"
+    }
+  ],
+  "breakMin": 0,
+  "scheduledMin": 270,
+  "active": true,
+  "sort": 2
+}

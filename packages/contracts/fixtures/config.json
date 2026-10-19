@@ -1,0 +1,15 @@
+{
+  "minAppVersion": "1.0.0",
+  "vapidPublicKey": "BPd3k1v8m2Qx7nT0yL4hR9sGwE5aZc6uJ1oKfXbN3iDpV8tYqM2rHlC7eAzS4gUxW0jOkF9nBvT6yPdLmQ1sR3c",
+  "punchEncPublicJwk": {
+    "kty": "RSA",
+    "alg": "RSA-OAEP-256",
+    "n": "q3vZ0mT8hY2kRxP9cLw5aN7sD1fGjB4eU6oIyHnV3tKzXr0qWpMlC8dS2bAgEu9JiOfT1xNvY5hRkQ7mPzLc4wD6sGa0eB3jUoFy8nHtXr2VqKlM9cZpW",
+    "e": "AQAB",
+    "ext": true,
+    "key_ops": ["encrypt"]
+  },
+  "orgDisplayName": "Feelings Beauty Care",
+  "env": "production",
+  "version": "1.0.0"
+}

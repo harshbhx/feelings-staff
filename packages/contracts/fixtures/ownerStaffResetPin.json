@@ -1,0 +1,10 @@
+{
+  "invite": {
+    "url": "https://staff.feelingsbeautycare.in/join/K7M4QPXD",
+    "code": "K7M-4QPXD",
+    "message": "Hi Kajal, this is Urmi from Feelings Beauty Care. Use this code to set a new PIN: K7M-4QPXD\nThe link works for 48 hours.",
+    "waLink": "https://wa.me/919724033403?text=Hi%20Kajal%2C%20this%20is%20Urmi%20from%20Feelings%20Beauty%20Care.%20Use%20this%20code%20to%20set%20a%20new%20PIN%3A%20K7M-4QPXD%0AThe%20link%20works%20for%2048%20hours.",
+    "expiresAt": 1792559520000,
+    "purpose": "pin_reset"
+  }
+}

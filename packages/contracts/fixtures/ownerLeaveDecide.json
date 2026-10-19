@@ -1,0 +1,24 @@
+{
+  "id": "01K8M244E0NC4JY58J2TCPDCYK",
+  "user": {
+    "id": "01K88WSYSDT60NPN5ARB5CJB45",
+    "name": "Komal Rathod",
+    "designation": "Trainee",
+    "phone": "+919924699009"
+  },
+  "typeCode": "CL",
+  "typeName": "Casual leave",
+  "fromDate": "2026-10-19",
+  "toDate": "2026-10-19",
+  "half": "none",
+  "daysPaid": 1,
+  "daysUnpaid": 0,
+  "reason": "Fever and a doctor visit.",
+  "blackoutHit": false,
+  "status": "approved",
+  "decidedAt": 1792132500000,
+  "decidedByName": "Urmi",
+  "decisionNote": null,
+  "cancelledAt": null,
+  "createdAt": 1792123800000
+}

@@ -1,0 +1,127 @@
+{
+  "items": [
+    {
+      "id": "01K88RV5TRY811SFKRGYG5NJ23",
+      "category": "change",
+      "actorType": "user",
+      "actorId": "01K894PPK418TJT35A8CDEANDV",
+      "actorName": "Urmi",
+      "action": "day.override",
+      "entity": "attendance_day",
+      "entityId": "01K8CHP18ZK28TGV9GRC2CJAY1",
+      "before": {
+        "status": "OPEN"
+      },
+      "after": {
+        "status": "P"
+      },
+      "reason": "Her bus broke down, she told me at 10:15.",
+      "createdAt": 1792386600000
+    },
+    {
+      "id": "01K8H1KJWMHEXWC33T5TG45R6S",
+      "category": "security",
+      "actorType": "user",
+      "actorId": "01K894PPK418TJT35A8CDEANDV",
+      "actorName": "Urmi",
+      "action": "device.approve",
+      "entity": "device",
+      "entityId": "01K8JYF6X0C704X5QAR4H2ENSF",
+      "before": {
+        "status": "pending"
+      },
+      "after": {
+        "status": "approved"
+      },
+      "reason": null,
+      "createdAt": 1792211700000
+    },
+    {
+      "id": "01K8T7E02PE84PFEVX0ZR95QGA",
+      "category": "change",
+      "actorType": "user",
+      "actorId": "01K894PPK418TJT35A8CDEANDV",
+      "actorName": "Urmi",
+      "action": "settings.update",
+      "entity": "org_settings",
+      "entityId": "01K88WMW5DRXRGE3RMW4NF61X1",
+      "before": {
+        "overtime": {
+          "blockMin": 30
+        }
+      },
+      "after": {
+        "overtime": {
+          "blockMin": 15
+        }
+      },
+      "reason": null,
+      "createdAt": 1792062600000
+    },
+    {
+      "id": "01K8FTKPFEKDA2ER4AGZVY44WC",
+      "category": "change",
+      "actorType": "user",
+      "actorId": "01K894PPK418TJT35A8CDEANDV",
+      "actorName": "Urmi",
+      "action": "advance.create",
+      "entity": "advance",
+      "entityId": "01K8D21FBSSP20BCWJAG3D88KX",
+      "before": null,
+      "after": {
+        "amountPaise": 300000,
+        "plan": "full"
+      },
+      "reason": "Scooter repair.",
+      "createdAt": 1791013200000
+    },
+    {
+      "id": "01K8J756K2VJG6RT8X5HY97YKP",
+      "category": "export",
+      "actorType": "user",
+      "actorId": "01K894PPK418TJT35A8CDEANDV",
+      "actorName": "Urmi",
+      "action": "export.create",
+      "entity": "export",
+      "entityId": "01K8PRBQN29D14HT47K9AB8M30",
+      "before": null,
+      "after": {
+        "kind": "salary_register",
+        "month": "2026-09"
+      },
+      "reason": null,
+      "createdAt": 1791176400000
+    },
+    {
+      "id": "01K8GBHRGYT5F1P38FY45Q804W",
+      "category": "access",
+      "actorType": "user",
+      "actorId": "01K894PPK418TJT35A8CDEANDV",
+      "actorName": "Urmi",
+      "action": "auth.sign_in",
+      "entity": "session",
+      "entityId": "01K8Z3SX1FGPTNY8CHK55G295V",
+      "before": null,
+      "after": null,
+      "reason": null,
+      "createdAt": 1792383720000
+    },
+    {
+      "id": "01K8EZSW3HR8XR26TY2YNT6NJM",
+      "category": "change",
+      "actorType": "system",
+      "actorId": null,
+      "actorName": "System",
+      "action": "attendance.auto_close",
+      "entity": "attendance_day",
+      "entityId": "01K8MMGKC3H84PMKQGP76VPGAW",
+      "before": null,
+      "after": {
+        "outTs": 1792247400000
+      },
+      "reason": "No check-out by closing time.",
+      "createdAt": 1792261740000
+    }
+  ],
+  "nextCursor": null
+}

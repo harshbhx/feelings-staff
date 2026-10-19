@@ -1,0 +1,58 @@
+[
+  {
+    "id": "01K8072GN05V5ERCWN47544P7X",
+    "date": "2026-01-14",
+    "name": "Uttarayan",
+    "paid": true,
+    "workedComp": "comp_off"
+  },
+  {
+    "id": "01K8DNEWPA9V9TAAYXBM182VGM",
+    "date": "2026-01-26",
+    "name": "Republic Day",
+    "paid": true,
+    "workedComp": "comp_off"
+  },
+  {
+    "id": "01K8BK56QSP010PHNRBSEACDJ2",
+    "date": "2026-03-04",
+    "name": "Holi",
+    "paid": true,
+    "workedComp": "comp_off"
+  },
+  {
+    "id": "01K8XZGBS9MCNQ5JHE1NBMQQF6",
+    "date": "2026-08-15",
+    "name": "Independence Day",
+    "paid": true,
+    "workedComp": "comp_off"
+  },
+  {
+    "id": "01K8271WQ6Q0FY72SRAF25PQPX",
+    "date": "2026-09-04",
+    "name": "Janmashtami",
+    "paid": true,
+    "workedComp": "comp_off"
+  },
+  {
+    "id": "01K8V7B26PJ4VY2P5Z450HQHJA",
+    "date": "2026-10-02",
+    "name": "Gandhi Jayanti",
+    "paid": true,
+    "workedComp": "comp_off"
+  },
+  {
+    "id": "01K8YBZFDSZBQNX4CRAB816E5Y",
+    "date": "2026-10-20",
+    "name": "Dussehra",
+    "paid": true,
+    "workedComp": "comp_off"
+  },
+  {
+    "id": "01K81PAXWP0HA3TPC65YBX0W60",
+    "date": "2026-11-08",
+    "name": "Diwali",
+    "paid": true,
+    "workedComp": "comp_off"
+  }
+]

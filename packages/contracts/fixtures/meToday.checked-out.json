@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-19",
+  "serverTime": 1792420740000,
+  "schedule": {
+    "dayType": "work",
+    "templateId": "01K8GSSSMCEJBEG2FMPXQCZR0J",
+    "templateName": "Full day",
+    "segments": [
+      {
+        "start": "10:00",
+        "end": "20:00"
+      }
+    ],
+    "breakMin": 60,
+    "scheduledMin": 540,
+    "startTs": 1792384200000,
+    "endTs": 1792420200000,
+    "holidayName": null,
+    "leave": null,
+    "nightHours": false
+  },
+  "state": "out",
+  "inSinceTs": null,
+  "punches": [
+    {
+      "id": "01K81VRKV5DKSM9VAM6NJH2ZFE",
+      "kind": "in",
+      "effectiveTs": 1792384337000,
+      "serverTs": 1792384337000,
+      "workDate": "2026-10-19",
+      "source": "online",
+      "status": "accepted",
+      "pendingReason": null,
+      "siteName": "Feelings Beauty Care",
+      "placeName": null,
+      "fenceResult": "pass",
+      "distanceBucket": "0-50",
+      "riskReasons": [],
+      "offsiteDutyId": null,
+      "edited": false,
+      "note": null,
+      "reviewNote": null
+    },
+    {
+      "id": "01K8BAD8FW37M50V1Z9MT9XJQ1",
+      "kind": "out",
+      "effectiveTs": 1792420702000,
+      "serverTs": 1792420702000,
+      "workDate": "2026-10-19",
+      "source": "online",
+      "status": "accepted",
+      "pendingReason": null,
+      "siteName": "Feelings Beauty Care",
+      "placeName": null,
+      "fenceResult": "pass",
+      "distanceBucket": "0-50",
+      "riskReasons": [],
+      "offsiteDutyId": null,
+      "edited": false,
+      "note": null,
+      "reviewNote": null
+    }
+  ],
+  "day": {
+    "workDate": "2026-10-19",
+    "dayType": "work",
+    "status": "P",
+    "leaveCode": null,
+    "templateName": "Full day",
+    "scheduledMin": 540,
+    "workedMin": 546,
+    "lateMin": 2,
+    "lateBillableMin": 0,
+    "earlyMin": 0,
+    "earlyBillableMin": 0,
+    "undertimeMin": 0,
+    "otPreapprovedMin": 0,
+    "otCandidateMin": 0,
+    "otApprovedMin": 0,
+    "otStatus": "none",
+    "offdayCredit": 0,
+    "tags": [],
+    "firstInTs": 1792384337000,
+    "lastOutTs": 1792420702000,
+    "locked": false,
+    "holidayName": null
+  },
+  "duty": null,
+  "earliestCheckInTs": 1792380600000,
+  "pendingCount": 0
+}

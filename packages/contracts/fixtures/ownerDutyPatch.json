@@ -1,0 +1,33 @@
+{
+  "id": "01K8B2CMEWHA5E0KVPW53A63ZH",
+  "workDate": "2026-10-24",
+  "startTs": 1792830600000,
+  "endTs": 1792863000000,
+  "mode": "geofence",
+  "otPreapproved": true,
+  "placeName": "Rajwadi Banquet",
+  "note": "Bridal party of six. Carry the trial kit.",
+  "site": {
+    "id": "01K8FVQKSGRM7ASXHK54D0KYEB",
+    "lat": 22.4702,
+    "lng": 70.0612,
+    "radiusM": 200
+  },
+  "staff": [
+    {
+      "id": "01K8RC525PJGR1P8TRDT8GBJ6Q",
+      "name": "Kajal Vyas",
+      "designation": "Makeup artist",
+      "phone": "+919724033403"
+    },
+    {
+      "id": "01K860ABG2KZEJ0J3KGQ5S997H",
+      "name": "Dhara Gohil",
+      "designation": "Stylist",
+      "phone": "+919586588908"
+    }
+  ],
+  "nightHours": true,
+  "cancelledAt": null,
+  "createdAt": 1792065600000
+}
