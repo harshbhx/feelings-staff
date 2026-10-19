@@ -748,7 +748,9 @@
       "getCode": "Get pairing code",
       "codeUntil": "Works until {{time}}.",
       "label": "Name",
-      "labelHint": "For example Reception tablet"
+      "labelHint": "For example Reception tablet",
+      "removeTitle": "Remove {{name}}?",
+      "removeBody": "It stops showing the door code. Pair it again to use it."
     },
     "shifts": {
       "what": "Shift times staff are rostered on. Breaks are unpaid.",
@@ -813,7 +815,8 @@
         "staff": "See staff",
         "payroll": "Run payroll",
         "exports": "Download reports"
-      }
+      },
+      "removeTitle": "Remove {{name}} as a manager?"
     }
   },
   "register": {

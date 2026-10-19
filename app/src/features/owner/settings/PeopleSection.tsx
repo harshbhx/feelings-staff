@@ -11,6 +11,7 @@ import { ownerKeys } from '../api/keys';
 import { useOwnerMutation } from '../api/query';
 import { useManagers } from '../api/settings';
 import { useStaffList } from '../api/staff';
+import { ConfirmButton } from '../components/ConfirmButton';
 import { Meta } from '../components/layout';
 import { QueryView, RowsSkeleton, useErrorText } from '../components/states';
 
@@ -61,14 +62,15 @@ export function PeopleSection() {
                   .map((p) => t(`owner:settings.people.perms.${p}`))
                   .join(' · ')}
                 trailing={
-                  <Button
+                  <ConfirmButton
                     size="sm"
-                    variant="danger-secondary"
-                    disabled={remove.isPending}
-                    onClick={() => remove.mutate(m.user.id, { onError: fail })}
-                  >
-                    {t('owner:common.remove')}
-                  </Button>
+                    label={t('owner:common.remove')}
+                    title={t('owner:settings.people.removeTitle', { name: m.user.name })}
+                    busy={remove.isPending}
+                    onConfirm={(done) =>
+                      remove.mutate(m.user.id, { onSuccess: done, onError: fail })
+                    }
+                  />
                 }
               />
             ))}

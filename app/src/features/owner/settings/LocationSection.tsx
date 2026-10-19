@@ -31,6 +31,7 @@ import {
   usePatchSite,
   useStoreCalibration,
 } from '../api/settings';
+import { ConfirmButton } from '../components/ConfirmButton';
 import { Meta, Section } from '../components/layout';
 import { QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { clock, shortDate, todayIst } from '../lib/format';
@@ -330,14 +331,14 @@ function DeviceRow({ device: d }: { device: z.infer<typeof DoorDeviceView> }) {
               {t('owner:settings.door.rotate')}
             </Button>
           )}
-          <Button
+          <ConfirmButton
             size="sm"
-            variant="danger-secondary"
-            disabled={m.remove.isPending}
-            onClick={() => m.remove.mutate(d.id, { onError: fb.fail })}
-          >
-            {t('owner:settings.door.remove')}
-          </Button>
+            label={t('owner:settings.door.remove')}
+            title={t('owner:settings.door.removeTitle', { name: d.label })}
+            body={t('owner:settings.door.removeBody')}
+            busy={m.remove.isPending}
+            onConfirm={(done) => m.remove.mutate(d.id, { onSuccess: done, onError: fb.fail })}
+          />
         </span>
       }
     />
