@@ -28,7 +28,8 @@ export const KIND_ORDER: Record<CreditLedgerKind, number> = {
   early: 1,
   away: 2,
   ot: 3,
-  settled: 4,
+  ot_legal: 4,
+  settled: 5,
 };
 
 export function adjustmentView(a: CreditAdjustmentRow): CreditAdjustment {
@@ -183,7 +184,14 @@ export function filterLedger(
 }
 
 export const kindLabel = (k: CreditKind | 'settled'): string =>
-  ({ late: 'Late', early: 'Early leave', away: 'Away', ot: 'Overtime', settled: 'Settled' })[k];
+  ({
+    late: 'Late',
+    early: 'Early leave',
+    away: 'Away',
+    ot: 'Overtime',
+    ot_legal: 'Legal overtime 2x',
+    settled: 'Settled',
+  })[k];
 
 // ---- Per-minute rate ----------------------------------------------------------------------------
 
