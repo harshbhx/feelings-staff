@@ -114,6 +114,11 @@ export const TimeCreditsSettings = z.object({
   enabled: z.boolean(),
   /** First day entries are written; earlier days keep the automatic rules of PRD 7.5 and 7.6. */
   startDate: WorkDate,
+  /**
+   * "Pay legal overtime at 2x" (PRD 7.17.7): approved overtime beyond 9 h a day or 48 h a week also
+   * gives an `ot_legal` entry, so it counts twice. Default on; changing it needs step-up.
+   */
+  legalOt2x: z.boolean(),
 });
 export type TimeCreditsSettings = z.infer<typeof TimeCreditsSettings>;
 
@@ -178,6 +183,7 @@ export const STEP_UP_SETTINGS: ReadonlyArray<readonly [keyof OrgSettings, string
   ['risk', 'flagAt'],
   ['risk', 'proofAt'],
   ['timeCredits', 'enabled'],
+  ['timeCredits', 'legalOt2x'],
   ['presence', 'enabled'],
 ];
 
@@ -242,7 +248,7 @@ export const DEFAULT_ORG_SETTINGS: OrgSettings = {
     selfieRetentionDays: 30,
   },
   app: { defaultStaffLang: 'en' },
-  timeCredits: { enabled: true, startDate: '2026-11-01' },
+  timeCredits: { enabled: true, startDate: '2026-11-01', legalOt2x: true },
   presence: {
     enabled: true,
     rollCallTimes: ['12:00', '15:00', '18:00'],

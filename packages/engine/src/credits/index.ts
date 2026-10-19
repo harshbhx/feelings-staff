@@ -1,8 +1,10 @@
 /**
  * Time credits (PRD 7.17): a minute ledger for the owner. One credit is one minute: minus for late,
- * early leave and owner-confirmed away time on P days, plus for owner-approved overtime. Nothing is cut
- * or paid automatically; the owner settles any part of the balance at payroll at the 1x per-minute
- * rate, inside the 50% deduction cap, and the rest carries over. Pure and deterministic.
+ * early leave and owner-confirmed away time on P days, plus for owner-approved overtime. Overtime
+ * beyond 9 h a day or 48 h a week (the legal band) counts a second time with "Pay legal overtime at
+ * 2x" on, so the 1x value pays it at 2x. Nothing is cut or paid automatically; the owner settles any
+ * part of the balance at payroll at the 1x per-minute rate, inside the 50% deduction cap, and the
+ * rest carries over. Pure and deterministic.
  */
 import type {
   ConfirmedAway,
@@ -37,7 +39,8 @@ export function creditsOn(
 /**
  * The ledger entries a day produces when Time credits is on for it (PRD 7.17.2). Minus entries only
  * on P days, from the first minute (no grace, no tolerance): the raw late and early minutes and each
- * counted away interval of the day. The plus entry is the overtime the owner approved, on any day.
+ * counted away interval of the day. The plus entry is the overtime the owner approved, on any day,
+ * and `ot_legal` repeats its legal-band part (`rules.legalOtMin`, at most the approved minutes).
  * Over-break, pending and rejected overtime give nothing. Entries are never 0.
  */
 export function creditEntriesForDay(
@@ -88,6 +91,17 @@ export function creditEntriesForDay(
       ...base,
       kind: 'ot',
       minutes: rules.otApprovedMin,
+      sourceKind: 'ot_decision',
+      sourceId: rules.otSourceId ?? '',
+      confirmed: true,
+    });
+  }
+  const legal = Math.min(rules.legalOtMin ?? 0, rules.otApprovedMin);
+  if (legal > 0) {
+    out.push({
+      ...base,
+      kind: 'ot_legal',
+      minutes: legal,
       sourceKind: 'ot_decision',
       sourceId: rules.otSourceId ?? '',
       confirmed: true,
@@ -186,12 +200,13 @@ export interface LegalHoursWarning {
 /**
  * Passive legal-hours warnings (PRD 7.17.7, 7.6): hours at the salon should never pass 9 h a day or
  * 48 h a week, so Time credits has no 2x logic and only warns. Hours of a day are the worked minutes
- * plus its overtime minutes (pre-approved and candidates), as in the payroll weekly warning.
+ * (`totalMin`; on results without it, the worked minutes plus the overtime minutes, as in the payroll
+ * weekly warning).
  */
 export function legalOvertime(
   days: readonly Pick<
     DayResult,
-    'workDate' | 'dayType' | 'workedMin' | 'otPreapprovedMin' | 'otCandidateMin'
+    'workDate' | 'dayType' | 'workedMin' | 'otPreapprovedMin' | 'otCandidateMin' | 'totalMin'
   >[],
   limits: { dayMin: number; weekMin: number } = { dayMin: 9 * 60, weekMin: 48 * 60 },
 ): LegalHoursWarning[] {
@@ -200,7 +215,7 @@ export function legalOvertime(
   const weeks = new Map<string, number>();
   for (const d of [...days].sort((a, b) => a.workDate.localeCompare(b.workDate))) {
     if (d.dayType === 'NE') continue;
-    const min = d.workedMin + d.otPreapprovedMin + d.otCandidateMin;
+    const min = d.totalMin ?? d.workedMin + d.otPreapprovedMin + d.otCandidateMin;
     if (min > limits.dayMin) daily.push({ code: 'daily_hours', period: d.workDate, minutes: min });
     const week = isoWeekOf(d.workDate);
     weeks.set(week, (weeks.get(week) ?? 0) + min);
@@ -211,4 +226,38 @@ export function legalOvertime(
       ([week, min]): LegalHoursWarning => ({ code: 'weekly_hours', period: week, minutes: min }),
     );
   return [...daily, ...weekly];
+}
+
+export interface LegalBandDay {
+  workDate: string;
+  /** `t_d`: every worked minute of the day (`DayResult.totalMin`). */
+  totalMin: number;
+  /** Owner-approved overtime minutes of the day. */
+  otApprovedMin: number;
+}
+
+/**
+ * The legal band of approved overtime (PRD 7.17.7): per day `d` of an ISO week, in date order,
+ * `daily = max(0, t_d − 540)`, `weekly = max(0, T(≤d) − 2880) − max(0, T(<d) − 2880)` (the part of
+ * the week past 48 h that day adds) and `legal_d = min(ot_approved_d, max(daily, weekly))`. Pass
+ * every day of each week up to the last one needed, credits on or not; the caller uses `legal_d` as
+ * `CreditRules.legalOtMin` on days with Time credits and "Pay legal overtime at 2x" on. Several weeks
+ * may be passed at once.
+ */
+export function legalOtBand(
+  days: readonly LegalBandDay[],
+  limits: { dayMin: number; weekMin: number } = { dayMin: 9 * 60, weekMin: 48 * 60 },
+): Array<{ workDate: string; legalMin: number }> {
+  const weeks = new Map<string, number>();
+  return [...days]
+    .sort((a, b) => a.workDate.localeCompare(b.workDate))
+    .map((d) => {
+      const week = isoWeekOf(d.workDate);
+      const before = weeks.get(week) ?? 0;
+      const upto = before + d.totalMin;
+      weeks.set(week, upto);
+      const daily = Math.max(0, d.totalMin - limits.dayMin);
+      const weekly = Math.max(0, upto - limits.weekMin) - Math.max(0, before - limits.weekMin);
+      return { workDate: d.workDate, legalMin: Math.min(d.otApprovedMin, Math.max(daily, weekly)) };
+    });
 }
