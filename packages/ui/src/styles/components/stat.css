@@ -143,6 +143,7 @@
   }
 
   .fs-stat__label {
+    margin-left: 0.2em;
     font-size: var(--text-sm);
     font-weight: var(--weight-ui);
     color: var(--text-body);
