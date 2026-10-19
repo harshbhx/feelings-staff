@@ -1,0 +1,33 @@
+# R2 lifecycle rules (PRD 8.4, 10.9): selfies 30 days, exports 7 days, backups 90 days.
+# `check` lists the bucket's rules and fails if one is missing; `apply` creates them. Without
+# CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID the script prints a notice and passes.
+# Run it by hand with mode=apply once, after the production bucket exists (docs/deploy.md).
+name: r2-lifecycle
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: check or apply
+        default: check
+        type: choice
+        options: [check, apply]
+  schedule:
+    - cron: '17 4 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  lifecycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/r2-lifecycle.ts ${{ inputs.mode || 'check' }}
