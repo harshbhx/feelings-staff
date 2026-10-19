@@ -46,6 +46,9 @@ export const resources = {
     errors: enErrors,
     notify: enNotify,
     payslip: enPayslip,
+    auth: enAuth,
+    door: enDoor,
+    ui: enUi,
   },
   gu: {
     common: guCommon,
@@ -54,6 +57,9 @@ export const resources = {
     errors: guErrors,
     notify: guNotify,
     payslip: guPayslip,
+    auth: guAuth,
+    door: guDoor,
+    ui: guUi,
   },
 } as const;
 
