@@ -4,7 +4,7 @@
  * Until a package lands, its folder exports a stub that throws EngineNotReady.
  */
 
-export { computeDay } from './day';
+export { type ComputeDayInput, computeDay, timeRulesFromSettings } from './day';
 export {
   bestFence,
   type CalibrationResult,
@@ -27,5 +27,5 @@ export {
   riskScore,
   riskSignals,
 } from './risk';
-export { resolveSchedule } from './schedule';
+export { hasNightHours, resolveSchedule, segmentOffsets, templateMinutes } from './schedule';
 export { ENGINE_VERSION, EngineNotReady } from './version';
