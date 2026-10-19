@@ -28,6 +28,9 @@ import { useQueue } from '../../../pwa/queue';
 import { staffKeys, useOwnerName, useStaffMe, useToday } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
 import { useNow } from '../lib/use-now';
+import { AwayCard, useImBack } from '../presence/AwayCard';
+import { deferNotice, noticeDeferred, usePresence } from '../presence/api';
+import { presenceUi } from '../presence/presence-model';
 import type { FrozenSheet } from '../punch/frozen';
 import { ActionBar } from '../shell/ActionBar';
 import { QueryError } from '../shell/ScreenFallback';
@@ -46,6 +49,13 @@ const loadPunchSheet = () => import('../punch/PunchSheet');
 const PunchSheetHost = lazy(() => loadPunchSheet().then((m) => ({ default: m.PunchSheetHost })));
 const SendNoteSheet = lazy(() =>
   import('./SendNoteSheet').then((m) => ({ default: m.SendNoteSheet })),
+);
+// Presence (PRD 4.18): the Step out sheet and the one-time notice load only when they open.
+const StepOutSheet = lazy(() =>
+  import('../presence/StepOutSheet').then((m) => ({ default: m.StepOutSheet })),
+);
+const PresenceConsentSheet = lazy(() =>
+  import('../presence/PresenceConsentSheet').then((m) => ({ default: m.PresenceConsentSheet })),
 );
 
 export function TodayScreen() {
@@ -110,6 +120,15 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
   // The sheet (and the punch flow inside it) is its own chunk: mount it on the first open only.
   const [sheetMounted, setSheetMounted] = useState(false);
   if (sheetOpen && !sheetMounted) setSheetMounted(true);
+  // Presence: Step out next to Check out, the away card with I'm back, the notice once.
+  const presence = usePresence();
+  const pres = presenceUi(model, presence.data, { duty: view.duty, now, ownerName: owner });
+  const imBack = useImBack();
+  const [stepOutOpen, setStepOutOpen] = useState(false);
+  const [stepOutMounted, setStepOutMounted] = useState(false);
+  if (stepOutOpen && !stepOutMounted) setStepOutMounted(true);
+  const [noticeClosed, setNoticeClosed] = useState(noticeDeferred);
+  const noticeOpen = pres.askConsent && !noticeClosed && !sheetOpen;
   useEffect(() => {
     const id = setTimeout(() => void loadPunchSheet(), PRELOAD_SHEET_MS);
     return () => clearTimeout(id);
@@ -176,6 +195,8 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
         <StatusBlock view={view} model={model} fmt={fmt} />
       </section>
 
+      {pres.card ? <AwayCard card={pres.card} /> : null}
+
       {model.pendingPunch && model.status === 'waiting_proof' ? (
         <WaitingProof punch={model.pendingPunch} />
       ) : null}
@@ -235,22 +256,72 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
           >
             {t('staff:today.scanDoor')}
           </Button>
+        ) : pres.card ? (
+          // Out (stepped out or marked away): I'm back is the one sindoor button (PRD 4.18.4).
+          <>
+            <Button
+              variant="primary"
+              size="lg"
+              icon="sign-in"
+              loading={imBack.busy}
+              onClick={imBack.run}
+            >
+              {t('staff:presence.back.button')}
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              icon="sign-out"
+              onClick={() => {
+                hapticTick();
+                setSheetOpen(true);
+              }}
+            >
+              {t('staff:today.checkOut')}
+            </Button>
+          </>
         ) : (
-          <Button
-            variant="primary"
-            size="lg"
-            block
-            icon={model.primary === 'check_out' ? 'sign-out' : 'sign-in'}
-            onClick={() => {
-              // One 8 ms tick under the thumb (Android; never with reduced motion), PRD 12.8.
-              hapticTick();
-              setSheetOpen(true);
-            }}
-          >
-            {model.primary === 'check_out' ? t('staff:today.checkOut') : t('staff:today.checkIn')}
-          </Button>
+          <>
+            <Button
+              variant="primary"
+              size="lg"
+              block
+              icon={model.primary === 'check_out' ? 'sign-out' : 'sign-in'}
+              onClick={() => {
+                // One 8 ms tick under the thumb (Android; never with reduced motion), PRD 12.8.
+                hapticTick();
+                setSheetOpen(true);
+              }}
+            >
+              {model.primary === 'check_out' ? t('staff:today.checkOut') : t('staff:today.checkIn')}
+            </Button>
+            {pres.stepOut ? (
+              <Button variant="secondary" size="lg" onClick={() => setStepOutOpen(true)}>
+                {t('staff:presence.stepOut')}
+              </Button>
+            ) : null}
+          </>
         )}
       </ActionBar>
+
+      {stepOutMounted ? (
+        <Suspense fallback={null}>
+          <StepOutSheet open={stepOutOpen} onOpenChange={setStepOutOpen} />
+        </Suspense>
+      ) : null}
+
+      {pres.askConsent && !noticeClosed ? (
+        <Suspense fallback={null}>
+          <PresenceConsentSheet
+            open={noticeOpen}
+            onOpenChange={(open) => {
+              if (open) return;
+              deferNotice();
+              setNoticeClosed(true);
+            }}
+          />
+        </Suspense>
+      ) : null}
 
       {sheetMounted ? (
         <Suspense fallback={null}>
