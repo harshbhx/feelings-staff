@@ -143,7 +143,12 @@ function PinForm({ pinSet }: { pinSet: boolean }) {
           </Field>
         </div>
         <div>
-          <Button type="submit" variant={pinSet ? 'secondary' : 'primary'} icon="lock" disabled={setPin.isPending}>
+          <Button
+            type="submit"
+            variant={pinSet ? 'secondary' : 'primary'}
+            icon="lock"
+            disabled={setPin.isPending}
+          >
             {setPin.isPending
               ? t('owner:common.saving')
               : pinSet
@@ -218,7 +223,12 @@ function PasswordForm({ passwordSet, pinSet }: { passwordSet: boolean; pinSet: b
           />
         </Field>
         <div>
-          <Button type="submit" variant="secondary" icon="lock" disabled={setPassword.isPending || !pinSet}>
+          <Button
+            type="submit"
+            variant="secondary"
+            icon="lock"
+            disabled={setPassword.isPending || !pinSet}
+          >
             {setPassword.isPending
               ? t('owner:common.saving')
               : passwordSet
@@ -271,4 +281,3 @@ function SignOutOthers() {
     />
   );
 }
-

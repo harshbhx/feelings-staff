@@ -5,7 +5,16 @@
  * when a field needs it, and says so beforehand.
  */
 import type { OrgSettings, SettingsView } from '@fs/contracts';
-import { Button, ChipGroup, Field as KitField, Input, Stepper, Switch, TimeField, useToast } from '@fs/ui';
+import {
+  Button,
+  ChipGroup,
+  Input,
+  Field as KitField,
+  Stepper,
+  Switch,
+  TimeField,
+  useToast,
+} from '@fs/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isStepUpCancelled } from '../../auth/step-up';
@@ -69,7 +78,13 @@ export function SettingsForm({ view, fields }: { view: SettingsView; fields: rea
       className="grid max-w-(--container-narrow) grid-cols-[minmax(0,1fr)] gap-7"
     >
       {fields.map((f) => (
-        <FieldRow key={`${keyOf(f)}-${round}`} field={f} value={value(f)} settings={settings} onChange={(v) => set(f, v)} />
+        <FieldRow
+          key={`${keyOf(f)}-${round}`}
+          field={f}
+          value={value(f)}
+          settings={settings}
+          onChange={(v) => set(f, v)}
+        />
       ))}
       <div className="grid gap-3 border-border border-t pt-5">
         {pin && changed.length > 0 ? <Meta>{t('owner:settings.needsPin')}</Meta> : null}
@@ -82,9 +97,7 @@ export function SettingsForm({ view, fields }: { view: SettingsView; fields: rea
           >
             {patch.isPending ? t('owner:common.saving') : t('owner:common.save')}
           </Button>
-          {changed.length > 0 ? (
-            <Button onClick={reset}>{t('owner:settings.undo')}</Button>
-          ) : null}
+          {changed.length > 0 ? <Button onClick={reset}>{t('owner:settings.undo')}</Button> : null}
         </div>
       </div>
     </form>
@@ -106,7 +119,9 @@ function FieldRow({
   const label = t(`owner:settings.f.${f.id}.label`);
   const shown =
     f.kind === 'otRate'
-      ? t(`owner:settings.ot.${otChoice(value as OrgSettings['overtime']['rate'])}`)
+      ? t(
+          `owner:settings.ot.${otChoice(value as OrgSettings['overtime']['rate']).replace('.', '_')}`,
+        )
       : f.kind === 'choice'
         ? t(`owner:settings.f.${f.id}.options.${String(value).replace('.', '_')}`)
         : f.kind === 'rupees'
@@ -132,7 +147,12 @@ function FieldRow({
       );
     case 'switch':
       return (
-        <Switch label={label} description={what} checked={value === true} onCheckedChange={onChange} />
+        <Switch
+          label={label}
+          description={what}
+          checked={value === true}
+          onCheckedChange={onChange}
+        />
       );
     case 'choice':
       return (
@@ -156,7 +176,10 @@ function FieldRow({
           hint={what}
           value={otChoice(value as OrgSettings['overtime']['rate'])}
           onValueChange={(v) => onChange(otRate(v as OtChoice, settings.overtime.rate))}
-          options={OT_CHOICES.map((o) => ({ value: o, label: t(`owner:settings.ot.${o}`) }))}
+          options={OT_CHOICES.map((o) => ({
+            value: o,
+            label: t(`owner:settings.ot.${o.replace('.', '_')}`),
+          }))}
         />
       );
     case 'time':

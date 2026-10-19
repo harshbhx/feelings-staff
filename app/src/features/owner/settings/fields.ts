@@ -54,10 +54,12 @@ export function buildPatch(
   const patch: Record<string, Record<string, unknown>> = {};
   for (const f of changedFields(settings, fields, draft)) {
     const [section, key, sub] = f.path;
-    const into = (patch[section] ??= {});
+    const into = patch[section] ?? {};
+    patch[section] = into;
     const value = draft[keyOf(f)];
     if (sub === undefined) into[key] = value;
-    else into[key] = { ...((into[key] as Record<string, unknown> | undefined) ?? {}), [sub]: value };
+    else
+      into[key] = { ...((into[key] as Record<string, unknown> | undefined) ?? {}), [sub]: value };
   }
   return patch as OrgSettingsPatch;
 }

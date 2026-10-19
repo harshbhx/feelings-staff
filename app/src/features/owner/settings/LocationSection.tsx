@@ -5,11 +5,24 @@
  * Pair, Rotate and Remove. Strong mode and the earliest check-in live in Attendance rules.
  */
 import type { CalibrationProposal, DoorDeviceView, SiteView } from '@fs/contracts';
-import { Banner, Button, Field, Input, List, ListRow, Sheet, Stepper, StatusChip, useToast } from '@fs/ui';
+import {
+  Banner,
+  Button,
+  Field,
+  Input,
+  List,
+  ListRow,
+  Sheet,
+  StatusChip,
+  Stepper,
+  useToast,
+} from '@fs/ui';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { isStepUpCancelled } from '../../auth/step-up';
+import { ownerKeys } from '../api/keys';
+import { useOwnerMutation } from '../api/query';
 import { useSites } from '../api/schedule';
 import {
   useCalibrationProposal,
@@ -17,8 +30,6 @@ import {
   usePatchSite,
   useStoreCalibration,
 } from '../api/settings';
-import { ownerKeys } from '../api/keys';
-import { useOwnerMutation } from '../api/query';
 import { Meta, Section } from '../components/layout';
 import { QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { clock, shortDate, todayIst } from '../lib/format';
@@ -111,7 +122,10 @@ function Location({ site }: { site: SiteView }) {
       <DoorDevices />
       <Meta>
         {t('owner:settings.location.strongNote')}{' '}
-        <Link to="/o/settings/attendance" className="font-semibold text-text underline underline-offset-4">
+        <Link
+          to="/o/settings/attendance"
+          className="font-semibold text-text underline underline-offset-4"
+        >
           {t('owner:settings.sections.attendance.title')}
         </Link>
       </Meta>
@@ -173,7 +187,12 @@ export function Calibrate({ site }: { site: SiteView }) {
         </div>
       ) : (
         <div>
-          <Button variant="secondary" icon="navigation" onClick={() => void start()} disabled={store.isPending}>
+          <Button
+            variant="secondary"
+            icon="navigation"
+            onClick={() => void start()}
+            disabled={store.isPending}
+          >
             {t('owner:settings.calibrate.start', { s: CALIBRATION_MS / 1000 })}
           </Button>
         </div>
@@ -183,7 +202,10 @@ export function Calibrate({ site }: { site: SiteView }) {
         <Meta>{t('owner:settings.calibrate.more', { count: p.stats.sessions })}</Meta>
       ) : null}
       {p?.enoughData && differs && !kept ? (
-        <div className="grid gap-3 rounded-md border border-border p-4" data-testid="calibration-proposal">
+        <div
+          className="grid gap-3 rounded-md border border-border p-4"
+          data-testid="calibration-proposal"
+        >
           <p className="font-semibold text-text">
             {t('owner:settings.calibrate.proposal', {
               radius: p.radiusM,
@@ -378,4 +400,3 @@ function PairSheet() {
     </Sheet>
   );
 }
-

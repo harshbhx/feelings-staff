@@ -27,7 +27,8 @@ export function SalonSection({ view }: { view: SettingsView }) {
   const problems = {
     name: name.trim() ? undefined : t('owner:settings.salon.errors.name'),
     owner: owner.trim() ? undefined : t('owner:settings.salon.errors.owner'),
-    phone: phone === '' || /^[6-9]\d{9}$/.test(phone) ? undefined : t('owner:staff.form.errors.phone'),
+    phone:
+      phone === '' || /^[6-9]\d{9}$/.test(phone) ? undefined : t('owner:staff.form.errors.phone'),
   };
 
   function submit(e: FormEvent) {
@@ -59,7 +60,12 @@ export function SalonSection({ view }: { view: SettingsView }) {
         <Input value={name} maxLength={120} onChange={(e) => setName(e.target.value)} />
       </Field>
       <Field label={t('owner:settings.salon.address')} hint={t('owner:settings.salon.addressHint')}>
-        <Textarea value={address} rows={3} maxLength={240} onChange={(e) => setAddress(e.target.value)} />
+        <Textarea
+          value={address}
+          rows={3}
+          maxLength={240}
+          onChange={(e) => setAddress(e.target.value)}
+        />
       </Field>
       <Field label={t('owner:settings.salon.phone')} error={tried ? problems.phone : undefined}>
         <PhoneField value={phone} onValueChange={setPhone} />
@@ -97,7 +103,10 @@ export function PrivacyNote({ view }: { view: SettingsView }) {
   const { t } = useTranslation();
   const p = view.settings.privacy;
   return (
-    <Section title={t('owner:settings.privacy.kept')} className="grid max-w-(--container-narrow) gap-2">
+    <Section
+      title={t('owner:settings.privacy.kept')}
+      className="grid max-w-(--container-narrow) gap-2"
+    >
       <ul className="grid list-disc gap-1 pl-5 text-text-body">
         <li>{t('owner:settings.privacy.location', { days: p.locationRetentionDays })}</li>
         <li>{t('owner:settings.privacy.selfies', { days: p.selfieRetentionDays })}</li>

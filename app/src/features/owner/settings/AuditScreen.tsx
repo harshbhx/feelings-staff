@@ -41,10 +41,21 @@ export function AuditScreen() {
       />
       <div className="grid grid-cols-2 gap-3 sm:max-w-md">
         <Field label={t('owner:audit.from')}>
-          <Input type="date" value={from} max={to || todayIst()} onChange={(e) => setFrom(e.target.value)} />
+          <Input
+            type="date"
+            value={from}
+            max={to || todayIst()}
+            onChange={(e) => setFrom(e.target.value)}
+          />
         </Field>
         <Field label={t('owner:audit.to')}>
-          <Input type="date" value={to} min={from || undefined} max={todayIst()} onChange={(e) => setTo(e.target.value)} />
+          <Input
+            type="date"
+            value={to}
+            min={from || undefined}
+            max={todayIst()}
+            onChange={(e) => setTo(e.target.value)}
+          />
         </Field>
       </div>
       {audit.isError && items.length === 0 ? (
@@ -85,7 +96,8 @@ function AuditRow({ entry: e }: { entry: AuditEntryView }) {
     <li className="fs-list__item grid gap-1 py-3">
       <p className="flex flex-wrap items-baseline justify-between gap-x-3">
         <span className="font-bold text-text">
-          {who} · {t(`owner:audit.actions.${e.action.replaceAll('.', '_')}`, { defaultValue: e.action })}
+          {who} ·{' '}
+          {t(`owner:audit.actions.${e.action.replaceAll('.', '_')}`, { defaultValue: e.action })}
         </span>
         <span className="text-sm text-text-muted tabular-nums">
           {shortDate(todayIst(e.createdAt))} {clock(e.createdAt)}

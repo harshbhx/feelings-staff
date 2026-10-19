@@ -18,7 +18,14 @@ describe('Audit log rows (O-18)', () => {
   });
 
   it('nested values read as short text, never raw JSON', () => {
-    const [line] = describeChange({ rate: { mode: 'multiplier', multiplier: 2 } }, { rate: { mode: 'comp_off' } });
-    expect(line).toEqual({ key: 'rate', before: 'mode multiplier, multiplier 2', after: 'mode comp_off' });
+    const [line] = describeChange(
+      { rate: { mode: 'multiplier', multiplier: 2 } },
+      { rate: { mode: 'comp_off' } },
+    );
+    expect(line).toEqual({
+      key: 'rate',
+      before: 'mode multiplier, multiplier 2',
+      after: 'mode comp_off',
+    });
   });
 });

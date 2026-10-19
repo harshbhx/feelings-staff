@@ -12,7 +12,10 @@ function fakeGeo() {
     }),
     clearWatch: vi.fn(),
     emit(lat: number, accuracy: number) {
-      cb?.({ coords: { latitude: lat, longitude: 70.05, accuracy }, timestamp: 1 } as GeolocationPosition);
+      cb?.({
+        coords: { latitude: lat, longitude: 70.05, accuracy },
+        timestamp: 1,
+      } as GeolocationPosition);
     },
     fail(code: number) {
       err?.({ code } as GeolocationPositionError);
