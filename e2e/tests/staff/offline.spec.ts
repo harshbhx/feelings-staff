@@ -148,9 +148,9 @@ async function signInOwner(
   };
 }
 
-/** Tap digits on the kit's PIN pad inside `scope`. */
-async function tapPin(scope: Pick<Page, 'getByRole'>, pin: string): Promise<void> {
-  for (const d of pin) await scope.getByRole('button', { name: d, exact: true }).click();
+/** The kit's PIN pad: the keys are visual only; the real control is a textbox named by its label. */
+async function enterPin(scope: Pick<Page, 'getByRole'>, label: string, pin: string): Promise<void> {
+  await scope.getByRole('textbox', { name: label }).fill(pin);
 }
 
 /** WP-3's join flow: phone and code, notice, PIN twice, notifications later, then waiting. */
@@ -161,9 +161,9 @@ async function joinOnThisPhone(page: Page, code: string): Promise<void> {
   if ((await codeField.inputValue()) === '') await codeField.fill(code);
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'I understand' }).click();
-  await tapPin(page, STAFF_PIN);
+  await enterPin(page, 'New PIN', STAFF_PIN);
   await page.getByRole('button', { name: 'Next' }).click();
-  await tapPin(page, STAFF_PIN);
+  await enterPin(page, 'Your PIN again', STAFF_PIN);
   await page.getByRole('button', { name: 'Set up this phone' }).click();
   const later = page.getByRole('button', { name: 'Not now' });
   const waiting = page.getByRole('heading', { level: 1, name: 'Waiting for approval' });
@@ -297,11 +297,11 @@ test.describe('offline', () => {
     const sheet = page.getByRole('dialog');
     // The phone's own clock may be outside the shift: answer the sheet's question if it asks.
     const anyway = sheet.getByRole('button', { name: 'Check in anyway' });
-    const pinPad = sheet.getByText('Enter your PIN');
+    const pinPad = sheet.getByRole('textbox', { name: 'Enter your PIN' });
     await expect(anyway.or(pinPad)).toBeVisible({ timeout: 30_000 });
     if (await anyway.isVisible()) await anyway.click();
     await expect(pinPad).toBeVisible({ timeout: 30_000 });
-    await tapPin(sheet, STAFF_PIN);
+    await enterPin(sheet, 'Enter your PIN', STAFF_PIN);
     await sheet.getByRole('button', { name: 'Check in', exact: true }).click();
 
     // S-09.1 stored on the phone and shown as waiting.
