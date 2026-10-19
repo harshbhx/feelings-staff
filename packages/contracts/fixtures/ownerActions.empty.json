@@ -9,6 +9,7 @@
     "overtime": 0,
     "offsite_request": 0,
     "auto_closed": 0,
-    "advance_request": 0
+    "advance_request": 0,
+    "away": 0
   }
 }

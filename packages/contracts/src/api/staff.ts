@@ -26,6 +26,7 @@ import {
   WorkDate,
   YearMonth,
 } from '../primitives';
+import { MyPresenceItem } from './credits';
 import {
   AdvanceView,
   AuditEntryView,
@@ -43,7 +44,7 @@ import {
 
 // ---- Nonces and signed time ------------------------------------------------
 
-export const NonceRequest = z.object({ purpose: z.enum(['punch', 'offline']) });
+export const NonceRequest = z.object({ purpose: z.enum(['punch', 'offline', 'presence']) });
 export const PunchNonce = z.object({
   nonce: Base64Url,
   expiresAt: EpochMs,
@@ -306,6 +307,8 @@ export const MyData = z.object({
       locationDeletesOn: WorkDate.nullable(),
     }),
   ),
+  /** Own roll-call marks, step-outs and foreground checks (P1); never credits or rupees. */
+  presence: z.array(MyPresenceItem),
   selfies: z.array(
     z.object({ punchId: Id, takenAt: EpochMs, deletesOn: WorkDate, url: z.string() }),
   ),

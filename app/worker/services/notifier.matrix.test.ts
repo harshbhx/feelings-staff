@@ -562,6 +562,80 @@ const rows: Row[] = [
     body: 'The online slip works.',
   },
   {
+    n: 32,
+    type: 'roll_call_due',
+    at: ist('15:00'),
+    event: () => ({ type: 'roll_call_due', rollCallId: 'RC1', workDate: D, slotTime: '15:00' }),
+    to: (w) => [w.owner],
+    push: true,
+    title: 'Roll-call time',
+    body: "Who's not here? It takes about 20 seconds.",
+  },
+  {
+    n: 33,
+    type: 'roll_call_missed',
+    at: ist('15:30'),
+    event: () => ({ type: 'roll_call_missed', rollCallId: 'RC1', workDate: D, slotTime: '15:00' }),
+    to: (w) => [w.owner],
+    push: false,
+    title: 'Roll-call at 15:00 not done',
+    body: 'Tap to do it now.',
+  },
+  {
+    n: 34,
+    type: 'staff_stepped_out',
+    at: ist('14:40'),
+    event: (w) => ({
+      type: 'staff_stepped_out',
+      userId: w.priya,
+      name: 'Priya',
+      awayId: 'AW1',
+      workDate: D,
+      startTs: ist('14:40'),
+      reason: 'lunch',
+    }),
+    to: (w) => [w.owner],
+    push: false,
+    title: 'Priya stepped out',
+    body: 'Lunch outside, since 14:40.',
+  },
+  {
+    n: 35,
+    type: 'away_to_confirm',
+    at: ist('16:10'),
+    event: (w) => ({
+      type: 'away_to_confirm',
+      userId: w.priya,
+      name: 'Priya',
+      awayId: 'AW1',
+      workDate: D,
+      startTs: ist('15:30'),
+      endTs: ist('16:10'),
+      minutes: 40,
+      reason: 'lunch',
+    }),
+    to: (w) => [w.owner],
+    push: true,
+    title: 'Priya stepped out 15:30–16:10',
+    body: '40 min, lunch outside. Confirm, mark as work or ignore.',
+  },
+  {
+    n: 36,
+    type: 'left_without_checkout',
+    at: ist('20:30'),
+    event: (w) => ({
+      type: 'left_without_checkout',
+      userId: w.priya,
+      name: 'Priya',
+      workDate: D,
+      awaySinceTs: ist('16:10'),
+    }),
+    to: (w) => [w.owner],
+    push: true,
+    title: 'Priya may have left without checking out',
+    body: 'Away since 16:10.',
+  },
+  {
     n: 27,
     type: 'schedule_changed',
     at: ist('14:00'),
@@ -683,6 +757,6 @@ describe('PRD 6 matrix: inbox rows, push, timing and copy', () => {
     expect([...covered].sort()).toEqual([...all].sort());
     // The contract's event union has one schema per type.
     const sample: NotifyEvent['type'][] = all as NotifyEvent['type'][];
-    expect(sample).toHaveLength(32);
+    expect(sample).toHaveLength(37);
   });
 });

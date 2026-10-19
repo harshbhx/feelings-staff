@@ -1,0 +1,25 @@
+{
+  "enabled": true,
+  "asOf": "2026-10-19",
+  "staff": [
+    {
+      "userId": "01K87R133CAYV58WCHEDPSC8TQ",
+      "name": "Jinal Kotak",
+      "balanceMin": -130,
+      "estimatePaise": -9630,
+      "awayPending": 0
+    },
+    {
+      "userId": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+      "name": "Neha Parmar",
+      "balanceMin": 50,
+      "estimatePaise": 4480,
+      "lastSettlement": {
+        "month": "2026-09",
+        "appliedMin": -60,
+        "amountPaise": -4444
+      },
+      "awayPending": 1
+    }
+  ]
+}

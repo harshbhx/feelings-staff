@@ -31,7 +31,7 @@ Contents: [Conventions](#conventions) · [Endpoints](#endpoints) · [Error shape
 | door | A paired door device session |
 | test token | Test-only route; needs `X-E2E-Token`, outside production only |
 
-- Manager permissions: `approve_attendance`, `approve_leave`, `approve_overtime`, `offsite`, `roster`, `door`, `payroll`, `staff`, `exports`.
+- Manager permissions: `approve_attendance`, `approve_leave`, `approve_overtime`, `offsite`, `roster`, `door`, `payroll`, `staff`, `exports`, `rollcall`.
 - **Step-up** `yes` means the owner must have entered the PIN in the last 10 minutes (`POST /auth/step-up`). Without it the call fails with `STEP_UP_REQUIRED` (403); the client shows the PIN sheet and repeats the call.
 - A wrong id, or an id from another organisation, always answers `NOT_FOUND` (404), never 403.
 
@@ -123,6 +123,19 @@ Payslips. The PDF endpoint is also used by the owner and by managers with the `p
 | GET | `/me/payslips` | any signed-in person | no | no | - | `PayslipSummary[]` | My payslips |
 | GET | `/me/payslips/:id` | any signed-in person | no | no | path `IdParams` | `PayslipView` | One payslip |
 | GET | `/payslips/:id/pdf` | any signed-in person | no | no | path `IdParams` | file | Payslip PDF (202 while generating) |
+
+### Staff: presence (P1)
+
+Step out, I'm back, the optional foreground check and the person's own presence log. None of these routes returns credits, balances or rupee values.
+
+| Method | Path | Who may call | Step-up | Idempotent | Request | Response | Summary |
+|---|---|---|---|---|---|---|---|
+| GET | `/me/presence` | any signed-in person | no | no | - | `PresenceState` | Presence state: Step out button, marked-away card, foreground timer |
+| POST | `/presence/step-out` | any signed-in person | no | yes | body `StepOutRequest` | `AwayIntervalStaff` | Step out with a reason chip (409 CONFLICT if not checked in or already out) |
+| POST | `/presence/back` | any signed-in person | no | yes | body `BackRequest` | `AwayIntervalStaff` | I'm back: end the open interval, stepped out or marked away |
+| POST | `/me/presence/away/:id/note` | any signed-in person | no | no | path `IdParams`; body `AwayNoteRequest` | `AwayIntervalStaff` | One note on an away interval |
+| POST | `/presence/checks` | any signed-in person | no | yes | body `PresenceCheckRequest` | `PresenceCheckResultView` | Optional signed foreground check (nonce purpose presence; no coordinates kept) |
+| GET | `/me/presence/history` | any signed-in person | no | no | query `PresenceHistoryQuery` | `PresenceHistory` | My roll-call marks, away intervals and checks for a month |
 
 ### Notifications
 
@@ -268,6 +281,27 @@ Organisation settings, the first-run checklist, the owner's own security, the au
 | GET | `/owner/managers` | owner | no | no | - | `ManagerView[]` | Managers (P1) |
 | PUT | `/owner/managers` | owner | yes | no | body `ManagerUpsert` | `ManagerView` | Grant manager rights (P1) |
 | DELETE | `/owner/managers/:id` | owner | yes | no | path `IdParams` | no body (204) | Remove manager rights (P1) |
+
+### Owner: Time credits and presence
+
+The credits routes are owner only; managers get 403 on all of them. Roll-call and away routes are open to managers with `rollcall`.
+
+| Method | Path | Who may call | Step-up | Idempotent | Request | Response | Summary |
+|---|---|---|---|---|---|---|---|
+| GET | `/owner/credits` | owner | no | no | query `CreditsQuery` | `CreditsOverview` | Credits: one row per person with balance and 1x estimate |
+| GET | `/owner/credits/:userId/ledger` | owner | no | no | path `CreditUserParams`; query `CreditLedgerQuery` | `CreditLedger` | One person's ledger with running balance and edit history |
+| POST | `/owner/credits/:userId/adjustments` | owner | no | yes | path `CreditUserParams`; body `CreditAdjustmentCreate` | `CreditAdjustment` (201) | Adjust one day and kind, with a required reason |
+| PATCH | `/owner/credits/adjustments/:id` | owner | no | no | path `IdParams`; body `CreditAdjustmentPatch` | `CreditAdjustment` | Change an adjustment; the original stays in the history |
+| DELETE | `/owner/credits/adjustments/:id` | owner | no | no | path `IdParams`; body `CreditAdjustmentVoid` | `CreditAdjustment` | Void an adjustment with a reason; the original stays in the history |
+| GET | `/owner/payroll-runs/:id/credits` | owner | no | no | path `IdParams` | `CreditsSettleView` | Settle credits step of a payroll run |
+| PUT | `/owner/payroll-runs/:id/credits/:userId` | owner | no | yes | path `RunPersonParams`; body `CreditSettleRequest` | `CreditSettleResult` | Settle minutes for one person until finalise (0 removes it) |
+| GET | `/owner/roll-calls` | owner, manager with `rollcall` | no | no | query `RollCallDayQuery` | `RollCallDay` | The day's roll-call slots (P1) |
+| GET | `/owner/roll-calls/:id` | owner, manager with `rollcall` | no | no | path `IdParams` | `RollCallView` | People checked in at the slot time (P1) |
+| POST | `/owner/roll-calls/:id/submit` | owner, manager with `rollcall` | no | yes | path `IdParams`; body `RollCallSubmit` | `RollCallResult` | Submit or edit a roll-call: Not here starts or continues an interval (P1) |
+| GET | `/owner/presence/away` | owner | no | no | query `AwayListQuery` | `AwayIntervalView[]` | Away intervals by state (same items as the Needs action away type) |
+| PATCH | `/owner/presence/away/:id` | owner, manager with `rollcall` | no | no | path `IdParams`; body `AwayPatch` | `AwayIntervalView` | Edit start, end, reason or the work flag of an away interval |
+| POST | `/owner/presence/away/:id/decide` | owner | no | yes | path `IdParams`; body `AwayDecideRequest` | `AwayIntervalView` | Confirm, mark as work or ignore a pending step-out |
+| GET | `/owner/presence/:userId/:date` | owner, manager with `rollcall` | no | no | path `UserDateParams` | `OwnerPresenceDay` | One person's roll-calls, away intervals and checks for a day |
 
 ### Door device
 

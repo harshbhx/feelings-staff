@@ -1,0 +1,14 @@
+{
+  "id": "01K8WP9ADJ0000000000000000",
+  "userId": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+  "workDate": "2026-10-05",
+  "kind": "early",
+  "deltaMin": 20,
+  "reason": "Approved by Urmi",
+  "status": "void",
+  "createdBy": "01K894PPK418TJT35A8CDEANDV",
+  "createdAt": 1792383120000,
+  "voidedBy": "01K894PPK418TJT35A8CDEANDV",
+  "voidedAt": 1792384920000,
+  "voidReason": "Entered by mistake"
+}

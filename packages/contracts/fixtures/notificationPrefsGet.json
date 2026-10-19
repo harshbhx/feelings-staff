@@ -223,6 +223,41 @@
       "whatsapp": false,
       "email": false,
       "locked": false
+    },
+    {
+      "type": "roll_call_due",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "roll_call_missed",
+      "push": false,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "staff_stepped_out",
+      "push": false,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "away_to_confirm",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
+    },
+    {
+      "type": "left_without_checkout",
+      "push": true,
+      "whatsapp": false,
+      "email": false,
+      "locked": false
     }
   ]
 }

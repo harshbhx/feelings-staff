@@ -5,6 +5,7 @@ import {
   ActionType,
   AdjustmentKind,
   AuditCategory,
+  AwayReason,
   ConsentKind,
   DayStatus,
   DayTag,
@@ -21,6 +22,7 @@ import {
   PdfStatus,
   Permission,
   PunchKind,
+  RollCallSlotStatus,
   SalaryType,
   SetupStep,
   UserStatus,
@@ -119,6 +121,8 @@ export const TodayBoard = z.object({
   notIn: z.array(BoardNotInRow),
   out: z.array(BoardInRow),
   away: z.array(BoardAwayRow),
+  /** The roll-call slot worth showing now (open, or missed), else null (PRD 4.18.3, 9.4). */
+  rollCall: z.object({ id: Id, slotTime: HHMM, status: RollCallSlotStatus }).nullable(),
   actionsCount: z.number().int(),
 });
 export type TodayBoard = z.infer<typeof TodayBoard>;
@@ -173,6 +177,18 @@ export const ActionItem = z.discriminatedUnion('type', [
     advance: AdvanceView,
     openBalancePaise: Paise,
   }),
+  /** A closed step-out waiting for Confirm, Mark as work or Ignore (PRD 4.18.5). */
+  ActionBase.extend({
+    type: z.literal('away'),
+    userId: Id,
+    workDate: WorkDate,
+    startTs: EpochMs,
+    endTs: EpochMs,
+    minutes: Minutes,
+    reason: AwayReason.nullable(),
+    staffNote: z.string().nullable().optional(),
+    backMissing: z.boolean(),
+  }),
 ]);
 export type ActionItem = z.infer<typeof ActionItem>;
 
@@ -203,6 +219,8 @@ export const OvertimeDecideRequest = z.object({
 export const AutoCloseDecideRequest = z.union([
   z.object({ keep: z.literal(true) }),
   z.object({ outTs: EpochMs }),
+  /** Use the start of the open away interval as the check-out time (PRD 4.18.6). */
+  z.object({ useAwayStart: z.literal(true) }),
 ]);
 export const OffsiteDecideRequest = z.object({
   decision: z.enum(['approve', 'approve_and_open', 'reject']),

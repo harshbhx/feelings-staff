@@ -156,6 +156,38 @@
       "title_other": "{{count}} salaries for {{month}} are not marked paid",
       "body": "The legal deadline is the 7th."
     },
+    "roll_call_due": {
+      "title": "Roll-call time",
+      "body": "Who's not here? It takes about 20 seconds."
+    },
+    "roll_call_missed": {
+      "title": "Roll-call at {{time}} not done",
+      "body": "Tap to do it now."
+    },
+    "staff_stepped_out": {
+      "title": "{{name}} stepped out",
+      "body": "{{reason}}, since {{time}}.",
+      "reason": {
+        "personal": "Personal",
+        "lunch": "Lunch outside",
+        "errand": "Work errand",
+        "other": "Other"
+      }
+    },
+    "away_to_confirm": {
+      "title": "{{name}} stepped out {{start}}–{{end}}",
+      "body": "{{minutes}} min, {{reason}}. Confirm, mark as work or ignore.",
+      "reason": {
+        "personal": "personal",
+        "lunch": "lunch outside",
+        "errand": "work errand",
+        "other": "other"
+      }
+    },
+    "left_without_checkout": {
+      "title": "{{name}} may have left without checking out",
+      "body": "Away since {{time}}."
+    },
     "payslip_pdf_failed": {
       "title_one": "1 payslip PDF couldn't be made",
       "title_other": "{{count}} payslip PDFs couldn't be made",

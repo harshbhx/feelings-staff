@@ -5,6 +5,14 @@
  */
 import { z } from 'zod';
 import {
+  AwayEndReason,
+  AwayReason,
+  AwaySource,
+  AwayState,
+  CreditAdjustmentStatus,
+  CreditKind,
+  CreditSettlementStatus,
+  CreditSourceKind,
   DayStatus,
   DayTag,
   DayType,
@@ -13,10 +21,12 @@ import {
   LeaveCode,
   OverrideStatus,
   PayslipLineCode,
+  PresenceCheckResult,
   PunchKind,
   PunchSource,
   PunchStatus,
   RiskReason,
+  RollCallMarkValue,
   SalaryType,
   WorkedOffDayComp,
 } from './enums';
@@ -147,6 +157,11 @@ export const TimeRules = z.object({
   breakPunches: z.boolean(),
   otThresholdMin: z.number().int(),
   otBlockMin: z.number().int(),
+  /**
+   * Time credits are on for this day (PRD 7.17.1): `computeDay` then returns undertime 0, makeup 0,
+   * no overtime pay minutes, and the raw late, early and over-break minutes. Absent means off.
+   */
+  credits: z.boolean().optional(),
 });
 export type TimeRules = z.infer<typeof TimeRules>;
 
@@ -397,3 +412,200 @@ export const RiskResult = z.object({
   outcome: z.enum(['accept', 'flag', 'proof', 'block']),
 });
 export type RiskResult = z.infer<typeof RiskResult>;
+
+// ---- Time credits (PRD 7.16, 7.17) -------------------------------------------------------------
+
+/** An exact fraction (numerator over a positive denominator), e.g. paise per day as `1500000 / 31`. */
+export const Fraction = z.object({ num: z.number().int(), den: z.number().int().positive() });
+export type Fraction = z.infer<typeof Fraction>;
+
+/**
+ * The per-minute rate of one person (PRD 7.17.4): `rDay` is the daily rate in paise as an exact
+ * fraction, `sStd` the standard day in minutes. One minute = `rDay / sStd`, at 1x.
+ */
+export const MinuteRate = z.object({ rDay: Fraction, sStd: z.number().int().positive() });
+export type MinuteRate = z.infer<typeof MinuteRate>;
+
+/**
+ * Input of `creditEntriesForDay` besides the day and the away intervals (PRD 7.17.1, 7.17.2). The
+ * caller decides `enabled` per day (`credits_on`), supplies the overtime minutes the owner approved
+ * for the day (preapproved plus decided) and the ids the entries point at.
+ */
+export const CreditRules = z.object({
+  enabled: z.boolean(),
+  /** Owner-approved overtime minutes of the day (any day type, including worked off-days). */
+  otApprovedMin: Minutes,
+  /** First `in` punch of the day (late entry source), null when there is none. */
+  lateSourceId: z.string().nullable(),
+  /** Last `out` punch of the day (early entry source), null when there is none. */
+  earlySourceId: z.string().nullable(),
+  /** The overtime decision (`ot_decisions.id`), or the preapproval or duty id (ot entry source). */
+  otSourceId: z.string().nullable(),
+});
+export type CreditRules = z.infer<typeof CreditRules>;
+
+/** An away interval the owner counted: marked at a roll-call, or a confirmed step-out (PRD 7.18). */
+export const ConfirmedAway = z.object({
+  /** `away_intervals.id` (the `away` entry's source). */
+  id: Id,
+  workDate: WorkDate,
+  startTs: EpochMs,
+  endTs: EpochMs,
+  /** Counted minutes, already clipped to the shift segments and presence (PRD 7.18 rule 3). */
+  minutes: Minutes,
+  confirmedBy: Id,
+});
+export type ConfirmedAway = z.infer<typeof ConfirmedAway>;
+
+/** A credit entry as the engine derives it, before ids and timestamps are assigned. */
+export const CreditEntryDraft = z.object({
+  workDate: WorkDate,
+  kind: CreditKind,
+  /** Signed, never 0: minus for late, early and away, plus for ot. */
+  minutes: Minutes.refine((m) => m !== 0, 'A credit entry is never 0'),
+  sourceKind: CreditSourceKind,
+  /** Punch id for late and early, the away interval id for away, the overtime decision for ot. */
+  sourceId: z.string(),
+  /** Away and ot entries are confirmed by the owner (or a manager for away); late and early are automatic. */
+  confirmed: z.boolean(),
+});
+export type CreditEntryDraft = z.infer<typeof CreditEntryDraft>;
+
+/** A stored `credit_entries` row. */
+export const CreditEntry = CreditEntryDraft.omit({ confirmed: true }).extend({
+  id: Id,
+  userId: Id,
+  confirmedBy: Id.nullable(),
+  confirmedAt: EpochMs.nullable(),
+  status: z.enum(['active', 'superseded']),
+  engineVersion: z.string(),
+  createdAt: EpochMs,
+});
+export type CreditEntry = z.infer<typeof CreditEntry>;
+
+/** A stored `credit_adjustments` row: the owner's change to one day and kind (PRD 4.19.5). */
+export const CreditAdjustment = z.object({
+  id: Id,
+  userId: Id,
+  workDate: WorkDate,
+  kind: CreditKind,
+  /** Signed change in minutes, never 0. */
+  deltaMin: Minutes.refine((m) => m !== 0, 'An adjustment is never 0'),
+  reason: z.string(),
+  status: CreditAdjustmentStatus,
+  createdBy: Id,
+  createdAt: EpochMs,
+  voidedBy: Id.nullable(),
+  voidedAt: EpochMs.nullable(),
+  voidReason: z.string().nullable(),
+});
+export type CreditAdjustment = z.infer<typeof CreditAdjustment>;
+
+/** A stored `credit_settlements` row (PRD 7.17.5). */
+export const CreditSettlement = z.object({
+  id: Id,
+  userId: Id,
+  payrollRunId: Id,
+  /** Period end is the last day of this month. */
+  month: YearMonth,
+  /** Signed balance at the period end, before this step. */
+  balanceMin: Minutes,
+  /** The owner's choice, signed like the balance; 0 is allowed. */
+  settleMin: Minutes,
+  /** After the 50% cap. */
+  appliedMin: Minutes,
+  /** Signed: negative is a cut, positive an earning (1x value of `appliedMin`). */
+  amountPaise: Paise,
+  rate: MinuteRate,
+  /** The payroll warnings that applied at the time of the step. */
+  warnings: z.array(PayslipWarning),
+  status: CreditSettlementStatus,
+  decidedBy: Id,
+  decidedAt: EpochMs,
+  note: z.string().nullable(),
+});
+export type CreditSettlement = z.infer<typeof CreditSettlement>;
+
+/** What `computePayslip` takes for one person's settlement (null: no settlement). */
+export const CreditSettlementInput = z.object({
+  /** Balance at the period end, signed. */
+  balanceMin: Minutes,
+  /** The owner's choice, signed like the balance. */
+  settleMin: Minutes,
+  /** The run month's `r_day` and the standard day (PRD 7.17.4). */
+  rate: MinuteRate,
+});
+export type CreditSettlementInput = z.infer<typeof CreditSettlementInput>;
+
+/** Result of `settleCredits` (PRD 7.17.5). */
+export const CreditSettlementResult = z.object({
+  appliedMin: Minutes,
+  amountPaise: Paise,
+  /** Minutes of the balance that stay unsettled (cap or choice). */
+  stayMin: Minutes,
+});
+export type CreditSettlementResult = z.infer<typeof CreditSettlementResult>;
+
+// ---- Presence (PRD 7.16, 7.18) -----------------------------------------------------------------
+
+/** A half-open span of absolute time. */
+export const Interval = z.object({ startTs: EpochMs, endTs: EpochMs });
+export type Interval = z.infer<typeof Interval>;
+
+/** One person's mark at one roll-call slot. */
+export const RollCallMark = z.object({
+  rollCallId: Id,
+  userId: Id,
+  slotTs: EpochMs,
+  mark: RollCallMarkValue,
+  markedBy: Id,
+});
+export type RollCallMark = z.infer<typeof RollCallMark>;
+
+/** A staff Step out. `state` keeps the owner's decision when the day is recomputed. */
+export const StepOut = z.object({
+  id: Id,
+  startTs: EpochMs,
+  endTs: EpochMs.nullable(),
+  reason: AwayReason,
+  state: AwayState,
+  /** The interval was closed by the next roll-call or check-out, not by I'm back. */
+  backMissing: z.boolean(),
+});
+export type StepOut = z.infer<typeof StepOut>;
+
+/** One foreground check. Only `outside` can raise a hint (PRD 7.18 rule 6). */
+export const PresenceCheck = z.object({ ts: EpochMs, result: PresenceCheckResult });
+export type PresenceCheck = z.infer<typeof PresenceCheck>;
+
+/** An away interval as `buildAwayIntervals` returns it (PRD 7.18 rules 1 to 4). */
+export const AwayInterval = z.object({
+  startTs: EpochMs,
+  /** Null while open. */
+  endTs: EpochMs.nullable(),
+  source: AwaySource,
+  /** Step-out reason chip; null for a roll-call interval. */
+  reason: AwayReason.nullable(),
+  /** Minutes clipped to shift segments and presence, minus the break window; 0 while open. */
+  minutes: Minutes,
+  /** `confirmed` for roll-call, `open` or `pending` for step-outs unless the owner decided. */
+  state: AwayState,
+  endReason: AwayEndReason.nullable(),
+  backMissing: z.boolean(),
+  /** Roll-call and step-out rows merged into this interval. */
+  rollCallIds: z.array(Id),
+  stepOutIds: z.array(Id),
+});
+export type AwayInterval = z.infer<typeof AwayInterval>;
+
+/** "Seems away" hint from an outside foreground check; never an interval, never credits. */
+export const SeemsAway = z.object({ sinceTs: EpochMs, lastCheckTs: EpochMs });
+export type SeemsAway = z.infer<typeof SeemsAway>;
+
+/** Rules for `buildAwayIntervals`, built from `OrgSettings.presence` by the caller. */
+export const PresenceRules = z.object({
+  enabled: z.boolean(),
+  /** Intervals shorter than this are dropped (5). */
+  minAwayMin: z.number().int().min(0),
+});
+export type PresenceRules = z.infer<typeof PresenceRules>;

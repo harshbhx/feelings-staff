@@ -118,6 +118,12 @@ function titleFor(item: ActionItem, t: T): string {
       return t('owner:actions.autoClosed.title', { name: first, time: clock(item.autoOutTs) });
     case 'advance_request':
       return t('owner:actions.advance.title', { name: first });
+    case 'away':
+      return t('owner:actions.away.title', {
+        name: first,
+        start: clock(item.startTs),
+        end: clock(item.endTs),
+      });
   }
 }
 
@@ -288,6 +294,12 @@ function Body({ item }: { item: ActionItem }) {
         </>
       );
     }
+    case 'away':
+      return (
+        <p className="text-text-body tabular-nums">
+          {t('owner:actions.away.line', { count: item.minutes })}
+        </p>
+      );
     case 'auto_closed':
       return (
         <p className="text-text-body tabular-nums">
@@ -514,6 +526,9 @@ function Actions({
           />
         </Row>
       );
+    case 'away':
+      // Confirm, mark as work and ignore arrive with the credits screens (WP-9 slice 9c).
+      return null;
     case 'advance_request':
       return (
         <Row>

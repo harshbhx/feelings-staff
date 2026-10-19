@@ -594,8 +594,10 @@ export async function decideAutoClose(
   ctx: Ctx,
   userId: string,
   date: string,
-  body: { keep: true } | { outTs: number },
+  body: { keep: true } | { outTs: number } | { useAwayStart: true },
 ): Promise<void> {
+  // "Use the away start as check-out" arrives with the presence API (WP-9).
+  if ('useAwayStart' in body) fail('NOT_IMPLEMENTED');
   await assertOpenMonth(ctx, date);
   const auto = await ctx.db.first<PunchRow>(
     `SELECT * FROM punches WHERE org_id = ?org AND user_id = ? AND work_date = ? AND source = 'auto'
