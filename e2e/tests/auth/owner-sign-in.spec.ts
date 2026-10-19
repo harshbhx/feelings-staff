@@ -29,8 +29,8 @@ test.describe('E2E-21 owner sign-in', () => {
         return code;
       })
       .toMatch(/^\d{6}$/);
+    // The sixth digit signs in by itself (the button only shows "Signing in…").
     await page.getByLabel('6-digit code').fill(code);
-    await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page).toHaveURL(/\/o\//);
   });
 

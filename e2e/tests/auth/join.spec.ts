@@ -116,7 +116,7 @@ test.describe('E2E-03 WebKit join with the typed code', () => {
     const api = await ownerApi(request, s.owner);
     const staff = await addStaff(api, '9824055502');
     await joinThroughScreens(page, '9824055502', staff.code, '2580');
-    await expect(page.getByText('Waiting')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Waiting for approval' })).toBeVisible();
     await approvePending(api, staff.id);
     await page.getByRole('button', { name: 'Check again' }).click();
     await expect(page.getByRole('heading', { name: 'Waiting for approval' })).toBeHidden({

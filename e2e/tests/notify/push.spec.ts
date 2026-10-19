@@ -1,4 +1,31 @@
+import type { BrowserContext } from '@playwright/test';
 import { expect, test } from '../../fixtures';
+
+interface Shown {
+  title: string;
+  body: string;
+  tag: string;
+  data: { url: string };
+}
+
+/** Notifications the service worker is showing, read inside the worker (a page read crashes the headless page). */
+async function shown(context: BrowserContext): Promise<Shown[]> {
+  const worker = context.serviceWorkers()[0];
+  if (!worker) return [];
+  return worker.evaluate(async () => {
+    const reg = (
+      self as unknown as {
+        registration: { getNotifications(): Promise<Shown[]> };
+      }
+    ).registration;
+    return (await reg.getNotifications()).map((n) => ({
+      title: n.title,
+      body: n.body,
+      tag: n.tag,
+      data: n.data,
+    }));
+  });
+}
 
 /**
  * E2E-19 (PRD 14.4, 11.6): the service worker shows a push and a click opens the target.
@@ -46,19 +73,7 @@ test.describe('E2E-19 push in the service worker', () => {
       data: JSON.stringify(payload),
     });
     await expect
-      .poll(
-        () =>
-          page.evaluate(async () => {
-            const reg = await navigator.serviceWorker.ready;
-            return (await reg.getNotifications()).map((n) => ({
-              title: n.title,
-              body: n.body,
-              tag: n.tag,
-              data: n.data as { url: string },
-            }));
-          }),
-        { timeout: 15_000 },
-      )
+      .poll(() => shown(context), { timeout: 15_000 })
       .toEqual([
         expect.objectContaining({
           title: 'Priya is 18 min late',
@@ -94,13 +109,6 @@ test.describe('E2E-19 push in the service worker', () => {
       registrationId: await registrationId,
       data: 'not json',
     });
-    await expect
-      .poll(() =>
-        page.evaluate(async () => {
-          const reg = await navigator.serviceWorker.ready;
-          return (await reg.getNotifications()).map((n) => n.title);
-        }),
-      )
-      .toEqual(['Feelings']);
+    await expect.poll(async () => (await shown(context)).map((n) => n.title)).toEqual(['Feelings']);
   });
 });
