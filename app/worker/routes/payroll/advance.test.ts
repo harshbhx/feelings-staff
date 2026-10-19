@@ -156,6 +156,7 @@ describe('O-12.2 recovery follows the plan and the cap', () => {
       cookie: owner,
       body: { month: '2026-11' },
     });
+    expect(nov.status, JSON.stringify(nov.body)).toBe(201);
     const slip = await callJson<{ advances: { duePaise: number; recoverPaise: number }[] }>(
       'GET',
       `/owner/payroll-runs/${nov.body.run.id}/people/${priya.id}`,

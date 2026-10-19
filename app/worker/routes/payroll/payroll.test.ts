@@ -537,6 +537,7 @@ describe('O-13.4 reopen', () => {
       cookie: owner,
       body: { month: '2026-11' },
     });
+    expect(nov.status, JSON.stringify(nov.body)).toBe(201);
     const slip = await callJson<OwnerPayslip>(
       'GET',
       `/owner/payroll-runs/${nov.body.run.id}/people/${priya.id}`,

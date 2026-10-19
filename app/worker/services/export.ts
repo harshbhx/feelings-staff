@@ -423,34 +423,30 @@ async function table(ctx: Ctx, kind: ExportKind, p: Params): Promise<Table> {
       };
     }
     case 'advances': {
-      const rows = await ctx.db
-        .all<{
-          name: string;
-          amount_paise: number;
-          given_on: string | null;
-          mode: string | null;
-          plan: string;
-          status: string;
-          month: string | null;
-          scheduled: number | null;
-          recovered: number | null;
-          carried: number | null;
-          total_recovered: number;
-        }>(
-          `SELECT u.name, a.amount_paise, a.given_on, a.mode, a.plan, a.status, r.month, r.scheduled_paise AS scheduled,
+      const rows = await ctx.db.all<{
+        name: string;
+        amount_paise: number;
+        given_on: string | null;
+        mode: string | null;
+        plan: string;
+        status: string;
+        month: string | null;
+        scheduled: number | null;
+        recovered: number | null;
+        carried: number | null;
+        total_recovered: number;
+      }>(
+        `SELECT u.name, a.amount_paise, a.given_on, a.mode, a.plan, a.status, r.month, r.scheduled_paise AS scheduled,
                 r.recovered_paise AS recovered, r.carried_paise AS carried,
                 COALESCE((SELECT SUM(recovered_paise) FROM advance_recoveries x WHERE x.advance_id = a.id), 0) AS total_recovered
            FROM advances a JOIN users u ON u.id = a.user_id
            LEFT JOIN advance_recoveries r ON r.advance_id = a.id AND r.month = ?
-          WHERE a.org_id = ? AND a.status IN ('active', 'closed') ${filter('a.user_id')}
+          WHERE a.org_id = ?org AND a.status IN ('active', 'closed') ${filter('a.user_id')}
             AND (a.given_on BETWEEN ? AND ? OR r.month IS NOT NULL OR a.status = 'active')
           ORDER BY a.given_on, u.name`,
-          p.month,
-          from,
-          to,
-          ...bind(),
-        )
-        .catch(() => []);
+        p.month,
+        ...bind(from, to),
+      );
       return {
         header: [
           'Staff',
