@@ -17,6 +17,9 @@ const RequestsScreen = lazy(() =>
   import('./requests/RequestsScreen').then((m) => ({ default: m.RequestsScreen })),
 );
 const ScanScreen = lazy(() => import('./scan/ScanScreen').then((m) => ({ default: m.ScanScreen })));
+const PresenceHistoryScreen = lazy(() =>
+  import('./presence/PresenceHistoryScreen').then((m) => ({ default: m.PresenceHistoryScreen })),
+);
 const FixItScreen = lazy(() =>
   import('./fixit/FixItScreen').then((m) => ({ default: m.FixItScreen })),
 );
@@ -37,6 +40,7 @@ export const staffRoutes: RouteObject[] = [
   { path: 'inbox', element: <InboxScreen /> },
   { path: 'me', element: <Placeholder titleKey="staff:screens.me" /> },
   { path: 'me/data', element: <Placeholder titleKey="staff:screens.myData" /> },
+  { path: 'me/data/presence', element: <PresenceHistoryScreen /> },
   { path: 'me/privacy', element: <Placeholder titleKey="staff:screens.privacy" /> },
   { path: 'scan', element: <ScanScreen /> },
   { path: 'fix/:topic', element: <FixItScreen /> },

@@ -1,6 +1,6 @@
 import type { AwayIntervalStaff, DutyView, PresenceState } from '@fs/contracts';
 import { describe, expect, it } from 'vitest';
-import { dutyRunning, minutesOut, presenceUi } from './presence-model';
+import { dutyRunning, historyByDay, minutesOut, presenceUi } from './presence-model';
 
 const NOW = Date.parse('2026-10-19T10:42:00+05:30');
 const open: AwayIntervalStaff = {
@@ -77,5 +77,25 @@ describe('presence on Today (PRD 4.18.4, S-24)', () => {
     expect(minutesOut({ awayMin: 25, startTs: 0, endTs: 60_000 })).toBe(25);
     expect(minutesOut({ awayMin: 0, startTs: 0, endTs: 40 * 60_000 })).toBe(40);
     expect(minutesOut({ awayMin: 0, startTs: 0, endTs: null })).toBe(0);
+  });
+});
+
+describe('My data, Presence (S-24.4)', () => {
+  it('groups marks, step-outs and checks by day, newest day first, in time order', () => {
+    const at = (d: string, hhmm: string) => Date.parse(`${d}T${hhmm}:00+05:30`);
+    const days = historyByDay({
+      rollCalls: [
+        { workDate: '2026-10-19', slotTime: '12:00', mark: 'here' },
+        { workDate: '2026-10-18', slotTime: '15:00', mark: 'not_here' },
+      ],
+      away: [{ ...open, startTs: at('2026-10-19', '09:32'), endTs: at('2026-10-19', '09:57') }],
+      checks: [{ ts: at('2026-10-19', '10:07'), result: 'inside', distanceBucket: '0-50' }],
+    });
+    expect(days.map((d) => d.date)).toEqual(['2026-10-19', '2026-10-18']);
+    expect(days[0]?.items.map((i) => `${i.kind} ${i.time}`)).toEqual([
+      'away 09:32',
+      'check 10:07',
+      'roll_call 12:00',
+    ]);
   });
 });

@@ -4,7 +4,15 @@
  * Step out button shows, and which away card shows. Staff never see credits, balances or rupees
  * here; only times, minutes out and the reason they chose.
  */
-import type { AwayIntervalStaff, AwayReason, DutyView, PresenceState } from '@fs/contracts';
+import {
+  type AwayIntervalStaff,
+  type AwayReason,
+  type DutyView,
+  istDate,
+  istTime,
+  type PresenceHistory,
+  type PresenceState,
+} from '@fs/contracts';
 import type { TodayModel } from '../today/today-model';
 
 /** Version of the presence notice text (4.18.1); stored with the `presence_checks` consent. */
@@ -60,4 +68,43 @@ export function minutesOut(away: Pick<AwayIntervalStaff, 'awayMin' | 'startTs' |
   if (away.awayMin > 0) return away.awayMin;
   if (away.endTs === null) return 0;
   return Math.max(0, Math.round((away.endTs - away.startTs) / 60_000));
+}
+
+// ---- My data -> Presence (4.18.4, S-24.4) ---------------------------------------------------
+
+export type HistoryItem =
+  | { kind: 'roll_call'; key: string; time: string; mark: 'here' | 'not_here' }
+  | { kind: 'away'; key: string; time: string; away: AwayIntervalStaff }
+  | { kind: 'check'; key: string; time: string; check: PresenceHistory['checks'][number] };
+
+export interface HistoryDay {
+  date: string;
+  items: HistoryItem[];
+}
+
+/** The month's marks, step-outs and checks by day, newest day first, in time order inside a day. */
+export function historyByDay(h: PresenceHistory): HistoryDay[] {
+  const days = new Map<string, HistoryItem[]>();
+  const add = (date: string, item: HistoryItem) => {
+    const list = days.get(date) ?? [];
+    list.push(item);
+    days.set(date, list);
+  };
+  for (const r of h.rollCalls)
+    add(r.workDate, {
+      kind: 'roll_call',
+      key: `r-${r.workDate}-${r.slotTime}`,
+      time: r.slotTime,
+      mark: r.mark,
+    });
+  for (const a of h.away)
+    add(a.workDate, { kind: 'away', key: a.id, time: istTime(a.startTs), away: a });
+  for (const c of h.checks)
+    add(istDate(c.ts), { kind: 'check', key: `c-${c.ts}`, time: istTime(c.ts), check: c });
+  return [...days.entries()]
+    .sort(([a], [b]) => (a < b ? 1 : a > b ? -1 : 0))
+    .map(([date, items]) => ({
+      date,
+      items: items.sort((x, y) => (x.time < y.time ? -1 : x.time > y.time ? 1 : 0)),
+    }));
 }

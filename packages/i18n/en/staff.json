@@ -656,6 +656,33 @@
     "errors": {
       "cannotStepOut": "You can step out only while you're checked in, and not twice. Check Today and try again.",
       "notOut": "You're not marked away now. If this looks wrong, tell {{owner}}."
+    },
+    "history": {
+      "title": "Presence",
+      "intro": "Roll-call marks, your step-outs and location checks. Only you and {{owner}} see this.",
+      "loadError": "We couldn't load your presence record.",
+      "empty": "Nothing recorded this month.",
+      "rollCall": "Roll-call at {{time}}",
+      "here": "Here",
+      "notHere": "Not here",
+      "out": "Out {{from}}–{{to}} · {{min}} min",
+      "outSince": "Out since {{time}}",
+      "markedBy": "Marked by {{name}}",
+      "check": "Location check at {{time}}",
+      "distance": "{{bucket}} m from the salon",
+      "state": {
+        "open": "Out now",
+        "waiting": "Waiting",
+        "counted": "Counted",
+        "work": "Work",
+        "ignored": "Ignored"
+      },
+      "result": {
+        "inside": "Inside",
+        "edge": "At the edge",
+        "outside": "Outside",
+        "no_fix": "No location"
+      }
     }
   }
 }

@@ -120,6 +120,23 @@ test.describe('staff presence', () => {
     await expect(page.getByTestId('presence-consent')).toHaveCount(0);
   });
 
+  test('STAFF-PRES S-24.4 My data, Presence: marks, step-outs with state, checks', async ({
+    page,
+    checkA11y,
+  }, info) => {
+    staffOnly(info);
+    await openToday(page, [], '/me/data/presence?month=2026-10');
+    await expect(page.getByRole('heading', { level: 1, name: 'Presence' })).toBeVisible();
+    const main = page.locator('#main');
+    await expect(main).toContainText('Roll-call at 12:00');
+    await expect(main).toContainText('Out 09:32–09:57 · 25 min');
+    await expect(main).toContainText('Waiting');
+    await expect(main).toContainText('Location check at 10:07');
+    await expect(main).not.toContainText('₹');
+    if (android(info)) await expect(page).toHaveScreenshot('staff-presence-history.png');
+    await checkA11y();
+  });
+
   test('STAFF-PRES E2E-26 privacy: no credit words on any staff screen', async ({ page }, info) => {
     staffOnly(info);
     const visits: [string, string[]][] = [
@@ -129,6 +146,7 @@ test.describe('staff presence', () => {
       ['/month', []],
       ['/day/2026-10-15', []],
       ['/requests', []],
+      ['/me/data/presence', []],
     ];
     for (const [path, variants] of visits) {
       await openToday(page, variants, path);

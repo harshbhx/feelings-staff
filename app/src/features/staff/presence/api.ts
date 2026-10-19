@@ -21,6 +21,15 @@ export function usePresence() {
   });
 }
 
+/** My data -> Presence for one month (`YYYY-MM`): marks, step-outs with state, checks. */
+export function usePresenceHistory(month: string) {
+  const api = useApi();
+  return useQuery({
+    queryKey: [...presenceKey, 'history', month] as const,
+    queryFn: () => api.mePresenceHistory({ query: { month } }),
+  });
+}
+
 /** Keep the open interval on Today straight from the server's answer. */
 function useSetOpenAway() {
   const qc = useQueryClient();
