@@ -154,9 +154,12 @@ function cellWords(cell: RosterCell, t: TFunction): string {
   }
 }
 
-/** The short form for the phone strip: first word of the shift, or WO / HO / L. */
+/** The short form for the phone strip: the shift's first word ("Full", "Eve"), or WO / HO / L. */
 function cellShort(cell: RosterCell): string {
-  if (cell.kind === 'template') return (cell.templateName ?? '–').split(' ')[0] ?? '–';
+  if (cell.kind === 'template') {
+    const word = (cell.templateName ?? '–').split(' ')[0] ?? '–';
+    return word.length <= 4 ? word : word.slice(0, 3);
+  }
   if (cell.kind === 'no_shift' || cell.kind === 'NE') return '–';
   return cell.kind;
 }
@@ -200,7 +203,7 @@ function RosterTable({ view, onPick }: { view: RosterView; onPick: (t: Target) =
           <tr>
             <th
               scope="col"
-              className="sticky left-0 z-10 min-w-44 border-border border-r border-b bg-bg px-3 py-2 text-left font-semibold text-text-muted text-xs"
+              className="sticky left-0 z-10 min-w-40 border-border border-r border-b bg-bg px-3 py-2 text-left font-semibold text-text-muted text-xs"
             >
               {t('owner:roster.staffColumn')}
             </th>
@@ -240,7 +243,7 @@ function RosterTable({ view, onPick }: { view: RosterView; onPick: (t: Target) =
                   <button
                     type="button"
                     onClick={() => onPick({ row, date: cell.date })}
-                    className={`grid min-h-14 w-full min-w-24 content-start gap-0.5 rounded-sm px-2 py-1.5 text-left transition-colors hover:outline-1 hover:outline-border-strong ${cellTone(cell)}`}
+                    className={`grid min-h-14 w-full min-w-[5.25rem] content-start gap-0.5 rounded-sm px-2 py-1.5 text-left transition-colors hover:outline-1 hover:outline-border-strong ${cellTone(cell)}`}
                   >
                     <span className="sr-only">{cellLabel(row, cell, t)}</span>
                     <span className="truncate font-semibold" aria-hidden="true">

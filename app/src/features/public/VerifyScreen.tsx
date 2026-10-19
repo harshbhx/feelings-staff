@@ -121,13 +121,11 @@ function Result({ v }: { v: PayslipVerify }) {
             : t('owner:verify.validLine', { org: v.orgName ?? '' })}
         </p>
       </div>
-      <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 border-border border-t">
+      <dl className="grid border-border border-t">
         {rows.map(([label, value]) => (
-          <div key={label} className="contents">
-            <dt className="border-border border-b py-2.5 text-text-muted">{label}</dt>
-            <dd className="border-border border-b py-2.5 text-right font-semibold text-text tabular-nums">
-              {value ?? '–'}
-            </dd>
+          <div key={label} className="flex justify-between gap-6 border-border border-b py-2.5">
+            <dt className="text-text-muted">{label}</dt>
+            <dd className="text-right font-semibold text-text tabular-nums">{value ?? '–'}</dd>
           </div>
         ))}
       </dl>
