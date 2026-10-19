@@ -110,7 +110,7 @@ export const ownerRoutes: RouteObject[] = [
   {
     path: 'inbox',
     ...h('owner:screens.inbox'),
-    lazy: () => import('../inbox').then((m) => ({ Component: m.InboxScreen })),
+    lazy: () => import('../inbox/screen').then((m) => ({ Component: m.InboxScreen })),
   },
   {
     path: 'more',

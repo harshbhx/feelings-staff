@@ -7,7 +7,8 @@ import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiProvider } from '../../api/provider';
 import { groupByDay } from './hooks';
-import { InboxBell, InboxScreen } from './index';
+import { InboxBell } from './index';
+import { InboxScreen } from './screen';
 
 afterEach(cleanup);
 
