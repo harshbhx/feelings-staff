@@ -75,12 +75,64 @@ export function notInYetTopic(userId: string, date: string): string {
   return topicFor('notin', userId, date);
 }
 
+/** Static facts per event type: who it is for, which manager permission opens it, push default. */
+export interface EventMeta {
+  audience: Audience;
+  permission: Permission | null;
+  pushDefault: boolean;
+}
+
+const OWNER = (permission: Permission | null, pushDefault = true): EventMeta => ({
+  audience: 'owner',
+  permission,
+  pushDefault,
+});
+const STAFF = (pushDefault = true): EventMeta => ({
+  audience: 'staff',
+  permission: null,
+  pushDefault,
+});
+
+export const EVENT_META: Record<NotifyEventType, EventMeta> = {
+  morning_summary: OWNER('approve_attendance'),
+  late_checkin: OWNER('approve_attendance'),
+  not_in_yet: OWNER('approve_attendance'),
+  checkin_reminder: STAFF(),
+  flagged_punch: OWNER('approve_attendance'),
+  punch_needs_approval: OWNER('approve_attendance'),
+  punch_decided: STAFF(),
+  early_checkout: OWNER('approve_attendance', false),
+  overtime_running: OWNER('approve_overtime'),
+  checkout_reminder: STAFF(),
+  missed_checkouts: OWNER('approve_attendance'),
+  day_auto_closed: STAFF(),
+  leave_requested: OWNER('approve_leave'),
+  leave_decided: STAFF(),
+  regularisation_requested: OWNER('approve_attendance', false),
+  regularisation_decided: STAFF(),
+  offsite_requested: OWNER('offsite'),
+  duty_assigned: STAFF(),
+  new_device: OWNER(null),
+  device_decided: STAFF(),
+  pin_attempts: OWNER(null),
+  advance_recorded: STAFF(false),
+  advance_requested: OWNER('payroll'),
+  payroll_draft_ready: OWNER('payroll'),
+  payslip_ready: STAFF(),
+  salary_unpaid: OWNER('payroll'),
+  schedule_changed: STAFF(),
+  holiday_announced: STAFF(),
+  needs_action_reminder: OWNER(null, false),
+  weekly_digest: OWNER(null, false),
+  sign_in_link: { audience: 'email', permission: null, pushDefault: false },
+};
+
 export function planFor(e: NotifyEvent): Plan {
-  const p = (over: Partial<Plan>): Plan => ({ ...BASE, ...over });
+  const meta = EVENT_META[e.type];
+  const p = (over: Partial<Plan>): Plan => ({ ...BASE, ...meta, ...over });
   switch (e.type) {
     case 'morning_summary':
       return p({
-        permission: 'approve_attendance',
         ttlSec: SUMMARY_TTL_SEC,
         summary: true,
         topic: `sum-${compact(e.date)}`,
@@ -88,7 +140,6 @@ export function planFor(e: NotifyEvent): Plan {
       });
     case 'late_checkin':
       return p({
-        permission: 'approve_attendance',
         priority: 'high',
         urgency: 'high',
         batchable: true,
@@ -97,7 +148,6 @@ export function planFor(e: NotifyEvent): Plan {
       });
     case 'not_in_yet':
       return p({
-        permission: 'approve_attendance',
         priority: 'high',
         urgency: 'high',
         topic: notInYetTopic(e.userId, e.workDate),
@@ -105,7 +155,6 @@ export function planFor(e: NotifyEvent): Plan {
       });
     case 'checkin_reminder':
       return p({
-        audience: 'staff',
         userIds: [e.userId],
         topic: topicFor('cin', e.userId, e.workDate),
         shiftWindowUserId: e.userId,
@@ -113,31 +162,22 @@ export function planFor(e: NotifyEvent): Plan {
       });
     case 'flagged_punch':
       return p({
-        permission: 'approve_attendance',
         priority: 'high',
         urgency: 'high',
         batchable: true,
         topic: topicFor('flag', e.userId, istDate(e.effectiveTs)),
       });
     case 'punch_needs_approval':
-      return p({ permission: 'approve_attendance', priority: 'high' });
+      return p({ priority: 'high' });
     case 'punch_decided':
-      return p({ audience: 'staff', userIds: [e.userId] });
+      return p({ userIds: [e.userId] });
     case 'early_checkout':
-      return p({
-        permission: 'approve_attendance',
-        batchable: true,
-        pushDefault: false,
-      });
+    case 'regularisation_requested':
+      return p({ batchable: true });
     case 'overtime_running':
-      return p({
-        permission: 'approve_overtime',
-        topic: topicFor('ot', e.userId, e.workDate),
-        workDate: e.workDate,
-      });
+      return p({ topic: topicFor('ot', e.userId, e.workDate), workDate: e.workDate });
     case 'checkout_reminder':
       return p({
-        audience: 'staff',
         userIds: [e.userId],
         topic: topicFor('cout', e.userId, e.workDate),
         shiftWindowUserId: e.userId,
@@ -145,7 +185,6 @@ export function planFor(e: NotifyEvent): Plan {
       });
     case 'missed_checkouts':
       return p({
-        permission: 'approve_attendance',
         priority: 'high',
         urgency: 'high',
         topic: `miss-${compact(e.workDate)}`,
@@ -153,57 +192,41 @@ export function planFor(e: NotifyEvent): Plan {
       });
     case 'day_auto_closed':
       return p({
-        audience: 'staff',
         userIds: [e.userId],
         topic: topicFor('auto', e.userId, e.workDate),
         workDate: e.workDate,
       });
     case 'leave_requested':
       return p({
-        permission: 'approve_leave',
         priority: e.urgent ? 'high' : 'normal',
         urgency: e.urgent ? 'high' : 'normal',
       });
     case 'leave_decided':
-      return p({ audience: 'staff', userIds: [e.userId] });
-    case 'regularisation_requested':
-      return p({
-        permission: 'approve_attendance',
-        batchable: true,
-        pushDefault: false,
-      });
     case 'regularisation_decided':
-      return p({ audience: 'staff', userIds: [e.userId] });
-    case 'offsite_requested':
-      return p({ permission: 'offsite' });
+    case 'device_decided':
+    case 'advance_recorded':
+      return p({ userIds: [e.userId] });
     case 'duty_assigned':
-      return p({ audience: 'staff', userIds: e.userIds, workDate: e.workDate });
+      return p({ userIds: e.userIds, workDate: e.workDate });
     case 'new_device':
       return p({ priority: 'high', urgency: 'high', ignoreQuietHours: true });
-    case 'device_decided':
-      return p({ audience: 'staff', userIds: [e.userId] });
-    case 'pin_attempts':
-      return p({});
-    case 'advance_recorded':
-      return p({ audience: 'staff', userIds: [e.userId], pushDefault: false });
-    case 'advance_requested':
-      return p({ permission: 'payroll' });
-    case 'payroll_draft_ready':
-      return p({ permission: 'payroll' });
     case 'payslip_ready':
-      return p({ audience: 'staff', userIds: e.userIds });
-    case 'salary_unpaid':
-      return p({ permission: 'payroll' });
+      return p({ userIds: e.userIds });
     case 'schedule_changed':
-      return p({ audience: 'staff', userIds: [e.userId], workDate: e.date });
+      return p({ userIds: [e.userId], workDate: e.date });
     case 'holiday_announced':
-      return p({ audience: 'staff', everyone: true, workDate: e.date });
-    case 'needs_action_reminder':
-      return p({ pushDefault: false });
+      return p({ everyone: true, workDate: e.date });
     case 'weekly_digest':
-      return p({ pushDefault: false, ttlSec: SUMMARY_TTL_SEC });
+      return p({ ttlSec: SUMMARY_TTL_SEC });
     case 'sign_in_link':
-      return p({ audience: 'email', inbox: false });
+      return p({ inbox: false });
+    case 'offsite_requested':
+    case 'pin_attempts':
+    case 'advance_requested':
+    case 'payroll_draft_ready':
+    case 'salary_unpaid':
+    case 'needs_action_reminder':
+      return p({});
   }
 }
 
@@ -544,7 +567,12 @@ export function render(e: NotifyEvent, rc: RenderCtx): Rendered {
         data: { weekStart: e.weekStart },
       };
     case 'sign_in_link':
-      return { title: t('email.signin.subject', { code: e.code }), body: null, url: '/', data: null };
+      return {
+        title: t('email.signin.subject', { code: e.code }),
+        body: null,
+        url: '/',
+        data: null,
+      };
   }
 }
 
