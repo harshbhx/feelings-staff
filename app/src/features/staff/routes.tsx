@@ -6,6 +6,7 @@ import { lazy } from 'react';
 import type { RouteObject } from 'react-router';
 import { Placeholder } from '../../app/placeholder';
 import { InboxScreen } from '../inbox';
+import { browserAllowed } from './install/allow-browser';
 import { TodayScreen } from './today/TodayScreen';
 
 const MonthScreen = lazy(() =>
@@ -19,6 +20,10 @@ const ScanScreen = lazy(() => import('./scan/ScanScreen').then((m) => ({ default
 const FixItScreen = lazy(() =>
   import('./fixit/FixItScreen').then((m) => ({ default: m.FixItScreen })),
 );
+
+// Remember `?allowBrowser=1` from the URL the tab opened with (often /signin, before the guard
+// redirects and the query is lost). Non-production hosts only; see install/allow-browser.ts.
+if (typeof window !== 'undefined') browserAllowed();
 
 export const staffRoutes: RouteObject[] = [
   { index: true, element: <TodayScreen /> },
