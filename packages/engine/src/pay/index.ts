@@ -20,7 +20,6 @@ import {
   add,
   formatInr,
   formatNum,
-  formatRate,
   frac,
   fromDecimal,
   minQ,
@@ -34,8 +33,11 @@ import {
 } from '../money';
 import { ENGINE_VERSION } from '../version';
 import { dailyRate, divisorDays } from './helpers';
+import { grouped, plural } from './shared';
+import { type PayStatus, type TimeDay, timeLines } from './time';
 
 export * from './helpers';
+export * from './time';
 
 export interface ComputePayslipInput {
   person: PersonPay;
@@ -54,8 +56,6 @@ export interface ComputePayslipInput {
   /** Overtime minutes already paid earlier in this calendar quarter, for the quarterly warning. */
   quarterOtMinBefore?: number;
 }
-
-type PayStatus = 'P' | 'H' | 'A' | 'L' | 'LOP' | 'WO' | 'HO';
 
 /** LOP days per status for monthly staff (PRD 7.13: A + 0.5 × H + unpaid leave + sandwich). */
 const LOP_WEIGHT: Record<PayStatus, number> = { P: 0, H: 0.5, A: 1, L: 0, LOP: 1, WO: 0, HO: 0 };
@@ -97,16 +97,6 @@ const earlier = (a: string, b: string) => (a < b ? a : b);
 const MONTHS = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
 const dayMonth = (date: string) =>
   `${Number(date.slice(8, 10))} ${MONTHS[Number(date.slice(5, 7)) - 1]}`;
-const plural = (n: number, word: string) => `${formatNum(n)} ${word}${n === 1 ? '' : 's'}`;
-
-function grouped<T>(map: Map<string, T>, key: string, init: () => T): T {
-  let t = map.get(key);
-  if (t === undefined) {
-    t = init();
-    map.set(key, t);
-  }
-  return t;
-}
 
 interface Part {
   index: number;
@@ -164,9 +154,6 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
     p.monthly ? `${formatInr(p.amountPaise)} ÷ ${div} days` : `${formatInr(p.amountPaise)} a day`;
 
   const holidays = new Map((input.holidays ?? []).map((h) => [h.date, h]));
-  const decisions = new Map(
-    input.approvals.filter((a) => a.decision !== 'auto').map((a) => [a.workDate, a]),
-  );
   const sandwich = new Set(rules.sandwich ? sandwichDates(input.days) : []);
 
   const counts: DayCounts = {
@@ -183,15 +170,8 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
   };
   const lop = new Map<string, { part: Part; days: number }>();
   const paidDaily = new Map<number, number>();
-  const ut = new Map<string, { rate: Q; sDay: number; min: number }>();
-  const ot = new Map<string, { rate: Q; min: number }>();
-  const off = new Map<string, { rate: Q; factor: Q; text: string; credit: number }>();
+  const timeDays: TimeDay[] = [];
   const weekMin = new Map<string, number>();
-  let lateBillableMin = 0;
-  let earlyBillableMin = 0;
-  let otApprovedMin = 0;
-  let otPendingMin = 0;
-  let compOffEarned = 0;
   let lopDaysMonthly = 0;
 
   for (const d of input.days) {
@@ -217,46 +197,29 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
         (paidDaily.get(part.index) ?? 0) + WORK_WEIGHT[st] + Number(paidOff),
       );
     }
-    if (st === 'P') {
-      lateBillableMin += d.lateBillableMin;
-      earlyBillableMin += d.earlyBillableMin;
-    }
-    if (d.undertimeMin > 0) {
-      const sDay = Math.max(1, d.scheduledMin);
-      const key = `${part.index}|${sDay}`;
-      grouped(ut, key, () => ({ rate: part.rate, sDay, min: 0 })).min += d.undertimeMin;
-    }
-
-    const decision = decisions.get(d.workDate);
-    const decided = decision === undefined ? 0 : Math.min(decision.approvedMin, d.otCandidateMin);
-    const approved = d.otPreapprovedMin + decided;
-    otPendingMin += decision === undefined ? d.otCandidateMin : 0;
-    otApprovedMin += approved;
-    grouped(ot, String(part.index), () => ({ rate: part.rate, min: 0 })).min += approved;
+    timeDays.push({
+      day: d,
+      status: st,
+      part,
+      offPaid: part.monthly || paidOff,
+      offMode: d.dayType === 'WO' ? rules.weekOffWorked : (holiday?.workedComp ?? 'extra_pay'),
+    });
     const week = isoWeekOf(d.workDate);
     weekMin.set(
       week,
       (weekMin.get(week) ?? 0) + d.workedMin + d.otPreapprovedMin + d.otCandidateMin,
     );
-
-    // Worked a weekly off or holiday with credit (PRD 7.7): extra pay and/or comp-off.
-    if (d.offdayCredit > 0) {
-      const mode = d.dayType === 'WO' ? rules.weekOffWorked : (holiday?.workedComp ?? 'extra_pay');
-      if (mode !== 'comp_off') {
-        const alreadyPaid = part.monthly || paidOff ? 1 : 0;
-        const factor = sub(fromDecimal(rules.offdayMultiplier), frac(alreadyPaid));
-        const m = formatNum(rules.offdayMultiplier);
-        const text = alreadyPaid ? `(${m} − 1)` : m;
-        grouped(off, `${part.index}|${alreadyPaid}`, () => ({
-          rate: part.rate,
-          factor,
-          text,
-          credit: 0,
-        })).credit += d.offdayCredit;
-      }
-      if (mode !== 'extra_pay') compOffEarned += d.offdayCredit;
-    }
   }
+
+  // Late/early, overtime and off-day extra (PRD 7.5-7.7) as one stage.
+  const time = timeLines({
+    days: timeDays,
+    approvals: input.approvals,
+    otRate: person.otRate,
+    stdMin: person.stdMin,
+    offdayMultiplier: rules.offdayMultiplier,
+  });
+  const { lateBillableMin, earlyBillableMin, otApprovedMin, otPendingMin } = time;
 
   const lines: PayslipLine[] = [];
   const push = (
@@ -288,35 +251,7 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
     }
   }
 
-  const otTerms = [...ot.values()].filter((t) => t.min > 0);
-  const rate = person.otRate;
-  const stdMin = Math.max(1, person.stdMin);
-  if (rate.mode === 'multiplier') {
-    const m = fromDecimal(rate.multiplier);
-    const amount = sum(otTerms.map((t) => mul(mul(t.rate, m), frac(t.min, stdMin))));
-    const formula = otTerms
-      .map(
-        (t) => `${formatRate(t.rate)} × ${formatNum(rate.multiplier)} × ${t.min} min ÷ ${stdMin}`,
-      )
-      .join(' + ');
-    if (otApprovedMin > 0) push('overtime', 'earning', toPaise(amount), formula);
-  } else if (rate.mode === 'flat') {
-    const amount = frac(rate.paisePerHour * otApprovedMin, 60);
-    const formula = `${formatInr(rate.paisePerHour)} an hour × ${formatNum(otApprovedMin / 60)} h`;
-    if (otApprovedMin > 0) push('overtime', 'earning', toPaise(amount), formula);
-  } else if (rate.mode === 'comp_off') {
-    // Every 4 hours of approved overtime is half a comp-off day (PRD 7.6).
-    compOffEarned += Math.floor(otApprovedMin / 240) / 2;
-  }
-
-  const offTerms = [...off.values()];
-  if (offTerms.length > 0) {
-    const amount = sum(offTerms.map((t) => mul(mul(t.rate, t.factor), fromDecimal(t.credit))));
-    const formula = offTerms
-      .map((t) => `${formatRate(t.rate)} × ${t.text} × ${plural(t.credit, 'day')}`)
-      .join(' + ');
-    push('offday_extra', 'earning', toPaise(amount), formula);
-  }
+  for (const l of time.earnings) push(l.code, 'earning', l.amountPaise, l.formula);
 
   for (const a of input.adjustments) {
     if (EARNING_KINDS.has(a.kind)) push(a.kind, 'earning', a.amountPaise, a.note, a.id);
@@ -335,18 +270,9 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
     const clamped = absence === mPro ? ', no more than the salary for days employed' : '';
     push('lop', 'deduction', -absencePaise, `${terms}${clamped}`);
   }
-  const utTerms = [...ut.values()];
-  const undertime = minQ(
-    sum(utTerms.map((t) => mul(t.rate, frac(t.min, t.sDay)))),
-    sub(add(mPro, basic), absence),
-  );
+  const undertime = minQ(time.undertime.amount, sub(add(mPro, basic), absence));
   const undertimePaise = toPaise(undertime);
-  if (undertimePaise > 0) {
-    const formula = utTerms
-      .map((t) => `${formatRate(t.rate)} × ${t.min} min ÷ ${t.sDay}`)
-      .join(' + ');
-    push('undertime', 'deduction', -undertimePaise, formula);
-  }
+  if (undertimePaise > 0) push('undertime', 'deduction', -undertimePaise, time.undertime.formula);
   const timePaise = absencePaise + undertimePaise;
 
   // The 50% cap (PRD 7.10 steps 2-5) -----------------------------------------------------
@@ -515,6 +441,7 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
       `${formatNum(quarterMin / 60)} hours of overtime this quarter, more than ${limits.quarterlyOtHours}.`,
     );
   }
+  const rate = person.otRate;
   if (rate.mode === 'multiplier' && rate.multiplier < 2) {
     warn('ot_multiplier_low', 'Below 2× may not comply with the Code on Wages.');
   }
@@ -540,7 +467,7 @@ export function computePayslip(input: ComputePayslipInput): PayslipResult {
     earlyBillableMin,
     otApprovedMin,
     otPendingMin,
-    compOffEarned,
+    compOffEarned: time.compOffEarned,
     lines,
     grossPaise,
     deductionsPaise,
