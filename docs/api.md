@@ -95,6 +95,7 @@ Check in and out, door proof, and the staff member's own day, month and data.
 | GET | `/me/days` | any signed-in person | no | no | query `MonthQuery` | `MonthView` | My month |
 | GET | `/me/days/:date` | any signed-in person | no | no | path `DateParams` | `DayDetail` | One day explained |
 | GET | `/me/data` | any signed-in person | no | no | - | `MyData` | DPDP: my data |
+| GET | `/me/punches/:id/selfie` | any signed-in person | no | no | path `IdParams` | file | My own selfie JPEG while it is kept |
 
 ### Staff: requests
 

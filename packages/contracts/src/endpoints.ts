@@ -405,6 +405,15 @@ export const endpoints = {
     res: MyData,
     summary: 'DPDP: my data',
   }),
+  meSelfie: ep({
+    method: 'GET',
+    path: '/me/punches/:id/selfie',
+    access: ME,
+    params: IdParams,
+    binary: true,
+    res: Binary,
+    summary: 'My own selfie JPEG while it is kept',
+  }),
 
   // ---- Staff: requests (WP-4 leave/fixes, WP-5 advances) -------------------------------------------
   meLeave: ep({
