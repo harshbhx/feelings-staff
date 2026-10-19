@@ -3,6 +3,7 @@ import { mergeHandlers } from '../lib/api';
 import { handlers as testRoutes } from '../test-routes';
 import { handlers as attendance } from './attendance';
 import { handlers as auth } from './auth';
+import { handlers as credits } from './credits';
 import { handlers as notify } from './notify';
 import { handlers as owner } from './owner';
 import { handlers as payroll } from './payroll';
@@ -16,6 +17,7 @@ export const allHandlers = mergeHandlers(
   attendance,
   owner,
   payroll,
+  credits,
   notify,
   testRoutes,
 );

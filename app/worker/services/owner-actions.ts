@@ -554,18 +554,21 @@ export async function decideOvertime(
   const decision: OtDecisionRow['decision'] =
     body.approvedMin === 0 ? 'rejected' : body.approvedMin === candidate ? 'approved' : 'partial';
   const now = ctx.now();
+  const decisionId = ulid(now);
   data.otDecisions.set(`${userId}|${date}`, {
+    id: decisionId,
     user_id: userId,
     work_date: date,
     candidate_min: candidate,
     approved_min: body.approvedMin,
     decision,
+    decided_by: ctx.user?.id ?? null,
     decided_at: now,
   });
   const plan = await planDay(ctx, userId, date, {}, data);
   await ctx.db.batch([
     ctx.db.insert('ot_decisions', {
-      id: ulid(now),
+      id: decisionId,
       user_id: userId,
       work_date: date,
       candidate_min: candidate,
