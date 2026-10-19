@@ -247,7 +247,7 @@ After Urmi finishes the month, you get "Your October payslip is ready".
 
 If the PDF says "Preparing the PDF...", wait a minute. The online payslip is always there.
 
-If Urmi has settled time for the month, you see one line, **Time adjustment**, with an amount and "settled by Urmi for time not worked in October". It is part of your pay like any other line. Ask Urmi if you want to know how it was worked out.
+If Urmi has settled time for the month, you see one line, **Time adjustment**, with an amount and "settled by Urmi for time not worked in October" for a cut, or "settled by Urmi for extra time worked in October" for extra time. It is part of your pay like any other line. Ask Urmi if you want to know how it was worked out.
 
 If you think a line is wrong, talk to Urmi. Every number comes from your check-ins, so you can see why.
 
