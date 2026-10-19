@@ -54,6 +54,19 @@ const SCREENS: Screen[] = [
   { name: 'day', path: '/day/2026-10-15', ready: h1(/15 Oct/) },
   { name: 'requests-leave', path: '/requests', ready: h1('Requests') },
   { name: 'requests-fixes', path: '/requests?tab=fixes', ready: h1('Requests') },
+  { name: 'leave-form', path: '/requests/leave', ready: h1('Ask for leave') },
+  { name: 'fix-form', path: '/requests/fix?date=2026-10-19', ready: h1('Fix a day') },
+  { name: 'payslips', path: '/payslips', ready: h1('Payslips') },
+  {
+    name: 'payslips-empty',
+    path: '/payslips',
+    variant: 'mePayslips:empty',
+    ready: h1('Payslips'),
+  },
+  { name: 'payslip', path: '/payslips/01K885FABFFQJST6Z99BWHFJAK', ready: h1('October 2026') },
+  { name: 'me', path: '/me', ready: h1('Me') },
+  { name: 'me-data', path: '/me/data', ready: h1('My data') },
+  { name: 'me-privacy', path: '/me/privacy', ready: h1('Privacy notice') },
   { name: 'scan', path: '/scan', ready: h1('Scan door code') },
   { name: 'fixit-location', path: '/fix/location', ready: h1(/^Location is off for this app/) },
   {
@@ -143,8 +156,9 @@ test.describe('staff screens', () => {
       await openScreen(page, s);
       if (info.project.name === 'staff-android') {
         // The scanner shows the live (fake) camera feed; only the frame around it is compared.
+        // The version line on Me changes with every build.
         await expect(page).toHaveScreenshot(`staff-${s.name}.png`, {
-          mask: [page.locator('video')],
+          mask: [page.locator('video'), page.getByTestId('app-version')],
         });
       }
       await checkA11y();
