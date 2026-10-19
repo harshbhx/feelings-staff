@@ -1,1 +1,17 @@
-{}
+{
+  "inbox": {
+    "title": "Inbox",
+    "today": "Today",
+    "earlier": "Earlier",
+    "markAllRead": "Mark all read",
+    "loadMore": "Load more",
+    "unread": "Unread",
+    "emptyTitle": "Nothing here yet",
+    "emptyBody": "Reminders and updates from the salon will show up here.",
+    "errorTitle": "We couldn't load your inbox",
+    "errorBody": "Check your connection and try again.",
+    "bell": "Inbox",
+    "bellUnread_one": "Inbox, {{count}} unread",
+    "bellUnread_other": "Inbox, {{count}} unread"
+  }
+}
