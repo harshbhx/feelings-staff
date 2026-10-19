@@ -3,13 +3,7 @@
  * Also reads the API's duplicate-phone, rehire and 15-active-staff answers into something the form
  * can show.
  */
-import {
-  ApiError,
-  type Designation,
-  isApiError,
-  normaliseIndianPhone,
-  type StaffCreate,
-} from '@fs/contracts';
+import { ApiError, type Designation, normaliseIndianPhone, type StaffCreate } from '@fs/contracts';
 
 export const DESIGNATIONS: readonly Designation[] = [
   'Stylist',
@@ -119,7 +113,7 @@ const str = (v: unknown): string | null => (typeof v === 'string' && v ? v : nul
 export function createProblem(e: unknown): CreateProblem {
   if (!(e instanceof ApiError)) return { kind: 'network' };
   const d = e.details ?? {};
-  if (isApiError(e, 'DUPLICATE') || isApiError(e, 'CONFLICT')) {
+  if (e.code === 'DUPLICATE' || e.code === 'CONFLICT') {
     const exited = d.status === 'exited' || str(d.exitDate) !== null || d.rehire === true;
     const name = str(d.name);
     const staffId = str(d.staffId) ?? str(d.userId) ?? str(d.id);
@@ -127,8 +121,8 @@ export function createProblem(e: unknown): CreateProblem {
       ? { kind: 'rehire', name, staffId, exitDate: str(d.exitDate) }
       : { kind: 'duplicate', name, staffId };
   }
-  if (isApiError(e, 'RULE_VIOLATION')) return { kind: 'cap', message: e.message };
-  if (isApiError(e, 'VALIDATION')) return { kind: 'validation', message: e.message };
+  if (e.code === 'RULE_VIOLATION') return { kind: 'cap', message: e.message };
+  if (e.code === 'VALIDATION') return { kind: 'validation', message: e.message };
   return { kind: 'network' };
 }
 
