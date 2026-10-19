@@ -7,7 +7,8 @@
  * 1. POST /__test/reset {scenario: 'demo'}: salon, owner, ~12 staff, ~7 weeks of raw punches, leave,
  *    duties, advances, a pending device and fix.
  * 2. POST /__test/cron {job: 'recompute-day', date} for every day: attendance through DayService.
- * 3. Owner signs in (password + PIN), steps up, runs last month's payroll, finalises it and marks
+ * 3. Owner signs in (password + PIN), steps up, approves overtime older than 3 days (so Needs action
+ *    looks like a salon where the owner keeps up), runs last month's payroll, finalises it and marks
  *    it paid, so payslips exist. Steps whose endpoints are not built yet are skipped with a warning.
  * Prints the demo logins (test data only).
  */
@@ -86,6 +87,28 @@ if (signIn.status !== 200) {
   console.warn(`owner sign-in: ${signIn.status} (auth not ready?); payroll skipped`);
 } else {
   await call('POST', '/auth/step-up', { pin });
+
+  // Urmi decides overtime as the days go by, so only the last few days still wait in Needs action.
+  const actions = await call('GET', '/owner/actions');
+  if (actions.status === 200) {
+    const cutoff = addDays(today, -3);
+    const old = (actions.json.items ?? [])
+      .filter((i) => i.type === 'overtime' && i.workDate < cutoff)
+      .map((i) => i.id);
+    let decided = 0;
+    for (let i = 0; i < old.length; i += 100) {
+      const r = await call('POST', '/owner/actions/bulk', {
+        type: 'overtime',
+        ids: old.slice(i, i + 100),
+        decision: 'approve',
+      });
+      if (r.status === 200) decided += old.slice(i, i + 100).length;
+      else console.warn(`overtime bulk: ${r.status} ${r.json?.error?.code ?? ''}`);
+    }
+    console.info(`Approved overtime on ${decided} older day(s).`);
+  } else {
+    console.warn(`owner actions: ${actions.status} (attendance API not ready?)`);
+  }
   const lastMonth = addDays(`${today.slice(0, 7)}-01`, -1).slice(0, 7);
   const run = await call('POST', '/owner/payroll-runs', { month: lastMonth });
   if (run.status !== 201 && run.status !== 200) {
