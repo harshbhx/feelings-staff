@@ -1,60 +1,32 @@
 /**
  * Status vocabulary for owner screens (PRD 12.3): every status is colour + icon + word, never colour
- * alone. These helpers map contract values to a tone, a Phosphor icon name, a short letter and an
- * i18n key; the components (StatusChip, register cells) only draw them.
+ * alone. These helpers map contract values to the kit's StatusChip status (which carries the colour
+ * and the icon), a register letter and an `owner:status.*` word.
  */
-import type {
-  DayStatus,
-  DayTag,
-  LeaveCode,
-  PunchStatus,
-  RiskReason,
-  RosterCell,
-} from '@fs/contracts';
+import type { DayStatus, DayTag, LeaveCode, PunchStatus, RiskReason } from '@fs/contracts';
+import type { DayStatus as ChipStatus, IconName } from '@fs/ui';
 
-/** Tones match the app tokens `--status-*` (PRD 12.3). `pending` is white with a dashed border. */
-export type StatusTone =
-  | 'present'
-  | 'late'
-  | 'half'
-  | 'absent'
-  | 'leave'
-  | 'off'
-  | 'flag'
-  | 'pending';
-
-/** Phosphor regular icons used for statuses (PRD 12.7 set). */
-export type StatusIcon =
-  | 'check-circle'
-  | 'clock'
-  | 'circle-half'
-  | 'x-circle'
-  | 'airplane-tilt'
-  | 'minus'
-  | 'confetti'
-  | 'warning-circle'
-  | 'hourglass'
-  | 'map-pin';
+export type { ChipStatus };
 
 export interface StatusMeta {
-  tone: StatusTone;
-  icon: StatusIcon;
-  /** Short code shown in grid cells (P, H, A, L, WO, HO). */
+  /** The kit StatusChip status: colour, tint and icon. */
+  chip: ChipStatus;
+  /** Short code for grid cells (P, H, A, L, WO, HO, OD); empty for tags. */
   letter: string;
   /** `owner:status.*` key with the word. */
   labelKey: string;
 }
 
 const DAY: Record<DayStatus, StatusMeta> = {
-  P: { tone: 'present', icon: 'check-circle', letter: 'P', labelKey: 'owner:status.P' },
-  H: { tone: 'half', icon: 'circle-half', letter: 'H', labelKey: 'owner:status.H' },
-  A: { tone: 'absent', icon: 'x-circle', letter: 'A', labelKey: 'owner:status.A' },
-  L: { tone: 'leave', icon: 'airplane-tilt', letter: 'L', labelKey: 'owner:status.L' },
-  LOP: { tone: 'leave', icon: 'airplane-tilt', letter: 'L', labelKey: 'owner:status.LOP' },
-  WO: { tone: 'off', icon: 'minus', letter: 'WO', labelKey: 'owner:status.WO' },
-  HO: { tone: 'off', icon: 'confetti', letter: 'HO', labelKey: 'owner:status.HO' },
-  NE: { tone: 'off', icon: 'minus', letter: '–', labelKey: 'owner:status.NE' },
-  OPEN: { tone: 'pending', icon: 'hourglass', letter: 'In', labelKey: 'owner:status.OPEN' },
+  P: { chip: 'present', letter: 'P', labelKey: 'owner:status.P' },
+  H: { chip: 'half', letter: 'H', labelKey: 'owner:status.H' },
+  A: { chip: 'absent', letter: 'A', labelKey: 'owner:status.A' },
+  L: { chip: 'leave', letter: 'L', labelKey: 'owner:status.L' },
+  LOP: { chip: 'leave', letter: 'L', labelKey: 'owner:status.LOP' },
+  WO: { chip: 'off', letter: 'WO', labelKey: 'owner:status.WO' },
+  HO: { chip: 'holiday', letter: 'HO', labelKey: 'owner:status.HO' },
+  NE: { chip: 'off', letter: '–', labelKey: 'owner:status.NE' },
+  OPEN: { chip: 'waiting', letter: 'In', labelKey: 'owner:status.OPEN' },
 };
 
 export function dayStatusMeta(status: DayStatus): StatusMeta {
@@ -62,38 +34,16 @@ export function dayStatusMeta(status: DayStatus): StatusMeta {
 }
 
 /** At a venue (off-site) shows as OD in plum with a pin (PRD 12.3). */
-export const VENUE_META: StatusMeta = {
-  tone: 'leave',
-  icon: 'map-pin',
-  letter: 'OD',
-  labelKey: 'owner:status.OD',
-};
-
-export const LATE_META: StatusMeta = {
-  tone: 'late',
-  icon: 'clock',
-  letter: '',
-  labelKey: 'owner:status.late',
-};
-
-export const FLAG_META: StatusMeta = {
-  tone: 'flag',
-  icon: 'warning-circle',
-  letter: '',
-  labelKey: 'owner:status.flagged',
-};
-
+export const VENUE_META: StatusMeta = { chip: 'venue', letter: 'OD', labelKey: 'owner:status.OD' };
+export const LATE_META: StatusMeta = { chip: 'late', letter: '', labelKey: 'owner:status.late' };
+export const FLAG_META: StatusMeta = { chip: 'flag', letter: '', labelKey: 'owner:status.flagged' };
 export const PENDING_META: StatusMeta = {
-  tone: 'pending',
-  icon: 'hourglass',
+  chip: 'waiting',
   letter: '',
   labelKey: 'owner:status.pending',
 };
 
-/**
- * The meta for a register cell: present days spent at a venue read as OD, flagged or pending days
- * keep their status but carry the tag separately.
- */
+/** A register cell: present days spent at a venue read as OD; tags are drawn separately. */
 export function cellMeta(status: DayStatus, tags: readonly DayTag[]): StatusMeta {
   if (status === 'P' && tags.includes('offsite')) return VENUE_META;
   return DAY[status];
@@ -106,41 +56,48 @@ export function punchStatusMeta(status: PunchStatus): StatusMeta | null {
     case 'pending':
       return PENDING_META;
     case 'rejected':
-      return {
-        tone: 'absent',
-        icon: 'x-circle',
-        letter: '',
-        labelKey: 'owner:status.rejected',
-      };
+      return { chip: 'absent', letter: '', labelKey: 'owner:status.rejected' };
     default:
       return null;
   }
 }
+
+/** Tint and text classes per chip status, for register and roster cells drawn as table cells. */
+export const TINT: Record<ChipStatus, string> = {
+  present: 'bg-present-bg text-present',
+  late: 'bg-late-bg text-late',
+  half: 'bg-half-bg text-half',
+  absent: 'bg-absent-bg text-absent',
+  leave: 'bg-leave-bg text-leave',
+  off: 'bg-off-bg text-off',
+  holiday: 'bg-off-bg text-off',
+  flag: 'bg-flag-bg text-flag',
+  waiting: 'bg-bg text-flag outline-1 outline-border-control outline-dashed -outline-offset-1',
+  venue: 'bg-leave-bg text-leave',
+};
+
+export const CHIP_ICON: Record<ChipStatus, IconName> = {
+  present: 'check-circle',
+  late: 'clock',
+  half: 'circle-half',
+  absent: 'x-circle',
+  leave: 'airplane-tilt',
+  off: 'minus',
+  holiday: 'confetti',
+  flag: 'warning-circle',
+  waiting: 'hourglass',
+  venue: 'map-pin',
+};
 
 /** `owner:leave.CL` etc. */
 export function leaveKey(code: LeaveCode): string {
   return `owner:leave.${code}`;
 }
 
-/** Risk reasons in words (S-05.4); positive signals are listed separately. */
+/** Signals that lower the score (shown as reassurance, not as a reason to worry). */
 export const POSITIVE_SIGNALS: readonly RiskReason[] = ['salon_network', 'door_qr', 'offsite_duty'];
 
+/** Risk reasons in words (S-05.4). */
 export function riskKey(reason: RiskReason): string {
   return `owner:risk.${reason}`;
-}
-
-/** Roster cell vocabulary (PRD 5.2 Roster: template, WO, HO, L, duty). */
-export function rosterCellMeta(cell: RosterCell): StatusMeta | null {
-  switch (cell.kind) {
-    case 'WO':
-      return DAY.WO;
-    case 'HO':
-      return DAY.HO;
-    case 'L':
-      return DAY.L;
-    case 'NE':
-      return DAY.NE;
-    default:
-      return null;
-  }
 }

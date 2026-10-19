@@ -4,19 +4,9 @@
  * Managers see only what their permissions allow (PRD 10.2).
  */
 import type { Me, Permission } from '@fs/contracts';
+import type { IconName } from '@fs/ui';
 
-export type NavIcon =
-  | 'calendar-check'
-  | 'warning-circle'
-  | 'calendar-blank'
-  | 'users'
-  | 'dots'
-  | 'currency-inr'
-  | 'clock'
-  | 'chart-bar'
-  | 'bell'
-  | 'qr-code'
-  | 'gear';
+export type NavIcon = IconName;
 
 export interface NavItem {
   key: string;
@@ -111,7 +101,7 @@ export const MORE_TAB: NavItem = {
   key: 'more',
   to: '/o/more',
   labelKey: 'owner:nav.more',
-  icon: 'dots',
+  icon: 'dots-three',
 };
 
 export function allowed(item: NavItem, me: Me | null | undefined): boolean {

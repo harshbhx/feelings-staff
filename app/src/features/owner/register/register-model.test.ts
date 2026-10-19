@@ -16,7 +16,7 @@ const row = view.rows[0];
 if (!row) throw new Error('register fixture has rows');
 
 describe('Register model (O-05)', () => {
-  it('O-05.1 every staff x day cell has a letter, an icon and a tone (future days blank)', () => {
+  it('O-05.1 every staff x day cell has a letter, a status (colour + icon) and a word (future days blank)', () => {
     for (const r of view.rows) {
       expect(r.cells).toHaveLength(view.dates.length);
       r.cells.forEach((c, i) => {
@@ -24,8 +24,8 @@ describe('Register model (O-05)', () => {
         if (c.future) expect(m.meta).toBeNull();
         else {
           expect(m.meta?.letter).toBeTruthy();
-          expect(m.meta?.icon).toBeTruthy();
-          expect(m.meta?.tone).toBeTruthy();
+          expect(m.meta?.chip).toBeTruthy();
+          expect(m.meta?.labelKey).toMatch(/^owner:status\./);
         }
       });
     }
