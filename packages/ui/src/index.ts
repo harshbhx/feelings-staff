@@ -26,6 +26,15 @@ export {
   type ChipProps,
   type ChipRadioGroupProps,
 } from './components/Chip';
+export {
+  Checkbox,
+  type CheckboxProps,
+  RadioGroup,
+  type RadioGroupProps,
+  type RadioOption,
+  Switch,
+  type SwitchProps,
+} from './components/Choice';
 export { EmptyState, type EmptyStateProps } from './components/EmptyState';
 export {
   Field,
@@ -39,8 +48,22 @@ export {
   type TextareaProps,
   useFieldContext,
 } from './components/Field';
+export {
+  CodeField,
+  type CodeFieldProps,
+  formatIndianMobile,
+  formatJoinCode,
+  normaliseJoinCode,
+  PhoneField,
+  type PhoneFieldProps,
+  parseTime24,
+  TimeField,
+  type TimeFieldProps,
+} from './components/FormattedInputs';
 export { List, type ListProps, ListRow, type ListRowProps } from './components/ListRow';
 export { PinPad, type PinPadProps } from './components/PinPad';
+export { Popover, type PopoverProps, Tooltip, type TooltipProps } from './components/Popover';
+export { Select, type SelectOption, type SelectProps } from './components/Select';
 export { Sheet, type SheetProps } from './components/Sheet';
 export {
   Skeleton,
@@ -55,7 +78,9 @@ export {
   StatusChip,
   type StatusChipProps,
 } from './components/StatusChip';
+export { Stepper, type StepperProps } from './components/Stepper';
 export { TabBar, TabBarItem, type TabBarItemProps, type TabBarProps } from './components/TabBar';
+export { type TabItem, Tabs, type TabsProps } from './components/Tabs';
 export {
   Toast,
   type ToastAction,

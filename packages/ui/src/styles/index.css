@@ -29,6 +29,7 @@
 @import "./components/tabbar.css";
 @import "./components/pinpad.css";
 @import "./components/feedback.css";
+@import "./components/controls.css";
 
 /* Scan the app and this package for class names (the Vite root is app/). */
 @source "../";
