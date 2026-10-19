@@ -33,7 +33,7 @@ export async function createServices(env: Env): Promise<Services> {
     days: createDayService(),
     payroll: createPayrollService(),
     pdf: createPdfRenderer(),
-    push: createPushSender(),
+    push: createPushSender(env),
     email: createEmailSender(),
     maps: createMapsResolver(),
     outbox: createOutbox(),
