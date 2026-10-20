@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { usePayrollRuns, useStartPayroll } from '../api/payroll';
-import { Section, Tag } from '../components/layout';
+import { Tag } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { money, monthLabel, shortDate, todayIst } from '../lib/format';
 import { firstDraftDate, runWord, startableMonth } from './run-model';
@@ -35,14 +35,13 @@ export function PayrollListScreen() {
         {(list) => (
           <>
             <StartPayroll month={startableMonth(list, today)} />
-            <Section title={t('owner:screens.payroll')}>
-              <List>
-                <SoFarRow month={thisMonth} />
-                {list.map((run) => (
-                  <RunRow key={run.id} run={run} />
-                ))}
-              </List>
-            </Section>
+            {/* The top bar already says Payroll: no second heading on a one-list page (WP-10). */}
+            <List>
+              <SoFarRow month={thisMonth} />
+              {list.map((run) => (
+                <RunRow key={run.id} run={run} />
+              ))}
+            </List>
           </>
         )}
       </QueryView>

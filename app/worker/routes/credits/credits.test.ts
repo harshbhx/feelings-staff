@@ -622,6 +622,60 @@ describe('O-29.3 the balance carries over between months', () => {
   });
 });
 
+describe('O-29.3 example 14: a minus balance is never cut on its own', () => {
+  it('O-29.3 -85 settled at 0 leaves the salary alone, carries over and grows by the next late', async () => {
+    await example13();
+    // Priya is at +50 after example 13; -135 on top brings the October ledger to Kajal's -85.
+    const adj = await callJson<CreditAdjustment>('POST', `/owner/credits/${priya.id}/adjustments`, {
+      cookie: owner,
+      body: { workDate: '2026-10-03', kind: 'late', deltaMin: -135, reason: 'example 14 balance' },
+    });
+    expect(adj.status).toBe(201);
+    const before = (await overview()).staff[0];
+    expect(before?.balanceMin).toBe(-85);
+    expect(before?.estimatePaise ?? 0).toBeLessThan(0);
+
+    const run = await startOctober();
+    const view = await callJson<CreditsSettleView>('GET', `/owner/payroll-runs/${run}/credits`, {
+      cookie: owner,
+    });
+    expect(view.body.rows).toEqual([
+      expect.objectContaining({
+        userId: priya.id,
+        balanceMin: -85,
+        suggestedMin: -85,
+        settleMin: 0,
+        appliedMin: 0,
+        amountPaise: 0,
+        stayMin: -85,
+      }),
+    ]);
+    const zero = await settle(run, 0);
+    expect(zero.status).toBe(200);
+    expect(zero.body.lines.some((l) => l.code === 'time_credits')).toBe(false);
+
+    await callJson<PayrollRunView>('POST', `/owner/payroll-runs/${run}/finalise`, {
+      cookie: stepUp,
+      body: { acceptDefaults: true },
+    });
+    expect((await overview()).staff[0]?.balanceMin).toBe(-85);
+
+    // The next month adds to it (10:20 is 20 minutes late), no reset.
+    await setClock(Date.UTC(2026, 10, 10, 5, 0));
+    await addPunches(
+      priya.id,
+      '2026-11-04',
+      [
+        ['in', '10:20'],
+        ['out', '20:00'],
+      ],
+      'accepted',
+    );
+    await recompute('2026-11-04');
+    expect((await overview()).staff[0]?.balanceMin).toBe(-105);
+  });
+});
+
 describe('O-29.11 Time credits can only be switched with the owner PIN', () => {
   it('O-29.11 changing the enabled flag needs step-up; the start date does not', async () => {
     const plain = await call('PATCH', '/owner/settings', {

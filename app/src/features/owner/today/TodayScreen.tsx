@@ -6,13 +6,17 @@
 import type { TodayBoard } from '@fs/contracts';
 import {
   Avatar,
+  Badge,
   Button,
-  ChipGroup,
   Icon,
   List,
   ListRow,
+  ProgressStrip,
   Skeleton,
   SkeletonGroup,
+  StatChipGroup,
+  type StatOption,
+  type StatTone,
   StatusChip,
 } from '@fs/ui';
 import type { TFunction } from 'i18next';
@@ -20,7 +24,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useTodayBoard } from '../api/attendance';
-import { CHIPS_WRAP, Meta, Section, Tag, useNow, WRAP_ROW } from '../components/layout';
+import { Meta, Section, useNow, WRAP_ROW } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { clock, dayLabel, duration } from '../lib/format';
 import { telLink, waLink } from '../lib/share';
@@ -32,9 +36,19 @@ import {
   boardModel,
   COUNTER_ORDER,
   type CounterKey,
-  headlineParts,
+  dayProgress,
   liveWorkedMin,
 } from './today-model';
+
+/** Each counter's tint and icon (PRD 12.3). Not in yet waits; it is not an absence. */
+const COUNTER_TONE: Record<CounterKey, { tone: StatTone; icon?: StatOption['icon'] }> = {
+  present: { tone: 'present' },
+  late: { tone: 'late' },
+  notInYet: { tone: 'waiting', icon: 'hourglass' },
+  onLeave: { tone: 'leave' },
+  weekOff: { tone: 'off' },
+  atVenue: { tone: 'venue' },
+};
 
 export function TodayScreen() {
   const board = useTodayBoard();
@@ -65,14 +79,42 @@ function Board({ board }: { board: TodayBoard }) {
     );
   }
 
-  const options = [
-    { value: 'all', label: t('owner:common.everyone') },
-    ...COUNTER_ORDER.map((key) => ({
+  const p = dayProgress(board);
+  // Zero counts stay out of the way, unless that filter is the one on.
+  const options: StatOption[] = [
+    { value: 'all', label: t('owner:today.stats.all'), count: p.everyone },
+    ...COUNTER_ORDER.filter(
+      (key) => key === 'present' || board.counters[key] > 0 || filter === key,
+    ).map((key) => ({
       value: key,
-      label: t(`owner:today.counters.${key}`),
+      label: t(`owner:today.stats.${key}`),
       count: board.counters[key],
+      ...COUNTER_TONE[key],
     })),
   ];
+  const stripParts = [
+    {
+      key: 'onTime',
+      value: p.onTime,
+      tone: 'present' as const,
+      label: t('owner:today.strip.onTime', { count: p.onTime }),
+    },
+    {
+      key: 'late',
+      value: p.late,
+      tone: 'late' as const,
+      label: t('owner:today.headline.late', { count: p.late }),
+    },
+    {
+      key: 'notInYet',
+      value: p.notInYet,
+      tone: 'waiting' as const,
+      label: t('owner:today.headline.notInYet', { count: p.notInYet }),
+    },
+  ];
+  const dueLaterPart =
+    p.dueLater > 0 ? [t('owner:today.strip.dueLater', { count: p.dueLater })] : [];
+  const progressLabel = t('owner:today.progress', { in: p.inCount, total: p.total });
 
   const lists = (
     <>
@@ -151,7 +193,7 @@ function Board({ board }: { board: TodayBoard }) {
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
-      <div className="grid gap-1">
+      <div className="grid gap-2">
         <Meta>{dayMeta}</Meta>
         {m.mode.kind === 'before' ? (
           <p className="font-extrabold text-text text-xl tracking-display">
@@ -160,22 +202,26 @@ function Board({ board }: { board: TodayBoard }) {
               : t('owner:today.beforeNoShift')}
           </p>
         ) : (
-          <p
-            className="font-extrabold text-2xl text-text tracking-display"
-            data-testid="today-headline"
-          >
-            {headlineParts(board).map((p, i) => (
-              <span key={p.key}>
-                {i > 0 ? <span className="text-text-muted"> · </span> : null}
-                <span className="whitespace-nowrap">{t(p.key, { count: p.count })}</span>
-              </span>
-            ))}
-          </p>
+          <ProgressStrip
+            size="lg"
+            label={<span data-testid="today-headline">{progressLabel}</span>}
+            total={p.total}
+            legend={false}
+            segments={stripParts}
+            description={t('owner:today.progressDesc', {
+              in: p.inCount,
+              total: p.total,
+              parts: [
+                ...stripParts.filter((x) => x.value > 0).map((x) => x.label),
+                ...dueLaterPart,
+              ].join(', '),
+            })}
+          />
         )}
       </div>
 
       {board.actionsCount > 0 ? (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-md border border-border bg-bg-soft px-4 py-3">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-md border border-border-strong bg-bg-soft px-4 py-3">
           <Icon name="warning-circle" className="size-6 shrink-0 text-accent" />
           <p className="min-w-0 flex-1 basis-48 font-bold text-text">
             {t('owner:today.needsAction', { count: board.actionsCount })}
@@ -186,16 +232,15 @@ function Board({ board }: { board: TodayBoard }) {
         </div>
       ) : null}
 
-      <ChipGroup
-        type="radio"
-        legend={t('owner:today.counters.label')}
-        legendHidden
-        layout="scroll"
-        className={CHIPS_WRAP}
-        options={options}
-        value={filter ?? 'all'}
-        onValueChange={(v) => setFilter(v === 'all' ? null : (v as CounterKey))}
-      />
+      <div className="xl:sticky xl:top-16 xl:z-20 xl:-my-3 xl:bg-bg xl:py-3">
+        <StatChipGroup
+          legend={t('owner:today.counters.label')}
+          legendHidden
+          options={options}
+          value={filter ?? 'all'}
+          onValueChange={(v) => setFilter(v === 'all' ? null : (v as CounterKey))}
+        />
+      </div>
 
       {nothing ? (
         <Empty
@@ -210,7 +255,7 @@ function Board({ board }: { board: TodayBoard }) {
       ) : (
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] xl:items-start xl:gap-12">
           <div className="grid grid-cols-[minmax(0,1fr)] gap-8">{lists}</div>
-          <div className="grid grid-cols-[minmax(0,1fr)] gap-8">{side}</div>
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-8 xl:sticky xl:top-36">{side}</div>
         </div>
       )}
     </div>
@@ -222,13 +267,29 @@ function placeTag(row: BoardInRow, t: TFunction) {
     case 'venue':
       return <StatusChip status="venue" label={row.placeName ?? t('owner:place.venue')} />;
     case 'edge':
-      return <Tag>{t('owner:place.edge')}</Tag>;
+      return (
+        <Badge tone="warning" icon="warning-circle">
+          {t('owner:place.edge')}
+        </Badge>
+      );
     case 'inside':
-      return <Tag>{t('owner:place.inside')}</Tag>;
+      return (
+        <Badge tone="success" icon="map-pin">
+          {t('owner:place.inside')}
+        </Badge>
+      );
     case 'offline':
-      return <Tag>{t('owner:place.offline')}</Tag>;
+      return (
+        <Badge tone="neutral" icon="wifi-slash">
+          {t('owner:place.offline')}
+        </Badge>
+      );
     case 'owner':
-      return <Tag>{t('owner:place.owner')}</Tag>;
+      return (
+        <Badge tone="outline" icon="pencil-simple">
+          {t('owner:place.owner')}
+        </Badge>
+      );
   }
 }
 
@@ -253,8 +314,8 @@ function InRow({ row, date, worked }: { row: BoardInRow; date: string; worked: n
           {times} · {hours}
         </span>
       }
-      trailing={
-        <span className="flex flex-wrap justify-end gap-1.5">
+      meta={
+        <>
           {row.lateMin > 0 ? (
             <StatusChip
               status="late"
@@ -266,8 +327,8 @@ function InRow({ row, date, worked }: { row: BoardInRow; date: string; worked: n
           {row.pending ? (
             <StatusChip status="waiting" label={t('owner:today.row.pending')} />
           ) : null}
-          <span className="hidden sm:inline-flex">{placeTag(row, t)}</span>
-        </span>
+          {placeTag(row, t)}
+        </>
       }
     >
       <Link to={`/o/register/${row.user.id}/${date}`} />
@@ -341,14 +402,15 @@ function AwayRow({ row }: { row: BoardAwayRow }) {
 function TodaySkeleton() {
   return (
     <div className="grid gap-6">
-      <SkeletonGroup className="grid gap-2">
+      <SkeletonGroup className="grid gap-3">
         <Skeleton width="11rem" />
-        <Skeleton width="min(22rem, 90%)" height="2.25rem" />
+        <Skeleton width="min(14rem, 70%)" height="2.25rem" />
+        <Skeleton height="0.5rem" />
       </SkeletonGroup>
       <SkeletonGroup className="flex gap-2 overflow-hidden">
-        {[5, 6, 7, 6, 6, 7].map((w, i) => (
+        {[8, 6, 6, 9, 8].map((w, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder chips
-          <Skeleton key={i} shape="pill" width={`${w}rem`} height="2.75rem" />
+          <Skeleton key={i} shape="pill" width={`${w}rem`} height="3rem" />
         ))}
       </SkeletonGroup>
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] xl:gap-12">

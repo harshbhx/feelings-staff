@@ -36,6 +36,7 @@ import mePatch from './mePatch.json';
 import mePayslip from './mePayslip.json';
 import mePayslips_empty from './mePayslips.empty.json';
 import mePayslips from './mePayslips.json';
+import mePresence_consentNeeded from './mePresence.consent-needed.json';
 import mePresence from './mePresence.json';
 import mePresence_markedAway from './mePresence.marked-away.json';
 import mePresence_steppedOut from './mePresence.stepped-out.json';
@@ -55,6 +56,7 @@ import notificationPrefsPut from './notificationPrefsPut.json';
 import notificationsList_empty from './notificationsList.empty.json';
 import notificationsList from './notificationsList.json';
 import notificationsList_owner from './notificationsList.owner.json';
+import ownerActions_away from './ownerActions.away.json';
 import ownerActions_empty from './ownerActions.empty.json';
 import ownerActions from './ownerActions.json';
 import ownerActionsBulk from './ownerActionsBulk.json';
@@ -70,6 +72,7 @@ import ownerAudit from './ownerAudit.json';
 import ownerAutoCloseDecide from './ownerAutoCloseDecide.json';
 import ownerAwayDecide from './ownerAwayDecide.json';
 import ownerAwayList from './ownerAwayList.json';
+import ownerAwayList_open from './ownerAwayList.open.json';
 import ownerAwayPatch from './ownerAwayPatch.json';
 import ownerBlackoutCreate from './ownerBlackoutCreate.json';
 import ownerBlackoutList from './ownerBlackoutList.json';
@@ -123,7 +126,9 @@ import ownerPresenceDay from './ownerPresenceDay.json';
 import ownerPunchReview from './ownerPunchReview.json';
 import ownerRegister from './ownerRegister.json';
 import ownerRegularisationDecide from './ownerRegularisationDecide.json';
+import ownerRollCallGet_empty from './ownerRollCallGet.empty.json';
 import ownerRollCallGet from './ownerRollCallGet.json';
+import ownerRollCallGet_open from './ownerRollCallGet.open.json';
 import ownerRollCallSubmit from './ownerRollCallSubmit.json';
 import ownerRollCalls from './ownerRollCalls.json';
 import ownerRosterGet from './ownerRosterGet.json';
@@ -154,6 +159,8 @@ import ownerStaffResetPin from './ownerStaffResetPin.json';
 import ownerToday_beforeFirstShift from './ownerToday.before-first-shift.json';
 import ownerToday_holiday from './ownerToday.holiday.json';
 import ownerToday from './ownerToday.json';
+import ownerToday_rollCallMissed from './ownerToday.roll-call-missed.json';
+import ownerToday_rollCallOpen from './ownerToday.roll-call-open.json';
 import ownerVerify from './ownerVerify.json';
 import presenceBack from './presenceBack.json';
 import presenceCheck from './presenceCheck.json';
@@ -360,6 +367,7 @@ export const variants: Partial<Record<EndpointKey, Record<string, unknown>>> = {
   },
   mePresence: {
     'stepped-out': mePresence_steppedOut,
+    'consent-needed': mePresence_consentNeeded,
     'marked-away': mePresence_markedAway,
   },
   notificationsList: {
@@ -369,9 +377,19 @@ export const variants: Partial<Record<EndpointKey, Record<string, unknown>>> = {
   ownerToday: {
     'before-first-shift': ownerToday_beforeFirstShift,
     holiday: ownerToday_holiday,
+    'roll-call-open': ownerToday_rollCallOpen,
+    'roll-call-missed': ownerToday_rollCallMissed,
   },
   ownerActions: {
     empty: ownerActions_empty,
+    away: ownerActions_away,
+  },
+  ownerAwayList: {
+    open: ownerAwayList_open,
+  },
+  ownerRollCallGet: {
+    open: ownerRollCallGet_open,
+    empty: ownerRollCallGet_empty,
   },
   ownerPayrollGet: {
     finalised: ownerPayrollGet_finalised,

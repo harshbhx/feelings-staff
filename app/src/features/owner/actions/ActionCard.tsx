@@ -55,7 +55,7 @@ export function ActionCard({
 
   return (
     <li
-      className="grid gap-3 border-border border-t py-4 first:border-t-0"
+      className="grid gap-3 border-border border-t px-(--card-pad) py-4 first:border-t-0"
       data-testid={`action-${item.type}`}
     >
       <div className="flex items-start gap-3">
@@ -83,7 +83,7 @@ export function ActionCard({
           </p>
         </div>
       </div>
-      <div className="grid gap-3 xl:pl-13">
+      <div className={`grid gap-3 ${selectable ? 'sm:pl-22' : 'sm:pl-13'}`}>
         <Body item={item} />
         <Actions item={item} busy={busy} run={run} />
       </div>

@@ -105,14 +105,47 @@
     margin-inline: auto;
   }
 
-  /* The live hours and big times: 800, tabular, at most 56 px on phones (PRD 12.4). */
+  /* The live hours and big times: 800, tabular, the full 56 px on phones (PRD 12.4, WP-10). */
   .staff-bignum {
-    font-size: min(var(--text-3xl), 3.5rem);
+    font-size: 3.5rem;
     font-weight: var(--weight-display);
     line-height: var(--leading-tight);
     letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
     color: var(--text);
+  }
+
+  /* Check-in success (WP-10): a present-tint disc with the check; it scales in once. */
+  .staff-success-check {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--status-present-bg);
+    color: var(--status-present);
+  }
+
+  .staff-success-check > .fs-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .staff-success-check[data-land] {
+    animation: staff-check-in var(--dur-enter) var(--ease-soft) both;
+  }
+
+  @keyframes staff-check-in {
+    from {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .staff-success-check[data-land] {
+      animation: none;
+    }
   }
 
   /* A hairline card (PRD 12.5): white, 1 px border, radius md, no shadow. */
