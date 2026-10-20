@@ -21,8 +21,9 @@ test.describe('stale chunk recovery', () => {
     await reset('basic-salon');
     let blocked = 0;
     let navigations = 0;
-    page.on('framenavigated', (frame) => {
-      if (frame === page.mainFrame()) navigations += 1;
+    // `load` fires for real page loads only (not for in-app route changes).
+    page.on('load', () => {
+      navigations += 1;
     });
     // Block the sign-in screen's lazy chunk for the first request only: the "deleted file" case.
     await page.route(/\/assets\/sign-in[^/]*\.js$/i, (route) => {
