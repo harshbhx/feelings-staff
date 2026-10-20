@@ -363,8 +363,9 @@ function Body({ item }: { item: ActionItem }) {
   }
 }
 
+/** On phones the buttons share each line (Approve | Reject), so every target is wide and lined up. */
 function Row({ children }: { children: ReactNode }) {
-  return <div className="flex flex-wrap gap-2">{children}</div>;
+  return <div className="flex flex-wrap gap-2 max-sm:*:grow">{children}</div>;
 }
 
 function Actions({

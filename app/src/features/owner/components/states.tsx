@@ -61,8 +61,14 @@ export function ErrorCard({ error, onRetry }: { error: unknown; onRetry?: () => 
         </div>
       ) : null}
       {requestId ? (
-        <details className="text-sm text-text-muted">
-          <summary className="cursor-pointer">{t('owner:common.details')}</summary>
+        <details className="group text-sm text-text-muted">
+          <summary className="-my-2 inline-flex min-h-11 cursor-pointer list-none items-center gap-1 [&::-webkit-details-marker]:hidden">
+            {t('owner:common.details')}
+            <Icon
+              name="caret-down"
+              className="size-4 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+            />
+          </summary>
           <p className="mt-1 tabular-nums">{t('owner:common.requestId', { id: requestId })}</p>
         </details>
       ) : null}

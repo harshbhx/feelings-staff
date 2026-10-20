@@ -413,7 +413,13 @@ function TodaySkeleton() {
         <Skeleton width="min(14rem, 70%)" height="2.25rem" />
         <Skeleton height="0.5rem" />
       </SkeletonGroup>
-      <SkeletonGroup className="flex gap-2 overflow-hidden">
+      {/* Phones show the counts as tiles (StatChipGroup `tiles`), wider screens as pills. */}
+      <SkeletonGroup className="grid grid-cols-3 gap-2 md:hidden">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <Skeleton key={i} shape="block" height="3.75rem" />
+        ))}
+      </SkeletonGroup>
+      <SkeletonGroup className="hidden gap-2 overflow-hidden md:flex">
         {[8, 6, 6, 9, 8].map((w, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder chips
           <Skeleton key={i} shape="pill" width={`${w}rem`} height="3rem" />

@@ -253,7 +253,10 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
                   onClick={() => openPerson(row.user.id)}
                   className="-mx-1 flex min-h-11 w-[calc(100%+0.5rem)] items-center rounded-sm px-1 text-left xl:hidden"
                 >
-                  <span className="block truncate">{row.user.name}</span>
+                  {/* Two short lines ("Meena / Chavda") instead of "Meena Cha…" on phones. */}
+                  <span className="line-clamp-2 leading-snug [overflow-wrap:anywhere]">
+                    {row.user.name}
+                  </span>
                   <span className="sr-only">{t('owner:register.openMonth')}</span>
                 </button>
                 <span className="hidden truncate xl:block">{row.user.name}</span>

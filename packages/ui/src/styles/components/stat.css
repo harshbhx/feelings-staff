@@ -82,6 +82,73 @@
     flex: none;
   }
 
+  /*
+   * Tiles (phones): every count stays in view, three to a row (two when there are two or four),
+   * the icon and number on top and the word under them. From 48rem the pills wrap as usual.
+   */
+  @media (max-width: 47.99rem) {
+    .fs-stat-group__items[data-layout="tiles"] {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .fs-stat-group__items[data-layout="tiles"]:is(
+        :has(> :last-child:nth-child(2)),
+        :has(> :last-child:nth-child(4))
+      ) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .fs-stat-group__items[data-layout="tiles"] > .fs-stat {
+      min-width: 0;
+    }
+
+    /* Tiles take the full width even when the group sits in a flex row (Credits: counts and sort). */
+    .fs-stat-group:has(> .fs-stat-group__items[data-layout="tiles"]) {
+      flex: 1 1 100%;
+      width: 100%;
+    }
+
+    .fs-stat-group__items[data-layout="tiles"] .fs-stat__face {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 0.25rem 0.5rem;
+      width: 100%;
+      min-height: 3.75rem;
+      padding: 0.5rem 0.625rem;
+      border-radius: var(--radius-md);
+    }
+
+    .fs-stat-group__items[data-layout="tiles"] .fs-stat__disc {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+
+    .fs-stat-group__items[data-layout="tiles"] .fs-stat__disc > .fs-icon {
+      width: 1.05rem;
+      height: 1.05rem;
+    }
+
+    /* The number and the word become grid items; the text node keeps the accessible name. */
+    .fs-stat-group__items[data-layout="tiles"] .fs-stat__text {
+      display: contents;
+    }
+
+    .fs-stat-group__items[data-layout="tiles"] .fs-stat__count {
+      line-height: 1;
+    }
+
+    .fs-stat-group__items[data-layout="tiles"] .fs-stat__label {
+      grid-column: 1 / -1;
+      margin-left: 0;
+      overflow: hidden;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
   .fs-stat__input {
     position: absolute;
     inset: 0;
