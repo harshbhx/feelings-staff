@@ -15,7 +15,7 @@ export function CreditLedgerScreen() {
   const overview = useCreditsOverview();
   const fromOverview = overview.data?.staff.find((s) => s.userId === userId)?.name;
   const staff = useStaff(userId);
-  const name = staff.data?.name ?? fromOverview ?? '';
+  const name = fromOverview ?? staff.data?.name ?? '';
   useOwnerTitle(name ? t('owner:credits.ledger.title', { name }) : null, '/o/credits');
   return <CreditLedger userId={userId} name={name} />;
 }
