@@ -17,10 +17,3 @@ export function usePresence() {
     retry: false,
   });
 }
-
-/** "Not now" on the notice holds until the app is opened again (4.18.1: at the next app open). */
-let noticeHeld = false;
-export const noticeDeferred = () => noticeHeld;
-export const deferNotice = () => {
-  noticeHeld = true;
-};

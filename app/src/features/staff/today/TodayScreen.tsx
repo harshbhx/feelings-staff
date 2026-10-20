@@ -29,7 +29,7 @@ import { useQueue } from '../../../pwa/queue';
 import { staffKeys, useOwnerName, useStaffMe, useToday } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
 import { useNow } from '../lib/use-now';
-import { deferNotice, noticeDeferred, presenceKey, usePresence } from '../presence/api';
+import { presenceKey, usePresence } from '../presence/api';
 import { presenceUi } from '../presence/presence-model';
 import type { FrozenSheet } from '../punch/frozen';
 import { ActionBar } from '../shell/ActionBar';
@@ -138,8 +138,6 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
   const [stepOutOpen, setStepOutOpen] = useState(false);
   const [stepOutMounted, setStepOutMounted] = useState(false);
   if (stepOutOpen && !stepOutMounted) setStepOutMounted(true);
-  const [noticeClosed, setNoticeClosed] = useState(noticeDeferred);
-  const noticeOpen = pres.askConsent && !noticeClosed && !sheetOpen;
   useEffect(() => {
     const id = setTimeout(() => void loadPunchSheet(), PRELOAD_SHEET_MS);
     return () => clearTimeout(id);
@@ -313,18 +311,14 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
         )}
       </ActionBar>
 
-      {stepOutMounted || (pres.askConsent && !noticeClosed) ? (
+      {stepOutMounted || pres.askConsent ? (
         <Suspense fallback={null}>
           <PresenceSheets
             stepOut={stepOutMounted}
             stepOutOpen={stepOutOpen}
             onStepOutOpenChange={setStepOutOpen}
-            notice={pres.askConsent && !noticeClosed}
-            noticeOpen={noticeOpen}
-            onNoticeClose={() => {
-              deferNotice();
-              setNoticeClosed(true);
-            }}
+            notice={pres.askConsent}
+            blocked={sheetOpen}
           />
         </Suspense>
       ) : null}
