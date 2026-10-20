@@ -115,6 +115,9 @@
     "startedAt": "Your shift started at {{time}}.",
     "canCheckInFrom": "You can check in from {{time}}.",
     "endsAt": "Your shift ends at {{time}}.",
+    "shiftTitle": "Your shift",
+    "shiftDesc": "Shift {{from}} to {{to}}, now {{now}}",
+    "shiftWorked": "worked from {{from}}",
     "weekOff": "Today is your week off.",
     "holiday": "Salon closed today ({{name}}).",
     "holidayNoName": "Salon closed today.",
@@ -122,6 +125,7 @@
     "onLeaveType": "{{type}} · approved",
     "notScheduled": "No shift today.",
     "lastPunch": "Last",
+    "recent": "Today so far",
     "punchIn": "In at {{time}}",
     "punchOut": "Out at {{time}}",
     "punchBreakStart": "Break from {{time}}",
@@ -480,7 +484,9 @@
     "sending": "Sending…",
     "sent": "Sent. {{owner}} will let you know.",
     "toBeforeFrom": "The last day can't be before the first day.",
-    "pickDates": "Pick the dates first."
+    "pickDates": "Pick the dates first.",
+    "splitNeeded": "Tick the box to confirm the unpaid days.",
+    "previewFailed": "We couldn't check these dates. You can still send."
   },
   "fix": {
     "kind": "What happened?",
@@ -500,7 +506,11 @@
     "timeRange": "Pick a time between 04:00 and 23:59.",
     "needTime": "Pick the time.",
     "needReason": "Write a short reason.",
-    "needPlace": "Write where you were."
+    "needPlace": "Write where you were.",
+    "needPunch": "Choose which time is wrong.",
+    "order": "The time you left must be after the time you arrived.",
+    "punchOption": "{{kind}} at {{time}}",
+    "noPunches": "No check-ins or check-outs on this day."
   },
   "payslips": {
     "row": "{{month}} · {{net}}",
@@ -527,7 +537,9 @@
     "deductions": "Deductions",
     "earnings": "Earnings",
     "days": "Days",
-    "loadError": "We couldn't load this payslip."
+    "loadError": "We couldn't load this payslip.",
+    "timeAdjustment": "Time adjustment",
+    "timeAdjustmentNote": "Settled by {{owner}} for {{month}}."
   },
   "me": {
     "role": "Role",
@@ -557,6 +569,7 @@
   "myData": {
     "lead": "What the app keeps about you, and for how long.",
     "punches": "Check-ins and check-outs",
+    "presence": "Presence",
     "punchRow": "{{kind}} · {{date}} {{time}}",
     "fence": {
       "pass": "Inside",
@@ -580,13 +593,22 @@
       "privacy_notice": "Privacy notice",
       "selfie": "Photo when you check in",
       "night_work": "Night work",
-      "fines_notice": "Fines notice"
+      "fines_notice": "Fines notice",
+      "presence_checks": "Roll-call during your shift"
     },
     "retention": "How long we keep things",
     "retentionLine": "Exact location {{location}} days · selfies {{selfie}} days · pay records {{wage}} years",
     "correction": "Ask for a correction",
     "grievance": "Questions or complaints about your data",
-    "grievanceLine": "{{name}} · {{phone}}"
+    "grievanceLine": "{{name}} · {{phone}}",
+    "kind": {
+      "in": "Check-in",
+      "out": "Check-out",
+      "break_start": "Break started",
+      "break_end": "Break ended"
+    },
+    "punchesNone": "No check-ins yet.",
+    "correctionText": "Hello {{owner}}, something in My data looks wrong:"
   },
   "privacy": {
     "lead": "Feelings Beauty Care uses this app to record attendance and pay. Here is what it keeps and why.",
@@ -595,10 +617,23 @@
     "h2": "When we check your location",
     "p2": "Only when you tap Check in or Check out. We never track you in the background and keep no route history.",
     "h3": "How long we keep it",
-    "p3": "Exact locations for 90 days, selfies for 30 days. Attendance and pay records for the years the law asks.",
+    "p3": "Exact locations for {{location}} days, selfies for {{selfie}} days. Attendance and pay records for the years the law asks.",
     "h4": "Who sees it",
     "p4": "{{owner}} and anyone she allows to manage attendance. We do not sell or share your data.",
     "h5": "Your rights",
-    "p5": "You can see your data in My data, ask for a correction, and ask {{owner}} any question about it."
+    "p5": "You can see your data in My data, ask for a correction, and ask {{owner}} any question about it.",
+    "choices": "Your choices",
+    "selfieOn": "You agreed to a photo when you check in. You can take that back.",
+    "selfieOff": "You took back your photo consent on {{date}}.",
+    "selfieNever": "You haven't been asked for a photo.",
+    "withdraw": "Take back photo consent",
+    "withdrawConfirm": "Stop sharing a photo when you check in? {{owner}} may ask you to check in another way.",
+    "withdrawn": "Photo consent withdrawn."
+  },
+  "presence": {
+    "stepOut": "Step out",
+    "back": {
+      "button": "I'm back"
+    }
   }
 }

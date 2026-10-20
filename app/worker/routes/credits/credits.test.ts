@@ -66,10 +66,11 @@ async function recompute(date: string): Promise<void> {
   expect(res.status).toBe(200);
 }
 
-async function enableCredits(cookie = owner): Promise<void> {
+/** The 1x examples run with the legal 2x guardrail off; its own suite turns it on. */
+async function enableCredits(cookie = stepUp, legalOt2x = false): Promise<void> {
   const res = await call('PATCH', '/owner/settings', {
     cookie,
-    body: { settings: { timeCredits: { startDate: '2026-10-01' } } },
+    body: { settings: { timeCredits: { startDate: '2026-10-01', legalOt2x } } },
   });
   expect(res.status).toBe(200);
 }
@@ -621,6 +622,60 @@ describe('O-29.3 the balance carries over between months', () => {
   });
 });
 
+describe('O-29.3 example 14: a minus balance is never cut on its own', () => {
+  it('O-29.3 -85 settled at 0 leaves the salary alone, carries over and grows by the next late', async () => {
+    await example13();
+    // Priya is at +50 after example 13; -135 on top brings the October ledger to Kajal's -85.
+    const adj = await callJson<CreditAdjustment>('POST', `/owner/credits/${priya.id}/adjustments`, {
+      cookie: owner,
+      body: { workDate: '2026-10-03', kind: 'late', deltaMin: -135, reason: 'example 14 balance' },
+    });
+    expect(adj.status).toBe(201);
+    const before = (await overview()).staff[0];
+    expect(before?.balanceMin).toBe(-85);
+    expect(before?.estimatePaise ?? 0).toBeLessThan(0);
+
+    const run = await startOctober();
+    const view = await callJson<CreditsSettleView>('GET', `/owner/payroll-runs/${run}/credits`, {
+      cookie: owner,
+    });
+    expect(view.body.rows).toEqual([
+      expect.objectContaining({
+        userId: priya.id,
+        balanceMin: -85,
+        suggestedMin: -85,
+        settleMin: 0,
+        appliedMin: 0,
+        amountPaise: 0,
+        stayMin: -85,
+      }),
+    ]);
+    const zero = await settle(run, 0);
+    expect(zero.status).toBe(200);
+    expect(zero.body.lines.some((l) => l.code === 'time_credits')).toBe(false);
+
+    await callJson<PayrollRunView>('POST', `/owner/payroll-runs/${run}/finalise`, {
+      cookie: stepUp,
+      body: { acceptDefaults: true },
+    });
+    expect((await overview()).staff[0]?.balanceMin).toBe(-85);
+
+    // The next month adds to it (10:20 is 20 minutes late), no reset.
+    await setClock(Date.UTC(2026, 10, 10, 5, 0));
+    await addPunches(
+      priya.id,
+      '2026-11-04',
+      [
+        ['in', '10:20'],
+        ['out', '20:00'],
+      ],
+      'accepted',
+    );
+    await recompute('2026-11-04');
+    expect((await overview()).staff[0]?.balanceMin).toBe(-105);
+  });
+});
+
 describe('O-29.11 Time credits can only be switched with the owner PIN', () => {
   it('O-29.11 changing the enabled flag needs step-up; the start date does not', async () => {
     const plain = await call('PATCH', '/owner/settings', {
@@ -686,5 +741,99 @@ describe('O-29.9 privacy: no staff route returns credits, balances or rupee valu
     expect(adj?.formula).toMatch(/^settled by .+ for extra time worked in Oct/);
     expect(slip.body.result.lines.some((l) => l.code === 'time_credits')).toBe(false);
     expect(JSON.stringify(slip.body)).not.toMatch(/min\b.*credit|credits/i);
+  });
+});
+
+describe('O-29.12 legal overtime at 2x (PRD 7.17.7, example 13: +170)', () => {
+  it('O-29.12 example 13: the 120 legal minutes count twice, balance +170, settled at Rs 152.33', async () => {
+    await enableCredits(stepUp, true);
+    await example13();
+    const rows = await entries();
+    expect(rows.filter((r) => r.kind === 'ot')).toEqual([
+      expect.objectContaining({ work_date: '2026-10-17', minutes: 120 }),
+    ]);
+    expect(rows.filter((r) => r.kind === 'ot_legal')).toEqual([
+      expect.objectContaining({ work_date: '2026-10-17', minutes: 120 }),
+    ]);
+    expect((await overview()).staff[0]?.balanceMin).toBe(170);
+    const ledger = await callJson<CreditLedger>('GET', `/owner/credits/${priya.id}/ledger`, {
+      cookie: owner,
+    });
+    expect(ledger.body.items.some((r) => r.kind === 'ot_legal')).toBe(true);
+
+    const run = await startOctober();
+    const set = await settle(run, 170);
+    expect(set.body.settlement).toMatchObject({
+      balanceMin: 170,
+      appliedMin: 170,
+      amountPaise: 15233,
+    });
+    expect(set.body.warnings.some((w) => w.code === 'legal_ot_2x')).toBe(true);
+  });
+
+  it('O-29.12 the CSV and the ledger label the rows "Legal overtime 2x"', async () => {
+    await enableCredits(stepUp, true);
+    await example13();
+    const res = await callJson<{ exportId: string }>('POST', '/owner/exports', {
+      cookie: stepUp,
+      body: { kind: 'credits_ledger', month: '2026-10', format: 'csv' },
+    });
+    await vi.waitFor(async () => {
+      const v = await callJson<ExportView>('GET', `/owner/exports/${res.body.exportId}`, {
+        cookie: stepUp,
+      });
+      expect(v.body.status).toBe('ready');
+    });
+    const file = await call('GET', `/owner/exports/${res.body.exportId}/file`, { cookie: owner });
+    expect(await file.text()).toContain('Legal overtime 2x,120,0,170');
+  });
+
+  it('O-29.12 with the guardrail off the minutes count once and payroll warns of the shortfall', async () => {
+    await example13();
+    expect((await entries()).some((r) => r.kind === 'ot_legal')).toBe(false);
+    expect((await overview()).staff[0]?.balanceMin).toBe(50);
+    const run = await startOctober();
+    const slip = await callJson<OwnerPayslipView>(
+      'GET',
+      `/owner/payroll-runs/${run}/people/${priya.id}`,
+      { cookie: owner },
+    );
+    expect(slip.body.result.warnings.some((w) => w.code === 'legal_ot_shortfall')).toBe(true);
+  });
+
+  it('O-29.12 a later day of the week is refreshed when an earlier day is recomputed', async () => {
+    await enableCredits(stepUp, true);
+    // Mon, Wed, Thu, Fri, Sat at 9 h and Sunday 10:00-16:00 with 180 min of approved overtime.
+    await fillMonth(priya.id, '2026-10', {
+      script: {
+        '2026-10-11': [
+          ['in', '10:00'],
+          ['out', '16:00'],
+        ],
+      },
+    });
+    await decideOvertime(priya.id, '2026-10-11', 180, 180);
+    await recompute('2026-10-11');
+    expect((await entries()).filter((r) => r.kind === 'ot_legal')).toEqual([]);
+    for (const d of ['2026-10-05', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10'])
+      await recompute(d);
+    const all = await entries();
+    const days = await testEnv.DB.prepare(
+      'SELECT work_date, total_min, ot_approved_min, status FROM attendance_days WHERE user_id = ?1 ORDER BY work_date',
+    )
+      .bind(priya.id)
+      .all();
+    expect(
+      all.filter((r) => r.kind === 'ot_legal'),
+      JSON.stringify({ all, days: days.results }),
+    ).toEqual([expect.objectContaining({ work_date: '2026-10-11', minutes: 180 })]);
+  });
+
+  it('O-29.12 the guardrail switch needs step-up', async () => {
+    const res = await call('PATCH', '/owner/settings', {
+      cookie: owner,
+      body: { settings: { timeCredits: { legalOt2x: true } } },
+    });
+    expect(res.status).toBe(403);
   });
 });

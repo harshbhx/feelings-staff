@@ -3,7 +3,18 @@
  * notifies the staff member (server side) and removes the item from the queue.
  */
 import type { ActionItem, OwnerPunchView } from '@fs/contracts';
-import { Avatar, Button, Field, Icon, Input, Sheet, StatusChip, Textarea, useToast } from '@fs/ui';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Field,
+  Icon,
+  Input,
+  Sheet,
+  StatusChip,
+  Textarea,
+  useToast,
+} from '@fs/ui';
 import type { TFunction } from 'i18next';
 import { type ReactNode, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +25,7 @@ import { MapToggle, PunchFacts, RiskReasons, SelfieCompare } from '../components
 import { useErrorText } from '../components/states';
 import { ago, clock, dayLabel, duration, money, shortDate } from '../lib/format';
 import { leaveKey } from '../lib/status';
+import { EditAwaySheet } from '../rollcall/EditAwaySheet';
 import { clampOvertime, waitingDays } from './actions-model';
 
 const firstName = (name: string) => name.split(' ')[0] ?? name;
@@ -55,7 +67,7 @@ export function ActionCard({
 
   return (
     <li
-      className="grid gap-3 border-border border-t py-4 first:border-t-0"
+      className="grid gap-3 border-border border-t px-(--card-pad) py-4 first:border-t-0"
       data-testid={`action-${item.type}`}
     >
       <div className="flex items-start gap-3">
@@ -83,7 +95,7 @@ export function ActionCard({
           </p>
         </div>
       </div>
-      <div className="grid gap-3 xl:pl-13">
+      <div className={`grid gap-3 ${selectable ? 'sm:pl-22' : 'sm:pl-13'}`}>
         <Body item={item} />
         <Actions item={item} busy={busy} run={run} />
       </div>
@@ -296,9 +308,26 @@ function Body({ item }: { item: ActionItem }) {
     }
     case 'away':
       return (
-        <p className="text-text-body tabular-nums">
-          {t('owner:actions.away.line', { count: item.minutes })}
-        </p>
+        <>
+          <p className="text-text-body tabular-nums">
+            {t('owner:actions.away.line', { count: item.minutes })}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {item.reason ? (
+              <Badge tone="neutral" icon="sign-out">
+                {t(`owner:presence.reason.${item.reason}`)}
+              </Badge>
+            ) : null}
+            {item.backMissing ? (
+              <Badge tone="warning" icon="warning-circle">
+                {t('owner:actions.away.backMissing')}
+              </Badge>
+            ) : null}
+          </div>
+          {item.staffNote ? (
+            <Quote>{t('owner:actions.away.note', { note: item.staffNote })}</Quote>
+          ) : null}
+        </>
       );
     case 'auto_closed':
       return (
@@ -527,8 +556,45 @@ function Actions({
         </Row>
       );
     case 'away':
-      // Confirm, mark as work and ignore arrive with the credits screens (WP-9 slice 9c).
-      return null;
+      // PRD 4.18.5: Confirm (minus credits), Mark as work (no minus) or Ignore (no minus).
+      return (
+        <Row>
+          {approve(t('owner:actions.away.confirm'), {
+            type: 'away',
+            id: item.id,
+            decision: 'confirm',
+          })}
+          <Button
+            size="sm"
+            variant="secondary"
+            icon="check"
+            disabled={busy}
+            onClick={() => run({ type: 'away', id: item.id, decision: 'work' })}
+          >
+            {t('owner:actions.away.work')}
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={busy}
+            onClick={() => run({ type: 'away', id: item.id, decision: 'ignore' })}
+          >
+            {t('owner:actions.away.ignore')}
+          </Button>
+          <EditAwaySheet
+            busy={busy}
+            away={{
+              id: item.id,
+              name: item.user.name,
+              workDate: item.workDate,
+              startTs: item.startTs,
+              endTs: item.endTs,
+              reason: item.reason,
+              state: 'pending',
+            }}
+          />
+        </Row>
+      );
     case 'advance_request':
       return (
         <Row>

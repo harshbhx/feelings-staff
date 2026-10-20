@@ -54,6 +54,19 @@ const SCREENS: Screen[] = [
   { name: 'day', path: '/day/2026-10-15', ready: h1(/15 Oct/) },
   { name: 'requests-leave', path: '/requests', ready: h1('Requests') },
   { name: 'requests-fixes', path: '/requests?tab=fixes', ready: h1('Requests') },
+  { name: 'leave-form', path: '/requests/leave', ready: h1('Ask for leave') },
+  { name: 'fix-form', path: '/requests/fix?date=2026-10-19', ready: h1('Fix a day') },
+  { name: 'payslips', path: '/payslips', ready: h1('Payslips') },
+  {
+    name: 'payslips-empty',
+    path: '/payslips',
+    variant: 'mePayslips:empty',
+    ready: h1('Payslips'),
+  },
+  { name: 'payslip', path: '/payslips/01K885FABFFQJST6Z99BWHFJAK', ready: h1('October 2026') },
+  { name: 'me', path: '/me', ready: h1('Me') },
+  { name: 'me-data', path: '/me/data', ready: h1('My data') },
+  { name: 'me-privacy', path: '/me/privacy', ready: h1('Privacy notice') },
   { name: 'scan', path: '/scan', ready: h1('Scan door code') },
   { name: 'fixit-location', path: '/fix/location', ready: h1(/^Location is off for this app/) },
   {
@@ -143,8 +156,11 @@ test.describe('staff screens', () => {
       await openScreen(page, s);
       if (info.project.name === 'staff-android') {
         // The scanner shows the live (fake) camera feed; only the frame around it is compared.
+        // The version line on Me changes with every build.
+        // The notification state on Me resolves after the first paint; wait for it.
+        if (s.name === 'me') await expect(page.getByText('Notifications are off')).toBeVisible();
         await expect(page).toHaveScreenshot(`staff-${s.name}.png`, {
-          mask: [page.locator('video')],
+          mask: [page.locator('video'), page.getByTestId('app-version')],
         });
       }
       await checkA11y();
@@ -161,13 +177,14 @@ test.describe('staff screens', () => {
         const out: string[] = [];
         if (document.documentElement.scrollWidth > window.innerWidth + 1)
           out.push(`scrolls sideways (${document.documentElement.scrollWidth} px)`);
-        // Same rules as the kit (KIT-04): chips and inputs count their drawn wrapper, small
+        // Same rules as the kit (KIT-04): chips, inputs and radio rows count their drawn wrapper, small
         // buttons extend their target 2 px above and below, links inside running text are exempt.
         const sel =
           'button:not([disabled]), a[href]:not(p a), input:not([type="hidden"]), [role="tab"], [role="radio"]';
         for (const el of Array.from(document.querySelectorAll<HTMLElement>(sel))) {
           const target =
-            el.closest('.fs-chip, .fs-input-wrap, .fs-pinpad__display') ?? (el as Element);
+            el.closest('.fs-chip, .fs-input-wrap, .fs-pinpad__display, .fs-choice') ??
+            (el as Element);
           const r = target.getBoundingClientRect();
           if (r.width <= 1 || r.height <= 1) continue; // hidden or visually hidden
           const extra = el.matches('.fs-btn[data-size="sm"]') ? 4 : 0;

@@ -6,10 +6,12 @@
 import { Button } from '@fs/ui';
 import { useTranslation } from 'react-i18next';
 import { useRouteError } from 'react-router';
+import { useStaleChunkRecovery } from '../../../app/useStaleChunkRecovery';
 
 export function RouteError() {
   const { t } = useTranslation();
   const error = useRouteError();
+  useStaleChunkRecovery(error);
   const detail = error instanceof Error ? error.message : null;
   return (
     <div

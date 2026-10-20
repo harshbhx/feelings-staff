@@ -24,6 +24,7 @@ import {
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
+import { useMe } from '../../../api/hooks';
 import { isStepUpCancelled } from '../../auth/step-up';
 import {
   useAddAdjustment,
@@ -35,6 +36,7 @@ import {
 import { ConfirmButton } from '../components/ConfirmButton';
 import { Meta, Section } from '../components/layout';
 import { QueryView, useErrorText } from '../components/states';
+import { SlipCreditsNote } from '../credits/SettleCreditsCard';
 import { days, longDate, money, monthLabel, shortDate } from '../lib/format';
 import { canShare, shareNative } from '../lib/share';
 import { useOwnerTitle } from '../shell/chrome';
@@ -74,6 +76,12 @@ function Review({ slip, runId }: { slip: OwnerPayslipView; runId: string }) {
   const draft = slip.status === 'draft';
   const statusChip =
     slip.status === 'draft' ? 'waiting' : slip.status === 'final' ? 'present' : 'off';
+  // Time credits are owner only (PRD 7.17.9): a manager with payroll never sees the line or its link.
+  const me = useMe();
+  const creditsLine =
+    me.data?.user.role === 'owner'
+      ? slip.result.lines.find((l) => l.code === 'time_credits')
+      : undefined;
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] xl:items-start xl:gap-12">
@@ -96,6 +104,7 @@ function Review({ slip, runId }: { slip: OwnerPayslipView; runId: string }) {
       </div>
       <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
         {draft ? <Adjustments slip={slip} runId={runId} /> : null}
+        {draft && creditsLine ? <SlipCreditsNote runId={runId} line={creditsLine} /> : null}
         {draft && slip.advances.length > 0 ? <Recovery slip={slip} runId={runId} /> : null}
         {!draft ? <Final slip={slip} runId={runId} /> : null}
       </div>
@@ -107,9 +116,13 @@ function Slip({ slip, month }: { slip: OwnerPayslipView; month: string }) {
   const { t } = useTranslation();
   const r = slip.result;
   const c = r.counts;
-  const earnings = r.lines.filter((l) => l.kind === 'earning');
-  const deductions = r.lines.filter((l) => l.kind === 'deduction');
-  const salary = r.lines.find((l) => l.code === 'salary');
+  // Time credits are owner only (PRD 7.17.9): other managers never see the line.
+  const me = useMe();
+  const lines =
+    me.data?.user.role === 'owner' ? r.lines : r.lines.filter((l) => l.code !== 'time_credits');
+  const earnings = lines.filter((l) => l.kind === 'earning');
+  const deductions = lines.filter((l) => l.kind === 'deduction');
+  const salary = lines.find((l) => l.code === 'salary');
   return (
     <article
       className="grid gap-5 rounded-md border border-border p-5"

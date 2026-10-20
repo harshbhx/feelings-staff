@@ -11,8 +11,6 @@ import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router';
 import { mockChoice, useApi } from '../../../api/provider';
 import { saveLang } from '../../../app/i18n';
-import { deviceSigner } from '../../../lib/punch/adapters';
-import { createPunchResigner } from '../../../lib/punch/resign';
 import { onQueueEvent, setResigner, startQueue } from '../../../pwa/queue';
 import { ensurePersisted } from '../../../pwa/storage';
 import { staffKeys, useStaffMe } from '../api';
@@ -66,14 +64,33 @@ function useStaffBoot(standalone: boolean) {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    setResigner(createPunchResigner({ api, getSigner: deviceSigner }));
-    const stop = startQueue(api);
+    // The re-signer (409 NONCE_INVALID) needs the device key and the punch adapters, both only
+    // reached from here (PRD 11.10: keep them out of the staff initial chunk). Set it before the
+    // queue starts, so the first flush never races it.
+    let cancelled = false;
+    let stopQueue: (() => void) | null = null;
     const off = onQueueEvent((e) => {
       if (e.type === 'synced') void qc.invalidateQueries({ queryKey: staffKeys.all });
     });
+    void Promise.all([
+      import('../../../lib/punch/adapters'),
+      import('../../../lib/punch/resign'),
+    ]).then(
+      ([adapters, resign]) => {
+        if (cancelled) return;
+        setResigner(resign.createPunchResigner({ api, getSigner: adapters.deviceSigner }));
+        stopQueue = startQueue(api);
+      },
+      () => {
+        // A chunk that will not load (stale hash after a deploy) must not strand queued punches:
+        // flush without the re-signer; a 409 NONCE_INVALID then stays queued for the next start.
+        if (!cancelled) stopQueue = startQueue(api);
+      },
+    );
     return () => {
+      cancelled = true;
       off();
-      stop();
+      stopQueue?.();
       setResigner(null);
     };
   }, [api, qc]);

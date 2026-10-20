@@ -3,7 +3,7 @@
  * Service worker entry (PRD 11.4, 11.6, 11.7). Owner: WP-7.
  * Built by vite-plugin-pwa with `injectManifest` (see build/pwa.ts) into `/sw.js`.
  *
- * - App shell precached; navigations fall back to index.html except /api, /v, /q, /__kit, /__test.
+ * - App shell precached; navigations are network-first (3 s) and fall back to the precached index.html except /api, /v, /q, /__kit, /__test.
  * - Runtime caches exactly as PRD 11.4. Cached API copies carry `X-FS-Cached-At`; when a request is
  *   answered from that cache the SW posts `{ type: 'fs:cached', url, cachedAt }` to every window.
  * - Every other /api request is not intercepted (network only). Punches use the app-level queue
@@ -83,8 +83,30 @@ clientsClaim();
 
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
+const precachedShell = createHandlerBoundToURL('/index.html');
+const SHELL_TIMEOUT_MS = 3000;
+
+/**
+ * Navigations are network-first (3 s) so a phone with an old precached shell gets the current one
+ * whenever it is online; the precached shell only answers offline or on a slow network. A reply that
+ * is not HTML (an error page) never replaces the shell.
+ */
 registerRoute(
-  new NavigationRoute(createHandlerBoundToURL('/index.html'), { denylist: NAVIGATION_DENYLIST }),
+  new NavigationRoute(
+    async (options) => {
+      try {
+        const timeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('shell timeout')), SHELL_TIMEOUT_MS),
+        );
+        const res = await Promise.race([fetch(options.request), timeout]);
+        if (res.ok && res.headers.get('Content-Type')?.includes('text/html')) return res;
+      } catch {
+        // offline or slow: fall through to the precached shell
+      }
+      return precachedShell(options);
+    },
+    { denylist: NAVIGATION_DENYLIST },
+  ),
 );
 
 // ---- API reads: NetworkFirst, 3 s, stamped with the time they were cached -------------------------

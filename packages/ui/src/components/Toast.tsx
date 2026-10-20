@@ -1,17 +1,13 @@
-import { Toast as RToast } from 'radix-ui';
 import {
-  type CSSProperties,
+  Component,
   createContext,
+  lazy,
   type ReactNode,
+  Suspense,
   useCallback,
   useContext,
-  useMemo,
   useState,
 } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Icon } from '../icons/Icon';
-import { cx } from '../lib/cx';
-import { Button, IconButton } from './Button';
 
 export type ToastTone = 'neutral' | 'success' | 'error';
 
@@ -31,57 +27,19 @@ export interface ToastInput {
   duration?: number | undefined;
 }
 
-export interface ToastProps extends ToastInput {
-  open?: boolean | undefined;
-  onOpenChange?: ((open: boolean) => void) | undefined;
-  className?: string | undefined;
+/** A failed chunk fetch (offline before the service worker is ready, or a stale hash after a deploy) must not take the whole app down: toasts just do not show. */
+class ToastLayerBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  override state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  override render() {
+    return this.state.failed ? null : this.props.children;
+  }
 }
 
-const TONE_ICON = { success: 'check-circle', error: 'warning-circle' } as const;
-
-/**
- * One toast: ink text on white with a hairline, at the bottom above the action bar, fading in
- * 140 ms. Use `useToast()` inside a `ToastProvider` rather than rendering this directly.
- */
-export function Toast({
-  title,
-  description,
-  tone = 'neutral',
-  action,
-  duration,
-  open,
-  onOpenChange,
-  className,
-}: ToastProps) {
-  const { t } = useTranslation();
-  return (
-    <RToast.Root
-      className={cx('fs-toast', className)}
-      data-tone={tone}
-      open={open}
-      onOpenChange={onOpenChange}
-      duration={duration ?? (action ? 8000 : 5000)}
-    >
-      {tone !== 'neutral' ? <Icon name={TONE_ICON[tone]} className="fs-toast__icon" /> : null}
-      <div className="fs-toast__text">
-        <RToast.Title className="fs-toast__title">{title}</RToast.Title>
-        {description ? (
-          <RToast.Description className="fs-toast__desc">{description}</RToast.Description>
-        ) : null}
-      </div>
-      {action ? (
-        <RToast.Action altText={action.altText} asChild>
-          <Button size="sm" variant="secondary" onClick={action.onClick}>
-            {action.label}
-          </Button>
-        </RToast.Action>
-      ) : null}
-      <RToast.Close asChild>
-        <IconButton icon="x" label={t('ui:toast.close')} className="fs-toast__close" />
-      </RToast.Close>
-    </RToast.Root>
-  );
-}
+// Radix Toast lives in its own chunk; it loads right after first paint, not with the entry.
+const ToastLayer = lazy(() => import('./ToastLayer'));
 
 type ShowToast = (toast: ToastInput) => void;
 
@@ -105,33 +63,26 @@ export interface ToastProviderProps {
 }
 
 export function ToastProvider({ children, bottomOffset, className }: ToastProviderProps) {
-  const { t } = useTranslation();
   const [current, setCurrent] = useState<(ToastInput & { key: number }) | null>(null);
   const [open, setOpen] = useState(false);
   const show = useCallback<ShowToast>((toast) => {
     setCurrent({ ...toast, key: Date.now() });
     setOpen(true);
   }, []);
-  const style = useMemo(
-    () => (bottomOffset ? ({ '--fs-toast-offset': bottomOffset } as CSSProperties) : undefined),
-    [bottomOffset],
-  );
   return (
-    <RToast.Provider swipeDirection="down" label={t('ui:toast.region')}>
+    <>
       <ToastContext.Provider value={show}>{children}</ToastContext.Provider>
-      {current ? (
-        <Toast
-          key={current.key}
-          title={current.title}
-          description={current.description}
-          tone={current.tone}
-          action={current.action}
-          duration={current.duration}
-          open={open}
-          onOpenChange={setOpen}
-        />
-      ) : null}
-      <RToast.Viewport className={cx('fs-toast-viewport', className)} style={style} />
-    </RToast.Provider>
+      <ToastLayerBoundary>
+        <Suspense fallback={null}>
+          <ToastLayer
+            current={current}
+            open={open}
+            onOpenChange={setOpen}
+            bottomOffset={bottomOffset}
+            className={className}
+          />
+        </Suspense>
+      </ToastLayerBoundary>
+    </>
   );
 }

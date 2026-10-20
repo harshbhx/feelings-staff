@@ -50,7 +50,13 @@ function useDropFromQueues() {
   };
 }
 
-const afterDecision = () => [ownerKeys.actionsAll(), ownerKeys.today(), ownerKeys.registerAll()];
+const afterDecision = () => [
+  ownerKeys.actionsAll(),
+  ownerKeys.today(),
+  ownerKeys.registerAll(),
+  // An away decision moves the credits overview (pending step-outs, confirmed deductions).
+  ownerKeys.creditsAll(),
+];
 
 /** A decision on one Needs-action item (PRD 4.12). `id` is the queue item id. */
 export type Decision =
@@ -82,7 +88,9 @@ export type Decision =
       note?: string;
     }
   | { type: 'auto_closed'; id: string; userId: string; workDate: string; outTs: number | null }
-  | { type: 'advance_request'; id: string; advanceId: string; decision: Verdict; note?: string };
+  | { type: 'advance_request'; id: string; advanceId: string; decision: Verdict; note?: string }
+  /** A pending step-out (PRD 4.18.5): the item id is the away interval id. */
+  | { type: 'away'; id: string; decision: 'confirm' | 'work' | 'ignore'; note?: string };
 
 export type Verdict = 'approve' | 'reject';
 
@@ -148,6 +156,11 @@ export function useDecide() {
         case 'advance_request':
           return api.ownerAdvanceDecide(
             { params: { id: d.advanceId }, body: { decision: d.decision, ...noteOf(d) } },
+            call,
+          );
+        case 'away':
+          return api.ownerAwayDecide(
+            { params: { id: d.id }, body: { decision: d.decision, ...noteOf(d) } },
             call,
           );
       }

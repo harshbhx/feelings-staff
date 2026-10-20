@@ -1,0 +1,73 @@
+{
+  "items": [
+    {
+      "id": "01K8WP9AWAY300000000000000",
+      "type": "away",
+      "createdAt": 1792385400000,
+      "user": {
+        "id": "01K8CX6TF7P9TEP6QNEP3FSBY7",
+        "name": "Pooja Bhatt",
+        "designation": "Receptionist",
+        "phone": "+919913477807"
+      },
+      "userId": "01K8CX6TF7P9TEP6QNEP3FSBY7",
+      "workDate": "2026-10-19",
+      "startTs": 1792384440000,
+      "endTs": 1792385400000,
+      "minutes": 16,
+      "reason": "personal",
+      "staffNote": "Went to the chemist",
+      "backMissing": false
+    },
+    {
+      "id": "01K8WP9AWAY400000000000000",
+      "type": "away",
+      "createdAt": 1792385700000,
+      "user": {
+        "id": "01K8VQK1MQ1GQKWX6D0EBBE455",
+        "name": "Meena Chavda",
+        "designation": "Helper",
+        "phone": "+919428144504"
+      },
+      "userId": "01K8VQK1MQ1GQKWX6D0EBBE455",
+      "workDate": "2026-10-19",
+      "startTs": 1792384200000,
+      "endTs": 1792385700000,
+      "minutes": 25,
+      "reason": "errand",
+      "staffNote": "Bank for the salon",
+      "backMissing": false
+    },
+    {
+      "id": "01K8WP9AWAY500000000000000",
+      "type": "away",
+      "createdAt": 1792386000000,
+      "user": {
+        "id": "01K86AFQDXWDHQ8238N67SVDDK",
+        "name": "Priya Solanki",
+        "designation": "Stylist",
+        "phone": "+919825011201"
+      },
+      "userId": "01K86AFQDXWDHQ8238N67SVDDK",
+      "workDate": "2026-10-19",
+      "startTs": 1792384560000,
+      "endTs": 1792386000000,
+      "minutes": 24,
+      "reason": "lunch",
+      "staffNote": null,
+      "backMissing": true
+    }
+  ],
+  "counts": {
+    "flagged_punch": 0,
+    "pending_punch": 0,
+    "new_device": 0,
+    "leave_request": 0,
+    "regularisation": 0,
+    "overtime": 0,
+    "offsite_request": 0,
+    "auto_closed": 0,
+    "advance_request": 0,
+    "away": 3
+  }
+}

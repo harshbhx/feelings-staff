@@ -2,10 +2,11 @@
  * Staff query hooks over the contract endpoints (PRD 5.1, 9.4). Screens never call fetch directly.
  * Query keys live under `staff` so invalidating `me` (WP-1's key) does not refetch every screen.
  */
-import type { LeaveRequestCreate, Me, RegularisationCreate } from '@fs/contracts';
+import type { ConsentKind, LeaveRequestCreate, Me, RegularisationCreate } from '@fs/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMe } from '../../api/hooks';
+import { meQueryKey, useMe } from '../../api/hooks';
 import { useApi } from '../../api/provider';
+import { clearUserData } from '../../pwa/purge';
 
 export const staffKeys = {
   all: ['staff'] as const,
@@ -51,11 +52,12 @@ export function useMonth(month: string) {
   });
 }
 
-export function useDay(date: string) {
+export function useDay(date: string, enabled = true) {
   const api = useApi();
   return useQuery({
     queryKey: staffKeys.day(date),
     queryFn: () => api.meDay({ params: { date } }),
+    enabled,
   });
 }
 
@@ -72,9 +74,13 @@ export function useMyRegularisations() {
   });
 }
 
-export function usePayslips() {
+export function usePayslips(enabled = true) {
   const api = useApi();
-  return useQuery({ queryKey: staffKeys.payslips, queryFn: () => api.mePayslips() });
+  return useQuery({
+    queryKey: staffKeys.payslips,
+    queryFn: () => api.mePayslips(),
+    enabled,
+  });
 }
 
 export function usePayslip(id: string) {
@@ -92,11 +98,28 @@ export function useMyData() {
   return useQuery({ queryKey: staffKeys.data, queryFn: () => api.meData() });
 }
 
+/** Counted days, paid/unpaid split and warnings for a leave range, before sending (PRD 4.9). */
+export function useLeavePreview(body: LeaveRequestCreate | null) {
+  const api = useApi();
+  return useQuery({
+    queryKey: ['staff', 'leave-preview', body] as const,
+    queryFn: () => {
+      if (!body) throw new Error('no range');
+      return api.leavePreview({ body });
+    },
+    enabled: body !== null,
+    staleTime: 30_000,
+    retry: false,
+  });
+}
+
+/** One `idempotencyKey` per form opening: a repeated Send (double tap, retry) is one request. */
 export function useLeaveCreate() {
   const api = useApi();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (body: LeaveRequestCreate) => api.leaveCreate({ body }),
+    mutationFn: ({ body, idempotencyKey }: { body: LeaveRequestCreate; idempotencyKey: string }) =>
+      api.leaveCreate({ body }, { idempotencyKey }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: staffKeys.leave });
     },
@@ -118,7 +141,13 @@ export function useRegularisationCreate() {
   const api = useApi();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (body: RegularisationCreate) => api.regularisationCreate({ body }),
+    mutationFn: ({
+      body,
+      idempotencyKey,
+    }: {
+      body: RegularisationCreate;
+      idempotencyKey: string;
+    }) => api.regularisationCreate({ body }, { idempotencyKey }),
     onSuccess: (reg) => {
       void qc.invalidateQueries({ queryKey: staffKeys.regularisations });
       void qc.invalidateQueries({ queryKey: staffKeys.day(reg.workDate) });
@@ -133,6 +162,47 @@ export function useRegularisationCancel() {
     mutationFn: (id: string) => api.regularisationCancel({ params: { id } }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: staffKeys.regularisations });
+    },
+  });
+}
+
+/** Language switch: saved on the server, then the cached `me` follows (PRD 5.1 Me, 11.9). */
+export function useLanguageSave() {
+  const api = useApi();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (lang: 'en' | 'gu') => api.mePatch({ body: { lang } }),
+    onSuccess: (_me, lang) => {
+      qc.setQueryData<Me | null>(meQueryKey, (old) =>
+        old ? { ...old, user: { ...old.user, lang } } : old,
+      );
+    },
+  });
+}
+
+export function useConsentWithdraw() {
+  const api = useApi();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (kind: ConsentKind) => api.consentWithdraw({ params: { kind } }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: staffKeys.data });
+      void qc.invalidateQueries({ queryKey: meQueryKey });
+    },
+  });
+}
+
+export function useSignOut() {
+  const api = useApi();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.logout(),
+    onSuccess: async () => {
+      // Personal caches and queued items go with the session (PRD 11.4); the device key stays.
+      await clearUserData();
+      // Everything user-scoped goes (inbox, month, payslips, ...), not only the staff keys.
+      qc.removeQueries();
+      qc.setQueryData<Me | null>(meQueryKey, null);
     },
   });
 }

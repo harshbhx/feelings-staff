@@ -9,23 +9,28 @@ import {
   Bindi,
   Button,
   type DayStatus,
+  hapticTick,
   Icon,
   type IconName,
   List,
   ListRow,
+  ShiftTimeline,
   Skeleton,
   SkeletonGroup,
   StatusChip,
+  useToast,
 } from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
-import { mockChoice } from '../../../api/provider';
+import { mockChoice, useApi } from '../../../api/provider';
 import { useQueue } from '../../../pwa/queue';
 import { staffKeys, useOwnerName, useStaffMe, useToday } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
 import { useNow } from '../lib/use-now';
+import { presenceKey, usePresence } from '../presence/api';
+import { presenceUi } from '../presence/presence-model';
 import type { FrozenSheet } from '../punch/frozen';
 import { ActionBar } from '../shell/ActionBar';
 import { QueryError } from '../shell/ScreenFallback';
@@ -44,6 +49,13 @@ const loadPunchSheet = () => import('../punch/PunchSheet');
 const PunchSheetHost = lazy(() => loadPunchSheet().then((m) => ({ default: m.PunchSheetHost })));
 const SendNoteSheet = lazy(() =>
   import('./SendNoteSheet').then((m) => ({ default: m.SendNoteSheet })),
+);
+// Presence (PRD 4.18): the Step out sheet and the one-time notice load only when they open.
+const AwayCard = lazy(() =>
+  import('../presence/AwayCardView').then((m) => ({ default: m.AwayCard })),
+);
+const PresenceSheets = lazy(() =>
+  import('../presence/PresenceSheets').then((m) => ({ default: m.PresenceSheets })),
 );
 
 export function TodayScreen() {
@@ -96,7 +108,7 @@ function TodaySkeleton() {
 }
 
 function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; now: number }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const fmt = useFmt();
   const me = useStaffMe();
   const owner = useOwnerName();
@@ -108,6 +120,26 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
   // The sheet (and the punch flow inside it) is its own chunk: mount it on the first open only.
   const [sheetMounted, setSheetMounted] = useState(false);
   if (sheetOpen && !sheetMounted) setSheetMounted(true);
+  // Presence: Step out next to Check out, the away card with I'm back, the notice once.
+  const presence = usePresence();
+  const pres = presenceUi(model, presence.isError ? undefined : presence.data, {
+    duty: view.duty,
+    now,
+    ownerName: owner,
+  });
+  const toast = useToast();
+  const api = useApi();
+  const [backBusy, setBackBusy] = useState(false);
+  // I'm back: the work is in `im-back.ts`, loaded on the first tap.
+  const onBack = () => {
+    hapticTick();
+    setBackBusy(true);
+    void import('../presence/im-back')
+      .then((m) => m.imBack({ api, qc, toast, i18n, owner }))
+      .catch(() => toast({ tone: 'error', title: t('errors:generic') }))
+      .finally(() => setBackBusy(false));
+  };
+  const [stepOutOpen, setStepOutOpen] = useState(false);
   useEffect(() => {
     const id = setTimeout(() => void loadPunchSheet(), PRELOAD_SHEET_MS);
     return () => clearTimeout(id);
@@ -141,6 +173,8 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
 
   const onSettled = useCallback(() => {
     void qc.invalidateQueries({ queryKey: staffKeys.today });
+    // A check-out closes any open away interval on the server (PRD 7.18).
+    void qc.invalidateQueries({ queryKey: presenceKey });
   }, [qc]);
 
   const kind = frozen?.kind ?? (model.primary === 'check_out' ? 'out' : 'in');
@@ -174,6 +208,12 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
         <StatusBlock view={view} model={model} fmt={fmt} />
       </section>
 
+      {pres.card ? (
+        <Suspense fallback={null}>
+          <AwayCard card={pres.card} />
+        </Suspense>
+      ) : null}
+
       {model.pendingPunch && model.status === 'waiting_proof' ? (
         <WaitingProof punch={model.pendingPunch} />
       ) : null}
@@ -199,7 +239,11 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
         </div>
       ) : null}
 
-      {model.lastPunch ? <LastPunch punch={model.lastPunch} /> : null}
+      {model.dayKind === 'work' && model.status !== 'waiting_proof' ? (
+        <ShiftCard model={model} fmt={fmt} now={now} />
+      ) : null}
+
+      {model.recentPunches.length > 0 ? <RecentPunches punches={model.recentPunches} /> : null}
 
       {model.status === 'not_in' && model.dayKind === 'work' ? (
         // Before the first tap: what checking in does with location (PRD 4.3.3), in plain words.
@@ -217,20 +261,68 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
 
       <ActionBar>
         {model.primary === 'scan' ? (
-          <Button variant="primary" block icon="qr-code" onClick={() => navigate('/scan')}>
+          <Button
+            variant="primary"
+            size="lg"
+            block
+            icon="qr-code"
+            onClick={() => {
+              hapticTick();
+              navigate('/scan');
+            }}
+          >
             {t('staff:today.scanDoor')}
           </Button>
         ) : (
-          <Button
-            variant="primary"
-            block
-            icon={model.primary === 'check_out' ? 'sign-out' : 'sign-in'}
-            onClick={() => setSheetOpen(true)}
-          >
-            {model.primary === 'check_out' ? t('staff:today.checkOut') : t('staff:today.checkIn')}
-          </Button>
+          <>
+            <Button
+              variant="primary"
+              size="lg"
+              block={!pres.card}
+              icon={pres.card || model.primary !== 'check_out' ? 'sign-in' : 'sign-out'}
+              loading={backBusy}
+              onClick={() => {
+                // One 8 ms tick under the thumb (Android; never with reduced motion), PRD 12.8.
+                if (pres.card) return onBack();
+                hapticTick();
+                setSheetOpen(true);
+              }}
+            >
+              {pres.card
+                ? t('staff:presence.back.button')
+                : model.primary === 'check_out'
+                  ? t('staff:today.checkOut')
+                  : t('staff:today.checkIn')}
+            </Button>
+            {pres.card || pres.stepOut ? (
+              <Button
+                variant="secondary"
+                size="lg"
+                {...(pres.card ? { icon: 'sign-out' as const } : {})}
+                onClick={() => {
+                  if (pres.card) {
+                    hapticTick();
+                    setSheetOpen(true);
+                  } else setStepOutOpen(true);
+                }}
+              >
+                {pres.card ? t('staff:today.checkOut') : t('staff:presence.stepOut')}
+              </Button>
+            ) : null}
+          </>
         )}
       </ActionBar>
+
+      {pres.stepOut || pres.askConsent ? (
+        <Suspense fallback={null}>
+          <PresenceSheets
+            stepOutOpen={stepOutOpen}
+            onStepOutOpenChange={setStepOutOpen}
+            notice={pres.askConsent}
+            blocked={sheetOpen}
+          />
+        </Suspense>
+      ) : null}
 
       {sheetMounted ? (
         <Suspense fallback={null}>
@@ -444,7 +536,24 @@ const KIND_ICON: Record<PunchView['kind'], IconName> = {
   break_end: 'coffee',
 };
 
-function LastPunch({ punch }: { punch: PunchView }) {
+/** The last three punches, newest first, as hairline rows (WP-10). */
+function RecentPunches({ punches }: { punches: readonly PunchView[] }) {
+  const { t } = useTranslation();
+  return (
+    <section aria-labelledby="today-last" className="flex flex-col gap-2">
+      <h2 id="today-last" className="text-sm font-semibold text-text-muted">
+        {t('staff:today.recent')}
+      </h2>
+      <List framed>
+        {punches.map((p) => (
+          <PunchRow key={p.id} punch={p} />
+        ))}
+      </List>
+    </section>
+  );
+}
+
+function PunchRow({ punch }: { punch: PunchView }) {
   const { t } = useTranslation();
   const owner = useOwnerName();
   const fmt = useFmt();
@@ -468,22 +577,56 @@ function LastPunch({ punch }: { punch: PunchView }) {
           ? t('staff:tags.edited', { owner })
           : null;
   return (
-    <section aria-labelledby="today-last" className="flex flex-col gap-2">
-      <h2 id="today-last" className="text-sm font-semibold text-text-muted">
-        {t('staff:today.lastPunch')}
+    <ListRow
+      leading={<Icon name={KIND_ICON[punch.kind]} />}
+      title={<span className="tabular">{title}</span>}
+      subtitle={where}
+      trailing={
+        tag ? (
+          <StatusChip status={punch.status === 'pending' ? 'waiting' : 'off'} label={tag} />
+        ) : undefined
+      }
+    />
+  );
+}
+
+/** The shift as one line with the worked part and a now marker (WP-10). */
+function ShiftCard({ model, fmt, now }: { model: TodayModel; fmt: Fmt; now: number }) {
+  const { t } = useTranslation();
+  const start = model.shiftStartTs;
+  const end = model.shiftEndTs;
+  if (start === null || end === null || end <= start) return null;
+  const workedTo = model.outTs ?? now;
+  const worked =
+    model.inSinceTs !== null && workedTo > model.inSinceTs
+      ? [{ from: model.inSinceTs, to: workedTo }]
+      : [];
+  const description = [
+    t('staff:today.shiftDesc', {
+      from: fmt.clock(start),
+      to: fmt.clock(end),
+      now: fmt.clock(now),
+    }),
+    model.inSinceTs !== null
+      ? t('staff:today.shiftWorked', { from: fmt.clock(model.inSinceTs) })
+      : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
+  return (
+    <section aria-labelledby="today-shift" className="staff-card flex flex-col gap-3">
+      <h2 id="today-shift" className="text-sm font-semibold text-text-muted">
+        {t('staff:today.shiftTitle')}
       </h2>
-      <List framed>
-        <ListRow
-          leading={<Icon name={KIND_ICON[punch.kind]} />}
-          title={<span className="tabular">{title}</span>}
-          subtitle={where}
-          trailing={
-            tag ? (
-              <StatusChip status={punch.status === 'pending' ? 'waiting' : 'off'} label={tag} />
-            ) : undefined
-          }
-        />
-      </List>
+      <ShiftTimeline
+        start={start}
+        end={end}
+        startLabel={fmt.clock(start)}
+        endLabel={fmt.clock(end)}
+        now={now}
+        worked={worked}
+        description={description}
+      />
     </section>
   );
 }

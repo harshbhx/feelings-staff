@@ -198,6 +198,17 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .fs-meter[data-size="lg"] {
+    gap: var(--space-3);
+  }
+
+  .fs-meter[data-size="lg"] .fs-meter__label {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-display);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.025em;
+  }
+
   .fs-meter__aside {
     font-size: var(--text-sm);
     color: var(--text-muted);

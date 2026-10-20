@@ -1,7 +1,14 @@
 import type { TodayBoard } from '@fs/contracts';
 import { fixtures, variants } from '@fs/contracts/fixtures';
 import { describe, expect, it } from 'vitest';
-import { boardMode, boardModel, headlineParts, liveWorkedMin, sections } from './today-model';
+import {
+  boardMode,
+  boardModel,
+  dayProgress,
+  headlineParts,
+  liveWorkedMin,
+  sections,
+} from './today-model';
 
 const board = fixtures.ownerToday as TodayBoard;
 const holiday = variants.ownerToday?.holiday as TodayBoard;
@@ -60,5 +67,19 @@ describe('Today board model (O-03)', () => {
     expect(liveWorkedMin(row, board.updatedAt, board.updatedAt + 5 * 60_000)).toBe(
       row.workedMin + 5,
     );
+  });
+
+  it('O-03.1 the progress strip counts who is working today, late split from on time', () => {
+    const p = dayProgress(board);
+    expect(p.inCount).toBe(board.counters.present);
+    expect(p.onTime + p.late).toBe(p.inCount);
+    const dueLater = board.notIn.filter((r) => r.state === 'due_later').length;
+    expect(p.late).toBe(Math.min(board.counters.late, board.counters.present));
+    expect(p.onTime).toBe(board.counters.present - p.late);
+    expect(p.notInYet).toBe(board.counters.notInYet - dueLater);
+    expect(p.total).toBe(board.counters.present + board.counters.notInYet);
+    expect(p.total).toBe(p.inCount + p.notInYet + p.dueLater);
+    expect(p.dueLater).toBe(board.notIn.filter((r) => r.state === 'due_later').length);
+    expect(p.everyone).toBe(p.inCount + board.notIn.length + board.away.length);
   });
 });
