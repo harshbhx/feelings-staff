@@ -20,7 +20,7 @@ async function openToday(page: Page, variants: string[] = [], path = '/'): Promi
   await page.clock.setFixedTime(VISUAL_NOW);
   const q = new URLSearchParams({ mock: '1', allowBrowser: '1' });
   if (variants.length > 0) q.set('variant', variants.join(','));
-  await page.goto(`${path}?${q}`);
+  await page.goto(`${path}${path.includes('?') ? '&' : '?'}${q}`);
   await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
   await page.evaluate(() => document.fonts.ready);
@@ -56,7 +56,7 @@ test.describe('staff presence', () => {
     await checkA11y();
     await sheet.getByRole('button', { name: 'Step out now' }).click();
     await expect(sheet.getByText('Pick one reason.')).toBeVisible();
-    await sheet.getByText('Work errand', { exact: true }).click();
+    await sheet.getByRole('radio', { name: 'Work errand' }).check({ force: true });
     await sheet.getByLabel('Note for Urmi').fill('Bank for the salon');
     await sheet.getByRole('button', { name: 'Step out now' }).click();
     // The server's answer (presenceStepOut.json, 09:32) becomes the card at once.
@@ -77,7 +77,9 @@ test.describe('staff presence', () => {
     if (android(info)) await expect(page).toHaveScreenshot('staff-presence-out.png');
     await checkA11y();
     await bar(page).getByRole('button', { name: "I'm back" }).click();
-    await expect(page.getByText('Welcome back. You were out 25 min.')).toBeVisible();
+    await expect(
+      page.locator('.fs-toast__title', { hasText: 'Welcome back. You were out 25 min.' }),
+    ).toBeVisible();
   });
 
   test('STAFF-PRES S-24.3 E2E-24 marked away by the owner, one note, I am back', async ({
@@ -96,9 +98,11 @@ test.describe('staff presence', () => {
     await expect(sheet.getByText('Write a few words first.')).toBeVisible();
     await sheet.getByLabel('Your note').fill('I was at the back, washing towels');
     await sheet.getByRole('button', { name: 'Send note' }).click();
-    await expect(page.getByText('Note sent to Urmi.')).toBeVisible();
+    await expect(page.locator('.fs-toast__title', { hasText: 'Note sent to Urmi.' })).toBeVisible();
     await bar(page).getByRole('button', { name: "I'm back" }).click();
-    await expect(page.getByText(/^Welcome back\. You were out \d+ min\.$/)).toBeVisible();
+    await expect(
+      page.locator('.fs-toast__title', { hasText: /^Welcome back\. You were out \d+ min\.$/ }),
+    ).toBeVisible();
   });
 
   test('STAFF-PRES S-24.1 E2E-26 the presence notice shows once', async ({
