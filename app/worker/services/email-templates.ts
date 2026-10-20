@@ -28,14 +28,27 @@ export function signInEmail(t: T, to: string, url: string, code: string): EmailM
   return { to, subject, text, html };
 }
 
-/** N30 weekly digest (P1). */
-export function digestEmail(t: T, to: string, title: string, body: string | null): EmailMessage {
-  const footer = t('email.digest.footer');
-  const text = [title, body ?? '', '', footer].join('\n').trim();
+/**
+ * Owner and staff notice emails (PRD 6: N24 payroll ready, N25 payslip ready, N30 weekly digest).
+ * Plain text first, simple HTML second: title, detail lines, a link into the app and a footer.
+ */
+export function noticeEmail(
+  t: T,
+  to: string,
+  n: { title: string; body: string | null; lines?: string[]; url: string; footer: string },
+): EmailMessage {
+  const lines = n.lines ?? [];
+  const open = t('email.notice.open', { url: n.url });
+  const text = [n.title, n.body ?? '', '', ...lines, '', open, '', n.footer]
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
   const html = `<!doctype html><html lang="en"><body style="margin:0;padding:24px;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:#1e1214;background:#ffffff">
-<h1 style="font-size:20px;line-height:1.3;margin:0 0 12px">${escapeHtml(title)}</h1>
-${body ? `<p style="font-size:16px;line-height:1.5;margin:0 0 16px">${escapeHtml(body)}</p>` : ''}
-<p style="font-size:14px;color:#5c0a14;margin:0">${escapeHtml(footer)}</p>
+<h1 style="font-size:20px;line-height:1.3;margin:0 0 12px">${escapeHtml(n.title)}</h1>
+${n.body ? `<p style="font-size:16px;line-height:1.5;margin:0 0 16px">${escapeHtml(n.body)}</p>` : ''}
+${lines.length ? `<ul style="font-size:16px;line-height:1.6;margin:0 0 16px;padding-left:20px">${lines.map((l) => `<li>${escapeHtml(l)}</li>`).join('')}</ul>` : ''}
+<p style="margin:0 0 16px"><a href="${escapeHtml(n.url)}" style="display:inline-block;padding:12px 20px;background:#b3121b;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:700">${escapeHtml(t('email.notice.button'))}</a></p>
+<p style="font-size:14px;color:#5c0a14;margin:0">${escapeHtml(n.footer)}</p>
 </body></html>`;
-  return { to, subject: title, text, html };
+  return { to, subject: n.title, text, html };
 }
