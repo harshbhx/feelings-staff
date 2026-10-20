@@ -516,8 +516,16 @@ export const handlers: Handlers = {
       });
       try {
         await octx.services.email.send(octx, { to: email, subject: mail.subject, text: mail.text });
-      } catch {
-        console.error(JSON.stringify({ msg: 'auth.magic_email_failed', requestId: ctx.requestId }));
+      } catch (err) {
+        // Always 202 (no account enumeration), but say why the mail did not go out.
+        console.error(
+          JSON.stringify({
+            msg: 'auth.magic_email_failed',
+            requestId: ctx.requestId,
+            provider: ctx.env.EMAIL_PROVIDER,
+            error: err instanceof Error ? err.message : String(err),
+          }),
+        );
       }
       await octx.services.audit.log(octx, {
         category: 'security',
