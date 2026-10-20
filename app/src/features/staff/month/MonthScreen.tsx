@@ -3,13 +3,12 @@
  * calendar where each day is a status chip (icon + letter, the word for screen readers) and today
  * is ringed, the month totals in words, and a legend.
  */
-import { istDate, istMonth, type MonthTotals } from '@fs/contracts';
-import { IconButton, Skeleton, SkeletonGroup, StatusChip } from '@fs/ui';
+import { isApiError, istDate, istMonth, type MonthTotals } from '@fs/contracts';
+import { Badge, Button, Icon, IconButton, Skeleton, SkeletonGroup, StatusChip } from '@fs/ui';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useMonth } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
-import { QueryError } from '../shell/ScreenFallback';
 import { ScreenHeader } from '../shell/ScreenHeader';
 import { calendarWeeks, chipStatusOf, monthNav } from './month-model';
 
@@ -54,7 +53,7 @@ export function MonthScreen() {
             <Legend />
           </>
         ) : data.isError ? (
-          <QueryError
+          <MonthError
             error={data.error}
             message={t('staff:month.loadError')}
             onRetry={() => void data.refetch()}
@@ -70,37 +69,94 @@ export function MonthScreen() {
   );
 }
 
+function MonthError({
+  error,
+  message,
+  onRetry,
+}: {
+  error: unknown;
+  message: string;
+  onRetry: () => void;
+}) {
+  const { t } = useTranslation();
+  const requestId = isApiError(error) ? error.requestId : undefined;
+  return (
+    <div role="alert" className="staff-card flex flex-col gap-3">
+      <p className="flex items-start gap-2 font-bold text-text">
+        <Icon name="warning-circle" className="mt-0.5 size-5 shrink-0 text-accent" />
+        <span>{isApiError(error, 'UNAVAILABLE') ? t('errors:network') : message}</span>
+      </p>
+      <div>
+        <Button size="sm" variant="secondary" icon="arrows-clockwise" onClick={onRetry}>
+          {t('common:actions.tryAgain')}
+        </Button>
+      </div>
+      {requestId ? (
+        <details className="text-sm text-text-muted">
+          <summary className="min-h-11 cursor-pointer py-2">{t('errors:details')}</summary>
+          <p>{t('errors:requestId', { id: requestId })}</p>
+        </details>
+      ) : null}
+    </div>
+  );
+}
+
+/** Totals as chips (colour + icon + word), only the ones that are not zero; no separators to orphan. */
 function Totals({ totals, fmt }: { totals: MonthTotals; fmt: Fmt }) {
   const { t } = useTranslation();
-  const parts = [
-    t('staff:month.totals.present', { count: totals.present }),
-    totals.half ? t('staff:month.totals.half', { count: totals.half }) : null,
-    totals.absent ? t('staff:month.totals.absent', { count: totals.absent }) : null,
-    totals.leave ? t('staff:month.totals.leave', { count: totals.leave }) : null,
-    totals.lateBillableMin
-      ? t('staff:month.totals.late', { duration: fmt.duration(totals.lateBillableMin) })
-      : null,
-    totals.otApprovedMin
-      ? t('staff:month.totals.ot', { duration: fmt.duration(totals.otApprovedMin) })
-      : null,
-    totals.otPendingMin
-      ? t('staff:month.totals.otPending', { duration: fmt.duration(totals.otPendingMin) })
-      : null,
-  ].filter((x): x is string => x !== null);
   return (
-    <ul className="flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-text tabular">
-      {/* The dot trails each item, so a wrapped line never starts with one. */}
-      {parts.map((p, i) => (
-        <li key={p} className="flex items-center gap-3">
-          {p}
-          {i < parts.length - 1 ? (
-            <span aria-hidden="true" className="text-text-muted">
-              ·
-            </span>
-          ) : null}
+    <ul className="flex flex-wrap gap-2 text-sm">
+      <TotalItem
+        status="present"
+        label={t('staff:month.totals.present', { count: totals.present })}
+      />
+      {totals.half ? (
+        <TotalItem status="half" label={t('staff:month.totals.half', { count: totals.half })} />
+      ) : null}
+      {totals.absent ? (
+        <TotalItem
+          status="absent"
+          label={t('staff:month.totals.absent', { count: totals.absent })}
+        />
+      ) : null}
+      {totals.leave ? (
+        <TotalItem status="leave" label={t('staff:month.totals.leave', { count: totals.leave })} />
+      ) : null}
+      {totals.lateBillableMin ? (
+        <TotalItem
+          status="late"
+          label={t('staff:month.totals.late', { duration: fmt.duration(totals.lateBillableMin) })}
+        />
+      ) : null}
+      {totals.otApprovedMin ? (
+        <li className="flex">
+          <Badge tone="success" icon="clock">
+            {t('staff:month.totals.ot', { duration: fmt.duration(totals.otApprovedMin) })}
+          </Badge>
         </li>
-      ))}
+      ) : null}
+      {totals.otPendingMin ? (
+        <li className="flex">
+          <Badge tone="outline" icon="clock">
+            {t('staff:month.totals.otPending', { duration: fmt.duration(totals.otPendingMin) })}
+          </Badge>
+        </li>
+      ) : null}
     </ul>
+  );
+}
+
+function TotalItem({
+  status,
+  label,
+}: {
+  status: 'present' | 'half' | 'absent' | 'leave' | 'late';
+  label: string;
+}) {
+  return (
+    <li className="flex">
+      <StatusChip status={status} label={label} />
+    </li>
   );
 }
 
@@ -215,9 +271,14 @@ function Legend() {
     { status: 'holiday', word: t('staff:status.HO') },
   ] as const;
   return (
-    <details className="staff-card">
-      <summary className="min-h-11 cursor-pointer py-2 font-semibold text-text">
+    <details className="staff-card group">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 py-2 font-semibold text-text [&::-webkit-details-marker]:hidden">
         {t('staff:month.legend')}
+        <Icon
+          name="caret-down"
+          aria-hidden="true"
+          className="size-5 shrink-0 text-text-muted transition-transform group-open:rotate-180 motion-reduce:transition-none"
+        />
       </summary>
       <ul className="flex flex-wrap gap-2 pt-2">
         {items.map((i) => (

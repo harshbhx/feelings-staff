@@ -2,6 +2,7 @@
  * Me (`/me`, PRD 5.1; AC S-17): who I am, language (English / ગુજરાતી, re-rendered without a
  * reload and saved with `PATCH /me`), notifications, this phone, My data, Privacy, Sign out.
  */
+import { formatIndianPhone } from '@fs/contracts';
 import type { AppLang } from '@fs/i18n';
 import { applyDocumentLang } from '@fs/i18n/fonts';
 import { Avatar, Badge, Button, Card, List, ListRow, RadioGroup, useToast } from '@fs/ui';
@@ -83,7 +84,7 @@ export function MeScreen() {
           {me.user.phone ? (
             <p className="mt-3 text-sm tabular">
               <span className="text-text-muted">{t('staff:me.phone')}: </span>
-              {me.user.phone}
+              {formatIndianPhone(me.user.phone)}
             </p>
           ) : null}
         </Card>
