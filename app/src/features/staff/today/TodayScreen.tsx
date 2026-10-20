@@ -108,7 +108,7 @@ function TodaySkeleton() {
 }
 
 function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; now: number }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const fmt = useFmt();
   const me = useStaffMe();
   const owner = useOwnerName();
@@ -125,7 +125,6 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
   const pres = presenceUi(model, presence.data, { duty: view.duty, now, ownerName: owner });
   const toast = useToast();
   const api = useApi();
-  const { i18n } = useTranslation();
   const [backBusy, setBackBusy] = useState(false);
   // I'm back: the work is in `im-back.ts`, loaded on the first tap.
   const onBack = () => {
@@ -278,7 +277,7 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
               size="lg"
               block={!pres.card}
               icon={pres.card || model.primary !== 'check_out' ? 'sign-in' : 'sign-out'}
-              loading={Boolean(pres.card) && backBusy}
+              loading={backBusy}
               onClick={() => {
                 // One 8 ms tick under the thumb (Android; never with reduced motion), PRD 12.8.
                 if (pres.card) return onBack();
