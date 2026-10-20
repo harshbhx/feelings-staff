@@ -7,7 +7,7 @@
 import { Button, Sheet, useToast } from '@fs/ui';
 import { useTranslation } from 'react-i18next';
 import { useOwnerName } from '../api';
-import { usePresenceConsent } from './api';
+import { usePresenceConsent } from './sheet-api';
 
 export function PresenceConsentSheet({
   open,

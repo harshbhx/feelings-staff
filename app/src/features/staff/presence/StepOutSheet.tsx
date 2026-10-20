@@ -9,8 +9,9 @@ import { Button, ChipGroup, Field, hapticTick, Sheet, Textarea, useToast } from 
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOwnerName } from '../api';
-import { newPresenceKey, useStepOut } from './api';
+import { newPresenceKey } from './api';
 import { STEP_OUT_REASONS } from './presence-model';
+import { useStepOut } from './sheet-api';
 
 export function StepOutSheet({
   open,

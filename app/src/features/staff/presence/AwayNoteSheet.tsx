@@ -7,7 +7,7 @@ import { Button, Field, Sheet, Textarea, useToast } from '@fs/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOwnerName } from '../api';
-import { useAwayNote } from './api';
+import { useAwayNote } from './sheet-api';
 
 export function AwayNoteSheet({
   awayId,
