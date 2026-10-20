@@ -64,8 +64,7 @@ const SCREENS: Screen[] = [
     ready: h1('Payslips'),
   },
   { name: 'payslip', path: '/payslips/01K885FABFFQJST6Z99BWHFJAK', ready: h1('October 2026') },
-  // The notification state resolves after the first paint; wait for it so the frame is stable.
-  { name: 'me', path: '/me', ready: (p) => p.getByText(/^Notifications are off/) },
+  { name: 'me', path: '/me', ready: h1('Me') },
   { name: 'me-data', path: '/me/data', ready: h1('My data') },
   { name: 'me-privacy', path: '/me/privacy', ready: h1('Privacy notice') },
   { name: 'scan', path: '/scan', ready: h1('Scan door code') },
@@ -158,6 +157,8 @@ test.describe('staff screens', () => {
       if (info.project.name === 'staff-android') {
         // The scanner shows the live (fake) camera feed; only the frame around it is compared.
         // The version line on Me changes with every build.
+        // The notification state on Me resolves after the first paint; wait for it.
+        if (s.name === 'me') await expect(page.getByText('Notifications are off')).toBeVisible();
         await expect(page).toHaveScreenshot(`staff-${s.name}.png`, {
           mask: [page.locator('video'), page.getByTestId('app-version')],
         });
