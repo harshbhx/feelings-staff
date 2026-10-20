@@ -116,9 +116,13 @@ function Slip({ slip, month }: { slip: OwnerPayslipView; month: string }) {
   const { t } = useTranslation();
   const r = slip.result;
   const c = r.counts;
-  const earnings = r.lines.filter((l) => l.kind === 'earning');
-  const deductions = r.lines.filter((l) => l.kind === 'deduction');
-  const salary = r.lines.find((l) => l.code === 'salary');
+  // Time credits are owner only (PRD 7.17.9): other managers never see the line.
+  const me = useMe();
+  const lines =
+    me.data?.user.role === 'owner' ? r.lines : r.lines.filter((l) => l.code !== 'time_credits');
+  const earnings = lines.filter((l) => l.kind === 'earning');
+  const deductions = lines.filter((l) => l.kind === 'deduction');
+  const salary = lines.find((l) => l.code === 'salary');
   return (
     <article
       className="grid gap-5 rounded-md border border-border p-5"
