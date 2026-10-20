@@ -62,7 +62,9 @@ test.describe('leave form', () => {
     await page.getByLabel(/^Reason/).fill('Family function');
     await page.getByRole('button', { name: 'Send' }).click();
     await expect(page).toHaveURL(/\/requests(\?|$)/);
-    await expect(page.getByText('Sent. Urmi will let you know.')).toBeVisible();
+    await expect(
+      page.locator('.fs-toast__title', { hasText: 'Sent. Urmi will let you know.' }),
+    ).toBeVisible();
   });
 });
 
@@ -82,7 +84,9 @@ test.describe('fix a day form', () => {
     await page.getByLabel(/^Tell Urmi what happened/).fill('My phone had no battery');
     await page.getByRole('button', { name: 'Send' }).click();
     await expect(page).toHaveURL(/\/requests\?tab=fixes/);
-    await expect(page.getByText('Sent. Urmi will let you know.')).toBeVisible();
+    await expect(
+      page.locator('.fs-toast__title', { hasText: 'Sent. Urmi will let you know.' }),
+    ).toBeVisible();
   });
 
   test('S-13.2 times before 04:00 are refused in words', async ({ page }, info) => {

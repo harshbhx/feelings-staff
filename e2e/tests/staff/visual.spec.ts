@@ -64,7 +64,8 @@ const SCREENS: Screen[] = [
     ready: h1('Payslips'),
   },
   { name: 'payslip', path: '/payslips/01K885FABFFQJST6Z99BWHFJAK', ready: h1('October 2026') },
-  { name: 'me', path: '/me', ready: h1('Me') },
+  // The notification state resolves after the first paint; wait for it so the frame is stable.
+  { name: 'me', path: '/me', ready: (p) => p.getByText(/^Notifications are off/) },
   { name: 'me-data', path: '/me/data', ready: h1('My data') },
   { name: 'me-privacy', path: '/me/privacy', ready: h1('Privacy notice') },
   { name: 'scan', path: '/scan', ready: h1('Scan door code') },
@@ -175,13 +176,14 @@ test.describe('staff screens', () => {
         const out: string[] = [];
         if (document.documentElement.scrollWidth > window.innerWidth + 1)
           out.push(`scrolls sideways (${document.documentElement.scrollWidth} px)`);
-        // Same rules as the kit (KIT-04): chips and inputs count their drawn wrapper, small
+        // Same rules as the kit (KIT-04): chips, inputs and radio rows count their drawn wrapper, small
         // buttons extend their target 2 px above and below, links inside running text are exempt.
         const sel =
           'button:not([disabled]), a[href]:not(p a), input:not([type="hidden"]), [role="tab"], [role="radio"]';
         for (const el of Array.from(document.querySelectorAll<HTMLElement>(sel))) {
           const target =
-            el.closest('.fs-chip, .fs-input-wrap, .fs-pinpad__display') ?? (el as Element);
+            el.closest('.fs-chip, .fs-input-wrap, .fs-pinpad__display, .fs-choice') ??
+            (el as Element);
           const r = target.getBoundingClientRect();
           if (r.width <= 1 || r.height <= 1) continue; // hidden or visually hidden
           const extra = el.matches('.fs-btn[data-size="sm"]') ? 4 : 0;
