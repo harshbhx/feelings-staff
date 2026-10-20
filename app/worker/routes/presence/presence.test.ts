@@ -48,11 +48,17 @@ async function recompute(): Promise<void> {
   expect(res.status).toBe(200);
 }
 
+/** The day ends with a check-out: Time credits only count away minutes on a finished present day. */
+async function finishDay(): Promise<void> {
+  await addPunches(priya.id, D, [['out', '19:00']], 'accepted');
+  await recompute();
+}
+
 const entries = async () =>
   (
     await testEnv.DB.prepare(
       `SELECT kind, minutes, confirmed_by FROM credit_entries
-        WHERE user_id = ?1 AND work_date = ?2 AND status = 'active' ORDER BY kind`,
+        WHERE user_id = ?1 AND work_date = ?2 AND kind = 'away' AND status = 'active' ORDER BY minutes`,
     )
       .bind(priya.id, D)
       .all<{ kind: string; minutes: number; confirmed_by: string | null }>()
@@ -106,6 +112,7 @@ describe('S-24.2 Step out and I am back', () => {
     const done = await back();
     expect(done.status).toBe(200);
     expect(done.body).toMatchObject({ state: 'waiting', awayMin: 25 });
+    await finishDay();
     expect(await entries()).toEqual([]);
 
     const waiting = await callJson<AwayIntervalView[]>(
@@ -251,6 +258,7 @@ describe('O-30 roll-call', () => {
     await setClock(at('15:40'));
     const done = await back();
     expect(done.body.state).toBe('counted');
+    await finishDay();
     expect(await entries()).toEqual([
       expect.objectContaining({ kind: 'away', minutes: -40, confirmed_by: s.ownerId }),
     ]);
@@ -303,6 +311,7 @@ describe('O-30 roll-call', () => {
     });
     await setClock(at('15:40'));
     await back();
+    await finishDay();
     const list = await callJson<AwayIntervalView[]>('GET', '/owner/presence/away', {
       cookie: owner,
     });

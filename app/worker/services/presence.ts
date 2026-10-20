@@ -132,7 +132,10 @@ export async function staffViews(ctx: Ctx, rows: readonly AwayRow[]): Promise<Aw
     staffNote: r.staff_note,
     startTs: r.start_ts,
     endTs: r.end_ts,
-    awayMin: Math.max(0, Math.floor(((r.end_ts ?? now) - r.start_ts) / MINUTE_MS)),
+    awayMin: Math.max(
+      0,
+      Math.floor((r.end_ts ?? now) / MINUTE_MS) - Math.floor(r.start_ts / MINUTE_MS),
+    ),
     state: STAFF_STATE[r.state],
   }));
 }
