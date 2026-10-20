@@ -25,6 +25,7 @@ const PERMISSIONS: Permission[] = [
   'staff',
   'payroll',
   'exports',
+  'rollcall',
 ];
 
 function useFail() {

@@ -15,6 +15,7 @@ export type SectionId =
   | 'credits'
   | 'leave'
   | 'notifications'
+  | 'presence'
   | 'people'
   | 'privacy'
   | 'security'
@@ -282,6 +283,7 @@ export const SECTIONS: readonly SectionDef[] = [
   { id: 'credits', icon: 'hourglass', fields: CREDITS },
   { id: 'leave', icon: 'airplane-tilt', fields: LEAVE },
   { id: 'notifications', icon: 'bell', fields: NOTIFICATIONS },
+  { id: 'presence', icon: 'check-circle' },
   { id: 'people', icon: 'users' },
   { id: 'privacy', icon: 'lock', fields: PRIVACY },
   { id: 'security', icon: 'fingerprint' },

@@ -88,6 +88,15 @@ export const MORE: readonly NavItem[] = [
     hintKey: 'owner:more.hints.roster',
   },
   {
+    key: 'rollcall',
+    to: '/o/roll-call',
+    labelKey: 'owner:nav.rollCall',
+    icon: 'check-circle',
+    needs: 'rollcall',
+    group: 'people',
+    hintKey: 'owner:more.hints.rollCall',
+  },
+  {
     key: 'inbox',
     to: '/o/inbox',
     labelKey: 'owner:nav.inbox',
