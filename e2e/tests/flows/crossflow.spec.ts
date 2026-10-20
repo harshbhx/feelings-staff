@@ -8,7 +8,7 @@
  *   E2E-04  check in inside the fence, the Today board shows her in (late)
  *   E2E-14  stays late, the owner approves part of the overtime
  *   E2E-16  payroll finalised, the staff member sees the payslip, owner marks it paid
- *   E2E-13  leave with an unpaid split, approved, shown in the register
+ *   E2E-13  unpaid leave, approved, shown in the register
  *   E2E-12  fix request for a missed day, approved, the day shows the times
  *
  * Staff-android only (Chromium with a staff session); the server clock is pinned per test.
@@ -148,7 +148,7 @@ test.describe('E2E-02 to E2E-16 a working day, then payroll', () => {
 });
 
 test.describe('E2E-13 leave request to register', () => {
-  test('E2E-13 the staff member asks, accepts the unpaid split, the owner approves, the register shows it', async ({
+  test('E2E-13 the staff member asks for unpaid leave, the owner approves, the register shows it', async ({
     page,
     request,
     reset,
@@ -175,7 +175,8 @@ test.describe('E2E-13 leave request to register', () => {
       toDate: '2026-09-30',
       half: 'none',
       reason: 'Family function',
-      acceptUnpaidSplit: true,
+      // Unpaid leave has no paid days to split, so there is nothing to accept.
+      acceptUnpaidSplit: false,
     };
     const preview = await staff<LeavePreview>('POST', '/leave-requests/preview', ask);
     expect(preview.status, JSON.stringify(preview.body)).toBe(200);

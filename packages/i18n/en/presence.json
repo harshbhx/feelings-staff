@@ -69,6 +69,7 @@
   },
   "errors": {
     "cannotStepOut": "You can step out only while you're checked in, and not twice. Check Today and try again.",
+    "alreadyNoted": "This time away already has a note, and it is with {{owner}}. One note is enough.",
     "notOut": "You're not marked away now. If this looks wrong, tell {{owner}}."
   },
   "back": {

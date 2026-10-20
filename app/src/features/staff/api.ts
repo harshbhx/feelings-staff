@@ -3,7 +3,7 @@
  * Query keys live under `staff` so invalidating `me` (WP-1's key) does not refetch every screen.
  */
 import type { ConsentKind, LeaveRequestCreate, Me, RegularisationCreate } from '@fs/contracts';
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { meQueryKey, useMe } from '../../api/hooks';
 import { useApi } from '../../api/provider';
 import { clearUserData } from '../../pwa/purge';
@@ -74,9 +74,13 @@ export function useMyRegularisations() {
   });
 }
 
-export function usePayslips() {
+export function usePayslips(enabled = true) {
   const api = useApi();
-  return useQuery({ queryKey: staffKeys.payslips, queryFn: () => api.mePayslips() });
+  return useQuery({
+    queryKey: staffKeys.payslips,
+    queryFn: () => api.mePayslips(),
+    enabled,
+  });
 }
 
 export function usePayslip(id: string) {
@@ -104,7 +108,6 @@ export function useLeavePreview(body: LeaveRequestCreate | null) {
       return api.leavePreview({ body });
     },
     enabled: body !== null,
-    placeholderData: keepPreviousData,
     staleTime: 30_000,
     retry: false,
   });
@@ -197,7 +200,8 @@ export function useSignOut() {
     onSuccess: async () => {
       // Personal caches and queued items go with the session (PRD 11.4); the device key stays.
       await clearUserData();
-      qc.removeQueries({ queryKey: staffKeys.all });
+      // Everything user-scoped goes (inbox, month, payslips, ...), not only the staff keys.
+      qc.removeQueries();
       qc.setQueryData<Me | null>(meQueryKey, null);
     },
   });

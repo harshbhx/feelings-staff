@@ -24,8 +24,15 @@ export function AwayNoteSheet({
   const save = useAwayNote();
   const [note, setNote] = useState('');
   const [missing, setMissing] = useState(false);
+  const onSheetChange = (o: boolean) => {
+    if (!o) {
+      setNote('');
+      setMissing(false);
+    }
+    onOpenChange(o);
+  };
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={t('presence:note.title', { owner })}>
+    <Sheet open={open} onOpenChange={onSheetChange} title={t('presence:note.title', { owner })}>
       <form
         noValidate
         className="flex flex-col gap-4"
@@ -39,14 +46,21 @@ export function AwayNoteSheet({
             { id: awayId, note: note.trim() },
             {
               onSuccess: () => {
-                onOpenChange(false);
+                onSheetChange(false);
                 toast({ tone: 'success', title: t('presence:note.sent', { owner }) });
               },
-              onError: (err) =>
+              onError: (err) => {
+                const conflict = isApiError(err, 'CONFLICT');
                 toast({
                   tone: 'error',
-                  title: isApiError(err, 'UNAVAILABLE') ? t('errors:network') : t('errors:generic'),
-                }),
+                  title: isApiError(err, 'UNAVAILABLE')
+                    ? t('errors:network')
+                    : conflict
+                      ? t('presence:errors.alreadyNoted', { owner })
+                      : t('errors:generic'),
+                });
+                if (conflict) onSheetChange(false);
+              },
             },
           );
         }}

@@ -196,4 +196,18 @@ describe('ShiftTimeline', () => {
     );
     expect(container.querySelector<HTMLElement>('.fs-shift__now')?.style.left).toBe('0%');
   });
+
+  it('WP-10 fix 5 now after the shift ends stays at the end', () => {
+    const { container } = renderUi(
+      <ShiftTimeline
+        start={600}
+        end={1200}
+        startLabel="10:00"
+        endLabel="20:00"
+        now={1500}
+        description="x"
+      />,
+    );
+    expect(container.querySelector<HTMLElement>('.fs-shift__now')?.style.left).toBe('100%');
+  });
 });

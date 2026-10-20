@@ -8,7 +8,6 @@ import { useApi } from '../../../api/provider';
 import { presenceKey } from './api';
 import { PRESENCE_NOTICE_VERSION } from './presence-model';
 
-/** My data -> Presence for one month (`YYYY-MM`): marks, step-outs with state, checks. */
 /** Keep the open interval on Today straight from the server's answer. */
 function useSetOpenAway() {
   const qc = useQueryClient();
@@ -22,6 +21,7 @@ function useSetOpenAway() {
 
 export const newPresenceKey = () => crypto.randomUUID();
 
+/** My data -> Presence for one month (`YYYY-MM`): marks, step-outs with state, checks. */
 export function usePresenceHistory(month: string) {
   const api = useApi();
   return useQuery({

@@ -109,7 +109,11 @@ export function MeScreen() {
                 variant="secondary"
                 icon="bell"
                 loading={push.busy}
-                onClick={() => void push.enable()}
+                onClick={() =>
+                  void push
+                    .enable()
+                    .catch(() => toast({ tone: 'error', title: t('errors:generic') }))
+                }
               >
                 {t('staff:me.notifTurnOn')}
               </Button>

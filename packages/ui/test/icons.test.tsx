@@ -21,6 +21,11 @@ describe('icons', () => {
     expect({ ...CORE_ICON_PATHS, ...REST_ICON_PATHS }).toEqual(readPaths(pkg));
   });
 
+  it('an icon is in the core set or the rest set, never both', () => {
+    const both = Object.keys(CORE_ICON_PATHS).filter((n) => n in REST_ICON_PATHS);
+    expect(both).toEqual([]);
+  });
+
   it('names.ts lists every icon exactly once', () => {
     expect(new Set(ICON_NAMES).size).toBe(ICON_NAMES.length);
     expect([...ICON_NAMES].sort()).toEqual(

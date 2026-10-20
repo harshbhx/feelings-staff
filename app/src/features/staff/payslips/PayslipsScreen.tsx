@@ -1,5 +1,5 @@
 /**
- * Payslips (`/payslips`, PRD 5.1, 4.14; AC S-14): one row per month with the net amount and the
+ * Payslips (`/payslips`, PRD 5.1, 4.14; AC S-14): one row per payslip revision with the net amount and the
  * paid date; tap for the payslip. Empty and "not shown in the app" states in words.
  */
 import type { PayslipSummary } from '@fs/contracts';
@@ -16,7 +16,7 @@ export function PayslipsScreen() {
   const { t } = useTranslation();
   const owner = useOwnerName();
   const me = useStaffMe();
-  const list = usePayslips();
+  const list = usePayslips(me.flags.showPayslips);
   return (
     <>
       <ScreenHeader title={t('staff:screens.payslips')} dataAt={list.dataUpdatedAt || undefined} />
