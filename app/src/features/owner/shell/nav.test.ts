@@ -15,6 +15,7 @@ describe('owner navigation (PRD 5.2)', () => {
       'advances',
       'reports',
       'roster',
+      'rollcall',
       'inbox',
       'door',
       'settings',
@@ -30,6 +31,14 @@ describe('owner navigation (PRD 5.2)', () => {
     };
     const shown = [...TABS, ...MORE].filter((i) => allowed(i, manager)).map((i) => i.key);
     expect(shown).toEqual(['today', 'actions', 'register', 'roster', 'inbox']);
+    const caller: Me = { ...manager, permissions: ['rollcall'] };
+    expect([...TABS, ...MORE].filter((i) => allowed(i, caller)).map((i) => i.key)).toEqual([
+      'today',
+      'actions',
+      'register',
+      'rollcall',
+      'inbox',
+    ]);
     expect(allowed(TABS[0] as (typeof TABS)[number], null)).toBe(false);
     expect(staff.user.role).toBe('staff');
   });

@@ -13,6 +13,7 @@ import { AuditScreen } from './AuditScreen';
 import { HolidaysSection } from './HolidaysSection';
 import { LocationSection } from './LocationSection';
 import { PeopleSection } from './PeopleSection';
+import { PresenceSection } from './PresenceSection';
 import { PrivacyNote, SalonSection } from './SalonSection';
 import { SecurityScreen } from './SecurityScreen';
 import { SettingsForm } from './SettingsForm';
@@ -73,6 +74,8 @@ function SectionPage() {
       return <HolidaysSection />;
     case 'people':
       return <PeopleSection />;
+    case 'presence':
+      return <PresenceSection />;
     default:
       return <WithSettings id={def.id} />;
   }
