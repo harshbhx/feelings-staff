@@ -1,6 +1,7 @@
 import type { AwayIntervalStaff, DutyView, PresenceState } from '@fs/contracts';
 import { describe, expect, it } from 'vitest';
-import { dutyRunning, historyByDay, minutesOut, presenceUi } from './presence-model';
+import { historyByDay } from './history-model';
+import { dutyRunning, minutesOut, presenceUi } from './presence-model';
 
 const NOW = Date.parse('2026-10-19T10:42:00+05:30');
 const open: AwayIntervalStaff = {

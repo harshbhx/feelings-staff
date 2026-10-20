@@ -268,48 +268,40 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
           >
             {t('staff:today.scanDoor')}
           </Button>
-        ) : pres.card ? (
-          // Out (stepped out or marked away): I'm back is the one sindoor button (PRD 4.18.4).
-          <>
-            <Button
-              variant="primary"
-              size="lg"
-              icon="sign-in"
-              loading={imBack.busy}
-              onClick={imBack.run}
-            >
-              {t('staff:presence.back.button')}
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              icon="sign-out"
-              onClick={() => {
-                hapticTick();
-                setSheetOpen(true);
-              }}
-            >
-              {t('staff:today.checkOut')}
-            </Button>
-          </>
         ) : (
           <>
             <Button
               variant="primary"
               size="lg"
-              block
-              icon={model.primary === 'check_out' ? 'sign-out' : 'sign-in'}
+              block={!pres.card}
+              icon={pres.card || model.primary !== 'check_out' ? 'sign-in' : 'sign-out'}
+              loading={Boolean(pres.card) && imBack.busy}
               onClick={() => {
                 // One 8 ms tick under the thumb (Android; never with reduced motion), PRD 12.8.
+                if (pres.card) return imBack.run();
                 hapticTick();
                 setSheetOpen(true);
               }}
             >
-              {model.primary === 'check_out' ? t('staff:today.checkOut') : t('staff:today.checkIn')}
+              {pres.card
+                ? t('staff:presence.back.button')
+                : model.primary === 'check_out'
+                  ? t('staff:today.checkOut')
+                  : t('staff:today.checkIn')}
             </Button>
-            {pres.stepOut ? (
-              <Button variant="secondary" size="lg" onClick={() => setStepOutOpen(true)}>
-                {t('staff:presence.stepOut')}
+            {pres.card || pres.stepOut ? (
+              <Button
+                variant="secondary"
+                size="lg"
+                {...(pres.card ? { icon: 'sign-out' as const } : {})}
+                onClick={() => {
+                  if (pres.card) {
+                    hapticTick();
+                    setSheetOpen(true);
+                  } else setStepOutOpen(true);
+                }}
+              >
+                {pres.card ? t('staff:today.checkOut') : t('staff:presence.stepOut')}
               </Button>
             ) : null}
           </>

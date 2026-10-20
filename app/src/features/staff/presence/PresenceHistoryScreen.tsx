@@ -23,7 +23,7 @@ import { useOwnerName } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
 import { QueryError } from '../shell/ScreenFallback';
 import { ScreenHeader } from '../shell/ScreenHeader';
-import { type HistoryItem, historyByDay } from './presence-model';
+import { type HistoryItem, historyByDay } from './history-model';
 import { usePresenceHistory } from './sheet-api';
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
