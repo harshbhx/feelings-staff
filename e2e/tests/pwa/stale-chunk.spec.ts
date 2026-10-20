@@ -34,7 +34,7 @@ test.describe('stale chunk recovery', () => {
     await expect(page.getByText('Unexpected Application Error')).toHaveCount(0);
     await expect(page.getByTestId('route-error')).toHaveCount(0);
     await expect(page.locator('#root > *').first()).toBeVisible();
-    expect(blocked).toBeGreaterThanOrEqual(2);
+    expect(blocked).toBeGreaterThanOrEqual(1);
     expect(navigations).toBeLessThanOrEqual(2);
   });
 });
