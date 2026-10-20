@@ -291,6 +291,28 @@ describe('O-30 roll-call', () => {
     expect(audit.results.map((a) => a.action)).toEqual(['rollcall.submit', 'rollcall.edit']);
   });
 
+  it('O-30.10 the view carries the saved mark and a re-submit acts only on changed marks', async () => {
+    await setClock(at('15:10'));
+    const rc = await slot();
+    const first = await callJson<RollCallView>('GET', `/owner/roll-calls/${rc?.id}`, {
+      cookie: owner,
+    });
+    expect(first.body.people[0]?.mark).toBeUndefined();
+    await call('POST', `/owner/roll-calls/${rc?.id}/submit`, {
+      cookie: owner,
+      body: { notHere: [priya.id], here: [], idempotencyKey: KEY },
+    });
+    const saved = await callJson<RollCallView>('GET', `/owner/roll-calls/${rc?.id}`, {
+      cookie: owner,
+    });
+    expect(saved.body.people[0]?.mark).toBe('not_here');
+    const again = await callJson<RollCallResult>('POST', `/owner/roll-calls/${rc?.id}/submit`, {
+      cookie: owner,
+      body: { notHere: [priya.id], here: [], idempotencyKey: `${KEY}-3` },
+    });
+    expect(again.body).toEqual({ started: [], continued: [], ended: [] });
+  });
+
   it('O-30.2 somebody who was not checked in cannot be marked', async () => {
     await setClock(at('15:10'));
     const rc = await slot();

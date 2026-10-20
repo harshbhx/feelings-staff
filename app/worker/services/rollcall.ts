@@ -192,6 +192,11 @@ export async function rollCallView(ctx: Ctx, id: string): Promise<RollCallView> 
     ),
   ]);
   const lastCheck = new Map(checks.map((c) => [c.user_id, c.result] as const));
+  const marks = await ctx.db.all<{ user_id: string; mark: 'here' | 'not_here' }>(
+    'SELECT user_id, mark FROM roll_call_marks WHERE org_id = ?org AND roll_call_id = ?',
+    rc.id,
+  );
+  const savedMark = new Map(marks.map((m) => [m.user_id, m.mark] as const));
   return {
     id: rc.id,
     slotTime: rc.slot_time,
@@ -203,11 +208,13 @@ export async function rollCallView(ctx: Ctx, id: string): Promise<RollCallView> 
         : p.onBreak
           ? ('on_break' as const)
           : ('here' as const);
+      const mark = savedMark.get(p.userId);
       return {
         userId: p.userId,
         name: p.name,
         inAt: p.inAt,
         state,
+        ...(mark ? { mark } : {}),
         ...(a ? { awaySince: a.start_ts } : {}),
         ...(a && a.source === 'step_out'
           ? { hint: 'stepped_out' as const, hintDetail: stepOutDetail(a) }
@@ -268,12 +275,22 @@ export async function rollCallSubmit(
   );
 
   const result: RollCallResult = { started: [], continued: [], ended: [] };
-  const stmts: D1PreparedStatement[] = [
-    ctx.db.stmt('DELETE FROM roll_call_marks WHERE org_id = ?org AND roll_call_id = ?', rc.id),
-  ];
+  const stmts: D1PreparedStatement[] = [];
+  const saved = new Map(before.map((m) => [m.user_id, m.mark] as const));
   const inputs = await loadDayData(ctx, null, rc.work_date, rc.work_date);
   for (const p of present) {
     const mark: 'here' | 'not_here' = notHere.has(p.userId) ? 'not_here' : 'here';
+    // A re-submit only acts on the people whose mark changed.
+    if (saved.get(p.userId) === mark) continue;
+    if (saved.has(p.userId)) {
+      stmts.push(
+        ctx.db.stmt(
+          'DELETE FROM roll_call_marks WHERE org_id = ?org AND roll_call_id = ? AND user_id = ?',
+          rc.id,
+          p.userId,
+        ),
+      );
+    }
     const current = open.find((a) => a.user_id === p.userId && a.end_ts === null);
     const own = open.find((a) => a.user_id === p.userId && a.roll_call_id === rc.id);
     let intervalId: string | null = null;
