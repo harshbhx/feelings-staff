@@ -140,7 +140,7 @@ test.describe('owner presence', () => {
     const items = page.getByTestId('action-away');
     await expect(items).toHaveCount(3);
     await expect(items.first()).toContainText('Mark as work');
-    await expect(shown(page, "I'm back missing")).toBeVisible();
+    await expect(shown(page, "Didn't tap I'm back")).toBeVisible();
     await expect(shown(page, '“Bank for the salon”')).toBeVisible();
     await noCrash(page);
     await expect(page).toHaveScreenshot('owner-actions-away.png', { fullPage: true });
