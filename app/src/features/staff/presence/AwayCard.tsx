@@ -4,46 +4,27 @@
  * for the owner. **I'm back** sits in the action bar as the one sindoor button while the person is
  * out (`useImBack`). Only times, minutes and the chosen reason; never credits or rupees.
  */
-import { isApiError } from '@fs/contracts';
 import { hapticTick, useToast } from '@fs/ui';
-import { useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useApi } from '../../../api/provider';
 import { useOwnerName } from '../api';
-import { newPresenceKey, useBack } from './api';
-import { minutesOut } from './presence-model';
 
-/** I'm back: ends the open interval (stepped out or marked away) at the server's time. */
+/** I'm back: the work is in `im-back.ts`, loaded on the first tap. */
 export function useImBack() {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
   const owner = useOwnerName();
   const toast = useToast();
-  const back = useBack();
-  // One key per intent: a second tap while the first is on its way repeats the same request.
-  const key = useRef<string | null>(null);
+  const api = useApi();
+  const qc = useQueryClient();
+  const [busy, setBusy] = useState(false);
   const run = () => {
     hapticTick();
-    key.current ??= newPresenceKey();
-    back.mutate(key.current, {
-      onSuccess: (away) => {
-        key.current = null;
-        toast({
-          tone: 'success',
-          title: t('staff:presence.back.done', { count: minutesOut(away) }),
-        });
-      },
-      onError: (err) => {
-        // No answer (offline, dropped reply): keep the key so a retry cannot repeat the action.
-        if (!isApiError(err, 'UNAVAILABLE')) key.current = null;
-        toast({
-          tone: 'error',
-          title: isApiError(err, 'UNAVAILABLE')
-            ? t('errors:network')
-            : isApiError(err, 'CONFLICT')
-              ? t('staff:presence.errors.notOut', { owner })
-              : t('errors:generic'),
-        });
-      },
-    });
+    setBusy(true);
+    void import('./im-back')
+      .then((m) => m.imBack({ api, qc, toast, i18n, owner }))
+      .finally(() => setBusy(false));
   };
-  return { run, busy: back.isPending };
+  return { run, busy };
 }

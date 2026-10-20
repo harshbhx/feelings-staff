@@ -68,6 +68,11 @@
     }
   },
   "errors": {
-    "cannotStepOut": "You can step out only while you're checked in, and not twice. Check Today and try again."
+    "cannotStepOut": "You can step out only while you're checked in, and not twice. Check Today and try again.",
+    "notOut": "You're not marked away now. If this looks wrong, tell {{owner}}."
+  },
+  "back": {
+    "done_one": "Welcome back. You were out {{count}} min.",
+    "done_other": "Welcome back. You were out {{count}} min."
   }
 }

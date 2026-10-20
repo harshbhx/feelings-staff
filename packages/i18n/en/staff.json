@@ -635,12 +635,7 @@
   "presence": {
     "stepOut": "Step out",
     "back": {
-      "button": "I'm back",
-      "done_one": "Welcome back. You were out {{count}} min.",
-      "done_other": "Welcome back. You were out {{count}} min."
-    },
-    "errors": {
-      "notOut": "You're not marked away now. If this looks wrong, tell {{owner}}."
+      "button": "I'm back"
     }
   }
 }

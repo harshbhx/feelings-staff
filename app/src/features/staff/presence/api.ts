@@ -4,7 +4,7 @@
  * API is not on the server yet (501), the query fails quietly and Today shows nothing extra.
  */
 import type { AwayIntervalStaff, PresenceState } from '@fs/contracts';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApi } from '../../../api/provider';
 
 export const presenceKey = ['staff', 'presence'] as const;
@@ -32,16 +32,6 @@ export function useSetOpenAway() {
 }
 
 const newKey = () => crypto.randomUUID();
-
-export function useBack() {
-  const api = useApi();
-  const setOpen = useSetOpenAway();
-  return useMutation({
-    mutationFn: (key: string) =>
-      api.presenceBack({ body: { idempotencyKey: key } }, { idempotencyKey: key }),
-    onSuccess: () => setOpen(null),
-  });
-}
 
 export { newKey as newPresenceKey };
 
