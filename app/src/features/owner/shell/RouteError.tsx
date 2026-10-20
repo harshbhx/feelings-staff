@@ -6,7 +6,7 @@
 import { Button } from '@fs/ui';
 import { useTranslation } from 'react-i18next';
 import { useRouteError } from 'react-router';
-import { useStaleChunkRecovery } from '../../../app/RouteErrorPage';
+import { useStaleChunkRecovery } from '../../../app/useStaleChunkRecovery';
 
 export function RouteError() {
   const { t } = useTranslation();

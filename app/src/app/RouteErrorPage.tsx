@@ -1,24 +1,10 @@
 /** Root route error page: a chunk-load failure reloads once by itself; anything else is a friendly card. */
 import { Button } from '@fs/ui';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouteError } from 'react-router';
+import { useStaleChunkRecovery } from './useStaleChunkRecovery';
 
-declare global {
-  interface Window {
-    /** public/recover.js */
-    __fsRecover?: (error?: unknown) => boolean;
-  }
-}
-
-/** A chunk-load failure reloads once by itself (the guard lives in public/recover.js). */
-export function useStaleChunkRecovery(error: unknown): void {
-  useEffect(() => {
-    window.__fsRecover?.(error);
-  }, [error]);
-}
-
-export function RouteErrorPage() {
+export function ErrorBoundary() {
   const { t } = useTranslation('errors');
   useStaleChunkRecovery(useRouteError());
   return (

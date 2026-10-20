@@ -18,12 +18,6 @@ const LazyOwnerShell = lazy(() =>
   import('./features/owner/shell/OwnerShell').then((m) => ({ default: m.OwnerShell })),
 );
 
-// Loaded only when something fails; a stale-chunk failure of this very file is caught by the
-// vite:preloadError listener (pwa/chunk-reload.ts), so it never needs to render.
-const LazyRouteError = lazy(() =>
-  import('./app/RouteErrorPage').then((m) => ({ default: m.RouteErrorPage })),
-);
-
 const OWNER_NS = ['owner', 'payslip'] as const;
 const DOOR_NS = ['door'] as const;
 const PUBLIC_NS = ['owner', 'payslip'] as const;
@@ -73,15 +67,11 @@ export const routes: RouteObject[] = [
 ];
 
 export function createRouter() {
-  // One root error page for every area, including a failed lazy load of the owner route table.
+  // One root error page (its own chunk) for every area, including a failed load of the owner routes.
   return createBrowserRouter(
     [
       {
-        errorElement: (
-          <Suspense fallback={null}>
-            <LazyRouteError />
-          </Suspense>
-        ),
+        lazy: () => import('./app/RouteErrorPage'),
         children: routes,
       },
     ],
