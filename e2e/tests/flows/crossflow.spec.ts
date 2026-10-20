@@ -81,7 +81,11 @@ test.describe('E2E-02 to E2E-16 a working day, then payroll', () => {
     await punch(page, 'out', PIN);
     const actions = await owner.ok<ActionsView>('GET', '/owner/actions?type=overtime');
     const ot = actions.items.find((i) => i.type === 'overtime' && i.user.id === me.id);
-    expect(ot, 'overtime waits in Needs action').toBeTruthy();
+    const seen = await owner.ok<OwnerDayDetail>('GET', `/owner/days/${me.id}/${WORK_DATE}`);
+    expect(
+      ot,
+      `overtime waits in Needs action; day: ${JSON.stringify({ day: seen.day, schedule: seen.schedule, punches: seen.punches.map((p) => ({ k: p.kind, s: p.status, t: p.effectiveTs, src: p.source })) })}`,
+    ).toBeTruthy();
     if (ot?.type !== 'overtime') throw new Error('not an overtime item');
     expect(ot.workDate).toBe(WORK_DATE);
     expect(ot.candidateMin).toBeGreaterThanOrEqual(30);
