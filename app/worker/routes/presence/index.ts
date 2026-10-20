@@ -26,7 +26,8 @@ export const handlers: Handlers = {
   presenceCheck: ({ body }, ctx) => presenceCheck(ctx, body),
   mePresenceHistory: ({ query }, ctx) => mePresenceHistory(ctx, query),
 
-  // Owner and managers with `rollcall`
+  // Roll-calls, away edits and the day view: owner and managers with `rollcall`. The away list and
+  // decisions (confirm, work, ignore) are owner only.
   ownerRollCalls: ({ query }, ctx) => rollCallDay(ctx, query),
   ownerRollCallGet: ({ params }, ctx) => rollCallView(ctx, params.id),
   ownerRollCallSubmit: ({ params, body }, ctx) => rollCallSubmit(ctx, params.id, body),

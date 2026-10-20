@@ -8,7 +8,7 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ### Added
 
-- Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026, generated from `date-holidays` (credited in `NOTICE`).
+- Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
 Docs for Time credits and presence (WP-9):
 

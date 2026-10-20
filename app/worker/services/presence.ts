@@ -472,8 +472,9 @@ export async function presenceCheck(
       check_ts: now,
       result,
       fence_result: fence,
-      distance_m: distanceM,
-      accuracy_m: body.fix?.accuracy ?? null,
+      // Bucket only (PRD 12.x privacy): the exact distance and the GPS accuracy are not kept.
+      distance_m: null,
+      accuracy_m: null,
       distance_bucket: distanceM === null ? null : distanceBucket(distanceM),
       risk_reasons_json: '[]',
       device_id: device.id,
@@ -485,7 +486,12 @@ export async function presenceCheck(
       action: 'presence.check',
       entity: 'presence_check',
       entityId: checkId,
-      after: { workDate: sess.workDate, result, fence, distanceM },
+      after: {
+        workDate: sess.workDate,
+        result,
+        fence,
+        distanceBucket: distanceM === null ? null : distanceBucket(distanceM),
+      },
     }),
   ]);
   return { result };
@@ -545,11 +551,14 @@ export async function myDataPresence(ctx: Ctx, userId: string): Promise<MyPresen
   const today = istDate(ctx.now());
   const from = istDate(ctx.now() - 90 * 24 * 60 * MINUTE_MS);
   const p = await ownPresence(ctx, userId, from, today);
-  return [
-    ...p.rollCalls.map((r) => ({ kind: 'roll_call' as const, ...r })),
-    ...p.away.map((a) => ({ kind: 'away' as const, ...a })),
-    ...p.checks.map((k) => ({ kind: 'check' as const, ...k })),
-  ];
+  const at = (ts: number) => `${istDate(ts)}T${istTime(ts)}`;
+  const keyed: { key: string; item: MyPresenceItem }[] = [];
+  for (const r of p.rollCalls)
+    keyed.push({ key: `${r.workDate}T${r.slotTime}`, item: { kind: 'roll_call', ...r } });
+  for (const a of p.away) keyed.push({ key: at(a.startTs), item: { kind: 'away', ...a } });
+  for (const k of p.checks) keyed.push({ key: at(k.ts), item: { kind: 'check', ...k } });
+  // Newest first, as the endpoint promises.
+  return keyed.sort((x, y) => (x.key < y.key ? 1 : x.key > y.key ? -1 : 0)).map((k) => k.item);
 }
 
 // ---- Owner: away intervals -----------------------------------------------------------------------

@@ -55,6 +55,15 @@ export function punchesForCalc(c: Pick<Computed, 'punches'>): PunchForCalc[] {
     }));
 }
 
+/** Which decision wins when two intervals merge: confirmed over work over ignored over pending. */
+const STATE_RANK: Record<AwayRow['state'], number> = {
+  open: 0,
+  pending: 0,
+  ignored: 1,
+  work: 2,
+  confirmed: 3,
+};
+
 /** The break punches' window when the salon uses them, else none (the break region is not guessed). */
 export function breakWindowOf(
   c: Pick<Computed, 'punches'>,
@@ -136,8 +145,9 @@ export async function syncAwayRows(
         cur.end_reason = r.end_reason ?? cur.end_reason;
       cur.source = cur.source === r.source ? cur.source : 'mixed';
       cur.reason ??= r.reason;
+      cur.reason_note ??= r.reason_note;
       cur.staff_note ??= r.staff_note;
-      if (r.state === 'confirmed') cur.state = 'confirmed';
+      if (STATE_RANK[r.state] > STATE_RANK[cur.state]) cur.state = r.state;
       cur.back_missing = cur.back_missing === 1 && r.back_missing === 1 ? 1 : 0;
       removed.push({ gone: r, into: cur });
     } else {
@@ -170,6 +180,7 @@ export async function syncAwayRows(
           back_missing: r.back_missing,
           source: r.source,
           reason: r.reason,
+          reason_note: r.reason_note,
           staff_note: r.staff_note,
           state: r.state,
           minutes,

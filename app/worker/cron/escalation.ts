@@ -44,7 +44,7 @@ export async function whatsappEscalation(ctx: Ctx, job: string, date: string): P
     `SELECT n.id, n.type, n.title, n.body, n.data_json FROM notifications n
       WHERE n.org_id = ?org AND n.user_id = ? AND n.type IN (${marks})
         AND n.push_status = 'sent' AND n.opened_at IS NULL AND n.read_at IS NULL AND n.wa_status IS NULL
-        AND n.push_sent_at <= ? AND n.push_sent_at > ?
+        AND n.push_sent_at <= ? AND n.push_sent_at >= ?
         AND NOT EXISTS (SELECT 1 FROM notification_prefs p
                          WHERE p.user_id = n.user_id AND p.event_type = n.type AND p.whatsapp = 0)
       ORDER BY n.push_sent_at, n.id`,
@@ -57,6 +57,7 @@ export async function whatsappEscalation(ctx: Ctx, job: string, date: string): P
   let sent = 0;
   for (const n of rows) {
     if (await resolvedElsewhere(ctx, n)) continue;
+    let outcome = '';
     const ran = await once(ctx, job, `${date}|wa_escalation|${n.id}`, async () => {
       const used = await ctx.db.first<{ n: number }>(
         `SELECT COUNT(*) AS n FROM cron_runs WHERE job = ? AND org_id = ?org AND slot LIKE ?
@@ -64,7 +65,10 @@ export async function whatsappEscalation(ctx: Ctx, job: string, date: string): P
         job,
         `${date}|wa_escalation|%`,
       );
-      if ((used?.n ?? 0) >= WHATSAPP_DAILY_CAP) return 'capped';
+      if ((used?.n ?? 0) >= WHATSAPP_DAILY_CAP) {
+        outcome = 'capped';
+        return 'capped';
+      }
       const result = await sendWhatsApp(ctx, owner.phone_e164 as string, {
         template: WHATSAPP_TEMPLATE,
         lang: owner.lang === 'gu' ? 'gu' : 'en',
@@ -85,9 +89,11 @@ export async function whatsappEscalation(ctx: Ctx, job: string, date: string): P
           actorType: 'system',
         }),
       ]);
+      outcome = result;
       return result;
     });
-    if (ran) sent += 1;
+    // Only real deliveries count, not capped, skipped or failed attempts.
+    if (ran && (outcome === 'sent' || outcome === 'recorded')) sent += 1;
   }
   return sent;
 }

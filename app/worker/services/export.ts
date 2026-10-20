@@ -555,10 +555,19 @@ async function table(ctx: Ctx, kind: ExportKind, p: Params): Promise<Table> {
         minutes: number;
         state: string;
         back_missing: number;
+        opened_by_name: string | null;
+        decided_by_name: string | null;
+        decided_at: number | null;
+        edited_by_name: string | null;
+        edited_at: number | null;
       }>(
         `SELECT a.work_date, u.name, a.source, a.reason, a.start_ts, a.end_ts, a.minutes, a.state,
-                a.back_missing
+                a.back_missing, ob.name AS opened_by_name, db.name AS decided_by_name,
+                a.decided_at, eb.name AS edited_by_name, a.edited_at
            FROM away_intervals a JOIN users u ON u.id = a.user_id
+           LEFT JOIN users ob ON ob.id = a.opened_by
+           LEFT JOIN users db ON db.id = a.decided_by
+           LEFT JOIN users eb ON eb.id = a.edited_by
           WHERE a.org_id = ?org AND a.work_date BETWEEN ? AND ? ${filter('a.user_id')}
           ORDER BY a.work_date, u.name, a.start_ts`,
         from,
@@ -576,6 +585,11 @@ async function table(ctx: Ctx, kind: ExportKind, p: Params): Promise<Table> {
           'Minutes',
           'State',
           'I am back missing',
+          'Opened by',
+          'Decided by',
+          'Decided at',
+          'Edited by',
+          'Edited at',
         ],
         rows: rows.map((r) => [
           dmy(r.work_date),
@@ -587,6 +601,11 @@ async function table(ctx: Ctx, kind: ExportKind, p: Params): Promise<Table> {
           r.minutes,
           r.state,
           r.back_missing === 1 ? 'yes' : '',
+          r.opened_by_name ?? '',
+          r.decided_by_name ?? '',
+          r.decided_at === null ? '' : `${dmy(istDay(r.decided_at))} ${istTime(r.decided_at)}`,
+          r.edited_by_name ?? '',
+          r.edited_at === null ? '' : `${dmy(istDay(r.edited_at))} ${istTime(r.edited_at)}`,
         ]),
       };
     }
