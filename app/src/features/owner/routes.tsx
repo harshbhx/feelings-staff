@@ -7,6 +7,7 @@
  */
 import { lazy, Suspense } from 'react';
 import type { RouteObject } from 'react-router';
+import { OwnerOnly } from './shell/OwnerOnly';
 import { RouteError } from './shell/RouteError';
 
 export interface OwnerRouteHandle {
@@ -97,6 +98,31 @@ export const ownerRoutes: RouteObject[] = [
     ...h('owner:screens.payrollRun', '/o/payroll'),
     lazy: () =>
       import('./payroll/PayrollRunScreen').then((m) => ({ Component: m.PayrollRunScreen })),
+  },
+  {
+    // Time credits are owner only (PRD 7.17.9): anyone else is sent to Today.
+    element: <OwnerOnly />,
+    children: [
+      {
+        path: 'payroll/:runId/credits',
+        ...h('owner:screens.settleCredits'),
+        lazy: () =>
+          import('./credits/SettleCreditsScreen').then((m) => ({
+            Component: m.SettleCreditsScreen,
+          })),
+      },
+      {
+        path: 'credits',
+        ...h('owner:screens.credits'),
+        lazy: () => import('./credits/CreditsScreen').then((m) => ({ Component: m.CreditsScreen })),
+      },
+      {
+        path: 'credits/:userId',
+        ...h('owner:screens.creditLedger', '/o/credits'),
+        lazy: () =>
+          import('./credits/CreditLedgerScreen').then((m) => ({ Component: m.CreditLedgerScreen })),
+      },
+    ],
   },
   {
     path: 'payroll/:runId/:userId',

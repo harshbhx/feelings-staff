@@ -1,8 +1,8 @@
 # Data model
 
-One D1 (SQLite) database per environment, plus one private R2 bucket. This page says what each table is for, the rules every table follows, how long data is kept and where files live. The schema itself is in [`migrations/0001_init.sql`](../migrations/0001_init.sql) (copied from PRD 8.2) and [`migrations/0002_platform.sql`](../migrations/0002_platform.sql). When this page and a migration disagree, the migration wins; fix the page.
+One D1 (SQLite) database per environment, plus one private R2 bucket. This page says what each table is for, the rules every table follows, how long data is kept and where files live. The schema itself is in [`migrations/0001_init.sql`](../migrations/0001_init.sql) (copied from PRD 8.2), [`migrations/0002_platform.sql`](../migrations/0002_platform.sql) and [`migrations/0003_time_credits_presence.sql`](../migrations/0003_time_credits_presence.sql) (WP-9). When this page and a migration disagree, the migration wins; fix the page.
 
-Contents: [Conventions](#conventions) · [Tables](#tables) · [Platform tables (0002)](#platform-tables-0002_platformsql) · [Retention](#retention) · [R2 layout](#r2-layout) · [Migrations](#migrations)
+Contents: [Conventions](#conventions) · [Tables](#tables) · [Platform tables (0002)](#platform-tables-0002_platformsql) · [Time credits and presence (0003)](#time-credits-and-presence-tables-0003_time_credits_presencesql) · [Retention](#retention) · [R2 layout](#r2-layout) · [Migrations](#migrations)
 
 ## Conventions
 
@@ -60,6 +60,8 @@ Grouped as in PRD 8.2.
 | `offsite_duty_staff` | Which staff are on a duty. |
 | `ot_preapprovals` | Overtime that is approved in advance (for example by a duty). |
 
+Setup and the demo seed propose Gujarat public holidays for 2026 and 2027 from `app/worker/seed/holidays-in.ts`. `scripts/gen-holidays.mjs` generates that file from the `date-holidays` package (ISC code, CC-BY-3.0 data; see `NOTICE`). The package is a dev dependency and the Worker bundles only the static list. Lunar festivals (Holi, Janmashtami, Dussehra, Diwali) are not in that data for Gujarat, so the owner adds them each year. Every proposed holiday is editable.
+
 ### Attendance
 
 | Table | What it is for |
@@ -112,6 +114,50 @@ Added by WP-1 on top of PRD 8.2.
 
 Neither table has a retention rule in PRD 8.3 yet. Idempotency rows are only useful for a few days, and the index on `created_at` is there so a purge job can be added; until then they stay. This is an open item for WP-8 (the nightly job). `test_outbox` is wiped by `/__test/reset`.
 
+## Time credits and presence tables (0003_time_credits_presence.sql)
+
+Added by WP-9 (PRD 8.2.1). Credit tables are owner only: no staff route returns them. Presence tables can be read by the staff member they belong to, for the My data screen.
+
+### Time credits
+
+| Table | Columns | What it is for |
+|---|---|---|
+| `credit_entries` | `user_id`, `work_date`, `kind` (`late`, `early`, `away`, `ot`, `ot_legal`), `minutes` (signed, never 0), `source_kind` (`punch`, `presence`, `ot_decision`), `source_id`, `confirmed_by`, `confirmed_at`, `status` (`active`, `superseded`), `engine_version` | The minute ledger, derived by the engine. Late, early and overtime entries are rewritten when the day is recomputed, while the day is unlocked. `ot_legal` is the second plus entry for overtime beyond 9 h a day or 48 h a week, written next to the `ot` entry when `legalOt2x` is on. `confirmed_by` is empty for automatic entries (late, early). Unique per person, day and kind, except `away`, which is unique per interval. |
+| `credit_adjustments` | `user_id`, `work_date`, `kind`, `delta_min` (signed, never 0), `reason` (required), `status` (`active`, `void`), `created_by`, `created_at`, `voided_by`, `voided_at`, `void_reason` | An owner edit of one day and kind. It is its own row, so a recompute never undoes it, and the original entry stays visible. |
+| `credit_settlements` | `user_id`, `payroll_run_id`, `month`, `balance_min`, `settle_min`, `applied_min`, `amount_paise`, `rate_json`, `warnings_json`, `status` (`draft`, `applied`, `void`), `decided_by`, `decided_at`, `note` | What the owner settled at payroll. `applied_min` is after the 50% cap. `amount_paise` is negative for a cut and positive for an earning, at 1x the person's rate. One live row per run and person. Takes effect on Finalise; Reopen voids it. |
+
+The balance is not stored. It is the sum of active entries and adjustments up to a date, less the settled minutes of finalised settlements. The payslip line code is `time_credits`.
+
+### Presence
+
+| Table | Columns | What it is for |
+|---|---|---|
+| `roll_calls` | `work_date`, `slot_time`, `slot_ts`, `reminded_at`, `submitted_by`, `submitted_at`, `edited_at` | One roll-call slot of one day, opened by the `rules` job. `submitted_by` is empty until someone taps Done. Unique per day and slot. |
+| `roll_call_marks` | `roll_call_id`, `user_id`, `mark` (`here`, `not_here`), `away_interval_id`, `marked_by`, `marked_at` | One row per person who was checked in at the slot. |
+| `away_intervals` | `user_id`, `work_date`, `source` (`roll_call`, `step_out`, `mixed`), `reason` (`personal`, `lunch`, `errand`, `other`), `reason_note`, `staff_note`, `start_ts`, `end_ts`, `end_reason`, `back_missing`, `minutes`, `state` (`open`, `pending`, `confirmed`, `work`, `ignored`), `roll_call_id`, `opened_by`, `decided_by`, `decided_at`, `edited_by`, `edited_at` | A time a person was away. `minutes` is clipped to the shift, the day's presence and outside the break window. Roll-call intervals start as `confirmed`; step-outs wait as `pending` until the owner decides. |
+| `presence_checks` | `user_id`, `work_date`, `check_ts`, `result` (`inside`, `edge`, `outside`, `no_fix`), `fence_result`, `distance_m`, `accuracy_m`, `distance_bucket`, `risk_reasons_json`, `device_id`, `idempotency_key` | The optional foreground check. It only raises a "seems away" hint and never makes an interval or a credit. No coordinates are stored. |
+
+### Changed tables
+
+| Table | Change |
+|---|---|
+| `attendance_days` | `away_min`: confirmed away minutes of the day. `total_min`: every worked minute of the day (in to out, less breaks), the figure the legal overtime band uses. Both default to 0. |
+| `staff_profiles` | `time_credits` (empty = salon default, 0 = left out) and `presence_enabled` (empty = salon default) |
+| `shift_templates` | `break_start`: optional usual break start, used for the presence break window |
+| `consents` | Rebuilt so `kind` can be `presence_checks` |
+| `challenges` | Rebuilt so `purpose` can be `presence` |
+
+SQLite cannot change a CHECK constraint, so `consents` and `challenges` are copied into a new table, which replaces the old one.
+
+### Settings
+
+Both live in `orgs.settings_json` (no table):
+
+- `timeCredits { enabled, startDate, legalOt2x }`: `legalOt2x` defaults to true. Changing `enabled` or `legalOt2x` needs step-up and is audited.
+- `presence { enabled, rollCallTimes[], stepOut, foreground { enabled, intervalMin }, quietDuringBreaks }`.
+
+Audit actions: `credits.settle`, `credits.adjust`, `credits.adjust.void`, `credits.export`, `rollcall.submit`, `rollcall.edit`, `presence.away.confirm`, `presence.away.work`, `presence.away.ignore`, `presence.away.edit`, `presence.step_out`.
+
 ## Retention
 
 What the nightly job (03:00 IST) and the monthly purge delete. Details and how to check it: [retention runbook](runbooks/retention-purge.md).
@@ -129,6 +175,9 @@ What the nightly job (03:00 IST) and the monthly purge delete. Details and how t
 | Push subscriptions | Until 404 or 410, device revoked, or staff exit | Deleted at once | On the event |
 | Devices | Until revoked plus 30 days | Deleted (the id stays in audit references) | Nightly |
 | Calibration samples | 30 days after the calibration is applied | Deleted | Nightly |
+| `presence_checks.distance_m`, `accuracy_m` | 90 days | Set to NULL (same rule as punch locations) | Nightly purge |
+| `presence_checks` rows, `roll_call_marks` with `here` | 90 days | Deleted (a not-here mark lives on in its away interval) | Nightly |
+| `away_intervals`, `roll_call_marks` with `not_here`, `credit_entries`, `credit_adjustments`, `credit_settlements` | 5 years after the last entry of that person (wage records) | Deleted | Monthly purge |
 | Salon network IPs (HMAC) | 7 days since last seen | Deleted | Nightly |
 | Exports (R2 `exports/`) | 7 days | R2 lifecycle | R2 rule |
 | Staff profile after exit | Statutory fields (name, code, designation, dates, wage records) 5 years; phone, photo and consent detail deleted 30 days after exit | Partial delete | Nightly |
@@ -153,4 +202,4 @@ Object metadata: `content-type`, `x-org-id`, `x-sha256`. Owners get selfie thumb
 - Files live in `migrations/` as `NNNN_name.sql` and are applied with `wrangler d1 migrations apply`. `app/wrangler.jsonc` points both databases at `../migrations`.
 - Locally and in CI the E2E run applies them to a local database. For the shared preview database, the `preview` workflow runs `wrangler d1 migrations apply fbc-staff-preview --remote -c wrangler.preview-migrations.jsonc`. In production, the `deploy` workflow exports the database first and then applies them ([deploy guide](deploy.md), [backup runbook](runbooks/backup-restore.md)).
 - A bad migration is fixed forward with a new file. D1 Time Travel (30 days) is the safety net for the data.
-- Current files: `0001_init.sql` (the PRD 8.2 schema) and `0002_platform.sql` (idempotency keys and the preview outbox).
+- Current files: `0001_init.sql` (the PRD 8.2 schema), `0002_platform.sql` (idempotency keys and the preview outbox) and `0003_time_credits_presence.sql` (time credits and presence, WP-9).

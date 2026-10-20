@@ -7,6 +7,7 @@
 import {
   type Adjustment,
   type AdvanceSchedule,
+  addDays,
   type CarryForward,
   daysInMonth,
   type Fine,
@@ -16,17 +17,22 @@ import {
   type PayrollBlocker,
   type PayslipResult,
   type PersonPay,
+  weekday,
 } from '@fs/contracts';
 import {
   advanceInstalment,
   computePayslip,
+  creditRate,
   dailyRate,
   divisorDays,
   lateFines,
+  legalOtBand,
   payRulesFromSettings,
   salaryParts,
 } from '@fs/engine';
 import { json } from '../db';
+import { balancesOn, type CreditSettlementRow } from './credit-entries';
+import { draftSettlements, type PersonCredit } from './credit-settlement';
 import {
   type Computed,
   computeFrom,
@@ -99,6 +105,8 @@ export interface PersonCalc {
   days: Computed[];
   result: PayslipResult;
   adjustments: AdjustmentRow[];
+  /** Time credits: balance on the month end, the owner's choice and what the engine applied. */
+  credit: PersonCredit;
 }
 
 export interface RunCalc {
@@ -217,6 +225,8 @@ export interface CalcOptions {
   userId?: string;
   /** "Payroll so far": pay only up to this date. */
   until?: string;
+  /** Settlement minutes to use instead of the saved draft ones (the person's settle step). */
+  settlements?: ReadonlyMap<string, number>;
 }
 
 /** Everything the engine needs, per person, and its result. */
@@ -231,26 +241,54 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
   );
   const ids = eligible.map((p) => p.user_id);
 
-  const [salaryRows, adjustmentRows, quarterRows, carried, schedules] = await Promise.all([
-    ctx.db.all<SalaryHistoryRow>(
-      'SELECT user_id, effective_from, salary_type, amount_paise FROM salary_history WHERE org_id = ?org AND effective_from <= ?',
-      to,
-    ),
-    o.runId
-      ? ctx.db.all<AdjustmentRow>(
-          'SELECT * FROM adjustments WHERE org_id = ?org AND payroll_run_id = ? ORDER BY created_at, id',
-          o.runId,
-        )
-      : Promise.resolve([] as AdjustmentRow[]),
-    ctx.db.all<{ user_id: string; min: number }>(
-      `SELECT user_id, SUM(ot_approved_min) AS min FROM attendance_days
+  const [salaryRows, adjustmentRows, quarterRows, carried, schedules, balances, drafts, edgeRows] =
+    await Promise.all([
+      ctx.db.all<SalaryHistoryRow>(
+        'SELECT user_id, effective_from, salary_type, amount_paise FROM salary_history WHERE org_id = ?org AND effective_from <= ?',
+        to,
+      ),
+      o.runId
+        ? ctx.db.all<AdjustmentRow>(
+            'SELECT * FROM adjustments WHERE org_id = ?org AND payroll_run_id = ? ORDER BY created_at, id',
+            o.runId,
+          )
+        : Promise.resolve([] as AdjustmentRow[]),
+      ctx.db.all<{ user_id: string; min: number }>(
+        `SELECT user_id, SUM(ot_approved_min) AS min FROM attendance_days
         WHERE org_id = ?org AND work_date >= ? AND work_date < ? GROUP BY user_id`,
-      quarterStart(month),
-      from,
-    ),
-    carriedIn(ctx, month),
-    advanceSchedules(ctx, month, ids, o.overrides),
-  ]);
+        quarterStart(month),
+        from,
+      ),
+      carriedIn(ctx, month),
+      advanceSchedules(ctx, month, ids, o.overrides),
+      balancesOn(ctx, ids, to),
+      o.runId
+        ? draftSettlements(ctx, o.runId)
+        : Promise.resolve(new Map<string, CreditSettlementRow>()),
+      // Days of the ISO weeks that start before or end after the month, for the legal band.
+      ctx.db.all<{
+        user_id: string;
+        work_date: string;
+        total_min: number;
+        ot_approved_min: number;
+      }>(
+        `SELECT user_id, work_date, total_min, ot_approved_min FROM attendance_days
+          WHERE org_id = ?org AND ((work_date >= ? AND work_date < ?) OR (work_date > ? AND work_date <= ?))`,
+        addDays(from, -((weekday(from) + 6) % 7)),
+        from,
+        to,
+        addDays(to, (7 - weekday(to)) % 7),
+      ),
+    ]);
+  const edgeDays = new Map<
+    string,
+    { workDate: string; totalMin: number; otApprovedMin: number }[]
+  >();
+  for (const r of edgeRows) {
+    const list = edgeDays.get(r.user_id) ?? [];
+    list.push({ workDate: r.work_date, totalMin: r.total_min, otApprovedMin: r.ot_approved_min });
+    edgeDays.set(r.user_id, list);
+  }
   const rules = payRulesFromSettings(settings);
   const holidays = data.holidays.filter((h) => h.date >= from && h.date <= to);
   const quarterMin = new Map(quarterRows.map((r) => [r.user_id, r.min]));
@@ -329,6 +367,30 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
         });
       }
     }
+    // Time credits (PRD 7.17): the balance on the month end and the owner's settlement choice.
+    const balanceMin = balances.get(profile.user_id) ?? 0;
+    const chosen =
+      o.settlements?.get(profile.user_id) ?? drafts.get(profile.user_id)?.settle_min ?? 0;
+    const rate = creditRate(person, month);
+    const settlement =
+      o.runId !== null && chosen !== 0 && balanceMin !== 0
+        ? { balanceMin, settleMin: chosen, rate }
+        : null;
+    // Legal-band overtime of the month on Time credits days (PRD 7.17.7), for the warnings.
+    const creditDays = days.filter((c) => c.creditsOn);
+    // Every day of each ISO week goes into the band, credits on or not, and the days of a week that
+    // spans the month edge come from the neighbouring months (see `legalOtBand`).
+    const creditDates = new Set(creditDays.map((c) => c.date));
+    const legalMin = legalOtBand([
+      ...(edgeDays.get(profile.user_id) ?? []),
+      ...days.map((c) => ({
+        workDate: c.date,
+        totalMin: c.result.totalMin ?? c.result.workedMin,
+        otApprovedMin: c.otApprovedMin,
+      })),
+    ])
+      .filter((b) => creditDates.has(b.workDate))
+      .reduce((s, b) => s + b.legalMin, 0);
     const result = computePayslip({
       person,
       month,
@@ -345,8 +407,18 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
         quarterlyOtHours: settings.overtime.quarterlyOtWarnHours,
       },
       quarterOtMinBefore: quarterMin.get(profile.user_id) ?? 0,
+      creditDays: creditDays.map((c) => c.date),
+      legalOt: { minutes: legalMin, pay2x: settings.timeCredits.legalOt2x },
+      settlement,
     });
-    people.push({ profile, person, days, result, adjustments: mine });
+    people.push({
+      profile,
+      person,
+      days,
+      result,
+      adjustments: mine,
+      credit: { balanceMin, settleMin: chosen, rate, applied: result.credits },
+    });
   }
   const blockers = o.userId ? [] : await findBlockers(ctx, month, data, people);
   return { month, data, people, blockers };

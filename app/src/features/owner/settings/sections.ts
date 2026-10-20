@@ -12,6 +12,7 @@ export type SectionId =
   | 'holidays'
   | 'attendance'
   | 'pay'
+  | 'credits'
   | 'leave'
   | 'notifications'
   | 'presence'
@@ -239,6 +240,13 @@ const LEAVE: readonly Field[] = [
   { id: 'earned', path: ['leave', 'earnedLeave'], kind: 'switch' },
 ];
 
+/** Time credits (PRD 4.19.4, 7.17.7): both switches need the PIN. */
+const CREDITS: readonly Field[] = [
+  { id: 'creditsOn', path: ['timeCredits', 'enabled'], kind: 'switch', stepUp: true },
+  { id: 'creditsStart', path: ['timeCredits', 'startDate'], kind: 'date' },
+  { id: 'legalOt2x', path: ['timeCredits', 'legalOt2x'], kind: 'switch', stepUp: true },
+];
+
 const NOTIFICATIONS: readonly Field[] = [
   { id: 'quiet', path: ['notifications', 'quietHours', 'enabled'], kind: 'switch' },
   { id: 'quietStart', path: ['notifications', 'quietHours', 'start'], kind: 'time' },
@@ -272,6 +280,7 @@ export const SECTIONS: readonly SectionDef[] = [
   { id: 'holidays', icon: 'confetti' },
   { id: 'attendance', icon: 'check-circle', fields: ATTENDANCE },
   { id: 'pay', icon: 'currency-inr', fields: PAY },
+  { id: 'credits', icon: 'hourglass', fields: CREDITS },
   { id: 'leave', icon: 'airplane-tilt', fields: LEAVE },
   { id: 'notifications', icon: 'bell', fields: NOTIFICATIONS },
   { id: 'presence', icon: 'check-circle' },

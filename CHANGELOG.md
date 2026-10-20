@@ -8,6 +8,12 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ### Added
 
+- Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026, generated from `date-holidays` (credited in `NOTICE`).
+
+Docs for Time credits and presence (WP-9):
+
+- Owner guide sections on Time credits, the Credits screen, settling at payroll, legal overtime at 2x, roll-call and step-outs; staff guide section on Step out and I'm back and the payslip Time adjustment line; data model for migration 0003 with retention; ADR-17 and ADR-18.
+
 WP-1, platform, contracts and CI (merged):
 
 - Monorepo with pnpm workspaces: `app` (React SPA and Worker in one Vite project), `packages/contracts`, `engine`, `i18n`, `templates`, `ui`, and `e2e`.

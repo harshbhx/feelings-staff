@@ -11,6 +11,7 @@ describe('owner navigation (PRD 5.2)', () => {
     expect(TABS.map((t) => t.key)).toEqual(['today', 'actions', 'register', 'staff']);
     expect(MORE.map((t) => t.key)).toEqual([
       'payroll',
+      'credits',
       'advances',
       'reports',
       'roster',
@@ -47,5 +48,6 @@ describe('owner navigation (PRD 5.2)', () => {
     expect(activeTab('/o/payroll/01K8QTKPY00JBH9HC76Z45ZRR1')).toBe('more');
     expect(activeItem('/o/payroll/01K8QTKPY00JBH9HC76Z45ZRR1')).toBe('payroll');
     expect(activeItem('/o/duties/new')).toBe('roster');
+    expect(activeItem('/o/credits/01K87R133CAYV58WCHEDPSC8TQ')).toBe('credits');
   });
 });
