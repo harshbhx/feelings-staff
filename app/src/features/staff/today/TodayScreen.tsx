@@ -28,7 +28,7 @@ import { useQueue } from '../../../pwa/queue';
 import { staffKeys, useOwnerName, useStaffMe, useToday } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
 import { useNow } from '../lib/use-now';
-import { AwayCard, useImBack } from '../presence/AwayCard';
+import { useImBack } from '../presence/AwayCard';
 import { deferNotice, noticeDeferred, presenceKey, usePresence } from '../presence/api';
 import { presenceUi } from '../presence/presence-model';
 import type { FrozenSheet } from '../punch/frozen';
@@ -51,6 +51,9 @@ const SendNoteSheet = lazy(() =>
   import('./SendNoteSheet').then((m) => ({ default: m.SendNoteSheet })),
 );
 // Presence (PRD 4.18): the Step out sheet and the one-time notice load only when they open.
+const AwayCard = lazy(() =>
+  import('../presence/AwayCardView').then((m) => ({ default: m.AwayCard })),
+);
 const StepOutSheet = lazy(() =>
   import('../presence/StepOutSheet').then((m) => ({ default: m.StepOutSheet })),
 );
@@ -197,7 +200,11 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
         <StatusBlock view={view} model={model} fmt={fmt} />
       </section>
 
-      {pres.card ? <AwayCard card={pres.card} /> : null}
+      {pres.card ? (
+        <Suspense fallback={null}>
+          <AwayCard card={pres.card} />
+        </Suspense>
+      ) : null}
 
       {model.pendingPunch && model.status === 'waiting_proof' ? (
         <WaitingProof punch={model.pendingPunch} />
