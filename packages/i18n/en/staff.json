@@ -552,7 +552,6 @@
     "notifOn": "On",
     "notifOff": "Off",
     "notifBlocked": "Notifications are off",
-    "notifInstall": "Add Feelings to your Home Screen first, then turn notifications on here.",
     "notifUnsupported": "This phone can't show notifications from the app.",
     "notifTurnOn": "Turn on notifications",
     "notifWhy": "Get a ping when {{owner}} approves your leave or your payslip is ready.",

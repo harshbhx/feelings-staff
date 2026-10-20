@@ -125,8 +125,6 @@ export function MeScreen() {
                 <Link to="/fix/notifications">{t('staff:me.notifHowTo')}</Link>
               </Button>
             </div>
-          ) : push.state === 'needs-install' ? (
-            <p className="text-sm text-text-muted">{t('staff:me.notifInstall')}</p>
           ) : push.state === 'granted-subscribed' ? (
             <p className="text-sm text-text-muted">{t('staff:me.notifWhy', { owner })}</p>
           ) : (
