@@ -79,6 +79,17 @@ test.describe('E2E-02 to E2E-16 a working day, then payroll', () => {
     owner = await ownerSession(request, seeded.owner);
     await page.reload();
     await punch(page, 'out', PIN);
+    // The phone's own clock is weeks away from the pinned server clock, so the server flags the
+    // punches (and may hold the second one for approval): the owner clears them first (E2E-05 path).
+    const all = await owner.ok<ActionsView>('GET', '/owner/actions');
+    for (const item of all.items) {
+      if (item.user.id !== me.id) continue;
+      if (item.type === 'pending_punch') {
+        await owner.ok('POST', `/owner/punches/${item.punch.id}/review`, { decision: 'approve' });
+      } else if (item.type === 'flagged_punch') {
+        await owner.ok('POST', `/owner/punches/${item.punch.id}/review`, { decision: 'clear' });
+      }
+    }
     const actions = await owner.ok<ActionsView>('GET', '/owner/actions?type=overtime');
     const ot = actions.items.find((i) => i.type === 'overtime' && i.user.id === me.id);
     const seen = await owner.ok<OwnerDayDetail>('GET', `/owner/days/${me.id}/${WORK_DATE}`);
