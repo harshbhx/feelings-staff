@@ -43,6 +43,24 @@ export function Meta({ children, className }: { children: ReactNode; className?:
 }
 
 /**
+ * "Stylist · FBC-003 · 98250 11201": a line may break between the parts, never inside a code or a
+ * phone number, and the dot stays at the end of a line, never the start of the next.
+ */
+export function NoBreakParts({ parts }: { parts: readonly (string | null | undefined)[] }) {
+  const shown = parts.filter((p): p is string => Boolean(p));
+  return (
+    <>
+      {shown.map((p, i) => (
+        <span key={p}>
+          <span className="whitespace-nowrap">{i < shown.length - 1 ? `${p} ·` : p}</span>
+          {i < shown.length - 1 ? ' ' : null}
+        </span>
+      ))}
+    </>
+  );
+}
+
+/**
  * A quiet word that is not a status ("Phone", "Kiosk"). Square-ish corners so it never reads as a
  * button; for words with a meaning by colour use the kit's `Badge` (WP-10).
  */

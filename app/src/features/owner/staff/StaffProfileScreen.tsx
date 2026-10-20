@@ -26,11 +26,12 @@ import {
   Textarea,
   useToast,
 } from '@fs/ui';
-import { lazy, type ReactNode, Suspense, useState } from 'react';
+import { lazy, type ReactNode, Suspense, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams, useSearchParams } from 'react-router';
 import { useMe } from '../../../api/hooks';
 import { isStepUpCancelled } from '../../auth/step-up';
+import { useCreditsOverview } from '../api/credits';
 import { useShiftTemplates } from '../api/schedule';
 import {
   useDecideDevice,
@@ -44,8 +45,9 @@ import {
   useStaff,
   useStaffLeave,
 } from '../api/staff';
-import { Meta, Section } from '../components/layout';
+import { Meta, NoBreakParts, Section } from '../components/layout';
 import { ErrorCard, QueryView, RowsSkeleton, useErrorText } from '../components/states';
+import { Balance, useEstimateText } from '../credits/parts';
 import { clock, days, duration, longDate, money, shortDate } from '../lib/format';
 import { phoneLabel } from '../lib/share';
 import { dayStatusMeta, leaveKey } from '../lib/status';
@@ -105,6 +107,14 @@ function Profile({ staff }: { staff: StaffDetail }) {
     p.set('tab', next);
     setParams(p, { replace: true });
   };
+  // On a phone the tab row scrolls; keep the open tab in view (a link to ?tab=credits lands on it).
+  const tabsRef = useRef<HTMLDivElement>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs again whenever the open tab changes
+  useEffect(() => {
+    tabsRef.current
+      ?.querySelector<HTMLElement>(`[role="tab"][data-state="active"]`)
+      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [tab]);
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
@@ -113,41 +123,70 @@ function Profile({ staff }: { staff: StaffDetail }) {
         <div className="grid min-w-0">
           <p className="font-bold text-text">{staff.designation}</p>
           <Meta>
-            {[
-              t('owner:staff.profile.joined', { date: longDate(staff.joinDate) }),
-              staff.employeeCode
-                ? t('owner:staff.profile.code', { code: staff.employeeCode })
-                : null,
-              staff.phone ? phoneLabel(staff.phone) : null,
-            ]
-              .filter(Boolean)
-              .join(' · ')}
+            <NoBreakParts
+              parts={[
+                t('owner:staff.profile.joined', { date: longDate(staff.joinDate) }),
+                staff.employeeCode
+                  ? t('owner:staff.profile.code', { code: staff.employeeCode })
+                  : null,
+                staff.phone ? phoneLabel(staff.phone) : null,
+              ]}
+            />
           </Meta>
         </div>
       </div>
-      <Tabs
-        variant="underline"
-        label={t('owner:staff.profile.tabs.label')}
-        value={tab}
-        onValueChange={setTab}
-        items={tabs.map((k) => ({
-          value: k,
-          label: t(`owner:staff.profile.tabs.${k}`),
-          content: (
-            <div className={k === 'credits' ? 'pt-2' : 'max-w-(--container-narrow) pt-2'}>
-              {tabContent(k, staff)}
-            </div>
-          ),
-        }))}
-      />
+      <div ref={tabsRef} className="contents">
+        <Tabs
+          variant="underline"
+          label={t('owner:staff.profile.tabs.label')}
+          value={tab}
+          onValueChange={setTab}
+          items={tabs.map((k) => ({
+            value: k,
+            label: t(`owner:staff.profile.tabs.${k}`),
+            content: (
+              <div className={k === 'credits' ? 'pt-2' : 'max-w-(--container-narrow) pt-2'}>
+                {tabContent(
+                  k,
+                  staff,
+                  tabs.includes('credits') ? () => setTab('credits') : undefined,
+                )}
+              </div>
+            ),
+          }))}
+        />
+      </div>
     </div>
   );
 }
 
-function tabContent(tab: Tab, staff: StaffDetail) {
+/** The credit balance on the overview (owner only), so it is one tap from the person, not hidden. */
+function CreditsLine({ userId, open }: { userId: string; open: () => void }) {
+  const { t } = useTranslation();
+  const estimate = useEstimateText();
+  const overview = useCreditsOverview();
+  const row = overview.data?.staff.find((r) => r.userId === userId);
+  if (!overview.data?.enabled || !row) return null;
+  return (
+    <Section
+      title={t('owner:staff.profile.tabs.credits')}
+      action={
+        <Button size="sm" variant="ghost" iconEnd="arrow-right" onClick={open}>
+          {t('owner:staff.profile.openCredits')}
+        </Button>
+      }
+    >
+      <p className="text-text-body">
+        <Balance min={row.balanceMin} /> · {estimate(row.estimatePaise, row.balanceMin)}
+      </p>
+    </Section>
+  );
+}
+
+function tabContent(tab: Tab, staff: StaffDetail, openCredits?: () => void) {
   switch (tab) {
     case 'overview':
-      return <Overview staff={staff} />;
+      return <Overview staff={staff} openCredits={openCredits} />;
     case 'salary':
       return <SalaryTab staff={staff} />;
     case 'shift':
@@ -169,7 +208,7 @@ function tabContent(tab: Tab, staff: StaffDetail) {
   }
 }
 
-function Overview({ staff }: { staff: StaffDetail }) {
+function Overview({ staff, openCredits }: { staff: StaffDetail; openCredits?: () => void }) {
   const { t } = useTranslation();
   const today = staff.today;
   const m = staff.monthTotals;
@@ -220,6 +259,7 @@ function Overview({ staff }: { staff: StaffDetail }) {
           })}
         </p>
       </Section>
+      {openCredits ? <CreditsLine userId={staff.id} open={openCredits} /> : null}
       {staff.consents.length > 0 ? (
         <Section title={t('owner:staff.profile.consents')}>
           <List>

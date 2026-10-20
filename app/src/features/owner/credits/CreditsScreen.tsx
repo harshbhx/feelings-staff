@@ -36,10 +36,11 @@ export function CreditsScreen() {
 function lastSettled(r: CreditsRow, t: TFunction): string {
   const s = r.lastSettlement;
   if (!s) return t('owner:credits.neverSettled');
+  // A word joiner after the sign keeps "−₹44.44" on one line (it broke after the minus).
   return t('owner:credits.lastSettled', {
     month: monthName(s.month),
     min: signedMin(s.appliedMin),
-    money: money(s.amountPaise),
+    money: money(s.amountPaise).replace(/^([−-])/, '$1\u2060'),
   });
 }
 
@@ -154,12 +155,8 @@ function CreditsList({ rows }: { rows: CreditsRow[] }) {
               <span className="tabular-nums">{lastSettled(r, t)}</span>
             </span>
           }
-          trailing={
-            <span className="flex flex-wrap items-center justify-end gap-2">
-              <AwayBadge count={r.awayPending} />
-              <Balance min={r.balanceMin} />
-            </span>
-          }
+          meta={r.awayPending > 0 ? <AwayBadge count={r.awayPending} /> : undefined}
+          trailing={<Balance min={r.balanceMin} />}
         >
           <Link to={`/o/credits/${r.userId}`} />
         </ListRow>

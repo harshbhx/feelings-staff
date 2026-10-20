@@ -49,3 +49,26 @@ export function runActions(view: Pick<PayrollRunView, 'run' | 'lines'>) {
   const unpaid = view.lines.some((l) => l.paid === null && l.payslipId !== null);
   return { finalise: draft, recompute: draft, markAllPaid: final && unpaid, reopen: final };
 }
+
+const plain = (s: string) => s.toLowerCase().replace(/[\s.]+$/, '');
+
+/**
+ * Payslip-level warnings, minus the ones the run already says about the same person
+ * ("Komal Rathod is below the minimum wage you set." and Komal's own "Below the minimum wage you
+ * set"), so "Worth a look" never lists one problem twice.
+ */
+export function personWarnings(
+  lines: readonly { user: { name: string }; warnings: readonly string[] }[],
+  runWarnings: readonly string[],
+): { who: string; text: string }[] {
+  const run = runWarnings.map(plain);
+  return lines.flatMap((l) =>
+    l.warnings
+      .filter((text) => {
+        const name = l.user.name.toLowerCase();
+        const words = plain(text);
+        return !run.some((w) => w.includes(name) && w.includes(words));
+      })
+      .map((text) => ({ who: l.user.name, text })),
+  );
+}

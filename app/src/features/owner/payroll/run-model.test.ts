@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   blockerCount,
   firstDraftDate,
+  personWarnings,
   previousMonth,
   runActions,
   runWord,
@@ -40,5 +41,19 @@ describe('Payroll model (O-13)', () => {
     expect(runWord({ status: 'finalised', people: 12, paidCount: 3 }).word).toBe('finalised');
     expect(runWord({ status: 'finalised', people: 11, paidCount: 11 }).word).toBe('paid');
     expect(runWord({ status: 'superseded', people: 11, paidCount: 11 }).word).toBe('superseded');
+  });
+});
+
+describe('Payroll warnings (O-13)', () => {
+  it('O-13 review: a payslip warning the run already states for that person is listed once', () => {
+    const lines = [
+      { user: { name: 'Komal Rathod' }, warnings: ['Below the minimum wage you set'] },
+      { user: { name: 'Priya Solanki' }, warnings: ['Below the minimum wage you set'] },
+    ];
+    const run = ['Komal Rathod is below the minimum wage you set.'];
+    expect(personWarnings(lines, run)).toEqual([
+      { who: 'Priya Solanki', text: 'Below the minimum wage you set' },
+    ]);
+    expect(personWarnings(lines, [])).toHaveLength(2);
   });
 });
