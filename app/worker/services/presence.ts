@@ -703,6 +703,11 @@ export async function presenceDay(
   userId: string,
   date: string,
 ): Promise<OwnerPresenceDay> {
+  const person = await ctx.db.first<{ id: string }>(
+    'SELECT id FROM users WHERE org_id = ?org AND id = ?',
+    userId,
+  );
+  if (!person) fail('NOT_FOUND', 'That person was not found.');
   const [marks, away, checks] = await Promise.all([
     ctx.db.all<{
       rollCallId: string;

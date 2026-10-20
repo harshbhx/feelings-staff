@@ -79,10 +79,13 @@ describe('N4 and N10 staff reminders, N3 not in yet', () => {
     await addPunch(salon, kajal, 'in', ist('10:00'));
     await addPunch(salon, kajal, 'out', ist('19:55'));
     await rules(ist('20:25'));
-    expect(await allInbox()).toHaveLength(0);
+    // The 18:00 roll-call (N33) is a separate rule; this test is about shift-end reminders.
+    const shiftEnd = async () => (await allInbox()).filter((r) => !r.type.startsWith('roll_call'));
+    expect(await shiftEnd()).toHaveLength(0);
     await rules(ist('20:30'));
     expect(titles(await inbox(priya))).toEqual(['Still at work?']);
-    expect(titles(await inbox(salon.ownerId))).toEqual(['Priya is still working']);
+    const ownerRows = (await inbox(salon.ownerId)).filter((r) => !r.type.startsWith('roll_call'));
+    expect(titles(ownerRows)).toEqual(['Priya is still working']);
     expect(await inbox(kajal)).toHaveLength(0);
   });
 
