@@ -51,10 +51,7 @@ function PayslipRow({ slip }: { slip: PayslipSummary }) {
   return (
     <ListRow
       asChild
-      title={t('staff:payslips.row', {
-        month: fmt.month(slip.month),
-        net: fmt.rupees(slip.netPaise),
-      })}
+      title={fmt.month(slip.month)}
       subtitle={
         slip.paidOn && slip.payMode
           ? t('staff:payslips.paid', {
@@ -63,7 +60,8 @@ function PayslipRow({ slip }: { slip: PayslipSummary }) {
             })
           : t('staff:payslips.notPaid')
       }
-      trailing={
+      trailing={<span className="font-bold tabular-nums">{fmt.rupees(slip.netPaise)}</span>}
+      meta={
         slip.superseded ? (
           <Badge tone="outline" icon="clock">
             {t('staff:payslips.superseded')}
