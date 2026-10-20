@@ -20,7 +20,7 @@ if (!manifestPath) {
 }
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
 const gz = (file) => gzipSync(readFileSync(join(dist, file))).length;
-const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
+const kb = (n) => `${(n / 1024).toFixed(1)} KB (${n} B)`;
 
 // The client entry is `index.html` in the manifest (main.tsx is bundled into it); accept both.
 const entryKey = Object.keys(manifest).find(
