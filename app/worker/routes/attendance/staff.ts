@@ -25,6 +25,7 @@ import {
 import { dutiesBetween, dutyViews, inWorkDateWindow } from '../../services/duty';
 import { lockedMonths } from '../../services/leave';
 import type { Ctx } from '../../services/ports';
+import { myDataPresence } from '../../services/presence';
 import {
   createPunch,
   issueNonces,
@@ -228,7 +229,7 @@ export const handlers: Handlers = {
           deletesOn: istDate(p.server_ts + selfieDays * DAY_MS),
           url: `/api/v1/me/punches/${p.id}/selfie`,
         })),
-      presence: [],
+      presence: await myDataPresence(ctx, user.id),
       consents: consents.map((x) => ({
         kind: x.kind,
         version: x.version,

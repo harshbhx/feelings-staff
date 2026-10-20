@@ -21,6 +21,7 @@ export type Field =
   | (FieldBase & { kind: 'switch' })
   | (FieldBase & { kind: 'choice'; options: readonly (string | number)[] })
   | (FieldBase & { kind: 'time' })
+  | (FieldBase & { kind: 'date' })
   | (FieldBase & { kind: 'text'; maxLength: number })
   | (FieldBase & { kind: 'rupees'; nullable?: boolean })
   | (FieldBase & { kind: 'otRate' });

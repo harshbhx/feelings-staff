@@ -544,8 +544,52 @@ async function table(ctx: Ctx, kind: ExportKind, p: Params): Promise<Table> {
     }
     case 'credits_ledger':
       return creditsLedgerTable(ctx, p);
-    case 'presence_log':
-      return fail('NOT_IMPLEMENTED', 'This report is not ready yet.');
+    case 'presence_log': {
+      const rows = await ctx.db.all<{
+        work_date: string;
+        name: string;
+        source: string;
+        reason: string | null;
+        start_ts: number;
+        end_ts: number | null;
+        minutes: number;
+        state: string;
+        back_missing: number;
+      }>(
+        `SELECT a.work_date, u.name, a.source, a.reason, a.start_ts, a.end_ts, a.minutes, a.state,
+                a.back_missing
+           FROM away_intervals a JOIN users u ON u.id = a.user_id
+          WHERE a.org_id = ?org AND a.work_date BETWEEN ? AND ? ${filter('a.user_id')}
+          ORDER BY a.work_date, u.name, a.start_ts`,
+        from,
+        to,
+        ...bind(),
+      );
+      return {
+        header: [
+          'Date',
+          'Staff',
+          'Source',
+          'Reason',
+          'From',
+          'To',
+          'Minutes',
+          'State',
+          'I am back missing',
+        ],
+        rows: rows.map((r) => [
+          dmy(r.work_date),
+          r.name,
+          r.source,
+          r.reason,
+          istTime(r.start_ts),
+          r.end_ts === null ? '' : istTime(r.end_ts),
+          r.minutes,
+          r.state,
+          r.back_missing === 1 ? 'yes' : '',
+        ]),
+      };
+    }
     case 'audit': {
       const rows = await ctx.db.all<{
         created_at: number;
