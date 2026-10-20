@@ -70,6 +70,9 @@ test.describe('owner credits visual', () => {
     await sheet.getByLabel('Minutes', { exact: true }).fill('10');
     await sheet.getByLabel('Reason', { exact: true }).fill('Bus strike, she called ahead');
     await expect(sheet.getByRole('button', { name: 'Save adjustment' })).toBeEnabled();
+    // The sheet slid up under the pointer left on "Adjust minutes": park it so no field keeps a
+    // hover border that depends on when the browser last re-checked hover.
+    await page.mouse.move(0, 0);
     await expect(page).toHaveScreenshot('owner-credits-adjust.png');
     await checkA11y();
   });
