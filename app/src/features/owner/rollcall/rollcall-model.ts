@@ -4,7 +4,7 @@
  * (the mark continues the interval) until the owner taps Here to end it. Done sends the marks.
  */
 import {
-  AwayReason,
+  type AwayReason,
   HHMM,
   type RollCallPerson,
   type RollCallSlot,
@@ -90,9 +90,11 @@ export function canOpenSlot(slot: Pick<RollCallSlot, 'status'>): boolean {
   return slot.status !== 'upcoming';
 }
 
-export const AWAY_REASONS: readonly AwayReason[] = AwayReason.options;
+export const AWAY_REASONS: readonly AwayReason[] = ['personal', 'lunch', 'errand', 'other'];
 
-const isHHMM = (v: string) => HHMM.safeParse(v).success;
+// Same shape as the contract's `HHMM` (a runtime import would widen the shared chunk).
+const HHMM = /^([01]\d|2[0-3]):([0-5]\d)$/;
+const isHHMM = (v: string) => HHMM.test(v);
 const HHMM_PARTS = /^(\d\d):(\d\d)$/;
 
 /** Epoch ms of `HH:MM` IST on a work date, or null for a time that is not a time. */
