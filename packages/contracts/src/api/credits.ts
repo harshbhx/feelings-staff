@@ -227,6 +227,11 @@ export const RollCallPerson = z.object({
   hint: z.enum(['seems_away', 'stepped_out']).optional(),
   /** E.g. "lunch outside, since 14:40" for a step-out hint. */
   hintDetail: z.string().optional(),
+  /**
+   * The mark saved at this roll-call, absent until it is submitted. Reopening a done roll-call
+   * starts from these marks, and a re-submit only acts on the people whose mark changed.
+   */
+  mark: z.enum(['here', 'not_here']).optional(),
 });
 export type RollCallPerson = z.infer<typeof RollCallPerson>;
 

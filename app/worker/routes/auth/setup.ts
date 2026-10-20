@@ -17,7 +17,7 @@ import { timingSafeEqual } from '../../lib/crypto';
 import { ApiException, fail } from '../../lib/errors';
 import { ulid } from '../../lib/ulid';
 import { forgetSingleOrg } from '../../middleware/context';
-import { HOLIDAYS_2026, LEAVE_TYPES } from '../../seed';
+import { LEAVE_TYPES, SEED_HOLIDAYS } from '../../seed';
 import { normaliseEmail, withOrg } from '../../services/auth';
 import type { Ctx } from '../../services/ports';
 
@@ -110,7 +110,7 @@ export const setup: Handler<Endpoints['setup']> = async ({ body }, ctx, c) => {
       }),
     );
   });
-  for (const h of HOLIDAYS_2026) {
+  for (const h of SEED_HOLIDAYS) {
     stmts.push(
       db.insert('holidays', {
         id: ulid(now),

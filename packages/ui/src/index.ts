@@ -81,6 +81,11 @@ export {
 export { Select, type SelectOption, type SelectProps } from './components/Select';
 export { Sheet, type SheetProps } from './components/Sheet';
 export {
+  type ShiftSpan,
+  ShiftTimeline,
+  type ShiftTimelineProps,
+} from './components/ShiftTimeline';
+export {
   Skeleton,
   SkeletonGroup,
   type SkeletonGroupProps,
@@ -105,10 +110,8 @@ export { Stepper, type StepperProps } from './components/Stepper';
 export { TabBar, TabBarItem, type TabBarItemProps, type TabBarProps } from './components/TabBar';
 export { type TabItem, Tabs, type TabsProps } from './components/Tabs';
 export {
-  Toast,
   type ToastAction,
   type ToastInput,
-  type ToastProps,
   ToastProvider,
   type ToastProviderProps,
   type ToastTone,

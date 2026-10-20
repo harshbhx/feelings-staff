@@ -115,6 +115,18 @@ node scripts/gen-secrets.mjs --wrangler [--preview]
 
 Never commit `.dev.vars`, and never paste real secrets into chats, issues, PRs or logs.
 
+## Email: what is sent where
+
+- **Local, tests, previews** (`EMAIL_PROVIDER=outbox`, `ENV=preview`): nothing leaves the Worker. Sign-in links, codes and digests are written to the test outbox (`/__test/*` with the E2E token). On the demo preview the owner signs in with email and password plus the owner PIN ("Use password instead"), not a mailed link.
+- **Production** (`EMAIL_PROVIDER=cloudflare`): the `EMAIL` `send_email` binding of Cloudflare Email Service sends from `staff@feelingsbeautycare.in`. The binding only allows that sender address (`allowed_sender_addresses` in `app/wrangler.jsonc`).
+- **Verify the sending domain before go-live** (the client's own domain, or any other domain you switch to):
+  1. Cloudflare dashboard, Compute, Email Service, Email Sending, Onboard Domain, pick the domain. Cloudflare adds SPF, DKIM and DMARC records on a `cf-bounce` sub-domain, so existing Email Routing MX records are untouched.
+  2. Wait until the domain shows as verified. Until then sends fail.
+  3. Change `EMAIL_FROM` and the binding's `allowed_sender_addresses` in `app/wrangler.jsonc` to an address on that domain, in a pull request.
+  4. After the deploy, request a sign-in link for the owner email at `/auth/owner` and check it arrives (and is not in spam).
+  5. Fallback if Email Sending misbehaves: set `EMAIL_PROVIDER=resend` and the `RESEND_API_KEY` secret; the owner can also use password and PIN.
+  Full production steps: [deploy.md, Email](deploy.md#4-email).
+
 ## Mock mode
 
 The SPA can run without a server, on the example responses in `packages/contracts/fixtures/`. It is meant for building screens before their endpoints exist and for stable visual baselines ([ADR-16](decisions/0016-mock-mode-on-localhost-for-visual-baselines.md)).

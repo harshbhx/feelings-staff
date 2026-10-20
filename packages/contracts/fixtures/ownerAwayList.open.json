@@ -1,0 +1,30 @@
+[
+  {
+    "id": "01K8WP9AWAY600000000000000",
+    "user": {
+      "id": "01K860ABG2KZEJ0J3KGQ5S997H",
+      "name": "Dhara Gohil",
+      "designation": "Stylist",
+      "phone": "+919586588908"
+    },
+    "workDate": "2026-10-19",
+    "source": "step_out",
+    "reason": "lunch",
+    "reasonNote": null,
+    "staffNote": null,
+    "startTs": 1792385640000,
+    "endTs": null,
+    "minutes": 0,
+    "state": "open",
+    "endReason": null,
+    "backMissing": false,
+    "rollCallId": null,
+    "openedBy": {
+      "id": "01K860ABG2KZEJ0J3KGQ5S997H",
+      "name": "Dhara Gohil"
+    },
+    "decidedBy": null,
+    "decidedAt": null,
+    "editedAt": null
+  }
+]

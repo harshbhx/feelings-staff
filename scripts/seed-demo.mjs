@@ -6,7 +6,9 @@
  *
  * 1. POST /__test/reset {scenario: 'demo'}: salon, owner, ~12 staff, ~7 weeks of raw punches, leave,
  *    duties, advances, a pending device and fix.
- * 2. POST /__test/cron {job: 'recompute-day', date} for every day: attendance through DayService.
+ * 2. The owner signs in and moves the Time credits start date (default 1 Nov 2026, still in the future)
+ *    to the first seeded day, so day recomputes write credit entries. Nothing is settled.
+ *    POST /__test/cron {job: 'recompute-day', date} for every day: attendance through DayService.
  * 3. Owner signs in (password + PIN), steps up, approves overtime older than 3 days (so Needs action
  *    looks like a salon where the owner keeps up), runs last month's payroll, finalises it and marks
  *    it paid, so payslips exist. Steps whose endpoints are not built yet are skipped with a warning.
@@ -67,8 +69,27 @@ if (reset.status !== 200) {
 console.info(`Seeded ${reset.json.staff.length} staff.`);
 
 const today = istToday();
+const rangeStart = addDays(today, -(days - 1));
+const { email, password, pin } = reset.json.owner;
+const signIn = await call('POST', '/auth/owner/password', { email, password, pin });
+if (signIn.status === 200) {
+  // Time credits count from startDate (default 1 Nov 2026), so move it to the first seeded day
+  // before any day is recomputed. Otherwise no entries are written and the balances stay empty.
+  const cred = await call('PATCH', '/owner/settings', {
+    settings: { timeCredits: { startDate: rangeStart } },
+  });
+  if (cred.status !== 200) {
+    console.error(`credits start date: ${cred.status} ${cred.json?.error?.code ?? ''}`);
+    process.exit(1);
+  } else {
+    console.info(`Time credits start on ${rangeStart}.`);
+  }
+} else {
+  console.warn(`owner sign-in: ${signIn.status} (auth not ready?); credits start date not set`);
+}
+
 let recomputed = 0;
-for (let d = addDays(today, -(days - 1)); d <= today; d = addDays(d, 1)) {
+for (let d = rangeStart; d <= today; d = addDays(d, 1)) {
   const r = await call('POST', '/__test/cron', { job: 'recompute-day', date: d });
   if (r.status !== 200) {
     console.warn(
@@ -81,8 +102,6 @@ for (let d = addDays(today, -(days - 1)); d <= today; d = addDays(d, 1)) {
 }
 console.info(`Recomputed ${recomputed} day(s).`);
 
-const { email, password, pin } = reset.json.owner;
-const signIn = await call('POST', '/auth/owner/password', { email, password, pin });
 if (signIn.status !== 200) {
   console.warn(`owner sign-in: ${signIn.status} (auth not ready?); payroll skipped`);
 } else {
@@ -122,6 +141,22 @@ if (signIn.status !== 200) {
       mode: 'upi',
     });
     console.info(`payroll ${lastMonth}: mark all paid ${paid.status}`);
+  }
+}
+
+if (signIn.status === 200) {
+  const credits = await call('GET', '/owner/credits');
+  if (credits.status === 200) {
+    const rows = credits.json.staff ?? [];
+    const plus = rows.filter((r) => r.balanceMin > 0).length;
+    const minus = rows.filter((r) => r.balanceMin < 0).length;
+    console.info(
+      `Credits check: ${plus + minus} of ${rows.length} people have a non-zero balance (${plus} plus, ${minus} minus).`,
+    );
+    if (plus + minus === 0)
+      console.warn('Credits check: every balance is zero, check the start date.');
+  } else {
+    console.warn(`credits check: ${credits.status} ${credits.json?.error?.code ?? ''}`);
   }
 }
 

@@ -21,6 +21,7 @@ import { isStepUpCancelled } from '../../auth/step-up';
 import { usePatchSettings } from '../api/settings';
 import { Meta } from '../components/layout';
 import { useErrorText } from '../components/states';
+import { longDate } from '../lib/format';
 import { rupeesToPaise } from '../staff/staff-form';
 import {
   buildPatch,
@@ -128,7 +129,9 @@ function FieldRow({
           ? value === null
             ? '–'
             : String(Number(value) / 100)
-          : String(value);
+          : f.kind === 'date'
+            ? longDate(String(value))
+            : String(value);
   const what = t(`owner:settings.f.${f.id}.what`, { value: shown });
 
   switch (f.kind) {
@@ -186,6 +189,16 @@ function FieldRow({
       return (
         <KitField label={label} hint={what} className="max-w-48">
           <TimeField value={String(value)} onValueChange={onChange} />
+        </KitField>
+      );
+    case 'date':
+      return (
+        <KitField label={label} hint={what} className="max-w-60">
+          <Input
+            type="date"
+            value={String(value)}
+            onChange={(e) => e.target.value && onChange(e.target.value)}
+          />
         </KitField>
       );
     case 'text':

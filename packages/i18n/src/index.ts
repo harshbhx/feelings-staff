@@ -1,11 +1,12 @@
 /**
  * i18n for Feelings Staff (PRD 11.9). Keys are semantic and namespaced: `t('staff:today.checkIn')`.
  * Namespaces and owners: common, staff, errors (WP-7); owner (WP-6); payslip (WP-5); auth (WP-3);
- * door (WP-4); notify (WP-8); ui (WP-2, component-level strings such as aria labels).
+ * door (WP-4); notify (WP-8); presence (WP-9, step-out, away and notice copy); ui (WP-2,
+ * component-level strings such as aria labels).
  * English is the source of truth; Gujarati falls back to English key by key.
  *
  * Bundling (PRD 11.10, staff initial JS): only the English catalogs a staff phone needs before its
- * first paint are in the app shell (`STAFF_NAMESPACES`). The owner, door and payslip copy and every
+ * first paint are in the app shell (`STAFF_NAMESPACES`). The owner, door, payslip and presence copy and every
  * Gujarati catalog are separate chunks, loaded through a small i18next backend when an instance
  * asks for them (at creation, on `changeLanguage('gu')`, or with `i18n.loadNamespaces`).
  */
@@ -26,6 +27,7 @@ export const NAMESPACES = [
   'payslip',
   'auth',
   'door',
+  'presence',
   'ui',
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];
@@ -60,6 +62,7 @@ const lazyCatalogs: Record<AppLang, Partial<Record<Namespace, Loader>>> = {
     owner: () => import('../en/owner.json'),
     door: () => import('../en/door.json'),
     payslip: () => import('../en/payslip.json'),
+    presence: () => import('../en/presence.json'),
   },
   gu: {
     common: () => import('../gu/common.json'),

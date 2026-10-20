@@ -21,10 +21,12 @@
     "build": "pnpm --filter @fs/app run build",
     "size": "node scripts/size-budgets.mjs",
     "gen:routes": "node scripts/gen-client-routes.mjs",
+    "gen:holidays": "node scripts/gen-holidays.mjs",
     "e2e": "pnpm --filter @fs/e2e run test"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
+    "date-holidays": "3.37.0",
     "typescript": "5.9.3"
   }
 }

@@ -330,9 +330,12 @@ test.describe('offline', () => {
     await setGeo('inside');
     await joinOnThisPhone(page, staff.code);
     await owner.approvePendingDevice(staff.id);
-    await expect(page.getByRole('heading', { level: 1, name: /Riya/ })).toBeVisible({
-      timeout: 30_000,
-    });
+    const home = page.getByRole('heading', { level: 1, name: /Riya/ });
+    // The first Today asks for the presence notice once (PRD 4.18.1): say OK, then the home shows.
+    const notice = page.getByRole('button', { name: 'OK, I understand' });
+    await expect(home.or(notice)).toBeVisible({ timeout: 30_000 });
+    if (await notice.isVisible()) await notice.click();
+    await expect(home).toBeVisible();
 
     // The shell gets this phone ready to check in offline while it is online (PRD 4.3.6).
     await expect.poll(() => offlineReady(page), { timeout: 20_000 }).toBe(true);

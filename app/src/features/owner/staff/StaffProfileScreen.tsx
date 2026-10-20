@@ -26,9 +26,10 @@ import {
   Textarea,
   useToast,
 } from '@fs/ui';
-import { type ReactNode, useState } from 'react';
+import { lazy, type ReactNode, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams, useSearchParams } from 'react-router';
+import { useMe } from '../../../api/hooks';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { useShiftTemplates } from '../api/schedule';
 import {
@@ -52,8 +53,22 @@ import { useOwnerTitle } from '../shell/chrome';
 import { InviteSheet } from './InviteSheet';
 import { rupeesToPaise } from './staff-form';
 
-const TABS = ['overview', 'salary', 'shift', 'leave', 'advances', 'devices', 'exit'] as const;
+const TABS = [
+  'overview',
+  'salary',
+  'shift',
+  'leave',
+  'advances',
+  'credits',
+  'devices',
+  'exit',
+] as const;
 type Tab = (typeof TABS)[number];
+
+/** Credits are owner only (PRD 7.17.9); the ledger is its own chunk. */
+const CreditLedger = lazy(() =>
+  import('../credits/CreditLedger').then((m) => ({ default: m.CreditLedger })),
+);
 
 export function StaffProfileScreen() {
   const { id = '' } = useParams();
@@ -81,8 +96,10 @@ function useMutationFeedback() {
 function Profile({ staff }: { staff: StaffDetail }) {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
+  const me = useMe();
+  const tabs = TABS.filter((k) => k !== 'credits' || me.data?.user.role === 'owner');
   const raw = params.get('tab');
-  const tab: Tab = (TABS as readonly string[]).includes(raw ?? '') ? (raw as Tab) : 'overview';
+  const tab: Tab = (tabs as readonly string[]).includes(raw ?? '') ? (raw as Tab) : 'overview';
   const setTab = (next: string) => {
     const p = new URLSearchParams(params);
     p.set('tab', next);
@@ -113,10 +130,14 @@ function Profile({ staff }: { staff: StaffDetail }) {
         label={t('owner:staff.profile.tabs.label')}
         value={tab}
         onValueChange={setTab}
-        items={TABS.map((k) => ({
+        items={tabs.map((k) => ({
           value: k,
           label: t(`owner:staff.profile.tabs.${k}`),
-          content: <div className="max-w-(--container-narrow) pt-2">{tabContent(k, staff)}</div>,
+          content: (
+            <div className={k === 'credits' ? 'pt-2' : 'max-w-(--container-narrow) pt-2'}>
+              {tabContent(k, staff)}
+            </div>
+          ),
         }))}
       />
     </div>
@@ -135,6 +156,12 @@ function tabContent(tab: Tab, staff: StaffDetail) {
       return <LeaveTab staff={staff} />;
     case 'advances':
       return <AdvancesTab staff={staff} />;
+    case 'credits':
+      return (
+        <Suspense fallback={<RowsSkeleton rows={4} />}>
+          <CreditLedger userId={staff.id} name={staff.name} />
+        </Suspense>
+      );
     case 'devices':
       return <DevicesTab staff={staff} />;
     case 'exit':

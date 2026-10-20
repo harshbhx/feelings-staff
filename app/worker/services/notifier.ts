@@ -7,6 +7,7 @@
  * failure here is logged and never undoes the thing that happened.
  */
 import {
+  formatDuration,
   hhmmToMin,
   istDate,
   istTime,
@@ -20,7 +21,8 @@ import { json } from '../db';
 import { isNonProd } from '../env';
 import { loadOrg } from '../lib/settings';
 import { ulid } from '../lib/ulid';
-import { digestEmail, signInEmail } from './email-templates';
+import { weeklyDigest } from './digest';
+import { noticeEmail, signInEmail } from './email-templates';
 import {
   type BatchItem,
   notInYetTopic,
@@ -299,6 +301,41 @@ interface Prefs {
   email: boolean;
 }
 
+/**
+ * Email is on by default for the owner's N24 and N30 (PRD 6). The staff payslip email (N25) is
+ * opt-in: the PRD lists in-app and push for it, so email only goes to people who switch it on.
+ */
+export const EMAIL_DEFAULT_ON: NotifyEventType[] = ['payroll_draft_ready', 'weekly_digest'];
+const EMAIL_TYPES: NotifyEventType[] = ['payroll_draft_ready', 'payslip_ready', 'weekly_digest'];
+
+async function emailLines(
+  ctx: Ctx,
+  e: NotifyEvent,
+  t: Awaited<ReturnType<typeof translator>>,
+): Promise<string[]> {
+  if (e.type !== 'weekly_digest') return [];
+  const d = await weeklyDigest(ctx, e.weekStart);
+  const lines = [
+    t('email.digest.late', { count: d.late }),
+    t('email.digest.absent', { count: d.absent }),
+    t('email.digest.overtime', { time: formatDuration(d.otApprovedMin) }),
+    t('email.digest.pending', { count: d.pending }),
+  ];
+  if (d.credits?.length) {
+    lines.push(t('email.digest.creditsHeading'));
+    for (const c of d.credits) {
+      const sign = c.balanceMin < 0 ? '-' : '+';
+      lines.push(
+        t('email.digest.credit', {
+          name: c.name,
+          balance: `${sign}${formatDuration(Math.abs(c.balanceMin))}`,
+        }),
+      );
+    }
+  }
+  return lines;
+}
+
 async function prefsFor(
   ctx: Ctx,
   userId: string,
@@ -313,7 +350,7 @@ async function prefsFor(
   const locked = SECURITY_EVENTS.includes(type);
   return {
     push: locked ? true : row ? row.push === 1 : plan.pushDefault,
-    email: row ? row.email === 1 : type === 'weekly_digest',
+    email: row ? row.email === 1 : EMAIL_DEFAULT_ON.includes(type),
   };
 }
 
@@ -464,11 +501,26 @@ async function notifyRecipient(
     else ctx.waitUntil(deliver());
   }
 
-  if (e.type === 'weekly_digest' && prefs.email && who.email) {
-    await ctx.services.email.send(ctx, digestEmail(t, who.email, view.title, view.body));
+  if (EMAIL_TYPES.includes(e.type) && prefs.email && who.email) {
+    let status = 'sent';
+    try {
+      const msg = noticeEmail(t, who.email, {
+        title: view.title,
+        body: view.body,
+        lines: await emailLines(ctx, e, t),
+        url: `${ctx.env.APP_ORIGIN}${view.url}`,
+        footer: t(e.type === 'weekly_digest' ? 'email.digest.footer' : 'email.notice.footer'),
+      });
+      await ctx.services.email.send(ctx, msg);
+    } catch (err) {
+      status = 'failed';
+      console.error(
+        JSON.stringify({ msg: 'notify.email_error', type: e.type, error: String(err) }),
+      );
+    }
     await ctx.db.run(
       'UPDATE notifications SET email_status = ? WHERE org_id = ?org AND id = ?',
-      'sent',
+      status,
       id,
     );
   }

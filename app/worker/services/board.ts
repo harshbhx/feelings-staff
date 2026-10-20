@@ -13,6 +13,7 @@ import { computeFrom, loadDayData, personBrief } from './day';
 import { actionsCount } from './owner-actions';
 import type { Ctx } from './ports';
 import type { PunchRow } from './punch';
+import { todayRollCall } from './rollcall';
 
 type PlaceBadge = BoardInRow['place'];
 type BoardAwayRow = TodayBoard['away'][number];
@@ -138,7 +139,7 @@ export async function todayBoard(ctx: Ctx): Promise<TodayBoard> {
     notIn,
     out: outRows,
     away,
-    rollCall: null,
+    rollCall: await todayRollCall(ctx, date),
     actionsCount: await actionsCount(ctx),
   };
 }

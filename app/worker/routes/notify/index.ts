@@ -10,6 +10,7 @@ import { json } from '../../db';
 import type { Handlers } from '../../lib/api';
 import { fail } from '../../lib/errors';
 import { ulid } from '../../lib/ulid';
+import { EMAIL_DEFAULT_ON } from '../../services/notifier';
 import { EVENT_META } from '../../services/notifier-plan';
 import type { Ctx } from '../../services/ports';
 
@@ -86,7 +87,7 @@ async function loadPrefs(ctx: Ctx): Promise<NotificationPrefs> {
         type,
         push: locked ? true : row ? row.push === 1 : EVENT_META[type].pushDefault,
         whatsapp: row ? row.whatsapp === 1 : false,
-        email: row ? row.email === 1 : type === 'weekly_digest',
+        email: row ? row.email === 1 : EMAIL_DEFAULT_ON.includes(type),
         locked,
       };
     }),

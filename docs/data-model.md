@@ -60,6 +60,8 @@ Grouped as in PRD 8.2.
 | `offsite_duty_staff` | Which staff are on a duty. |
 | `ot_preapprovals` | Overtime that is approved in advance (for example by a duty). |
 
+Setup and the demo seed propose Gujarat public holidays for 2026 and 2027. The 2026 rows are the hand-written `HOLIDAYS_2026` list in `app/worker/seed/index.ts` (it already includes Holi, Janmashtami, Dussehra and Diwali). The 2027 rows come from `app/worker/seed/holidays-in.ts`, which `scripts/gen-holidays.mjs` generates from the `date-holidays` package (ISC code, CC-BY-3.0 data; see `NOTICE`). The package is a dev dependency and the Worker bundles only the static list. Lunar festivals are not in the generated data for Gujarat, so for 2027 the owner adds Holi, Janmashtami, Dussehra and Diwali. Every proposed holiday is editable.
+
 ### Attendance
 
 | Table | What it is for |

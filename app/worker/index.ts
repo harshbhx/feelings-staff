@@ -43,6 +43,13 @@ export function createApp(): Hono<AppEnv> {
   );
 
   // Payslip verify page and the component kit are SPA routes; the kit exists outside production only.
+  // A missing hashed file must be a real 404: the asset layer's SPA fallback would answer with
+  // index.html, and a stale shell would then fail on "module script" MIME errors instead of reloading.
+  app.get('/assets/*', async (c) => {
+    const res = await c.env.ASSETS.fetch(c.req.raw);
+    const html = res.headers.get('Content-Type')?.includes('text/html');
+    return res.status === 404 || html ? c.text('Not found', 404) : res;
+  });
   app.get('/v/*', (c) => c.env.ASSETS.fetch(new Request(new URL('/', c.req.url))));
   app.get('/__kit', (c) =>
     isNonProd(c.env)

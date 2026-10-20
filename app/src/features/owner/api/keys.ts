@@ -2,7 +2,7 @@
  * TanStack Query keys for the owner panel. Everything lives under `['owner', ...]` so a push or a
  * sign-out can invalidate the whole panel at once.
  */
-import type { ActionType, AuditCategory } from '@fs/contracts';
+import type { ActionType, AuditCategory, CreditLedgerKind } from '@fs/contracts';
 
 export type StaffStatusFilter = 'active' | 'invited' | 'exited' | 'all';
 
@@ -11,6 +11,14 @@ export interface AuditFilter {
   category?: AuditCategory;
   from?: string;
   to?: string;
+}
+
+/** Person ledger filters (PRD 4.19.2). */
+export interface LedgerFilter {
+  kind?: CreditLedgerKind | undefined;
+  from?: string | undefined;
+  to?: string | undefined;
+  unsettled?: boolean | undefined;
 }
 
 export const ownerKeys = {
@@ -48,6 +56,20 @@ export const ownerKeys = {
   payrollPreview: (month: string) => ['owner', 'payroll', 'preview', month] as const,
   payslip: (runId: string, userId: string) =>
     ['owner', 'payroll', 'payslip', runId, userId] as const,
+  payrollCredits: (runId: string) => ['owner', 'payroll', 'credits', runId] as const,
+  creditsAll: () => ['owner', 'credits'] as const,
+  credits: () => ['owner', 'credits', 'overview'] as const,
+  creditLedger: (userId: string, f: LedgerFilter) =>
+    [
+      'owner',
+      'credits',
+      'ledger',
+      userId,
+      f.kind ?? '',
+      f.from ?? '',
+      f.to ?? '',
+      f.unsettled ? 'unsettled' : '',
+    ] as const,
   exports: () => ['owner', 'exports'] as const,
   exportOne: (id: string) => ['owner', 'export', id] as const,
   settings: () => ['owner', 'settings'] as const,
@@ -56,4 +78,8 @@ export const ownerKeys = {
   audit: (f: AuditFilter) =>
     ['owner', 'audit', f.entity ?? '', f.category ?? '', f.from ?? '', f.to ?? ''] as const,
   managers: () => ['owner', 'managers'] as const,
+  rollCallsAll: () => ['owner', 'roll-calls'] as const,
+  awayOpen: () => ['owner', 'away', 'open'] as const,
+  rollCalls: () => ['owner', 'roll-calls', 'today'] as const,
+  rollCall: (id: string) => ['owner', 'roll-calls', 'one', id] as const,
 };

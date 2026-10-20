@@ -18,6 +18,8 @@ export default defineConfig({
   build: {
     manifest: true,
     target: 'es2022',
+    // es2022 browsers load modules natively; the preload polyfill only adds bytes to the staff entry.
+    modulePreload: { polyfill: false },
   },
   server: { port: 5173 },
   preview: { port: 8787 },
