@@ -103,6 +103,12 @@
       min-width: 0;
     }
 
+    /* Tiles take the full width even when the group sits in a flex row (Credits: counts and sort). */
+    .fs-stat-group:has(> .fs-stat-group__items[data-layout="tiles"]) {
+      flex: 1 1 100%;
+      width: 100%;
+    }
+
     .fs-stat-group__items[data-layout="tiles"] .fs-stat__face {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
