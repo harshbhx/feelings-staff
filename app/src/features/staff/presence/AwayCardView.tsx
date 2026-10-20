@@ -33,18 +33,18 @@ export function AwayCard({ card }: { card: Card }) {
         <div className="flex min-w-0 flex-col gap-1">
           <h2 id="today-away" className="tabular text-lg font-bold text-text">
             {card.kind === 'marked'
-              ? t('staff:presence.card.marked', { name: card.by, time })
-              : t('staff:presence.card.stepped', { time })}
+              ? t('presence:card.marked', { name: card.by, time })
+              : t('presence:card.stepped', { time })}
           </h2>
           <p className="text-sm text-text-muted">
             {card.kind === 'marked'
-              ? t('staff:presence.card.markedHint')
-              : t('staff:presence.card.steppedHint')}
+              ? t('presence:card.markedHint')
+              : t('presence:card.steppedHint')}
           </p>
           {away.reason ? (
             <div>
               <Badge tone="neutral" icon="sign-out">
-                {t(`staff:presence.reason.${away.reason}`)}
+                {t(`presence:reason.${away.reason}`)}
               </Badge>
             </div>
           ) : null}
@@ -52,7 +52,7 @@ export function AwayCard({ card }: { card: Card }) {
       </div>
       {away.staffNote ? (
         <p className="border-border-strong border-l-2 pl-3 text-text-body">
-          {t('staff:presence.card.yourNote', { note: away.staffNote })}
+          {t('presence:card.yourNote', { note: away.staffNote })}
         </p>
       ) : (
         <div>
@@ -62,7 +62,7 @@ export function AwayCard({ card }: { card: Card }) {
             icon="pencil-simple"
             onClick={() => setNoteOpen(true)}
           >
-            {t('staff:presence.card.addNote')}
+            {t('presence:card.addNote')}
           </Button>
         </div>
       )}

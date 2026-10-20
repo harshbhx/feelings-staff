@@ -30,6 +30,7 @@ import { type Fmt, useFmt } from '../lib/format';
 import { useNow } from '../lib/use-now';
 import { useImBack } from '../presence/AwayCard';
 import { deferNotice, noticeDeferred, presenceKey, usePresence } from '../presence/api';
+import { withPresenceCopy } from '../presence/copy';
 import { presenceUi } from '../presence/presence-model';
 import type { FrozenSheet } from '../punch/frozen';
 import { ActionBar } from '../shell/ActionBar';
@@ -52,13 +53,15 @@ const SendNoteSheet = lazy(() =>
 );
 // Presence (PRD 4.18): the Step out sheet and the one-time notice load only when they open.
 const AwayCard = lazy(() =>
-  import('../presence/AwayCardView').then((m) => ({ default: m.AwayCard })),
+  import('../presence/AwayCardView').then((m) => ({ default: withPresenceCopy(m.AwayCard) })),
 );
 const StepOutSheet = lazy(() =>
-  import('../presence/StepOutSheet').then((m) => ({ default: m.StepOutSheet })),
+  import('../presence/StepOutSheet').then((m) => ({ default: withPresenceCopy(m.StepOutSheet) })),
 );
 const PresenceConsentSheet = lazy(() =>
-  import('../presence/PresenceConsentSheet').then((m) => ({ default: m.PresenceConsentSheet })),
+  import('../presence/PresenceConsentSheet').then((m) => ({
+    default: withPresenceCopy(m.PresenceConsentSheet),
+  })),
 );
 
 export function TodayScreen() {

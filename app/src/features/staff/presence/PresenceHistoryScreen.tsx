@@ -39,21 +39,21 @@ export function PresenceHistoryScreen() {
   return (
     <>
       <ScreenHeader
-        title={t('staff:presence.history.title')}
+        title={t('presence:history.title')}
         back="/me/data"
         dataAt={history.dataUpdatedAt || undefined}
       />
       <main id="main" className="staff-main flex flex-col gap-6">
         <div className="flex flex-col gap-1">
           <p className="text-lg font-bold text-text">{fmt.month(month)}</p>
-          <p className="text-text-muted">{t('staff:presence.history.intro', { owner })}</p>
+          <p className="text-text-muted">{t('presence:history.intro', { owner })}</p>
         </div>
         {history.data ? (
           <HistoryBody history={history.data} fmt={fmt} />
         ) : history.isError ? (
           <QueryError
             error={history.error}
-            message={t('staff:presence.history.loadError')}
+            message={t('presence:history.loadError')}
             onRetry={() => void history.refetch()}
           />
         ) : (
@@ -71,7 +71,7 @@ function HistoryBody({ history, fmt }: { history: PresenceHistory; fmt: Fmt }) {
   const { t } = useTranslation();
   const days = historyByDay(history);
   if (days.length === 0)
-    return <p className="staff-card text-text-body">{t('staff:presence.history.empty')}</p>;
+    return <p className="staff-card text-text-body">{t('presence:history.empty')}</p>;
   return (
     <>
       {days.map((d) => (
@@ -116,15 +116,13 @@ function HistoryRow({ item, fmt, t }: { item: HistoryItem; fmt: Fmt; t: TFunctio
         <ListRow
           leading={<Icon name="users" />}
           title={
-            <span className="tabular">
-              {t('staff:presence.history.rollCall', { time: item.time })}
-            </span>
+            <span className="tabular">{t('presence:history.rollCall', { time: item.time })}</span>
           }
           trailing={
             item.mark === 'here' ? (
-              <StatusChip status="present" label={t('staff:presence.history.here')} />
+              <StatusChip status="present" label={t('presence:history.here')} />
             ) : (
-              <StatusChip status="absent" label={t('staff:presence.history.notHere')} />
+              <StatusChip status="absent" label={t('presence:history.notHere')} />
             )
           }
         />
@@ -133,16 +131,16 @@ function HistoryRow({ item, fmt, t }: { item: HistoryItem; fmt: Fmt; t: TFunctio
       const a = item.away;
       const title =
         a.endTs === null
-          ? t('staff:presence.history.outSince', { time: fmt.clock(a.startTs) })
-          : t('staff:presence.history.out', {
+          ? t('presence:history.outSince', { time: fmt.clock(a.startTs) })
+          : t('presence:history.out', {
               from: fmt.clock(a.startTs),
               to: fmt.clock(a.endTs),
               min: a.awayMin,
             });
       const parts = [
-        a.reason ? t(`staff:presence.reason.${a.reason}`) : null,
-        a.markedByName ? t('staff:presence.history.markedBy', { name: a.markedByName }) : null,
-        a.staffNote ? t('staff:presence.card.yourNote', { note: a.staffNote }) : null,
+        a.reason ? t(`presence:reason.${a.reason}`) : null,
+        a.markedByName ? t('presence:history.markedBy', { name: a.markedByName }) : null,
+        a.staffNote ? t('presence:card.yourNote', { note: a.staffNote }) : null,
       ].filter(Boolean);
       const s = STATE[a.state];
       return (
@@ -152,7 +150,7 @@ function HistoryRow({ item, fmt, t }: { item: HistoryItem; fmt: Fmt; t: TFunctio
           subtitle={parts.length > 0 ? parts.join(' · ') : undefined}
           trailing={
             <Badge tone={s.tone} icon={s.icon}>
-              {t(`staff:presence.history.state.${a.state}`)}
+              {t(`presence:history.state.${a.state}`)}
             </Badge>
           }
         />
@@ -165,18 +163,16 @@ function HistoryRow({ item, fmt, t }: { item: HistoryItem; fmt: Fmt; t: TFunctio
         <ListRow
           leading={<Icon name="map-pin" />}
           title={
-            <span className="tabular">
-              {t('staff:presence.history.check', { time: item.time })}
-            </span>
+            <span className="tabular">{t('presence:history.check', { time: item.time })}</span>
           }
           subtitle={
             c.distanceBucket
-              ? t('staff:presence.history.distance', { bucket: c.distanceBucket.replace('-', '–') })
+              ? t('presence:history.distance', { bucket: c.distanceBucket.replace('-', '–') })
               : undefined
           }
           trailing={
             <Badge tone={s.tone} icon={s.icon}>
-              {t(`staff:presence.history.result.${c.result}`)}
+              {t(`presence:history.result.${c.result}`)}
             </Badge>
           }
         />

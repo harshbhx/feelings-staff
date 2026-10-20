@@ -40,8 +40,8 @@ export function StepOutSheet({
     <Sheet
       open={open}
       onOpenChange={(o) => (o ? onOpenChange(true) : close())}
-      title={t('staff:presence.sheet.title')}
-      description={t('staff:presence.sheet.who', { owner })}
+      title={t('presence:sheet.title')}
+      description={t('presence:sheet.who', { owner })}
     >
       <form
         noValidate
@@ -67,7 +67,7 @@ export function StepOutSheet({
                   title: isApiError(err, 'UNAVAILABLE')
                     ? t('errors:network')
                     : isApiError(err, 'CONFLICT')
-                      ? t('staff:presence.errors.cannotStepOut')
+                      ? t('presence:errors.cannotStepOut')
                       : t('errors:generic'),
                 });
               },
@@ -77,7 +77,7 @@ export function StepOutSheet({
       >
         <ChipGroup
           type="radio"
-          legend={t('staff:presence.sheet.reason')}
+          legend={t('presence:sheet.reason')}
           layout="grid"
           required
           value={reason ?? ''}
@@ -85,15 +85,15 @@ export function StepOutSheet({
             setReason(v as AwayReason);
             setMissing(false);
           }}
-          error={missing ? t('staff:presence.sheet.reasonMissing') : undefined}
+          error={missing ? t('presence:sheet.reasonMissing') : undefined}
           options={STEP_OUT_REASONS.map((r) => ({
             value: r,
-            label: t(`staff:presence.reason.${r}`),
+            label: t(`presence:reason.${r}`),
           }))}
         />
         <Field
-          label={t('staff:presence.sheet.note', { owner })}
-          hint={t('staff:presence.sheet.noteHint')}
+          label={t('presence:sheet.note', { owner })}
+          hint={t('presence:sheet.noteHint')}
           optional
         >
           <Textarea
@@ -111,7 +111,7 @@ export function StepOutSheet({
           icon="sign-out"
           loading={stepOut.isPending}
         >
-          {t('staff:presence.sheet.go')}
+          {t('presence:sheet.go')}
         </Button>
       </form>
     </Sheet>

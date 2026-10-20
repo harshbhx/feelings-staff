@@ -23,14 +23,14 @@ export function PresenceConsentSheet({
   const lang = i18n.language === 'gu' ? 'gu' : 'en';
   const paragraphs = ['p1', 'p2', 'p3', 'p4'] as const;
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={t('staff:presence.consent.title')}>
+    <Sheet open={open} onOpenChange={onOpenChange} title={t('presence:consent.title')}>
       <div className="flex flex-col gap-4" data-testid="presence-consent">
         {paragraphs.map((p) => (
           <p key={p} className="text-text-body">
-            {t(`staff:presence.consent.${p}`, { owner })}
+            {t(`presence:consent.${p}`, { owner })}
           </p>
         ))}
-        <p className="font-bold text-text">{t('staff:presence.consent.nothingCut')}</p>
+        <p className="font-bold text-text">{t('presence:consent.nothingCut')}</p>
         <div className="flex flex-col gap-3">
           <Button
             variant="primary"
@@ -44,10 +44,10 @@ export function PresenceConsentSheet({
               })
             }
           >
-            {t('staff:presence.consent.ok')}
+            {t('presence:consent.ok')}
           </Button>
           <Button variant="ghost" block onClick={() => onOpenChange(false)}>
-            {t('staff:presence.consent.later')}
+            {t('presence:consent.later')}
           </Button>
         </div>
       </div>

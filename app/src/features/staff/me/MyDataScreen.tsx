@@ -118,7 +118,7 @@ function Body({ data }: { data: MyData }) {
         <List framed>
           <ListRow
             asChild
-            title={t('staff:presence.history.title')}
+            title={t('staff:myData.presenceRow')}
             subtitle={t('staff:myData.presenceHint')}
           >
             <Link to="/me/data/presence" />

@@ -1,0 +1,73 @@
+{
+  "reason": {
+    "personal": "Personal",
+    "lunch": "Lunch outside",
+    "errand": "Work errand",
+    "other": "Other"
+  },
+  "sheet": {
+    "title": "Step out",
+    "who": "{{owner}} sees the reason and your note.",
+    "reason": "Why are you stepping out?",
+    "reasonMissing": "Pick one reason.",
+    "note": "Note for {{owner}}",
+    "noteHint": "For example: Bank for the salon",
+    "go": "Step out now"
+  },
+  "card": {
+    "stepped": "You're out since {{time}}",
+    "steppedHint": "Tap I'm back when you are at the salon again.",
+    "marked": "{{name}} marked you away since {{time}}",
+    "markedHint": "If you are at the salon, tap I'm back.",
+    "addNote": "Add a note",
+    "yourNote": "Your note: “{{note}}”"
+  },
+  "note": {
+    "title": "Note for {{owner}}",
+    "label": "Your note",
+    "hint": "One note for this time away. {{owner}} sees it.",
+    "missing": "Write a few words first.",
+    "send": "Send note",
+    "sent": "Note sent to {{owner}}."
+  },
+  "consent": {
+    "title": "When you are not at the salon",
+    "p1": "During your shift, {{owner}} or a manager can mark when you are not at the salon. You can tap Step out when you leave and I'm back when you return.",
+    "p2": "If the app is open, it may check once in a while whether you are at the salon. It never asks you.",
+    "p3": "We only look during your shift. We keep only the times, and for a location check only inside or outside and how far. No route, no map trail.",
+    "p4": "{{owner}} sees the reason you give when you step out. You can see all of it under Me, My data.",
+    "nothingCut": "Nothing is cut automatically.",
+    "ok": "OK, I understand",
+    "later": "Not now"
+  },
+  "history": {
+    "title": "Presence",
+    "intro": "Roll-call marks, your step-outs and location checks. Only you and {{owner}} see this.",
+    "loadError": "We couldn't load your presence record.",
+    "empty": "Nothing recorded this month.",
+    "rollCall": "Roll-call at {{time}}",
+    "here": "Here",
+    "notHere": "Not here",
+    "out": "Out {{from}}–{{to}} · {{min}} min",
+    "outSince": "Out since {{time}}",
+    "markedBy": "Marked by {{name}}",
+    "check": "Location check at {{time}}",
+    "distance": "{{bucket}} m from the salon",
+    "state": {
+      "open": "Out now",
+      "waiting": "Waiting",
+      "counted": "Counted",
+      "work": "Work",
+      "ignored": "Ignored"
+    },
+    "result": {
+      "inside": "Inside",
+      "edge": "At the edge",
+      "outside": "Outside",
+      "no_fix": "No location"
+    }
+  },
+  "errors": {
+    "cannotStepOut": "You can step out only while you're checked in, and not twice. Check Today and try again."
+  }
+}

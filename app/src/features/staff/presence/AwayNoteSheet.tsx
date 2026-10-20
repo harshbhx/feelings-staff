@@ -25,11 +25,7 @@ export function AwayNoteSheet({
   const [note, setNote] = useState('');
   const [missing, setMissing] = useState(false);
   return (
-    <Sheet
-      open={open}
-      onOpenChange={onOpenChange}
-      title={t('staff:presence.note.title', { owner })}
-    >
+    <Sheet open={open} onOpenChange={onOpenChange} title={t('presence:note.title', { owner })}>
       <form
         noValidate
         className="flex flex-col gap-4"
@@ -44,7 +40,7 @@ export function AwayNoteSheet({
             {
               onSuccess: () => {
                 onOpenChange(false);
-                toast({ tone: 'success', title: t('staff:presence.note.sent', { owner }) });
+                toast({ tone: 'success', title: t('presence:note.sent', { owner }) });
               },
               onError: (err) =>
                 toast({
@@ -56,9 +52,9 @@ export function AwayNoteSheet({
         }}
       >
         <Field
-          label={t('staff:presence.note.label')}
-          hint={t('staff:presence.note.hint', { owner })}
-          error={missing ? t('staff:presence.note.missing') : undefined}
+          label={t('presence:note.label')}
+          hint={t('presence:note.hint', { owner })}
+          error={missing ? t('presence:note.missing') : undefined}
         >
           <Textarea
             value={note}
@@ -71,7 +67,7 @@ export function AwayNoteSheet({
           />
         </Field>
         <Button variant="primary" type="submit" block loading={save.isPending}>
-          {t('staff:presence.note.send')}
+          {t('presence:note.send')}
         </Button>
       </form>
     </Sheet>

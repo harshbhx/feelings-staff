@@ -26,6 +26,7 @@ export const NAMESPACES = [
   'payslip',
   'auth',
   'door',
+  'presence',
   'ui',
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];
@@ -60,6 +61,7 @@ const lazyCatalogs: Record<AppLang, Partial<Record<Namespace, Loader>>> = {
     owner: () => import('../en/owner.json'),
     door: () => import('../en/door.json'),
     payslip: () => import('../en/payslip.json'),
+    presence: () => import('../en/presence.json'),
   },
   gu: {
     common: () => import('../gu/common.json'),
@@ -70,6 +72,7 @@ const lazyCatalogs: Record<AppLang, Partial<Record<Namespace, Loader>>> = {
     payslip: () => import('../gu/payslip.json'),
     auth: () => import('../gu/auth.json'),
     door: () => import('../gu/door.json'),
+    presence: () => import('../gu/presence.json'),
     ui: () => import('../gu/ui.json'),
   },
 };
