@@ -20,11 +20,15 @@ import {
 import type { Env } from '../env';
 import { loadOrg } from '../lib/settings';
 import { ulid } from '../lib/ulid';
+import { computeFrom, loadDayData } from '../services/day';
 import { inQuietHours, releaseHeld } from '../services/notifier';
 import { firstStart, lastEnd, loadPersonDays, type PersonDay } from '../services/notifier-schedule';
 import { sweepPayslipPdfs } from '../services/payslip-pdf';
 import type { Ctx } from '../services/ports';
+import { checkedInAt, ensureSlots, MISSED_AFTER_MS } from '../services/rollcall';
 import { type CronCtx, once, systemCtx } from './context';
+import { weeklyDigestRule } from './digest';
+import { whatsappEscalation } from './escalation';
 
 const JOB = 'rules';
 
@@ -103,6 +107,15 @@ export async function runRules(
     ['summary', morningSummary],
     ['payroll', payrollRules],
     ['duties', dutyReminders],
+    ['presence', presenceRules],
+    [
+      'whatsapp',
+      async (rr) => rr.bump('whatsapp_escalation', await whatsappEscalation(rr.ctx, JOB, rr.date)),
+    ],
+    [
+      'digest',
+      async (rr) => ((await weeklyDigestRule(rr.ctx, JOB)) ? rr.bump('weekly_digest') : undefined),
+    ],
     ['payslipPdfs', async (rr) => rr.bump('payslip_pdf', await sweepPayslipPdfs(rr.ctx))],
   ];
   for (const [name, fn] of rules) {
@@ -480,5 +493,79 @@ async function dutyReminders(r: RuleEnv): Promise<void> {
       });
     });
     if (ran) r.bump('duty_reminder');
+  }
+}
+
+// N32, N33, N36 presence -----------------------------------------------------------------------------
+
+/**
+ * Roll-call slots (PRD 4.18.3, 9.5): at each time the owner and managers with `rollcall` get N32 if
+ * anyone is checked in; 30 minutes later an undone one raises N33. N36 goes for someone still
+ * checked in 30 minutes after the shift ended with an open away interval or a "seems away" hint.
+ */
+async function presenceRules(r: RuleEnv): Promise<void> {
+  const { ctx, at, date } = r;
+  const { settings } = await loadOrg(ctx);
+  if (!settings.presence.enabled) return;
+  const slots = await ensureSlots(ctx, date, settings);
+  for (const s of slots) {
+    if (at < s.slot_ts || s.submitted_at !== null) continue;
+    const base = {
+      orgId: ctx.orgId ?? '',
+      at,
+      rollCallId: s.id,
+      workDate: date,
+      slotTime: s.slot_time,
+    };
+    if (at < s.slot_ts + MISSED_AFTER_MS) {
+      const ran = await once(ctx, JOB, `${date}|rollcall|${s.slot_time}`, async () => {
+        if ((await checkedInAt(ctx, date, s.slot_ts)).length === 0) return;
+        await ctx.db.run(
+          'UPDATE roll_calls SET reminded_at = ? WHERE org_id = ?org AND id = ?',
+          at,
+          s.id,
+        );
+        await ctx.services.notifier.emit(ctx, { type: 'roll_call_due', ...base });
+      });
+      if (ran) r.bump('roll_call_due');
+    } else if (at < s.slot_ts + 4 * HOUR_MS) {
+      const ran = await once(ctx, JOB, `${date}|rollcall_missed|${s.slot_time}`, async () => {
+        if ((await checkedInAt(ctx, date, s.slot_ts)).length === 0) return;
+        await ctx.services.notifier.emit(ctx, { type: 'roll_call_missed', ...base });
+      });
+      if (ran) r.bump('roll_call_missed');
+    }
+  }
+
+  const data = await loadDayData(ctx, null, date, date);
+  const open = await ctx.db.all<{ user_id: string; start_ts: number }>(
+    'SELECT user_id, start_ts FROM away_intervals WHERE org_id = ?org AND work_date = ? AND end_ts IS NULL',
+    date,
+  );
+  const outside = await ctx.db.all<{ user_id: string; check_ts: number }>(
+    `SELECT user_id, MAX(check_ts) AS check_ts FROM presence_checks
+      WHERE org_id = ?org AND work_date = ? AND result = 'outside' GROUP BY user_id`,
+    date,
+  );
+  const since = new Map<string, number>();
+  for (const o of outside) since.set(o.user_id, o.check_ts);
+  for (const o of open)
+    since.set(o.user_id, Math.min(o.start_ts, since.get(o.user_id) ?? o.start_ts));
+  for (const [userId, awaySinceTs] of since) {
+    const c = computeFrom(data, userId, date);
+    const end = c?.schedule.segments.at(-1)?.endTs;
+    if (!c || end === undefined || !c.result.open || at < end + 30 * MINUTE_MS) continue;
+    const ran = await once(ctx, JOB, `${date}|left_no_checkout|${userId}`, async () => {
+      await ctx.services.notifier.emit(ctx, {
+        type: 'left_without_checkout',
+        orgId: ctx.orgId ?? '',
+        at,
+        userId,
+        name: data.people.get(userId)?.name ?? '',
+        workDate: date,
+        awaySinceTs,
+      });
+    });
+    if (ran) r.bump('left_without_checkout');
   }
 }

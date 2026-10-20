@@ -21,6 +21,7 @@ import { json } from '../db';
 import { fail } from '../lib/errors';
 import { loadOrg } from '../lib/settings';
 import { ulid } from '../lib/ulid';
+import { creditsLedgerTable } from './credits';
 import { jsonList } from './day';
 import { calcRun, monthEnd, monthStart, type PersonCalc } from './payroll-calc';
 import { type PayslipRow, snapshotOf } from './payslip';
@@ -542,8 +543,53 @@ async function table(ctx: Ctx, kind: ExportKind, p: Params): Promise<Table> {
       };
     }
     case 'credits_ledger':
-    case 'presence_log':
-      return fail('NOT_IMPLEMENTED', 'This report is not ready yet.');
+      return creditsLedgerTable(ctx, p);
+    case 'presence_log': {
+      const rows = await ctx.db.all<{
+        work_date: string;
+        name: string;
+        source: string;
+        reason: string | null;
+        start_ts: number;
+        end_ts: number | null;
+        minutes: number;
+        state: string;
+        back_missing: number;
+      }>(
+        `SELECT a.work_date, u.name, a.source, a.reason, a.start_ts, a.end_ts, a.minutes, a.state,
+                a.back_missing
+           FROM away_intervals a JOIN users u ON u.id = a.user_id
+          WHERE a.org_id = ?org AND a.work_date BETWEEN ? AND ? ${filter('a.user_id')}
+          ORDER BY a.work_date, u.name, a.start_ts`,
+        from,
+        to,
+        ...bind(),
+      );
+      return {
+        header: [
+          'Date',
+          'Staff',
+          'Source',
+          'Reason',
+          'From',
+          'To',
+          'Minutes',
+          'State',
+          'I am back missing',
+        ],
+        rows: rows.map((r) => [
+          dmy(r.work_date),
+          r.name,
+          r.source,
+          r.reason,
+          istTime(r.start_ts),
+          r.end_ts === null ? '' : istTime(r.end_ts),
+          r.minutes,
+          r.state,
+          r.back_missing === 1 ? 'yes' : '',
+        ]),
+      };
+    }
     case 'audit': {
       const rows = await ctx.db.all<{
         created_at: number;
@@ -703,6 +749,8 @@ export async function createExport(
   }
   if (body.kind === 'audit' && user.role !== 'owner')
     fail('FORBIDDEN', 'Only the owner can export the audit log.');
+  if (body.kind === 'credits_ledger' && user.role !== 'owner')
+    fail('FORBIDDEN', 'Only the owner can export the credits ledger.');
   const recent = await ctx.db.first<{ n: number }>(
     'SELECT COUNT(*) AS n FROM exports WHERE org_id = ?org AND created_at > ?',
     ctx.now() - HOUR_MS,
@@ -725,7 +773,7 @@ export async function createExport(
     }),
     ctx.services.audit.stmt(ctx, {
       category: 'export',
-      action: 'export.create',
+      action: body.kind === 'credits_ledger' ? 'credits.export' : 'export.create',
       entity: 'export',
       entityId: id,
       after: { kind: body.kind, format: body.format, ...params },

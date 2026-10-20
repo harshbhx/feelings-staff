@@ -3,7 +3,7 @@
  * with one action and the request id behind "Details", and one-sentence empty states.
  */
 import { ApiError, type ErrorCode } from '@fs/contracts';
-import { Button, EmptyState, Icon, Skeleton, SkeletonGroup } from '@fs/ui';
+import { Button, EmptyState, Icon, SkeletonList } from '@fs/ui';
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -105,22 +105,5 @@ export function Empty({ children, action }: { children: ReactNode; action?: Reac
 
 /** A list of skeleton rows (avatar, two lines, trailing chip) keeping the list's layout. */
 export function RowsSkeleton({ rows = 5, label }: { rows?: number; label?: string }) {
-  return (
-    <SkeletonGroup label={label} className="grid">
-      {Array.from({ length: rows }, (_, i) => (
-        <div
-          // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder rows
-          key={i}
-          className="flex min-h-14 items-center gap-3 border-border border-t py-2.5 first:border-t-0"
-        >
-          <Skeleton shape="circle" width="2.5rem" height="2.5rem" />
-          <span className="grid flex-1 gap-1.5">
-            <Skeleton width="45%" />
-            <Skeleton width="30%" />
-          </span>
-          <Skeleton shape="pill" width="4.5rem" height="1.75rem" />
-        </div>
-      ))}
-    </SkeletonGroup>
-  );
+  return <SkeletonList rows={rows} trailing label={label} />;
 }

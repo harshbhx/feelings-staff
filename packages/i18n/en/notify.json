@@ -226,7 +226,18 @@
       "button": "Sign in to Feelings Staff"
     },
     "digest": {
-      "footer": "You get this every Monday. Turn it off in Settings."
+      "footer": "You get this every Monday. Turn it off in Settings.",
+      "late": "Late arrivals: {{count}}",
+      "absent": "Absent days: {{count}}",
+      "overtime": "Overtime approved: {{time}}",
+      "pending": "Waiting for your decision: {{count}}",
+      "creditsHeading": "Time credits balances:",
+      "credit": "{{name}}: {{balance}}"
+    },
+    "notice": {
+      "open": "Open it in Feelings Staff: {{url}}",
+      "button": "Open Feelings Staff",
+      "footer": "You get this email because it is switched on for you. Change it in Settings."
     }
   },
   "inbox": {

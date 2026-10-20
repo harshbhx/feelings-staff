@@ -38,13 +38,16 @@ import {
   type TimeRules,
   type WorkedOffDayComp,
 } from '@fs/contracts';
-import { computeDay, resolveSchedule, timeRulesFromSettings } from '@fs/engine';
+import { computeDay, creditsOn, resolveSchedule, timeRulesFromSettings } from '@fs/engine';
 import { json } from '../db';
 import { fail } from '../lib/errors';
 import { loadOrg } from '../lib/settings';
 import { ulid } from '../lib/ulid';
+import { creditStmts } from './credit-entries';
+import { legalPlan } from './credit-legal';
 import type { DutyRow } from './duty';
 import type { Ctx, DayService } from './ports';
+import { syncAwayRows } from './presence-rows';
 import type { PunchRow } from './punch';
 
 // ---- Rows ------------------------------------------------------------------------------------
@@ -66,6 +69,10 @@ export interface ProfileRow {
   enrolled_photo_key: string | null;
   divisor_override: 'calendar' | 'fixed30' | 'fixed26' | 'working' | null;
   ot_rate_override_json: string | null;
+  /** Time credits: null follows the salon, 0 excludes this person (PRD 7.17.1). */
+  time_credits: number | null;
+  /** Presence: null follows the salon, 0 excludes this person (PRD 4.18.7). */
+  presence_enabled: number | null;
 }
 
 export interface TemplateRow {
@@ -84,6 +91,8 @@ export interface AttendanceDayRow {
   template_id: string | null;
   scheduled_min: number;
   worked_min: number;
+  /** Every worked minute of the day, inside the shift or not (`DayResult.totalMin`). */
+  total_min: number;
   break_min: number;
   late_min: number;
   late_billable_min: number;
@@ -149,11 +158,13 @@ interface PreapprovalRow {
 }
 
 export interface OtDecisionRow {
+  id: string;
   user_id: string;
   work_date: string;
   candidate_min: number;
   approved_min: number;
   decision: 'approved' | 'partial' | 'rejected' | 'auto';
+  decided_by: string | null;
   decided_at: number;
 }
 
@@ -259,7 +270,8 @@ export async function loadDayData(
     ctx.db.all<ProfileRow>(
       `SELECT p.user_id, u.name, u.role, u.status, u.phone_e164, p.designation, p.employee_code, p.join_date,
               p.exit_date, p.default_template_id, p.week_off_dow, p.selfie_required, p.strong_mode,
-              p.enrolled_photo_key, p.divisor_override, p.ot_rate_override_json
+              p.enrolled_photo_key, p.divisor_override, p.ot_rate_override_json, p.time_credits,
+              p.presence_enabled
          FROM staff_profiles p JOIN users u ON u.id = p.user_id
         WHERE p.org_id = ?org ${userFilter('p.user_id')}`,
       ...bind(),
@@ -315,7 +327,7 @@ export async function loadDayData(
       ...bind(from, to),
     ),
     ctx.db.all<OtDecisionRow>(
-      `SELECT user_id, work_date, candidate_min, approved_min, decision, decided_at FROM ot_decisions
+      `SELECT id, user_id, work_date, candidate_min, approved_min, decision, decided_by, decided_at FROM ot_decisions
         WHERE org_id = ?org ${userFilter('user_id')} AND work_date BETWEEN ? AND ?
         ORDER BY decided_at`,
       ...bind(from, to),
@@ -425,6 +437,8 @@ export interface Computed {
   tags: DayTag[];
   locked: boolean;
   punches: PunchRow[];
+  /** Time credits are on for this person on this date (PRD 7.17.1). */
+  creditsOn: boolean;
 }
 
 export interface DayOverlay {
@@ -450,6 +464,19 @@ function windowsFor(data: DayData, userId: string, date: string): OtWindow[] {
     }
   }
   return out;
+}
+
+/** `credits_on(person, date)` (PRD 7.17.1): the salon switch, its start date and the person's exclusion. */
+export function creditsEnabledFor(
+  settings: OrgSettings,
+  profile: Pick<ProfileRow, 'time_credits'>,
+  date: string,
+): boolean {
+  return creditsOn(
+    settings.timeCredits,
+    profile.time_credits === null ? null : profile.time_credits === 1,
+    date,
+  );
 }
 
 /** Compute one person-day from loaded data. Null when the person has no staff profile. */
@@ -480,12 +507,14 @@ export function computeFrom(
       ? overlay.override
       : json<DayOverride | null>(stored?.override_json ?? null, null);
   const leave = leaveOnDay(data, userId, date);
+  const profile = data.people.get(userId);
+  const creditsOnDay = profile ? creditsEnabledFor(data.settings, profile, date) : false;
   const result = computeDay({
     schedule,
     punches,
     preapprovals: windowsFor(data, userId, date),
     leave,
-    rules: data.rules,
+    rules: creditsOnDay ? { ...data.rules, credits: true } : data.rules,
     override,
   });
 
@@ -521,6 +550,7 @@ export function computeFrom(
     tags: TAG_ORDER.filter((t) => tags.has(t)),
     locked: stored?.locked === 1,
     punches: rows,
+    creditsOn: creditsOnDay,
   };
 }
 
@@ -528,14 +558,14 @@ export function computeFrom(
 export function upsertDayStmt(ctx: Ctx, c: Computed, now: number): D1PreparedStatement {
   const r = c.result;
   return ctx.db.stmt(
-    `INSERT INTO attendance_days (org_id, user_id, work_date, day_type, template_id, scheduled_min, worked_min,
+    `INSERT INTO attendance_days (org_id, user_id, work_date, day_type, template_id, scheduled_min, worked_min, total_min,
         break_min, late_min, late_billable_min, early_min, early_billable_min, overbreak_min, makeup_min,
         undertime_min, ot_preapproved_min, ot_candidate_min, ot_approved_min, ot_status, status,
         leave_type_code, offday_credit, tags_json, override_json, engine_version, computed_at, locked)
-     VALUES (?org, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+     VALUES (?org, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
      ON CONFLICT (user_id, work_date) DO UPDATE SET
         day_type = excluded.day_type, template_id = excluded.template_id,
-        scheduled_min = excluded.scheduled_min, worked_min = excluded.worked_min,
+        scheduled_min = excluded.scheduled_min, worked_min = excluded.worked_min, total_min = excluded.total_min,
         break_min = excluded.break_min, late_min = excluded.late_min,
         late_billable_min = excluded.late_billable_min, early_min = excluded.early_min,
         early_billable_min = excluded.early_billable_min, overbreak_min = excluded.overbreak_min,
@@ -553,6 +583,7 @@ export function upsertDayStmt(ctx: Ctx, c: Computed, now: number): D1PreparedSta
     r.templateId,
     r.scheduledMin,
     r.workedMin,
+    r.totalMin ?? r.workedMin,
     r.breakMin,
     r.lateMin,
     r.lateBillableMin,
@@ -636,10 +667,51 @@ export async function planDay(
   return {
     computed,
     data: d,
-    stmts: computed.locked
-      ? []
-      : [upsertDayStmt(ctx, computed, ctx.now()), ...compOffStmts(ctx, d, computed)],
+    stmts: computed.locked ? [] : await dayStmts(ctx, d, computed),
   };
+}
+
+/** The day row, its comp-off credit and its Time credits entries (PRD 7.17.2), for one batch. */
+export async function dayStmts(
+  ctx: Ctx,
+  data: DayData,
+  c: Computed,
+): Promise<D1PreparedStatement[]> {
+  const decision = data.otDecisions.get(dayKey(c.userId, c.date));
+  const profile = data.people.get(c.userId);
+  const legalOn = c.creditsOn && data.settings.timeCredits.legalOt2x;
+  const legal = legalOn
+    ? await legalPlan(
+        ctx,
+        c.userId,
+        {
+          date: c.date,
+          totalMin: c.result.totalMin ?? c.result.workedMin,
+          otApprovedMin: c.otApprovedMin,
+        },
+        (d) => (profile ? creditsEnabledFor(data.settings, profile, d) : false),
+      )
+    : { legalMin: 0, stmts: [] };
+  // Presence first: it closes and re-clips away intervals, which the Time credits entries read.
+  const awayMin = await syncAwayRows(ctx, c, {
+    breakPunches: data.settings.attendance.breakPunches,
+  });
+  return [
+    upsertDayStmt(ctx, c, ctx.now()),
+    ctx.db.stmt(
+      'UPDATE attendance_days SET away_min = ? WHERE org_id = ?org AND user_id = ? AND work_date = ?',
+      awayMin,
+      c.userId,
+      c.date,
+    ),
+    ...compOffStmts(ctx, data, c),
+    ...(await creditStmts(ctx, c, {
+      otSourceId: decision?.id ?? windowsFor(data, c.userId, c.date)[0]?.refId ?? null,
+      otConfirmedBy: decision?.decided_by ?? null,
+      legalOtMin: legal.legalMin,
+    })),
+    ...legal.stmts,
+  ];
 }
 
 /** DayService with a `plan` step so the punch pipeline can commit the day in its own batch. */

@@ -2,6 +2,7 @@
   "nav": {
     "today": "Today",
     "actions": "Needs action",
+    "actionsShort": "Actions",
     "register": "Register",
     "staff": "Staff",
     "more": "More",
@@ -12,7 +13,8 @@
     "inbox": "Inbox",
     "doorCode": "Show door code",
     "settings": "Settings",
-    "label": "Owner panel"
+    "label": "Owner panel",
+    "credits": "Credits"
   },
   "screens": {
     "signIn": "Owner sign-in",
@@ -36,7 +38,10 @@
     "settings": "Settings",
     "audit": "Audit log",
     "doorScreen": "Door screen",
-    "verify": "Payslip check"
+    "verify": "Payslip check",
+    "credits": "Credits",
+    "creditLedger": "Credits",
+    "settleCredits": "Settle credits"
   },
   "shell": {
     "back": "Back",
@@ -206,6 +211,14 @@
   "today": {
     "title": "Today",
     "dateUpdated": "{{date}} · updated {{time}}",
+    "progress": "{{in}} of {{total}} in",
+    "progressDesc": "{{in}} of {{total}} in: {{parts}}",
+    "strip": {
+      "onTime_one": "{{count}} on time",
+      "onTime_other": "{{count}} on time",
+      "dueLater_one": "{{count}} due later",
+      "dueLater_other": "{{count}} due later"
+    },
     "headline": {
       "in_one": "{{count}} in",
       "in_other": "{{count}} in",
@@ -226,6 +239,15 @@
       "onLeave": "On leave",
       "weekOff": "Week off",
       "atVenue": "At a venue"
+    },
+    "stats": {
+      "all": "everyone",
+      "present": "in",
+      "late": "late",
+      "notInYet": "not in yet",
+      "onLeave": "on leave",
+      "weekOff": "week off",
+      "atVenue": "at a venue"
     },
     "filtered": "Showing {{label}} only.",
     "showAll": "Show everyone",
@@ -582,6 +604,10 @@
       "audit": {
         "title": "Audit log",
         "hint": "Who changed what, and why"
+      },
+      "credits": {
+        "title": "Time credits",
+        "hint": "Minute ledger, settled at payroll"
       }
     },
     "units": {
@@ -807,6 +833,18 @@
       "grievancePhone": {
         "label": "Their phone",
         "what": "Shown in the privacy notice."
+      },
+      "creditsOn": {
+        "label": "Time credits",
+        "what": "Late, early and away minutes and approved overtime go to a ledger only you see. Nothing is cut or paid until you settle it at payroll. Needs your PIN."
+      },
+      "creditsStart": {
+        "label": "Start counting from",
+        "what": "Days from {{value}} count. Earlier days keep the usual late and overtime rules."
+      },
+      "legalOt2x": {
+        "label": "Pay legal overtime at 2×",
+        "what": "Overtime beyond 9 h a day or 48 h a week counts twice in the ledger, as the law requires. Off, payroll shows a shortfall warning. Needs your PIN."
       }
     },
     "ot": {
@@ -1004,6 +1042,7 @@
     "future": "Not yet",
     "locked": "Finalised. Reopen payroll to make changes.",
     "legend": "Key",
+    "summary": "This month, everyone",
     "week": "Week of {{date}}",
     "openMonth": "Open the month",
     "dayLink": "{{name}}, {{date}}: {{status}}",
@@ -1204,7 +1243,8 @@
         "leave": "Leave",
         "advances": "Advances",
         "devices": "Phones",
-        "exit": "Exit"
+        "exit": "Exit",
+        "credits": "Credits"
       },
       "joined": "Joined {{date}}",
       "code": "Code {{code}}",
@@ -1578,7 +1618,8 @@
       "roster": "Who works when, venue duties",
       "inbox": "Every alert in one place",
       "doorCode": "Use this phone as the door screen",
-      "settings": "Rules, holidays, security"
+      "settings": "Rules, holidays, security",
+      "credits": "Minutes late, early, away and overtime"
     }
   },
   "audit": {
@@ -1702,5 +1743,179 @@
     "invalid": "This payslip link isn't valid.",
     "invalidLine": "Check the link, or ask the salon for a new payslip.",
     "footer": "Checked with Feelings Staff."
+  },
+  "credits": {
+    "lead": "Every minute late, early or away, and every approved overtime minute, as of {{date}}. Nothing on this screen changes pay.",
+    "off": "Time credits is off. Balances stay until you settle them at payroll.",
+    "openSettings": "Open settings",
+    "show": "Show",
+    "filter": {
+      "all": "everyone",
+      "plus": "plus",
+      "minus": "minus"
+    },
+    "sort": {
+      "label": "Sort",
+      "minus": "Most minus first",
+      "plus": "Most plus first",
+      "name": "By name"
+    },
+    "min": "{{value}} min",
+    "worth": "worth about {{money}}",
+    "cut": "might cut around {{money}}",
+    "even": "nothing either way",
+    "lastSettled": "Last settled {{month}}: {{min}} min, {{money}}",
+    "neverSettled": "Not settled yet",
+    "awayWaiting_one": "{{count}} away to decide",
+    "awayWaiting_other": "{{count}} away to decide",
+    "empty": "No one has any credits yet.",
+    "emptyFilter": "No one has a balance on this side.",
+    "tableCaption": "Credit balances as of {{date}}",
+    "col": {
+      "person": "Person",
+      "balance": "Balance",
+      "money": "Money at 1×",
+      "last": "Last settlement",
+      "away": "Away to decide"
+    },
+    "kinds": {
+      "all": "All",
+      "late": "Late",
+      "early": "Early",
+      "away": "Away",
+      "ot": "Overtime",
+      "ot_legal": "Legal 2×",
+      "adjusted": "Adjusted",
+      "settled": "Settled"
+    },
+    "ledger": {
+      "title": "{{name}}: credits",
+      "balance": "Balance",
+      "carried": "{{min}} min carried over from earlier months",
+      "carriedNone": "Nothing carried over from earlier months",
+      "nothingUntil": "Nothing is cut or paid until you settle it at payroll.",
+      "adjust": "Adjust minutes",
+      "export": "Export CSV",
+      "kind": "Kind",
+      "from": "From",
+      "to": "To",
+      "unsettled": "Only unsettled",
+      "unsettledHint": "Hide what a finalised payroll already settled.",
+      "clear": "Clear filters",
+      "empty": "Nothing in the ledger yet.",
+      "emptyFilter": "Nothing matches these filters.",
+      "more": "Show older",
+      "tableCaption": "Credit ledger of {{name}}",
+      "col": {
+        "date": "Date",
+        "kind": "Kind",
+        "minutes": "Minutes",
+        "balance": "Balance after",
+        "source": "From",
+        "confirmed": "Confirmed by",
+        "edit": "Change"
+      },
+      "automatic": "Automatic",
+      "source": {
+        "punch": "Check-in or check-out",
+        "presence": "Away interval",
+        "ot_decision": "Overtime decision",
+        "settlement": "Settled at payroll",
+        "adjustment": "Your adjustment"
+      },
+      "balanceAfter": "Balance {{min}}",
+      "edit": "Adjust or see history",
+      "editFor": "Adjust or see history for {{kind}} on {{date}}",
+      "changes_one": "{{count}} change",
+      "changes_other": "{{count}} changes",
+      "adjustedBy": "{{min}} min adjusted",
+      "forEntry": "for {{kind}} on {{date}}"
+    },
+    "entry": {
+      "title": "{{kind}} on {{date}}",
+      "recorded": "Recorded {{min}} min",
+      "now": "Counts {{min}} min now",
+      "openDay": "Open the day",
+      "history": "History",
+      "noHistory": "No changes yet.",
+      "original": "Recorded {{min}} min",
+      "adjustment": "{{min}} min by {{name}}",
+      "voided": "Voided by {{name}}",
+      "someone": "someone",
+      "change": "Change",
+      "void": "Void",
+      "adjustThis": "Adjust this entry"
+    },
+    "adjustForm": {
+      "title": "Adjust minutes",
+      "body": "The original entry stays in the ledger. Your change and its reason are kept with it.",
+      "day": "Day",
+      "kind": "Kind",
+      "direction": "Change",
+      "add": "Add minutes",
+      "take": "Take away minutes",
+      "minutes": "Minutes",
+      "reason": "Reason",
+      "reasonHint": "Only you see credits and this reason.",
+      "save": "Save adjustment",
+      "saved": "Adjustment saved"
+    },
+    "changeForm": {
+      "title": "Change adjustment",
+      "save": "Save change",
+      "saved": "Adjustment changed"
+    },
+    "voidForm": {
+      "title": "Void adjustment",
+      "body": "The entry goes back to what was recorded. The adjustment stays in the history.",
+      "reason": "Why void it?",
+      "save": "Void adjustment",
+      "saved": "Adjustment voided"
+    },
+    "exportForm": {
+      "title": "Export the ledger",
+      "body": "A CSV file of {{name}}'s ledger for one month. We ask for your PIN.",
+      "month": "Month",
+      "make": "Make file",
+      "queued": "Making the file. You will find it in Reports.",
+      "openReports": "Open Reports"
+    },
+    "settle": {
+      "title": "Settle credits",
+      "lead": "{{month}} payroll. Choose how many minutes to settle for each person. Nothing is settled unless you choose, and what you leave stays on the balance.",
+      "balance": "Balance {{min}} min",
+      "toCut": "Minutes to cut",
+      "toPay": "Minutes to pay",
+      "exact": "Minutes to settle for {{name}}",
+      "less": "5 min less",
+      "more": "5 min more",
+      "zero": "Settle 0",
+      "suggested": "Suggested {{min}}",
+      "money": "Money",
+      "after": "Balance after",
+      "about": "about {{money}}",
+      "capKept": "{{count}} min stay on the balance",
+      "capHint": "A cut stays within half of the month's pay.",
+      "unsaved": "Not saved yet",
+      "save": "Save settlements",
+      "saved": "Settlements saved",
+      "undo": "Undo changes",
+      "finalised": "This payroll is final. Reopen it to change these.",
+      "empty": "No one has a balance at the end of {{month}}.",
+      "warnings": "Worth a look",
+      "settledLine": "Settled {{min}} min, {{money}}",
+      "nothing": "Nothing settled",
+      "cardTitle": "Settle credits",
+      "cardPeople_one": "{{count}} person has a balance at the month end.",
+      "cardPeople_other": "{{count}} people have a balance at the month end.",
+      "cardSettled": "{{settled}} settled: {{min}} min, {{money}}.",
+      "cardNothing": "Nothing is settled yet, so nothing is cut or paid.",
+      "open": "Settle credits",
+      "view": "See settled credits",
+      "back": "Back to the payroll"
+    },
+    "slip": {
+      "line": "Change it in Settle credits."
+    }
   }
 }

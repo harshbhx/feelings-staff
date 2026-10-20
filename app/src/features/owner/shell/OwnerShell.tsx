@@ -5,7 +5,19 @@
  * to 76rem. Also: the step-up PIN sheet, push refetch, the app badge and the toast region.
  */
 
-import { Banner, Bindi, Button, IconButton, TabBar, TabBarItem, ToastProvider } from '@fs/ui';
+import {
+  Avatar,
+  Banner,
+  Bindi,
+  Button,
+  IconButton,
+  RailGroup,
+  RailItem,
+  RailNav,
+  TabBar,
+  TabBarItem,
+  ToastProvider,
+} from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { type CSSProperties, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +38,16 @@ import {
   useOnline,
   usePushRefetch,
 } from './hooks';
-import { activeItem, activeTab, allowed, MORE, MORE_TAB, type NavItem, TABS } from './nav';
+import {
+  activeItem,
+  activeTab,
+  allowed,
+  MORE,
+  MORE_TAB,
+  type NavItem,
+  RAIL_GROUPS,
+  TABS,
+} from './nav';
 
 const SHELL_VARS = {
   '--owner-rail-w': '15rem',
@@ -183,7 +204,7 @@ function Tabs({ count }: { count: number }) {
             key={item.key}
             asChild
             icon={item.icon}
-            label={t(item.labelKey)}
+            label={t(item.tabLabelKey ?? item.labelKey)}
             current={active === item.key}
             badge={item.key === 'actions' && count > 0 ? count : undefined}
           >
@@ -200,7 +221,18 @@ function Rail({ count }: { count: number }) {
   const { pathname } = useLocation();
   const { tabs, more, me } = useNavItems();
   const active = activeItem(pathname);
-  const items = [...tabs, ...more];
+  const item = (i: NavItem) => (
+    <RailItem
+      key={i.key}
+      asChild
+      icon={i.icon}
+      label={t(i.labelKey)}
+      current={active === i.key}
+      badge={i.key === 'actions' && count > 0 ? count : undefined}
+    >
+      <Link to={i.to} />
+    </RailItem>
+  );
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-(--owner-rail-w) flex-col border-border border-r bg-bg xl:flex">
       <div className="flex h-16 items-center gap-1 px-6">
@@ -209,36 +241,24 @@ function Rail({ count }: { count: number }) {
         </span>
         <Bindi size="heading" className="text-xl" />
       </div>
-      <nav aria-label={t('owner:nav.label')} className="flex-1 overflow-y-auto px-3 py-2">
-        <ul className="grid gap-0.5">
-          {items.map((item) => {
-            const current = active === item.key;
-            return (
-              <li key={item.key}>
-                <Link
-                  to={item.to}
-                  aria-current={current ? 'page' : undefined}
-                  className={`relative flex min-h-11 items-center gap-3 rounded-md py-2 pr-3 pl-6 font-semibold text-sm transition-colors hover:bg-bg-soft ${current ? 'text-text' : 'text-text-muted'}`}
-                >
-                  {current ? (
-                    <Bindi size="marker" className="-translate-y-1/2 absolute top-1/2 left-2" />
-                  ) : null}
-                  <span className="flex-1">{t(item.labelKey)}</span>
-                  {item.key === 'actions' && count > 0 ? (
-                    <span className="min-w-6 rounded-full bg-bg-tint px-2 text-center font-bold text-maroon-800 text-xs tabular-nums leading-6">
-                      {count}
-                    </span>
-                  ) : null}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      <RailNav label={t('owner:nav.label')} className="flex-1 overflow-y-auto px-3 pt-2 pb-4">
+        <RailGroup>{tabs.map(item)}</RailGroup>
+        {RAIL_GROUPS.map((g) => {
+          const items = more.filter((i) => i.group === g);
+          return items.length > 0 ? (
+            <RailGroup key={g} label={t(`owner:more.groups.${g}`)}>
+              {items.map(item)}
+            </RailGroup>
+          ) : null;
+        })}
+      </RailNav>
       {me ? (
-        <div className="border-border border-t px-6 py-4">
-          <p className="truncate font-bold text-sm text-text">{me.user.name}</p>
-          <p className="truncate text-text-muted text-xs">{me.org.name}</p>
+        <div className="flex items-center gap-3 border-border border-t px-5 py-4">
+          <Avatar name={me.user.name} size="sm" />
+          <div className="min-w-0">
+            <p className="truncate font-bold text-sm text-text">{me.user.name}</p>
+            <p className="truncate text-text-muted text-xs">{me.org.name}</p>
+          </div>
         </div>
       ) : null}
     </aside>
