@@ -9,6 +9,7 @@ import { Card } from '../src/components/Card';
 import { List, ListRow } from '../src/components/ListRow';
 import { ProgressStrip } from '../src/components/ProgressStrip';
 import { RailGroup, RailItem, RailNav } from '../src/components/Rail';
+import { ShiftTimeline } from '../src/components/ShiftTimeline';
 import { SkeletonList } from '../src/components/Skeleton';
 import { StatChipGroup } from '../src/components/StatChip';
 import { renderUi } from './render';
@@ -159,5 +160,40 @@ describe('SkeletonList', () => {
     const status = screen.getByRole('status');
     expect(status.textContent).toBe('Loading the register');
     expect(status.querySelectorAll('.fs-skeleton-list__row')).toHaveLength(4);
+  });
+});
+
+describe('ShiftTimeline', () => {
+  it('WP-10 fix 5 the worked part and the now marker sit at their share of the shift', () => {
+    const { container } = renderUi(
+      <ShiftTimeline
+        start={600}
+        end={1200}
+        startLabel="10:00"
+        endLabel="20:00"
+        now={900}
+        worked={[{ from: 600, to: 900 }]}
+        description="Shift 10:00 to 20:00, now 15:00"
+      />,
+    );
+    expect(screen.getByRole('img', { name: 'Shift 10:00 to 20:00, now 15:00' })).toBeTruthy();
+    const now = container.querySelector<HTMLElement>('.fs-shift__now');
+    expect(now?.style.left).toBe('50%');
+    const worked = container.querySelector<HTMLElement>('.fs-shift__worked');
+    expect(worked?.style.left).toBe('0%');
+  });
+
+  it('WP-10 fix 5 now outside the shift stays at the nearer end', () => {
+    const { container } = renderUi(
+      <ShiftTimeline
+        start={600}
+        end={1200}
+        startLabel="10:00"
+        endLabel="20:00"
+        now={500}
+        description="x"
+      />,
+    );
+    expect(container.querySelector<HTMLElement>('.fs-shift__now')?.style.left).toBe('0%');
   });
 });

@@ -35,6 +35,7 @@
 @import "./components/stat.css";
 @import "./components/card.css";
 @import "./components/rail.css";
+@import "./components/shift.css";
 
 /* Scan the app and this package for class names (the Vite root is app/). */
 @source "../";
