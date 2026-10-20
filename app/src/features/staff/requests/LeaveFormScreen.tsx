@@ -140,10 +140,11 @@ function LeaveForm({
           options={options}
         />
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3">
           <Field label={t('staff:leave.from')} error={err('pickDates')}>
             <Input
               type="date"
+              className="min-w-0"
               value={draft.fromDate}
               onChange={(e) =>
                 set({
@@ -156,6 +157,7 @@ function LeaveForm({
           <Field label={t('staff:leave.to')} error={err('toBeforeFrom')}>
             <Input
               type="date"
+              className="min-w-0"
               value={draft.toDate}
               min={draft.fromDate || undefined}
               onChange={(e) => set({ toDate: e.target.value })}
