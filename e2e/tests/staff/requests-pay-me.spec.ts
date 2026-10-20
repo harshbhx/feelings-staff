@@ -125,7 +125,7 @@ test.describe('payslips', () => {
     staffOnly(info);
     await open(page, '/payslips');
     await expect(h1(page, 'Payslips')).toBeVisible();
-    await expect(page.getByRole('link', { name: /October 2026 · ₹/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /October 2026.*₹/ })).toBeVisible();
     await checkA11y();
   });
 
@@ -144,7 +144,7 @@ test.describe('payslips', () => {
     staffOnly(info);
     await open(page, '/payslips');
     await page
-      .getByRole('link', { name: /October 2026 · ₹/ })
+      .getByRole('link', { name: /October 2026.*₹/ })
       .first()
       .click();
     await expect(h1(page, 'October 2026')).toBeVisible();
