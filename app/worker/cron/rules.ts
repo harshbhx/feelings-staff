@@ -25,6 +25,8 @@ import { firstStart, lastEnd, loadPersonDays, type PersonDay } from '../services
 import { sweepPayslipPdfs } from '../services/payslip-pdf';
 import type { Ctx } from '../services/ports';
 import { type CronCtx, once, systemCtx } from './context';
+import { weeklyDigestRule } from './digest';
+import { whatsappEscalation } from './escalation';
 
 const JOB = 'rules';
 
@@ -103,6 +105,14 @@ export async function runRules(
     ['summary', morningSummary],
     ['payroll', payrollRules],
     ['duties', dutyReminders],
+    [
+      'whatsapp',
+      async (rr) => rr.bump('whatsapp_escalation', await whatsappEscalation(rr.ctx, JOB, rr.date)),
+    ],
+    [
+      'digest',
+      async (rr) => ((await weeklyDigestRule(rr.ctx, JOB)) ? rr.bump('weekly_digest') : undefined),
+    ],
     ['payslipPdfs', async (rr) => rr.bump('payslip_pdf', await sweepPayslipPdfs(rr.ctx))],
   ];
   for (const [name, fn] of rules) {
