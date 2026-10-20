@@ -136,11 +136,15 @@ export async function onboardPhone(
   const staff = await addStaff(owner, p);
   await joinOnPhone(page, p.phone, staff.code, p.pin);
   await approvePhone(owner, staff.id);
-  await expect(
-    page.getByRole('heading', { level: 1, name: new RegExp(p.name.split(' ')[0] ?? p.name) }),
-  ).toBeVisible({
-    timeout: 30_000,
+  const home = page.getByRole('heading', {
+    level: 1,
+    name: new RegExp(p.name.split(' ')[0] ?? p.name),
   });
+  // The first Today asks for the presence notice once (PRD 4.18.1): say OK, then the home shows.
+  const notice = page.getByRole('button', { name: 'OK, I understand' });
+  await expect(home.or(notice)).toBeVisible({ timeout: 30_000 });
+  if (await notice.isVisible()) await notice.click();
+  await expect(home).toBeVisible();
   return { id: staff.id };
 }
 
