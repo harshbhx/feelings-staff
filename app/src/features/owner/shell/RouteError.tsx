@@ -3,7 +3,7 @@
  * after an update replaced the old files). The shell, tabs and rail stay, so Urmi can move on; the
  * error text sits behind "Details" for support (PRD 5 shared states: never a raw error up front).
  */
-import { Button } from '@fs/ui';
+import { Button, Icon } from '@fs/ui';
 import { useTranslation } from 'react-i18next';
 import { useRouteError } from 'react-router';
 import { useStaleChunkRecovery } from '../../../app/useStaleChunkRecovery';
@@ -32,8 +32,14 @@ export function RouteError() {
         </Button>
       </div>
       {detail ? (
-        <details className="text-sm text-text-muted">
-          <summary className="cursor-pointer">{t('owner:common.details')}</summary>
+        <details className="group text-sm text-text-muted">
+          <summary className="-my-2 inline-flex min-h-11 cursor-pointer list-none items-center gap-1 [&::-webkit-details-marker]:hidden">
+            {t('owner:common.details')}
+            <Icon
+              name="caret-down"
+              className="size-4 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+            />
+          </summary>
           <p className="mt-1 break-words">{detail}</p>
         </details>
       ) : null}

@@ -111,7 +111,7 @@ function Header() {
           />
         ) : null}
         <h1
-          className="min-w-0 flex-1 truncate font-extrabold text-text text-xl tracking-display"
+          className="line-clamp-2 min-w-0 flex-1 text-balance font-extrabold text-text text-xl leading-snug tracking-display"
           data-testid="owner-title"
         >
           {title ?? t(titleKey)}
@@ -241,7 +241,7 @@ function Rail({ count }: { count: number }) {
         </span>
         <Bindi size="heading" className="text-xl" />
       </div>
-      <RailNav label={t('owner:nav.label')} className="flex-1 overflow-y-auto px-3 pt-2 pb-4">
+      <RailNav label={t('owner:nav.label')} className="flex-1 overflow-y-auto px-3 pt-1 pb-2">
         <RailGroup>{tabs.map(item)}</RailGroup>
         {RAIL_GROUPS.map((g) => {
           const items = more.filter((i) => i.group === g);
@@ -253,7 +253,7 @@ function Rail({ count }: { count: number }) {
         })}
       </RailNav>
       {me ? (
-        <div className="flex items-center gap-3 border-border border-t px-5 py-4">
+        <div className="flex items-center gap-3 border-border border-t px-5 py-3">
           <Avatar name={me.user.name} size="sm" />
           <div className="min-w-0">
             <p className="truncate font-bold text-sm text-text">{me.user.name}</p>
