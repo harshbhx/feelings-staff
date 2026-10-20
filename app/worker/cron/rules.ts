@@ -27,6 +27,8 @@ import { sweepPayslipPdfs } from '../services/payslip-pdf';
 import type { Ctx } from '../services/ports';
 import { checkedInAt, ensureSlots, MISSED_AFTER_MS } from '../services/rollcall';
 import { type CronCtx, once, systemCtx } from './context';
+import { weeklyDigestRule } from './digest';
+import { whatsappEscalation } from './escalation';
 
 const JOB = 'rules';
 
@@ -106,6 +108,14 @@ export async function runRules(
     ['payroll', payrollRules],
     ['duties', dutyReminders],
     ['presence', presenceRules],
+    [
+      'whatsapp',
+      async (rr) => rr.bump('whatsapp_escalation', await whatsappEscalation(rr.ctx, JOB, rr.date)),
+    ],
+    [
+      'digest',
+      async (rr) => ((await weeklyDigestRule(rr.ctx, JOB)) ? rr.bump('weekly_digest') : undefined),
+    ],
     ['payslipPdfs', async (rr) => rr.bump('payslip_pdf', await sweepPayslipPdfs(rr.ctx))],
   ];
   for (const [name, fn] of rules) {
