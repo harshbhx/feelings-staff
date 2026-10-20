@@ -74,11 +74,17 @@ export function useBack() {
 
 export function useAwayNote() {
   const api = useApi();
-  const setOpen = useSetOpenAway();
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (v: { id: string; note: string }) =>
       api.mePresenceAwayNote({ params: { id: v.id }, body: { note: v.note } }),
-    onSuccess: (away) => setOpen(away),
+    // A note does not end the interval: only the note changes on the open card.
+    onSuccess: (away) =>
+      qc.setQueryData<PresenceState>(presenceKey, (prev) =>
+        prev?.openAway?.id === away.id
+          ? { ...prev, openAway: { ...prev.openAway, staffNote: away.staffNote } }
+          : prev,
+      ),
   });
 }
 
