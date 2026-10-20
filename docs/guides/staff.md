@@ -4,7 +4,7 @@ Welcome to the Feelings team. This guide shows you how to use the Feelings staff
 
 If you get stuck at any point, ask Urmi. Every screen in the app has a way to reach her.
 
-**About "ships with the next release".** Some parts of this guide describe screens that are built but not yet in your app. They carry a note that says **Ships with the next release**. Until then you will not see them. Urmi tells you when they arrive. For quick answers, see the [FAQ](../faq.md).
+Everything in this guide is in your app now. The app is in English only for now. For quick answers, see the [FAQ](../faq.md).
 
 <!-- Source: PRD sections 4 to 6 (flows, screens, messages). Update this guide when the copy on a screen changes. -->
 
@@ -112,15 +112,12 @@ About 30 minutes after your shift ends, you get "Still at work? Check out when y
 
 ## Step out and I'm back
 
-> **Ships with the next release.** **Step out**, **I'm back** and the "marked away" card are not in your app yet.
-
-
 If you leave the salon during your shift, for lunch, the bank or something personal, tell the app. It takes two taps and keeps the record fair for you.
 
 <!-- screenshot: staff-step-out -->
 
 1. On **Today**, under the red **Check out** button, tap **Step out**.
-2. Choose a reason: **Personal**, **Lunch outside**, **Work errand** or **Other**. You can add a note, for example "Bank for the salon".
+2. Choose a reason: **Personal**, **Lunch outside**, **Work errand** or **Other**. You can add a note, for example "Bank for the salon". Tap **Step out now**.
 3. Today now says "You're out since 15:30" with **I'm back**.
 4. When you return, tap **I'm back**. You see "Welcome back. You were out 40 min."
 
@@ -134,13 +131,13 @@ Urmi or a manager checks who is in the salon two or three times a shift. If you 
 
 ### Add a note
 
-For any away time today you can add a note. It goes to Urmi with the item. For example, "Customer asked me to fetch the colour from the shop."
+For any away time today, tap **Add a note**, write a few words and tap **Send note**. You can add one note for each time away. It goes to Urmi with the item. For example, "Customer asked me to fetch the colour from the shop."
 
 ### What you can see
 
 **Me → My data → Presence** lists your own roll-call marks (Here, Not here), your step-outs with reasons, and each away time with its state: Waiting, Counted, Work or Ignored. If Urmi changes one, you see it change there.
 
-The first time, the app shows a short notice and asks you to accept. If you do not, you can still check in, check out and use **Step out**. The app never asks for your location for this and does not follow you. If it is open on screen, it may check once in a while whether you are at the salon, and it only tells Urmi "seems away"; it does not take any time off by itself.
+The first time, the app shows a short notice, **When you are not at the salon**, with **OK, I understand** and **Not now**. If you tap **Not now**, you can still check in, check out and use **Step out**. The app never asks for your location for this and does not follow you. If it is open on screen, it may check once in a while whether you are at the salon, and it only tells Urmi "seems away"; it does not take any time off by itself.
 
 ## What the messages mean
 
@@ -160,8 +157,9 @@ The first time, the app shows a short notice and asks you to accept. If you do n
 | "Urmi didn't accept your 10:04 check-in" | She did not accept it, and gives a reason. | Talk to her, or use [Fix a day](#fix-a-day). |
 | "Urmi hasn't approved this phone yet." | Your phone is waiting for approval. | Ask Urmi. |
 | "This phone was removed. Ask Urmi." | Your phone was taken off the list. | Ask Urmi. |
-| "Please update the app." | There is a new version. | Tap **Update now**. |
-| "A new version is ready." | Same. | Tap **Update**. |
+| "Please update the app." | This version is too old to talk to the salon. | Tap **Update now**. It takes a few seconds. |
+| "A new version is ready." | There is a newer version. | Tap **Update** when it suits you. |
+| "We couldn't load this." with **Try again** | The app was updated while it was open on your phone and could not find a file. It normally fixes itself by reloading once. | If you still see it, tap **Try again**. If it keeps coming back, close the app and open it again, then tell Urmi. |
 | "Your account is not active. Talk to Urmi." | Your account is not active. | Talk to Urmi. |
 
 A check-in that is flagged is **never** a reason for a cut in your pay. If you did nothing wrong, Urmi just looks and clears it. Your check-in still counts as normal until she says otherwise.
@@ -210,9 +208,6 @@ Tap a day to see what happened: your check-in and check-out times, where, the sh
 
 ## Ask for leave
 
-> **Ships with the next release.** The leave form is not in your app yet. Until then, ask Urmi in person or on WhatsApp.
-
-
 **Requests**, then **Ask for leave**.
 
 1. Choose the type. You see how many days you have left, for example "Casual 5 left", "Sick 7 left".
@@ -231,9 +226,6 @@ You get a ping when Urmi decides. If you change your mind before she decides, yo
 
 ## Fix a day
 
-> **Ships with the next release.** The fix form is not in your app yet. Until then, tell Urmi what went wrong and she fixes the day for you.
-
-
 If you forgot to check in or out, or the time is wrong, ask Urmi to fix it.
 
 1. **Month**, tap the day, then **Something's wrong with this day**. (Or tap **Fix the time** in the ping you got.)
@@ -249,9 +241,6 @@ If Urmi records an advance for you, you get a message such as "Urmi recorded an 
 
 ## Your payslip
 
-> **Ships with the next release.** The **Payslips** tab is not in your app yet. Until then, Urmi can share your payslip with you.
-
-
 After Urmi finishes the month, you get "Your October payslip is ready".
 
 1. **Payslips**, tap the month.
@@ -261,7 +250,7 @@ After Urmi finishes the month, you get "Your October payslip is ready".
 
 If the PDF says "Preparing the PDF...", wait a minute. The online payslip is always there.
 
-If Urmi has settled time for the month, you see one line, **Time adjustment**, with an amount and "settled by Urmi for time not worked in October" for a cut, or "settled by Urmi for extra time worked in October" for extra time. It is part of your pay like any other line. Ask Urmi if you want to know how it was worked out.
+If Urmi has settled time for the month, you see one line, **Time adjustment**, with an amount (a minus for time not worked, a plus for extra time worked) and "Settled by Urmi for October." It is part of your pay like any other line. Ask Urmi if you want to know how it was worked out.
 
 If you think a line is wrong, talk to Urmi. Every number comes from your check-ins, so you can see why.
 
@@ -269,12 +258,9 @@ If you think a line is wrong, talk to Urmi. Every number comes from your check-i
 
 ## Me: your phone, language and data
 
-> **Ships with the next release.** The **Me** tab, **My data** and the **Privacy notice** screens are not in your app yet.
-
-
 The **Me** tab has:
 
-- **Language:** English or Gujarati.
+- **Language:** a switch for English or Gujarati. Gujarati is not ready yet, so every screen stays in English for now.
 - **Notifications:** on or off, and a help text if they are off.
 - **This phone:** the name of your phone and the day Urmi approved it.
 - **My data:** what we keep about you: your check-ins and whether each was inside, near the edge or outside, any selfies still kept (with the date each is deleted), and what you agreed to. You can **Ask for a correction**, and see Urmi's contact for any complaint.

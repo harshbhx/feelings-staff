@@ -84,7 +84,7 @@ Optional secrets, only if you use them: `RESEND_API_KEY` (when `EMAIL_PROVIDER=r
 
 ## 4. Email
 
-Owner sign-in links and codes are sent by Cloudflare Email Service ([ADR-09](decisions/0009-email-through-cloudflare-email-service.md)).
+Owner sign-in links and codes, and the payroll and weekly digest emails, are sent by Cloudflare Email Service in production ([ADR-09](decisions/0009-email-through-cloudflare-email-service.md)). Preview (`EMAIL_PROVIDER=outbox`) never sends: messages go to the outbox. `feelingsbeautycare.in` is already enabled for Email Sending in the DualMind Labs Cloudflare account and its DNS records are live; do the steps below only for a different account.
 
 1. Dashboard, Compute, Email Service, Email Sending, Onboard Domain, choose `feelingsbeautycare.in`.
 2. Cloudflare adds SPF, DKIM and DMARC records on the `cf-bounce` subdomain, so the existing Email Routing MX records are not touched. Wait until the domain shows as verified.

@@ -10,7 +10,7 @@ Contents: [How an update reaches production](#how-an-update-reaches-production) 
 2. The pull request is merged into `main`.
 3. When `e2e` passes on `main`, the `deploy` workflow starts by itself. Docs-only merges do not deploy.
 4. `deploy` makes sure `ci` was green for that commit, then: builds, exports the production database as the `d1-backup` artifact (kept 30 days), applies new migrations, publishes the Worker with the app, checks `/api/v1/health`, `/api/v1/config` and the home page, and tags the commit `vYYYY.MM.DD-N`.
-5. Staff phones pick up the new version the next time they open the app. They see "A new version is ready" and tap **Update**.
+5. Staff phones pick up the new version the next time they open the app. They see "A new version is ready" and tap **Update**. A phone that is online always asks the server for the current app shell first (waiting up to 3 seconds), and uses its saved copy only when offline or on a slow connection. If a phone was open across a deploy and cannot find a file that no longer exists, the app removes its saved copy and reloads itself once; if that does not help, the staff member sees "We couldn't load this." with **Try again**.
 
 If the deploy fails before the publish step, nothing changed for users. If it fails at the smoke checks, the new version is already live: decide quickly between fixing forward and [rolling back](#roll-back-the-code).
 

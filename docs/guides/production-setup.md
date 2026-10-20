@@ -110,12 +110,15 @@ Now merge the pull request from step 3.
 
 ## Step 6. Email
 
-Owner sign-in links and codes are sent by email.
+Owner sign-in links and codes, the payroll and weekly digest emails are sent by Cloudflare Email Service in production. Previews never send real email: they put each message in the outbox, which the tests read.
 
-1. Dashboard, Compute, Email Service, Email Sending, Onboard Domain, pick `feelingsbeautycare.in`.
-2. Wait until the domain shows as verified. Cloudflare adds its records on a separate sub-domain, so existing email routing is not touched.
+1. Verify the sending domain. Dashboard, Compute, Email Service, Email Sending, Onboard Domain, pick `feelingsbeautycare.in`, and wait until it shows as verified. Cloudflare adds its records on a separate sub-domain, so existing email routing is not touched. Status today: `feelingsbeautycare.in` is already enabled for Email Sending in the DualMind Labs Cloudflare account and its DNS records are live, so for that account this step is done. Check that the dashboard still shows it as verified.
+2. Send a test sign-in email to the owner. After the first deploy (step 7) ask Urmi to request a link on the sign-in page, or request it for her address yourself, and confirm that it arrives with a link and a 6-digit code.
+3. Check spam. Look in Urmi's spam or junk folder if it is not in the inbox, and mark it as not spam. If it landed there, check that SPF, DKIM and DMARC show as valid for the sending domain before you go on.
 
 The sender is already set in the config as `staff@feelingsbeautycare.in`. Email problems and the fallback are in the [deploy guide](../deploy.md#4-email).
+
+**Known limitation: English only.** Gujarati and Hindi are not shipped. The staff app and the owner app are in English only. The language switch in the staff app's **Me** tab exists, but the Gujarati texts are not written yet, so every screen stays in English. Plan the first weeks with that in mind (a short demo in Gujarati from Urmi helps).
 
 ## Step 7. First deploy
 
@@ -193,13 +196,13 @@ The first sign-in opens **Setup**: "A few quick things, then you're ready." Each
 7. **Add your first staff member.**
 8. **Install and notifications** on her own phone.
 
-Show her **Time credits** and **Roll-call** too, once they are live in her version (see the [owner guide](owner.md#time-credits)).
+Show her **Time credits**, **Roll-call** and **Step out** too (see the [owner guide](owner.md#time-credits)).
 
 ## Step 12. Add staff
 
 Up to 15 active staff can be added.
 
-1. **Staff**, **Add staff**. Fill in name, mobile number, role, joining date, salary, shift, weekly off, language and selfie. Tick that the person is 18 or older.
+1. **Staff**, **Add staff**. Fill in name, mobile number, role, joining date, salary, shift, weekly off, language (English; Gujarati is not ready) and selfie. Tick that the person is 18 or older.
 2. **Save and invite.** The share sheet opens with a ready WhatsApp message that holds a link and a join code. The link works for 48 hours.
 3. When each person joins, a card **New phone for Priya** shows in **Needs action**. Urmi checks the phone name and taps **Approve** (it asks for her PIN). Nobody can check in before that.
 
