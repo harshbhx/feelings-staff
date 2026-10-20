@@ -23,9 +23,7 @@ function Sheets(p: Props) {
   const [closed, setClosed] = useState(noticeHeld);
   return (
     <>
-      {p.stepOut ? (
-        <StepOutSheet open={p.stepOutOpen} onOpenChange={p.onStepOutOpenChange} />
-      ) : null}
+      <StepOutSheet open={p.stepOutOpen} onOpenChange={p.onStepOutOpenChange} />
       {p.notice && !closed ? (
         <PresenceConsentSheet
           open={!p.blocked}
