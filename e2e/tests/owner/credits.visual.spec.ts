@@ -195,6 +195,8 @@ test.describe('owner credits flows on the fixtures', () => {
     const sheet = page.getByRole('dialog');
     await expect(sheet.getByLabel('Month', { exact: true })).toHaveValue('2026-10');
     await sheet.getByRole('button', { name: 'Make file' }).click();
-    await expect(page.getByText('Making the file. You will find it in Reports.')).toBeVisible();
+    await expect(
+      page.getByText('Making the file. You will find it in Reports.', { exact: true }),
+    ).toBeVisible();
   });
 });
