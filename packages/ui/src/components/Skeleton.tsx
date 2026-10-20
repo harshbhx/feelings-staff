@@ -53,3 +53,33 @@ export function SkeletonGroup({ children, label, className, ...rest }: SkeletonG
     </div>
   );
 }
+
+export interface SkeletonListProps {
+  /** How many rows to hold (default 3). */
+  rows?: number | undefined;
+  /** Hold a chip at the end of each row too. */
+  trailing?: boolean | undefined;
+  /** What is loading, for screen readers. */
+  label?: string | undefined;
+  className?: string | undefined;
+}
+
+/** Placeholder `ListRow`s: avatar, two lines and an optional chip, in the final row height. */
+export function SkeletonList({ rows = 3, trailing = false, label, className }: SkeletonListProps) {
+  const widths = ['55%', '42%', '62%', '48%', '58%'];
+  return (
+    <SkeletonGroup label={label} className={cx('fs-skeleton-list', className)}>
+      {Array.from({ length: rows }, (_, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: fixed placeholder rows
+        <div key={i} className="fs-skeleton-list__row">
+          <Skeleton shape="circle" />
+          <div className="fs-skeleton-list__text">
+            <Skeleton width={widths[i % widths.length]} />
+            <Skeleton width="34%" height="0.8125rem" />
+          </div>
+          {trailing ? <Skeleton width="4.5rem" height="1.75rem" /> : null}
+        </div>
+      ))}
+    </SkeletonGroup>
+  );
+}

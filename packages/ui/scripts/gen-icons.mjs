@@ -73,6 +73,8 @@ export const ICON_FILES = {
   'dots-three': 'dots-three',
   'pencil-simple': 'pencil-simple',
   trash: 'trash',
+  // WP-10: Advances in the owner's rail (Payroll keeps currency-inr).
+  'hand-coins': 'hand-coins',
 };
 
 /**

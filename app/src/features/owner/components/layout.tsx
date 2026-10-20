@@ -42,10 +42,13 @@ export function Meta({ children, className }: { children: ReactNode; className?:
   return <p className={`text-sm text-text-muted ${className ?? ''}`}>{children}</p>;
 }
 
-/** A neutral pill for words that are not statuses ("Inside", "Edge", "Added by you"). */
+/**
+ * A quiet word that is not a status ("Phone", "Kiosk"). Square-ish corners so it never reads as a
+ * button; for words with a meaning by colour use the kit's `Badge` (WP-10).
+ */
 export function Tag({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex min-h-7 items-center rounded-full border border-border-strong px-2.5 font-bold text-text-body text-xs">
+    <span className="inline-flex min-h-7 items-center rounded-sm border border-border-strong bg-bg px-2 font-bold text-text-body text-xs">
       {children}
     </span>
   );

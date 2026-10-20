@@ -93,6 +93,28 @@
     gap: var(--space-3);
   }
 
+  .fs-skeleton-list {
+    gap: 0;
+  }
+
+  .fs-skeleton-list__row {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    min-height: 4.125rem;
+    padding: 0.75rem 0;
+  }
+
+  .fs-skeleton-list__row + .fs-skeleton-list__row {
+    border-top: 1px solid var(--border);
+  }
+
+  .fs-skeleton-list__text {
+    display: grid;
+    flex: 1;
+    gap: 0.5rem;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .fs-skeleton::after {
       animation: none;

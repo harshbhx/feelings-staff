@@ -1,0 +1,39 @@
+/*
+ * Kit tokens (WP-10). Aliases only: every value points at tokens.css or the PRD 12.3 status
+ * colours in app-tokens.css, so no new hue enters the app and both of those files stay exact copies.
+ *
+ *   intents   semantic tints for words that are not day statuses ("Inside", "Edge", "Synced"):
+ *             success = the present green, warning = the late henna, info = the leave plum,
+ *             neutral = the flag ink. Red stays for the brand and for errors (PRD 12.2).
+ *   chrome    the solid tab bar and the owner's left rail.
+ *   meter     the progress strip ("8 of 11 in").
+ */
+:root {
+  --intent-success: var(--status-present);
+  --intent-success-bg: var(--status-present-bg);
+  --intent-warning: var(--status-late);
+  --intent-warning-bg: var(--status-late-bg);
+  --intent-info: var(--status-leave);
+  --intent-info-bg: var(--status-leave-bg);
+  --intent-neutral: var(--status-flag);
+  --intent-neutral-bg: var(--status-flag-bg);
+
+  /* Solid, not glass: content never shows through the tab bar. */
+  --tabbar-bg: var(--bg);
+  --rail-w: 15rem;
+  --rail-item-h: 2.75rem;
+  --rail-active-bg: var(--bg-tint);
+  --rail-hover-bg: var(--bg-soft);
+
+  --meter-h: 0.5rem;
+  --meter-track: var(--bg-tint);
+  --meter-gap: 2px;
+
+  --card-pad: var(--space-4);
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --card-pad: var(--space-5);
+  }
+}

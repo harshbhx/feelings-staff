@@ -13,7 +13,8 @@ export interface TabBarProps {
 
 /**
  * The bottom tab bar: up to 5 items, icon + label, the bindi under the active icon (PRD 5, 12.6,
- * 12.9). Glass, hairline on top, padded for the home indicator.
+ * 12.9). Solid white, hairline on top, padded for the home indicator. Keep labels to one short
+ * word ("Actions", not "Needs action"); a long one still wraps to two lines rather than being cut.
  */
 export function TabBar({ label, children, className }: TabBarProps) {
   return (
