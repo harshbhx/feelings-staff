@@ -142,8 +142,9 @@ export async function onboardPhone(
   });
   // The first Today asks for the presence notice once (PRD 4.18.1): say OK, then the home shows.
   const notice = page.getByRole('button', { name: 'OK, I understand' });
-  await expect(home).toBeVisible({ timeout: 30_000 });
-  // The home heading shows before the presence answer and the lazy notice sheet: let both settle.
+  await expect(home.or(notice)).toBeVisible({ timeout: 30_000 });
+  // The home heading can show before the presence answer and the lazy notice sheet arrive: let
+  // both settle, then look for the notice again.
   await page.waitForLoadState('networkidle');
   if (await notice.isVisible()) await notice.click();
   await expect(home).toBeVisible();
