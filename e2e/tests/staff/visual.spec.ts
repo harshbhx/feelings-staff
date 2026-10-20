@@ -15,13 +15,23 @@ interface Screen {
   variant?: string;
   /** Visible once the screen has its data (or its error card). */
   ready: (page: Page) => Locator;
+  /**
+   * Visible once a later query has landed too. Today's presence query answers after the day, so
+   * "Step out" joins the action bar a moment after "Check out"; without this the shot raced it.
+   */
+  settled?: (page: Page) => Locator;
 }
 
 const h1 = (name: string | RegExp) => (page: Page) => page.getByRole('heading', { level: 1, name });
 const alert = (text: string) => (page: Page) => page.getByRole('alert').filter({ hasText: text });
 
 const SCREENS: Screen[] = [
-  { name: 'today', path: '/', ready: h1(/Good morning, Priya/) },
+  {
+    name: 'today',
+    path: '/',
+    ready: h1(/Good morning, Priya/),
+    settled: (page) => page.locator('.staff-actionbar').getByRole('button', { name: 'Step out' }),
+  },
   { name: 'today-ready', path: '/', variant: 'meToday:ready', ready: h1(/Good morning/) },
   {
     name: 'today-checked-out',
@@ -143,6 +153,7 @@ async function openScreen(page: Page, s: Screen): Promise<void> {
   await freeze(page);
   await page.goto(url(s.path, s.variant ? { variant: s.variant } : {}));
   await expect(s.ready(page).first()).toBeVisible();
+  if (s.settled) await expect(s.settled(page)).toBeVisible();
   await settle(page);
 }
 
