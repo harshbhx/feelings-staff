@@ -208,7 +208,13 @@ function tabContent(tab: Tab, staff: StaffDetail, openCredits?: () => void) {
   }
 }
 
-function Overview({ staff, openCredits }: { staff: StaffDetail; openCredits?: () => void }) {
+function Overview({
+  staff,
+  openCredits,
+}: {
+  staff: StaffDetail;
+  openCredits?: (() => void) | undefined;
+}) {
   const { t } = useTranslation();
   const today = staff.today;
   const m = staff.monthTotals;
