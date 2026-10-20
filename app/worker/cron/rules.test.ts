@@ -23,6 +23,12 @@ afterEach(() => setServiceOverridesForTests(null));
 
 async function setup() {
   const salon = await newSalon();
+  // The fixed test Monday would also send the weekly digest (N30, covered in p1-notify.test.ts).
+  await testEnv.DB.prepare(
+    "INSERT INTO cron_runs (job, org_id, slot, ran_at) VALUES ('rules', ?1, '2026-10-12|weekly_digest', 0)",
+  )
+    .bind(salon.orgId)
+    .run();
   const priya = await addUser(salon, { name: 'Priya' });
   const kajal = await addUser(salon, { name: 'Kajal' });
   for (const id of [salon.ownerId, priya, kajal]) await subscribe(salon, id);

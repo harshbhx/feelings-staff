@@ -27,8 +27,7 @@ const OWNER_PHONE = '+919800000001';
 async function world(opts: { whatsapp?: boolean } = {}) {
   const salon = await newSalon();
   const kajal = await addUser(salon, { name: 'Kajal' });
-  const priya = await addUser(salon, { name: 'Priya' });
-  for (const id of [salon.ownerId, kajal, priya]) await subscribe(salon, id);
+  for (const id of [salon.ownerId, kajal]) await subscribe(salon, id);
   await testEnv.DB.prepare('UPDATE users SET phone_e164 = ?1, email = ?2 WHERE id = ?3')
     .bind(OWNER_PHONE, 'owner@feelings.test', salon.ownerId)
     .run();
@@ -40,17 +39,11 @@ async function world(opts: { whatsapp?: boolean } = {}) {
   const push = fakePush();
   const email = fakeEmail();
   setServiceOverridesForTests({ push, email });
-  return { salon, kajal, priya, push, email };
+  return { salon, kajal, push, email };
 }
 
-const notInYet = (s: Salon, kajal: string, at: number) =>
-  emitAt(s, at, {
-    type: 'not_in_yet',
-    userId: kajal,
-    name: 'Kajal',
-    workDate: DAY,
-    shiftStart: '10:00',
-  });
+/** N3 for Kajal (no punch) is raised by the rules job at shift start + 30 min. */
+const notInYet = (_s: Salon, _kajal: string, at: number) => rules(at);
 
 async function whatsappOutbox() {
   const res = await testEnv.DB.prepare(
@@ -120,11 +113,11 @@ describe('O-20 WhatsApp escalation of unopened critical alerts (PRD 6)', () => {
   });
 
   it('O-20.5 it waits through quiet hours and never escalates alerts older than 2 hours', async () => {
-    const { salon, priya } = await world();
+    const { salon, kajal } = await world();
     await emitAt(salon, ist('21:20'), {
       type: 'new_device',
-      userId: priya,
-      name: 'Priya',
+      userId: kajal,
+      name: 'Kajal',
       deviceId: 'DV1',
       deviceLabel: 'Redmi Note 12 · Chrome',
     });
@@ -135,11 +128,11 @@ describe('O-20 WhatsApp escalation of unopened critical alerts (PRD 6)', () => {
   });
 
   it('O-20.6 a new-device alert escalates outside quiet hours', async () => {
-    const { salon, priya } = await world();
+    const { salon, kajal } = await world();
     await emitAt(salon, ist('12:00'), {
       type: 'new_device',
-      userId: priya,
-      name: 'Priya',
+      userId: kajal,
+      name: 'Kajal',
       deviceId: 'DV1',
       deviceLabel: 'Redmi Note 12 · Chrome',
     });
@@ -151,9 +144,16 @@ describe('O-20 WhatsApp escalation of unopened critical alerts (PRD 6)', () => {
 
   it('O-20.7 at most 10 WhatsApp messages go out in a day', async () => {
     const { salon, kajal } = await world();
-    for (let i = 0; i < 12; i++) await notInYet(salon, kajal, ist('10:30') + i);
-    await rules(ist('10:50'));
-    await rules(ist('10:55'));
+    for (let i = 0; i < 12; i++)
+      await emitAt(salon, ist('12:00') + i, {
+        type: 'new_device',
+        userId: kajal,
+        name: 'Kajal',
+        deviceId: `DV${i}`,
+        deviceLabel: 'Redmi Note 12 · Chrome',
+      });
+    await rules(ist('12:20'));
+    await rules(ist('12:25'));
     expect(await whatsappOutbox()).toHaveLength(10);
   });
 
@@ -191,7 +191,8 @@ describe('O-21 weekly digest N30 (PRD 6)', () => {
   }
 
   it('O-21.1 on Monday at 09:00 IST the owner gets last week by email and in the inbox, once', async () => {
-    const { salon, kajal, priya, email } = await world();
+    const { salon, kajal, email } = await world();
+    const priya = await addUser(salon, { name: 'Priya' });
     const neha = await addUser(salon, { name: 'Neha' });
     await seedWeek(salon, { priya, kajal, neha });
     await rules(ist('08:55', MONDAY));
@@ -216,7 +217,8 @@ describe('O-21 weekly digest N30 (PRD 6)', () => {
   });
 
   it('O-21.2 the digest lists what is waiting for a decision and the Time credits balances', async () => {
-    const { salon, kajal, priya, email } = await world();
+    const { salon, kajal, email } = await world();
+    const priya = await addUser(salon, { name: 'Priya' });
     await setSettings(salon, (s) => {
       (s.timeCredits as Record<string, unknown>).startDate = '2026-10-01';
     });
@@ -261,7 +263,9 @@ describe('O-21 payroll emails N24 and N25 (PRD 6)', () => {
   });
 
   it('O-21.5 N25 emails a staff member their payslip notice only when they switched email on', async () => {
-    const { salon, kajal, priya, email } = await world();
+    const { salon, kajal, email } = await world();
+    const priya = await addUser(salon, { name: 'Priya' });
+    await subscribe(salon, priya);
     await testEnv.DB.prepare('UPDATE users SET email = ?1 WHERE id = ?2')
       .bind('priya@feelings.test', priya)
       .run();
