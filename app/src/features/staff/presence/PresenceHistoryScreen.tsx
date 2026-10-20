@@ -23,12 +23,13 @@ import { useOwnerName } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
 import { QueryError } from '../shell/ScreenFallback';
 import { ScreenHeader } from '../shell/ScreenHeader';
+import { withPresenceCopy } from './copy';
 import { type HistoryItem, historyByDay } from './history-model';
 import { usePresenceHistory } from './sheet-api';
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
 
-export function PresenceHistoryScreen() {
+function PresenceHistory() {
   const { t } = useTranslation();
   const fmt = useFmt();
   const owner = useOwnerName();
@@ -180,3 +181,5 @@ function HistoryRow({ item, fmt, t }: { item: HistoryItem; fmt: Fmt; t: TFunctio
     }
   }
 }
+
+export const PresenceHistoryScreen = withPresenceCopy(PresenceHistory);
