@@ -6,6 +6,7 @@ import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet, type RouteObject } from 'react-router';
 import { RequireRole } from './app/guards';
 import { WithNamespaces } from './app/i18n';
+import { RouteErrorPage } from './app/RouteErrorPage';
 import { authRoutes } from './features/auth/routes';
 import { doorRoutes } from './features/door/routes';
 import { kitRoutes } from './features/kit/routes';
@@ -67,7 +68,8 @@ export const routes: RouteObject[] = [
 ];
 
 export function createRouter() {
-  return createBrowserRouter(routes, {
+  // One root error page for every area, including a failed lazy load of the owner route table.
+  return createBrowserRouter([{ errorElement: <RouteErrorPage />, children: routes }], {
     async patchRoutesOnNavigation({ path, patch }) {
       if (path !== '/o' && !path.startsWith('/o/')) return;
       const { ownerRoutes } = await import('./features/owner/routes');

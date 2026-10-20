@@ -41,7 +41,7 @@ flowchart TB
   worker -.-> wa
 ```
 
-Static files are served from assets. `/api/*`, `/v/*`, `/q/*` and `/__kit` always reach the Worker code first (`run_worker_first`), everything else falls back to the single-page app ([ADR-01](decisions/0001-one-worker-for-assets-api-and-cron.md)).
+Static files are served from assets. `/api/*`, `/v/*`, `/q/*`, `/__kit` and `/assets/*` (a missing hashed file is a real 404, never the shell) always reach the Worker code first (`run_worker_first`), everything else falls back to the single-page app ([ADR-01](decisions/0001-one-worker-for-assets-api-and-cron.md)).
 
 What the Worker does on every `/api/*` request, in order:
 

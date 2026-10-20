@@ -1,7 +1,12 @@
 {
   "app": {
     "name": "Feelings Staff",
-    "shortName": "Feelings"
+    "shortName": "Feelings",
+    "errorTitle": "Something got stuck on our side.",
+    "errorBody": "Reload the page and it will come right back. Nothing you saved is lost.",
+    "reload": "Reload",
+    "updatingTitle": "Freshening things up.",
+    "updatingBody": "A newer version of Feelings is ready. One moment."
   },
   "actions": {
     "tryAgain": "Try again",

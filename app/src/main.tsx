@@ -4,6 +4,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
 import { AppProviders } from './app/root';
+import { installChunkReload } from './pwa/chunk-reload';
 import { startPwa } from './pwa/register';
 import { createRouter } from './router';
 
@@ -12,6 +13,7 @@ const root = document.getElementById('root');
 if (!root) throw new Error('#root missing');
 
 // Service worker, update flow and offline state (PRD 11.4-11.7) for staff and owner alike.
+installChunkReload();
 startPwa();
 
 createRoot(root).render(
