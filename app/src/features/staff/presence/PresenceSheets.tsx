@@ -11,7 +11,6 @@ import { StepOutSheet } from './StepOutSheet';
 let noticeHeld = false;
 
 interface Props {
-  stepOut: boolean;
   stepOutOpen: boolean;
   onStepOutOpenChange: (open: boolean) => void;
   /** The server wants the notice shown. */

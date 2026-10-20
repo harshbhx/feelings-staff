@@ -135,8 +135,6 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
       .finally(() => setBackBusy(false));
   };
   const [stepOutOpen, setStepOutOpen] = useState(false);
-  const [stepOutMounted, setStepOutMounted] = useState(false);
-  if (stepOutOpen && !stepOutMounted) setStepOutMounted(true);
   useEffect(() => {
     const id = setTimeout(() => void loadPunchSheet(), PRELOAD_SHEET_MS);
     return () => clearTimeout(id);
@@ -310,10 +308,9 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
         )}
       </ActionBar>
 
-      {stepOutMounted || pres.askConsent ? (
+      {pres.stepOut || pres.askConsent ? (
         <Suspense fallback={null}>
           <PresenceSheets
-            stepOut={stepOutMounted}
             stepOutOpen={stepOutOpen}
             onStepOutOpenChange={setStepOutOpen}
             notice={pres.askConsent}
