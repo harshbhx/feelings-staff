@@ -2,13 +2,26 @@
  * Presence hooks that only the lazy sheets and the history screen use, kept out of the staff
  * shell chunk (PRD 11.10 JS budget).
  */
-import type { AwayReason, PresenceState } from '@fs/contracts';
+import type { AwayIntervalStaff, AwayReason, PresenceState } from '@fs/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApi } from '../../../api/provider';
-import { presenceKey, useSetOpenAway } from './api';
+import { presenceKey } from './api';
 import { PRESENCE_NOTICE_VERSION } from './presence-model';
 
 /** My data -> Presence for one month (`YYYY-MM`): marks, step-outs with state, checks. */
+/** Keep the open interval on Today straight from the server's answer. */
+function useSetOpenAway() {
+  const qc = useQueryClient();
+  return (away: AwayIntervalStaff | null) =>
+    qc.setQueryData<PresenceState>(presenceKey, (prev) => {
+      if (!prev) return prev;
+      const { openAway: _old, ...rest } = prev;
+      return away && away.endTs === null ? { ...rest, openAway: away } : rest;
+    });
+}
+
+export const newPresenceKey = () => crypto.randomUUID();
+
 export function usePresenceHistory(month: string) {
   const api = useApi();
   return useQuery({
