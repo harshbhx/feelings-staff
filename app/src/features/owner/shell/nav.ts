@@ -12,6 +12,8 @@ export interface NavItem {
   key: string;
   to: string;
   labelKey: string;
+  /** A one-word label for the phone tab bar ("Actions"), so no label wraps (WP-10). */
+  tabLabelKey?: string;
   icon: NavIcon;
   /** Manager permission needed; the owner always passes. `owner` = owner only. */
   needs?: Permission | 'owner';
@@ -22,7 +24,13 @@ export interface NavItem {
 
 export const TABS: readonly NavItem[] = [
   { key: 'today', to: '/o/today', labelKey: 'owner:nav.today', icon: 'calendar-check' },
-  { key: 'actions', to: '/o/actions', labelKey: 'owner:nav.actions', icon: 'warning-circle' },
+  {
+    key: 'actions',
+    to: '/o/actions',
+    labelKey: 'owner:nav.actions',
+    tabLabelKey: 'owner:nav.actionsShort',
+    icon: 'warning-circle',
+  },
   {
     key: 'register',
     to: '/o/register',
@@ -56,7 +64,7 @@ export const MORE: readonly NavItem[] = [
     key: 'advances',
     to: '/o/advances',
     labelKey: 'owner:nav.advances',
-    icon: 'currency-inr',
+    icon: 'hand-coins',
     needs: 'payroll',
     group: 'money',
     hintKey: 'owner:more.hints.advances',
@@ -121,6 +129,9 @@ export function allowed(item: NavItem, me: Me | null | undefined): boolean {
   if (item.needs === 'owner') return false;
   return me.permissions.includes(item.needs);
 }
+
+/** Rail groups on desktop, in order: the four tabs first (no heading), then More's groups. */
+export const RAIL_GROUPS = ['money', 'people', 'salon'] as const;
 
 /** Which tab is active for a path (More is active for everything that lives in More). */
 export function activeTab(pathname: string): string {

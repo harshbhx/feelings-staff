@@ -2,6 +2,7 @@
   "nav": {
     "today": "Today",
     "actions": "Needs action",
+    "actionsShort": "Actions",
     "register": "Register",
     "staff": "Staff",
     "more": "More",
@@ -210,6 +211,14 @@
   "today": {
     "title": "Today",
     "dateUpdated": "{{date}} · updated {{time}}",
+    "progress": "{{in}} of {{total}} in",
+    "progressDesc": "{{in}} of {{total}} in: {{parts}}",
+    "strip": {
+      "onTime_one": "{{count}} on time",
+      "onTime_other": "{{count}} on time",
+      "dueLater_one": "{{count}} due later",
+      "dueLater_other": "{{count}} due later"
+    },
     "headline": {
       "in_one": "{{count}} in",
       "in_other": "{{count}} in",
@@ -230,6 +239,15 @@
       "onLeave": "On leave",
       "weekOff": "Week off",
       "atVenue": "At a venue"
+    },
+    "stats": {
+      "all": "everyone",
+      "present": "in",
+      "late": "late",
+      "notInYet": "not in yet",
+      "onLeave": "on leave",
+      "weekOff": "week off",
+      "atVenue": "at a venue"
     },
     "filtered": "Showing {{label}} only.",
     "showAll": "Show everyone",
@@ -1024,6 +1042,7 @@
     "future": "Not yet",
     "locked": "Finalised. Reopen payroll to make changes.",
     "legend": "Key",
+    "summary": "This month, everyone",
     "week": "Week of {{date}}",
     "openMonth": "Open the month",
     "dayLink": "{{name}}, {{date}}: {{status}}",

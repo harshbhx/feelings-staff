@@ -1,0 +1,43 @@
+/* ShiftTimeline (WP-10): the shift as one line, the worked part in the present green, a now marker. */
+@layer components {
+  .fs-shift {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .fs-shift__track {
+    position: relative;
+    height: var(--meter-h);
+    border-radius: var(--radius-pill);
+    background: var(--meter-track);
+  }
+
+  .fs-shift__worked {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: var(--radius-pill);
+    background: var(--status-present);
+  }
+
+  /* Now: an ink tick taller than the track, ringed in white so it reads on the green. */
+  .fs-shift__now {
+    position: absolute;
+    top: 50%;
+    width: 0.25rem;
+    height: 1.25rem;
+    border-radius: var(--radius-pill);
+    background: var(--text);
+    box-shadow: 0 0 0 2px var(--bg);
+    transform: translate(-50%, -50%);
+  }
+
+  .fs-shift__ends {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-ui);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+}

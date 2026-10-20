@@ -1,6 +1,6 @@
 # Architecture decisions
 
-One short record per decision: what was going on, what we chose, what follows from it. ADR-01 to ADR-14 come from PRD section 13.5. ADR-15 and ADR-16 record what WP-1 built. The overview and diagrams are in [architecture.md](../architecture.md).
+One short record per decision: what was going on, what we chose, what follows from it. ADR-01 to ADR-14 come from PRD section 13.5. ADR-15 and ADR-16 record what WP-1 built. ADR-17 and ADR-18 record the Time credits and presence decisions of WP-9 (PRD 4.18, 4.19, 7.17, 7.18). The overview and diagrams are in [architecture.md](../architecture.md).
 
 | ADR | Decision |
 |---|---|
@@ -20,5 +20,7 @@ One short record per decision: what was going on, what we chose, what follows fr
 | [ADR-14](0014-leaflet-and-openstreetmap-loaded-lazily.md) | Leaflet and OpenStreetMap, loaded lazily |
 | [ADR-15](0015-endpoint-table-drives-server-and-client.md) | Endpoint table drives server and client |
 | [ADR-16](0016-mock-mode-on-localhost-for-visual-baselines.md) | Mock mode on localhost for visual baselines |
+| [ADR-17](0017-time-credits-an-owner-settled-minute-ledger-instead-of-automatic-late-and-overtime-pay.md) | Time credits: an owner-settled minute ledger instead of automatic late and overtime pay |
+| [ADR-18](0018-presence-by-roll-call-and-step-out-not-background-location.md) | Presence by roll-call and step-out, not background location |
 
 To add a decision, copy the newest file, use the next number, and add a row above. Do not edit an accepted record to change history; write a new one that supersedes it and mark the old one "superseded by ADR-NN".

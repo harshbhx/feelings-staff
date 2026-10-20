@@ -24,6 +24,8 @@ export interface ProgressStripProps extends Omit<HTMLAttributes<HTMLDivElement>,
   legend?: boolean | undefined;
   /** The bar's accessible description ("8 of 11 in: 5 on time, 3 late"). */
   description: string;
+  /** `lg`: the label is the screen's headline (owner Today), 30-48 px, 800. */
+  size?: 'md' | 'lg' | undefined;
 }
 
 /**
@@ -38,13 +40,14 @@ export function ProgressStrip({
   total,
   legend = true,
   description,
+  size = 'md',
   className,
   ...rest
 }: ProgressStripProps) {
   const safeTotal = Math.max(total, 1);
   const shown = segments.filter((s) => s.value > 0);
   return (
-    <div className={cx('fs-meter', className)} {...rest}>
+    <div className={cx('fs-meter', className)} data-size={size} {...rest}>
       <div className="fs-meter__head">
         <span className="fs-meter__label">{label}</span>
         {aside ? <span className="fs-meter__aside">{aside}</span> : null}

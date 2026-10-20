@@ -49,8 +49,11 @@ describe('fixtures', () => {
     const need: Partial<Record<EndpointKey, string[]>> = {
       meToday: ['checked-in', 'checked-out', 'week-off', 'on-leave', 'pending-proof'],
       punchCreate: ['flagged', 'needs-proof', 'pending'],
-      ownerToday: ['before-first-shift', 'holiday'],
-      ownerActions: ['empty'],
+      ownerToday: ['before-first-shift', 'holiday', 'roll-call-open', 'roll-call-missed'],
+      ownerActions: ['empty', 'away'],
+      ownerRollCallGet: ['open', 'empty'],
+      ownerAwayList: ['open'],
+      mePresence: ['stepped-out', 'marked-away', 'consent-needed'],
       ownerPayrollGet: ['finalised', 'with-blockers'],
       mePayslips: ['empty'],
       notificationsList: ['empty'],

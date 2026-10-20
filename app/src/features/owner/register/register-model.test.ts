@@ -5,6 +5,7 @@ import {
   cellDetail,
   cellModel,
   monthNav,
+  monthTotals,
   stripIndexFor,
   TOTAL_COLUMNS,
   totalValue,
@@ -74,5 +75,13 @@ describe('Register model (O-05)', () => {
   it('cannot page past the current month', () => {
     expect(monthNav('2026-10', '2026-10')).toEqual({ prev: '2026-09', next: null });
     expect(monthNav('2026-09', '2026-10')).toEqual({ prev: '2026-08', next: '2026-10' });
+  });
+
+  it('O-05.1 the month summary adds every row, column by column', () => {
+    const sum = monthTotals(view);
+    for (const c of TOTAL_COLUMNS) {
+      const expected = view.rows.reduce((n, r) => n + totalValue(r, c), 0);
+      expect(sum[c]).toBeCloseTo(expected, 5);
+    }
   });
 });

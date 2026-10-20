@@ -22,7 +22,8 @@ import { randomToken } from '../lib/crypto';
 import { fail } from '../lib/errors';
 import { loadSettings } from '../lib/settings';
 import { ulid } from '../lib/ulid';
-import { compOffStmts, dayKey, jsonList, personBrief, upsertDayStmt } from './day';
+import { applyStmts, reopenStmts } from './credit-settlement';
+import { dayKey, dayStmts, jsonList, personBrief } from './day';
 import { monthName } from './leave';
 import {
   type AdjustmentRow,
@@ -41,6 +42,7 @@ import {
   type PayslipRow,
   payslipView,
   snapshotOf,
+  staffSafePayslip,
 } from './payslip';
 import { generateRunPdfs } from './payslip-pdf';
 import type { Ctx, PayrollService } from './ports';
@@ -70,12 +72,12 @@ async function runPayslips(ctx: Ctx, runId: string): Promise<PayslipRow[]> {
   );
 }
 
-function requireDraft(run: RunRow): void {
+export function requireDraft(run: RunRow): void {
   if (run.status !== 'draft')
     fail('MONTH_LOCKED', 'This payroll is final. Reopen it to change it.');
 }
 
-const draftCalc = (ctx: Ctx, run: RunRow, userId?: string): Promise<RunCalc> => {
+export const draftCalc = (ctx: Ctx, run: RunRow, userId?: string): Promise<RunCalc> => {
   const snap = parseSnapshot(run.settings_snapshot_json);
   return calcRun(ctx, {
     month: run.month,
@@ -333,6 +335,9 @@ export async function personView(ctx: Ctx, run: RunRow, userId: string): Promise
     );
   }
   const extras = await personExtras(ctx, run, userId, base.result, phone, adj);
+  // Time credits are owner only (PRD 7.17.9): a manager with `payroll` gets the neutral
+  // "Time adjustment" line, never the minutes, the balance or the word "credits".
+  if (ctx.user?.role !== 'owner') base = await staffSafePayslip(ctx, base);
   const share = base.verifyUrl ? `Your ${monthName(run.month)} salary slip: ${base.verifyUrl}` : '';
   const digits = extras.phone?.replace(/\D/g, '') ?? '';
   return {
@@ -409,7 +414,7 @@ export async function recomputeRun(ctx: Ctx, runId: string): Promise<PayrollRunV
 
 // ---- Adjustments and advance recovery -----------------------------------------------------------
 
-async function requireEmployed(ctx: Ctx, run: RunRow, userId: string): Promise<void> {
+export async function requireEmployed(ctx: Ctx, run: RunRow, userId: string): Promise<void> {
   const p = await ctx.db.first<{ id: string }>(
     `SELECT user_id AS id FROM staff_profiles
       WHERE org_id = ?org AND user_id = ? AND join_date <= ? AND (exit_date IS NULL OR exit_date >= ?)`,
@@ -630,10 +635,12 @@ export async function finaliseRun(
         offday_credit: r2.offdayCredit,
       };
       if (!stored || DAY_FIELDS.some((f) => stored[f] !== fresh[f])) {
-        stmts.push(upsertDayStmt(ctx, c, now), ...compOffStmts(ctx, calc.data, c));
+        stmts.push(...(await dayStmts(ctx, calc.data, c)));
       }
     }
   }
+  // The Time credits settlements become final with the payslips (PRD 7.17.5).
+  stmts.push(...(await applyStmts(ctx, run, calc.people, now)));
   stmts.push(
     ctx.db.stmt(
       `UPDATE attendance_days SET locked = 1, payroll_run_id = ?
@@ -744,6 +751,7 @@ export async function reopenRun(
       "UPDATE payslips SET pdf_status = 'pending' WHERE org_id = ?org AND payroll_run_id = ?",
       run.id,
     ),
+    ...(await reopenStmts(ctx, run, id, now)),
     ...adjustments.map((a) =>
       ctx.db.insert('adjustments', {
         id: ulid(now),
