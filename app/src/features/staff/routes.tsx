@@ -5,10 +5,10 @@
 import { lazy } from 'react';
 import type { RouteObject } from 'react-router';
 import { WithNamespaces } from '../../app/i18n';
-import { InboxScreen } from '../inbox';
 import { browserAllowed } from './install/allow-browser';
 import { TodayScreen } from './today/TodayScreen';
 
+const InboxScreen = lazy(() => import('../inbox/screen').then((m) => ({ default: m.InboxScreen })));
 const MonthScreen = lazy(() =>
   import('./month/MonthScreen').then((m) => ({ default: m.MonthScreen })),
 );

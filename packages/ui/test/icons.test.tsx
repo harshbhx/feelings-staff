@@ -3,9 +3,11 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { readPaths } from '../scripts/gen-icons.mjs';
+import { CORE_ICON_NAMES, readPaths } from '../scripts/gen-icons.mjs';
 import { Icon } from '../src/icons/Icon';
-import { ICON_PATHS } from '../src/icons/paths';
+import { ICON_NAMES } from '../src/icons/names';
+import { CORE_ICON_PATHS } from '../src/icons/paths-core';
+import { REST_ICON_PATHS } from '../src/icons/paths-rest';
 import { renderUi } from './render';
 
 const pkg = resolve(
@@ -14,9 +16,20 @@ const pkg = resolve(
 );
 
 describe('icons', () => {
-  it('paths.ts matches @phosphor-icons/core regular (run scripts/gen-icons.mjs after adding one)', () => {
+  it('paths-core.ts/paths-rest.ts match @phosphor-icons/core regular (run scripts/gen-icons.mjs after adding one)', () => {
     expect(existsSync(pkg)).toBe(true);
-    expect(readPaths(pkg)).toEqual(ICON_PATHS);
+    expect({ ...CORE_ICON_PATHS, ...REST_ICON_PATHS }).toEqual(readPaths(pkg));
+  });
+
+  it('names.ts lists every icon exactly once', () => {
+    expect(new Set(ICON_NAMES).size).toBe(ICON_NAMES.length);
+    expect([...ICON_NAMES].sort()).toEqual(
+      Object.keys({ ...CORE_ICON_PATHS, ...REST_ICON_PATHS }).sort(),
+    );
+  });
+
+  it('PRD 11.10 the staff-core set is exactly paths-core.ts (run gen-icons.mjs after changing it)', () => {
+    expect(Object.keys(CORE_ICON_PATHS).sort()).toEqual([...CORE_ICON_NAMES].sort());
   });
 
   it('PRD 12.7 decorative icons are hidden from screen readers', () => {
