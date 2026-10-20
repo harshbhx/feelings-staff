@@ -5,7 +5,7 @@ import { useRouteError } from 'react-router';
 import { useStaleChunkRecovery } from './useStaleChunkRecovery';
 
 export function ErrorBoundary() {
-  const { t } = useTranslation('errors');
+  const { t } = useTranslation(['errors', 'common']);
   useStaleChunkRecovery(useRouteError());
   return (
     <main
@@ -13,10 +13,10 @@ export function ErrorBoundary() {
       className="mx-auto grid min-h-dvh max-w-sm content-center gap-3 p-6"
       data-testid="route-error"
     >
-      <h1 className="text-xl font-bold text-text">{t('loadFailed')}</h1>
-      <p className="text-text-body">{t('generic')}</p>
+      <h1 className="text-xl font-bold text-text">{t('errors:loadFailed')}</h1>
+      <p className="text-text-body">{t('errors:generic')}</p>
       <div>
-        <Button onClick={() => window.location.reload()}>{t('reload')}</Button>
+        <Button onClick={() => window.location.reload()}>{t('common:actions.tryAgain')}</Button>
       </div>
     </main>
   );
