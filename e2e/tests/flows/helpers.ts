@@ -3,7 +3,7 @@
  * PIN, step-up, idempotency keys) and a real staff phone driven through the join screens. The staff
  * phone keeps its own cookie in the page, so staff API calls go through `staffApi(page)`.
  */
-import type { APIRequestContext, Page } from '@playwright/test';
+import { type APIRequestContext, errors, type Page } from '@playwright/test';
 import { expect } from '../../fixtures';
 
 const HEADERS = { 'X-FS-Client': '0.1.0', Origin: 'http://localhost:8787' };
@@ -138,11 +138,13 @@ export async function onboardPhone(
   await approvePhone(owner, staff.id);
   const home = page.getByRole('heading', {
     level: 1,
-    name: new RegExp(p.name.split(' ')[0] ?? p.name),
+    name: p.name.split(' ')[0] ?? p.name,
   });
   // The first Today asks for the presence notice once (PRD 4.18.1): say OK, then the home shows.
   const notice = page.getByRole('button', { name: 'OK, I understand' });
-  await expect(home.or(notice)).toBeVisible({ timeout: 30_000 });
+  await expect(home).toBeVisible({ timeout: 30_000 });
+  // The home heading shows before the presence answer and the lazy notice sheet: let both settle.
+  await page.waitForLoadState('networkidle');
   if (await notice.isVisible()) await notice.click();
   await expect(home).toBeVisible();
   return { id: staff.id };
@@ -187,7 +189,9 @@ export async function punch(page: Page, kind: 'in' | 'out', pin: string) {
   await sheet
     .getByRole('button', { name: label, exact: true })
     .click({ timeout: 2_000 })
-    .catch(() => undefined);
+    .catch((err: unknown) => {
+      if (!(err instanceof errors.TimeoutError)) throw err;
+    });
   const result = sheet.locator('[data-punch-step="result"]');
   const problem = sheet.locator('[data-punch-step="problem"]');
   await expect(result.or(problem)).toBeVisible({ timeout: 30_000 });

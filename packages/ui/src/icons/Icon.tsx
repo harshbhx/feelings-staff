@@ -27,7 +27,8 @@ function loadRestPaths(): void {
       for (const l of restListeners) l();
     })
     .catch(() => {
-      restLoading = false; // let the next Icon mount try again
+      restLoading = false; // a later Icon mount retries; icons already mounted retry in a moment
+      if (restListeners.size > 0) setTimeout(loadRestPaths, 3_000);
     });
 }
 

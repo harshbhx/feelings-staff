@@ -219,7 +219,7 @@ function Buttons() {
           </div>
         </Specimen>
         <Specimen label="Hero, 56 px (staff Today's one Check in)">
-          <Button variant="secondary" size="lg" block icon="sign-in">
+          <Button variant="primary" size="lg" block icon="sign-in">
             Check in
           </Button>
         </Specimen>

@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { telLink } from '../../owner/lib/share';
 import { useConsentWithdraw, useMyData, useOwnerName } from '../api';
 import { useFmt } from '../lib/format';
+import { QueryError } from '../shell/ScreenFallback';
 import { ScreenHeader } from '../shell/ScreenHeader';
 import { latestConsents } from './my-data-model';
 
@@ -45,7 +46,13 @@ export function PrivacyScreen() {
         ))}
 
         <Card title={t('staff:privacy.choices')}>
-          {!data.data ? (
+          {data.isError && !data.data ? (
+            <QueryError
+              error={data.error}
+              message={t('staff:privacy.loadError')}
+              onRetry={() => void data.refetch()}
+            />
+          ) : !data.data ? (
             <SkeletonList rows={1} label={t('common:states.loading')} />
           ) : selfie && !selfie.withdrawnAt ? (
             <div className="flex flex-col gap-3">

@@ -109,7 +109,11 @@ export function MeScreen() {
                 variant="secondary"
                 icon="bell"
                 loading={push.busy}
-                onClick={() => void push.enable()}
+                onClick={() =>
+                  void push
+                    .enable()
+                    .catch(() => toast({ tone: 'error', title: t('errors:generic') }))
+                }
               >
                 {t('staff:me.notifTurnOn')}
               </Button>
@@ -121,6 +125,8 @@ export function MeScreen() {
                 <Link to="/fix/notifications">{t('staff:me.notifHowTo')}</Link>
               </Button>
             </div>
+          ) : push.state === 'needs-install' ? (
+            <p className="text-sm text-text-muted">{t('staff:me.notifInstall')}</p>
           ) : push.state === 'granted-subscribed' ? (
             <p className="text-sm text-text-muted">{t('staff:me.notifWhy', { owner })}</p>
           ) : (

@@ -122,7 +122,11 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
   if (sheetOpen && !sheetMounted) setSheetMounted(true);
   // Presence: Step out next to Check out, the away card with I'm back, the notice once.
   const presence = usePresence();
-  const pres = presenceUi(model, presence.data, { duty: view.duty, now, ownerName: owner });
+  const pres = presenceUi(model, presence.isError ? undefined : presence.data, {
+    duty: view.duty,
+    now,
+    ownerName: owner,
+  });
   const toast = useToast();
   const api = useApi();
   const [backBusy, setBackBusy] = useState(false);
@@ -132,6 +136,7 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
     setBackBusy(true);
     void import('../presence/im-back')
       .then((m) => m.imBack({ api, qc, toast, i18n, owner }))
+      .catch(() => toast({ tone: 'error', title: t('errors:generic') }))
       .finally(() => setBackBusy(false));
   };
   const [stepOutOpen, setStepOutOpen] = useState(false);
@@ -235,7 +240,7 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
       ) : null}
 
       {model.dayKind === 'work' && model.status !== 'waiting_proof' ? (
-        <ShiftCard model={model} fmt={fmt} />
+        <ShiftCard model={model} fmt={fmt} now={now} />
       ) : null}
 
       {model.recentPunches.length > 0 ? <RecentPunches punches={model.recentPunches} /> : null}
@@ -586,9 +591,8 @@ function PunchRow({ punch }: { punch: PunchView }) {
 }
 
 /** The shift as one line with the worked part and a now marker (WP-10). */
-function ShiftCard({ model, fmt }: { model: TodayModel; fmt: Fmt }) {
+function ShiftCard({ model, fmt, now }: { model: TodayModel; fmt: Fmt; now: number }) {
   const { t } = useTranslation();
-  const now = useNow();
   const start = model.shiftStartTs;
   const end = model.shiftEndTs;
   if (start === null || end === null || end <= start) return null;

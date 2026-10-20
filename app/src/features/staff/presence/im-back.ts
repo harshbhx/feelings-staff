@@ -12,8 +12,9 @@ import type { useApi } from '../../../api/provider';
 import { presenceKey } from './api';
 import { minutesOut } from './presence-model';
 
-// One key per intent: a second tap while the first is on its way repeats the same request.
-let key: string | null = null;
+// One key per away interval: a second tap while the first is on its way repeats the same request,
+// and a later interval never reuses it.
+let keyed: { awayId: string | null; key: string } | null = null;
 
 export async function imBack(d: {
   api: ReturnType<typeof useApi>;
@@ -25,11 +26,12 @@ export async function imBack(d: {
   const { api, qc, toast, i18n, owner } = d;
   await i18n.loadNamespaces('presence');
   const t = i18n.t.bind(i18n);
-  key ??= crypto.randomUUID();
-  const k = key;
+  const awayId = qc.getQueryData<PresenceState>(presenceKey)?.openAway?.id ?? null;
+  if (keyed?.awayId !== awayId) keyed = { awayId, key: crypto.randomUUID() };
+  const k = keyed.key;
   try {
     const away = await api.presenceBack({ body: { idempotencyKey: k } }, { idempotencyKey: k });
-    key = null;
+    keyed = null;
     qc.setQueryData<PresenceState>(presenceKey, (prev) => {
       if (!prev) return prev;
       const { openAway: _old, ...rest } = prev;
@@ -38,7 +40,7 @@ export async function imBack(d: {
     toast({ tone: 'success', title: t('presence:back.done', { count: minutesOut(away) }) });
   } catch (err) {
     // No answer (offline, dropped reply): keep the key so a retry cannot repeat the action.
-    if (!isApiError(err, 'UNAVAILABLE')) key = null;
+    if (!isApiError(err, 'UNAVAILABLE')) keyed = null;
     toast({
       tone: 'error',
       title: isApiError(err, 'UNAVAILABLE')

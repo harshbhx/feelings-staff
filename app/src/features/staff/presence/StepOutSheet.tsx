@@ -41,6 +41,7 @@ export function StepOutSheet({
       open={open}
       onOpenChange={(o) => (o ? onOpenChange(true) : close())}
       title={t('presence:sheet.title')}
+      dismissible={!stepOut.isPending}
       description={t('presence:sheet.who', { owner })}
     >
       <form

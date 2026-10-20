@@ -103,6 +103,8 @@ export const CORE_ICON_NAMES = new Set([
   'qr-code',
   'sign-in',
   'sign-out',
+  // Break punches on Today's recent list.
+  'coffee',
   // Staff tab bar.
   'calendar-blank',
   'calendar-check',

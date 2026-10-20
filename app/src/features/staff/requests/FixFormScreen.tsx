@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useDay, useOwnerName, useRegularisationCreate } from '../api';
 import { useFmt } from '../lib/format';
+import { useOnline } from '../lib/online';
 import { ActionBar } from '../shell/ActionBar';
 import { ScreenHeader } from '../shell/ScreenHeader';
 import { type FixDraft, type FixIssue, fixBody, fixDateBounds, fixIssues } from './form-models';
@@ -50,7 +51,8 @@ export function FixFormScreen() {
   const inRange = draft.workDate >= bounds.min && draft.workDate <= bounds.max;
   const day = useDay(draft.workDate, inRange);
   const punches = (day.data?.punches ?? []).filter(
-    (p) => p.status !== 'superseded' && (p.kind === 'in' || p.kind === 'out'),
+    (p) =>
+      p.status !== 'superseded' && p.status !== 'rejected' && (p.kind === 'in' || p.kind === 'out'),
   );
   const closed = day.data ? !day.data.canRegularise : false;
   const alreadyOpen = day.data?.openRegularisation ?? null;
@@ -70,7 +72,7 @@ export function FixFormScreen() {
     const hit = i.find((x) => issues.includes(x));
     return hit ? text[hit] : undefined;
   };
-  const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  const offline = !useOnline();
 
   const send = () => {
     setTried(true);

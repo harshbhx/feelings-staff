@@ -9,6 +9,7 @@ import {
   Badge,
   type BadgeTone,
   Icon,
+  IconButton,
   type IconName,
   List,
   ListRow,
@@ -21,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import { useOwnerName } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
+import { monthNav } from '../month/month-model';
 import { QueryError } from '../shell/ScreenFallback';
 import { ScreenHeader } from '../shell/ScreenHeader';
 import { withPresenceCopy } from './copy';
@@ -33,10 +35,12 @@ function HistoryScreenView() {
   const { t } = useTranslation();
   const fmt = useFmt();
   const owner = useOwnerName();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const asked = params.get('month') ?? '';
   const month = MONTH.test(asked) ? asked : istDate(Date.now()).slice(0, 7);
   const history = usePresenceHistory(month);
+  const nav = monthNav(month, istDate(Date.now()).slice(0, 7));
+  const go = (m: string) => setParams({ month: m }, { replace: true });
   return (
     <>
       <ScreenHeader
@@ -46,7 +50,22 @@ function HistoryScreenView() {
       />
       <main id="main" className="staff-main flex flex-col gap-6">
         <div className="flex flex-col gap-1">
-          <p className="text-lg font-bold text-text">{fmt.month(month)}</p>
+          <div className="flex items-center justify-between gap-2">
+            <IconButton
+              icon="caret-left"
+              label={t('staff:month.prev')}
+              onClick={() => go(nav.prev)}
+            />
+            <p className="text-lg font-bold text-text" aria-live="polite">
+              {fmt.month(month)}
+            </p>
+            <IconButton
+              icon="caret-right"
+              label={t('staff:month.next')}
+              onClick={() => nav.next && go(nav.next)}
+              disabled={!nav.next}
+            />
+          </div>
           <p className="text-text-muted">{t('presence:history.intro', { owner })}</p>
         </div>
         {history.data ? (

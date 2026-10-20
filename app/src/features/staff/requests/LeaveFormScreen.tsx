@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useLeaveCreate, useLeavePreview, useMyLeave, useOwnerName } from '../api';
 import { useFmt } from '../lib/format';
+import { useOnline } from '../lib/online';
 import { ActionBar } from '../shell/ActionBar';
 import { QueryError } from '../shell/ScreenFallback';
 import { ScreenHeader } from '../shell/ScreenHeader';
@@ -85,11 +86,15 @@ function LeaveForm({
   };
 
   const ready = leaveRangeReady(draft);
-  const preview = useLeavePreview(ready ? leaveBody(draft) : null);
+  const preview = useLeavePreview(
+    // The preview only needs to know whether a reason is there, so typing does not refetch it.
+    ready ? leaveBody({ ...draft, reason: draft.reason.trim() ? 'x' : '' }) : null,
+  );
   const shown = ready ? preview.data : undefined;
   const issues = leaveIssues(draft, shown);
   const blocked = shown?.warnings.some((w) => w.blocking) ?? false;
-  const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  const offline = !useOnline();
+  const previewPending = ready && !shown && !preview.isError;
 
   const issueText: Record<LeaveIssue, string> = {
     pickDates: t('staff:leave.pickDates'),
@@ -109,7 +114,7 @@ function LeaveForm({
 
   const send = () => {
     setTried(true);
-    if (issues.length || blocked || create.isPending) return;
+    if (issues.length || blocked || previewPending || create.isPending) return;
     create.mutate(
       { body: leaveBody(draft, shown), idempotencyKey: key },
       {
@@ -254,7 +259,7 @@ function LeaveForm({
           block
           loading={create.isPending}
           loadingLabel={t('staff:leave.sending')}
-          disabled={offline || blocked}
+          disabled={offline || blocked || previewPending}
         >
           {t('staff:leave.send')}
         </Button>

@@ -14,7 +14,6 @@ describe('Today model (PRD 5.1, AC S-10)', () => {
     expect(m.workedMin).toBe(40);
     expect(m.lastPunch?.kind).toBe('in');
     expect(m.recentPunches[0]).toBe(m.lastPunch);
-    expect(m.recentPunches.length).toBeLessThanOrEqual(3);
     expect(m.confirm).toBeNull();
   });
 

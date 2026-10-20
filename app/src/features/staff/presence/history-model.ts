@@ -28,8 +28,9 @@ export function historyByDay(h: PresenceHistory): HistoryDay[] {
     });
   for (const a of h.away)
     add(a.workDate, { kind: 'away', key: a.id, time: istTime(a.startTs), away: a });
-  for (const c of h.checks)
-    add(istDate(c.ts), { kind: 'check', key: `c-${c.ts}`, time: istTime(c.ts), check: c });
+  h.checks.forEach((c, i) => {
+    add(istDate(c.ts), { kind: 'check', key: `c-${c.ts}-${i}`, time: istTime(c.ts), check: c });
+  });
   return [...days.entries()]
     .sort(([a], [b]) => (a < b ? 1 : a > b ? -1 : 0))
     .map(([date, items]) => ({

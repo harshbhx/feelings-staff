@@ -1,7 +1,7 @@
 /** Small rules for My data and Privacy (PRD 10.6; AC S-16). */
 import type { ConsentKind, ConsentView, MyData } from '@fs/contracts';
 
-/** The newest row per consent kind (a withdrawal or a new version replaces the earlier one). */
+/** The newest row per consent kind (a new version supersedes the earlier one; a withdrawal is recorded on the same row). */
 export function latestConsents(rows: readonly ConsentView[]): ConsentView[] {
   const byKind = new Map<ConsentKind, ConsentView>();
   for (const c of rows) {

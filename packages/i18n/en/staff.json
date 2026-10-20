@@ -552,6 +552,7 @@
     "notifOn": "On",
     "notifOff": "Off",
     "notifBlocked": "Notifications are off",
+    "notifInstall": "Add Feelings to your Home Screen first, then come back here to turn notifications on.",
     "notifUnsupported": "This phone can't show notifications from the app.",
     "notifTurnOn": "Turn on notifications",
     "notifWhy": "Get a ping when {{owner}} approves your leave or your payslip is ready.",
@@ -611,6 +612,7 @@
     "correctionText": "Hello {{owner}}, something in My data looks wrong:"
   },
   "privacy": {
+    "loadError": "We couldn't load your choices.",
     "lead": "Feelings Beauty Care uses this app to record attendance and pay. Here is what it keeps and why.",
     "h1": "What we collect",
     "p1": "Your name, phone number, role and salary details, which {{owner}} enters. Each check-in and check-out: the time from our server, whether you were inside the salon or a venue, and how far you were. A photo only if the salon asks for one.",
