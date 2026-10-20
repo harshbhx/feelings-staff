@@ -4,7 +4,6 @@
  */
 import type { Endpoints, JoinLookup, JoinVerifyResult, Me, OutputOf } from '@fs/contracts';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { SEED_HOLIDAYS } from '../../seed';
 import { setServiceOverridesForTests } from '../../services/registry';
 import { fakeEmail, fakeNotifier } from '../../test/fakes';
 import {
@@ -903,7 +902,8 @@ describe('O-02.1 setup', () => {
               (SELECT COUNT(*) FROM leave_types) AS l, (SELECT COUNT(*) FROM sites) AS s,
               (SELECT COUNT(*) FROM users WHERE role = 'owner') AS o`,
     ).first<{ t: number; h: number; l: number; s: number; o: number }>();
-    expect(counts).toEqual({ t: 5, h: 17, // 8 for 2026 and 9 for 2027: a literal, so a shrinking list is caught l: 5, s: 1, o: 1 });
+    // 8 holidays for 2026 and 9 for 2027, as a literal so a shrinking list is caught.
+    expect(counts).toEqual({ t: 5, h: 17, l: 5, s: 1, o: 1 });
     const again = await call('POST', '/setup', { body, headers });
     expect(again.status).toBe(409);
     expect((await errorCode(again)).code).toBe('CONFLICT');
