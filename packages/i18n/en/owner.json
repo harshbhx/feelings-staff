@@ -1856,7 +1856,7 @@
           "afterClosing": "Roll-call times must be before closing at {{time}}."
         }
       },
-      "who": "Managers with the Do the roll-call permission can do roll-calls too (Settings, People).",
+      "who": "Managers who have the roll-call permission can do roll-calls too (Settings, People).",
       "stepOut": {
         "label": "Step out button for staff",
         "on": "Staff can tap Step out and I'm back on Today.",
