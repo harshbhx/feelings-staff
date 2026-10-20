@@ -4,6 +4,8 @@ Welcome to the Feelings team. This guide shows you how to use the Feelings staff
 
 If you get stuck at any point, ask Urmi. Every screen in the app has a way to reach her.
 
+**About "ships with the next release".** Some parts of this guide describe screens that are built but not yet in your app. They carry a note that says **Ships with the next release**. Until then you will not see them. Urmi tells you when they arrive. For quick answers, see the [FAQ](../faq.md).
+
 <!-- Source: PRD sections 4 to 6 (flows, screens, messages). Update this guide when the copy on a screen changes. -->
 
 Contents: [What the app does](#what-the-app-does) · [Put the app on your phone](#put-the-app-on-your-phone) · [Join with your code](#join-with-your-code) · [Check in and check out](#check-in-and-check-out) · [Step out and I'm back](#step-out-and-im-back) · [What the messages mean](#what-the-messages-mean) · [The door code](#the-door-code) · [Wedding and venue days](#wedding-and-venue-days) · [No internet](#no-internet) · [Your month](#your-month) · [Ask for leave](#ask-for-leave) · [Fix a day](#fix-a-day) · [Advances](#advances) · [Your payslip](#your-payslip) · [Me: your phone, language and data](#me-your-phone-language-and-data) · [New phone, forgot PIN](#new-phone-forgot-pin) · [Questions](#questions)
@@ -110,6 +112,9 @@ About 30 minutes after your shift ends, you get "Still at work? Check out when y
 
 ## Step out and I'm back
 
+> **Ships with the next release.** **Step out**, **I'm back** and the "marked away" card are not in your app yet.
+
+
 If you leave the salon during your shift, for lunch, the bank or something personal, tell the app. It takes two taps and keeps the record fair for you.
 
 <!-- screenshot: staff-step-out -->
@@ -205,6 +210,9 @@ Tap a day to see what happened: your check-in and check-out times, where, the sh
 
 ## Ask for leave
 
+> **Ships with the next release.** The leave form is not in your app yet. Until then, ask Urmi in person or on WhatsApp.
+
+
 **Requests**, then **Ask for leave**.
 
 1. Choose the type. You see how many days you have left, for example "Casual 5 left", "Sick 7 left".
@@ -223,6 +231,9 @@ You get a ping when Urmi decides. If you change your mind before she decides, yo
 
 ## Fix a day
 
+> **Ships with the next release.** The fix form is not in your app yet. Until then, tell Urmi what went wrong and she fixes the day for you.
+
+
 If you forgot to check in or out, or the time is wrong, ask Urmi to fix it.
 
 1. **Month**, tap the day, then **Something's wrong with this day**. (Or tap **Fix the time** in the ping you got.)
@@ -237,6 +248,9 @@ You can fix days from the last 7 days, in a month that is not closed, and one fi
 If Urmi records an advance for you, you get a message such as "Urmi recorded an advance of ₹3,000 on 12 Oct. Recovery: ₹3,000 from October salary." Tap **That's right**, or **Something's wrong** to tell her. Your payslip shows what was taken back each month.
 
 ## Your payslip
+
+> **Ships with the next release.** The **Payslips** tab is not in your app yet. Until then, Urmi can share your payslip with you.
+
 
 After Urmi finishes the month, you get "Your October payslip is ready".
 
@@ -254,6 +268,9 @@ If you think a line is wrong, talk to Urmi. Every number comes from your check-i
 <!-- screenshot: staff-payslip -->
 
 ## Me: your phone, language and data
+
+> **Ships with the next release.** The **Me** tab, **My data** and the **Privacy notice** screens are not in your app yet.
+
 
 The **Me** tab has:
 

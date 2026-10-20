@@ -2,7 +2,7 @@
 
 What copies of the production data exist, how to take one, and how to restore. The database is D1 (`fbc-staff`); files are in R2 (`fbc-staff-media`). Run the commands on your own machine, in `app/`, signed in to the salon's Cloudflare account.
 
-Contents: [What exists](#what-exists) · [Before every deploy](#before-every-deploy) · [Take a manual export](#take-a-manual-export) · [Restore with Time Travel](#restore-with-time-travel) · [Restore from an export](#restore-from-an-export) · [Weekly backup to R2 (P1)](#weekly-backup-to-r2-p1) · [Files in R2](#files-in-r2) · [After a restore](#after-a-restore) · [Practice](#practice)
+Contents: [What exists](#what-exists) · [Before every deploy](#before-every-deploy) · [Take a manual export](#take-a-manual-export) · [Restore with Time Travel](#restore-with-time-travel) · [Restore from an export](#restore-from-an-export) · [Weekly backup to R2 (P1)](#weekly-backup-to-r2-p1) · [Files in R2](#files-in-r2) · [After a restore](#after-a-restore) · [Verify a backup](#verify-a-backup)
 
 ## What exists
 
@@ -112,6 +112,58 @@ R2 has no versioning here, and the lifecycle rules delete files on purpose ([ret
 5. Phones that queued punches keep them and send them when online, so some lost punches may reappear; they are accepted or flagged by the normal rules.
 6. Write the ops log entry: date and time, reason, restore point, bookmark before and after, who was told. Add the `ops.manual` audit row ([incident runbook](incident.md#useful-commands)).
 
-## Practice
+## Verify a backup
 
-Once before launch, and then every three months, restore the latest export into a scratch database and run a few `SELECT` queries on it, then delete it. A backup that has never been restored is a guess. Record each drill in the ops log.
+A backup that has never been restored is a guess. Do this once before launch, and then every three months. It uses a scratch database, so production is never touched. It takes about 15 minutes. Run from `app/`.
+
+1. **Get the newest copy.** Download the export of the last deploy, or take a manual one:
+
+```sh
+gh run list --workflow deploy --limit 5
+gh run download <run-id> -n d1-backup
+# or: npx wrangler d1 export fbc-staff --remote --output=../d1-export-$(date +%Y%m%d-%H%M).sql
+```
+
+2. **Check the file.** It must not be empty, and it must hold the tables:
+
+```sh
+ls -l ../d1-export-*.sql d1-backup-*.sql 2>/dev/null
+grep -c 'CREATE TABLE' <the file>
+grep -c 'INSERT INTO' <the file>
+```
+
+   Both counts must be above zero.
+
+3. **Load it into a new, empty scratch database.**
+
+```sh
+npx wrangler d1 create fbc-staff-restore --location apac
+npx wrangler d1 execute fbc-staff-restore --remote --file=<the file>
+```
+
+4. **Compare it with production.** The counts will differ only by what happened since the copy was taken:
+
+```sh
+npx wrangler d1 execute fbc-staff-restore --remote --command "SELECT (SELECT COUNT(*) FROM users) AS users, (SELECT COUNT(*) FROM punches) AS punches, (SELECT COUNT(*) FROM payslips) AS payslips"
+npx wrangler d1 execute fbc-staff --remote --command "SELECT (SELECT COUNT(*) FROM users) AS users, (SELECT COUNT(*) FROM punches) AS punches, (SELECT COUNT(*) FROM payslips) AS payslips"
+```
+
+   The numbers of users and payslips should match or be close. Punches may be higher in production.
+
+5. **Check the newest data.** The latest punch time in the scratch copy should be close to the time of the export:
+
+```sh
+npx wrangler d1 execute fbc-staff-restore --remote --command "SELECT datetime(MAX(server_ts)/1000,'unixepoch') AS newest_punch_utc FROM punches"
+```
+
+6. **Delete the scratch database and the local files.** The export holds personal data.
+
+```sh
+npx wrangler d1 delete fbc-staff-restore
+rm -f ../d1-export-*.sql d1-backup-*.sql
+```
+
+7. **Also check Time Travel works:** `npx wrangler d1 time-travel info fbc-staff` shows a current bookmark and a restore window of 30 days. Do not restore.
+8. **Write one line in the [ops log](../ops-log.md):** the date, which copy, the counts, and "verified".
+
+If a step fails (empty file, load errors, counts far apart), treat it as an urgent problem: take a fresh export, find the cause, and verify again before the next payroll.

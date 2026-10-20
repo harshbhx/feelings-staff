@@ -13,6 +13,7 @@
     "check:ui": "node scripts/check-ui.mjs",
     "check:arch": "node scripts/check-arch.mjs",
     "check:i18n": "node scripts/check-i18n.mjs",
+    "check:docs": "node scripts/check-docs-links.mjs",
     "check": "pnpm run lint && pnpm run check:ui && pnpm run check:arch && pnpm run check:i18n",
     "test": "pnpm -r run test",
     "test:unit": "pnpm --no-bail --filter @fs/contracts --filter @fs/engine --filter @fs/i18n --filter @fs/ui --filter @fs/templates run test",

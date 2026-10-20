@@ -4,6 +4,10 @@ For Urmi. This guide shows you how to set up Feelings Staff, add your team, see 
 
 Harsh looks after the system behind the app. You never need to touch any of that.
 
+**About "ships with the next release".** Some parts of this guide describe screens that are built but not yet live in your app. They carry a note that says **Ships with the next release**. Until then, you will not see them, and the app works as described in the rest of the guide. Harsh tells you when each one goes live.
+
+If something does not work, start with [When something is wrong](#when-something-is-wrong), and see the [FAQ](../faq.md).
+
 <!-- Source: PRD sections 4 to 6 and 10. Update this guide when the copy on a screen changes. -->
 
 Contents: [Sign in](#sign-in) · [Set up the app first time](#set-up-the-app-first-time) · [Add staff and approve phones](#add-staff-and-approve-phones) · [Today](#today) · [Needs action](#needs-action) · [The register](#the-register) · [Roster and venue duties](#roster-and-venue-duties) · [The door code](#the-door-code) · [Advances](#advances) · [Time credits](#time-credits) · [Roll-call and step-outs](#roll-call-and-step-outs) · [Payroll at month end](#payroll-at-month-end) · [Exports](#exports) · [Settings](#settings) · [Your own sign-in and security](#your-own-sign-in-and-security) · [Notifications you get](#notifications-you-get) · [What the app never does](#what-the-app-never-does) · [Good to know](#good-to-know) · [When something is wrong](#when-something-is-wrong)
@@ -23,7 +27,7 @@ Contents: [Sign in](#sign-in) · [Set up the app first time](#set-up-the-app-fir
 
 ## Set up the app first time
 
-The first time you sign in, you see **Setup**: "Five quick things, then you're ready." You can skip a step and finish it later in Settings.
+The first time you sign in, you see **Setup**: "A few quick things, then you're ready." There are eight steps. You can skip a step and finish it later in Settings.
 
 <!-- screenshot: owner-setup-checklist -->
 
@@ -122,7 +126,7 @@ One list for everything that waits for your decision. Newest first, grouped by k
 | Overtime | The day, minutes, and "approved in advance" if it was a venue duty | **Approve all**, **Approve part** (in 15-minute steps) or **Reject** |
 | Venue request | The place, map and note | **Approve**, **Approve and let others check in here**, or **Reject** |
 | Day closed by the app | The day and the time the app used | **Keep 20:00** or **Change time** |
-| Away interval | A step-out that is waiting: name, times, reason, minutes, her note | **Confirm**, **Mark as work** or **Ignore** (see [Roll-call and step-outs](#roll-call-and-step-outs)) |
+| Away interval (ships with the next release) | A step-out that is waiting: name, times, reason, minutes, her note | **Confirm**, **Mark as work** or **Ignore** (see [Roll-call and step-outs](#roll-call-and-step-outs)) |
 
 - To approve several of the same kind, tap them and choose **Approve selected**. (Phones are always one by one.)
 - Every decision is written down and the staff member gets a message.
@@ -177,6 +181,9 @@ The ledger shows what was given, what was taken back each month, what was moved 
 
 ## Time credits
 
+> **Ships with the next release.** The Credits screen, settling credits at payroll and the settings for Time credits are not live in your app yet. Until then, late arrivals, early leaves and overtime follow the old pay rules (grace and make-up time for lateness, overtime paid after you approve it), as written under [The default rules](#the-default-rules).
+
+
 Time credits keep a count of minutes for each person, in your favour or against. Every minute counts: a late arrival from the first minute, an early leave from the first minute, time spent away from the salon that you confirmed, and overtime you approved. The count is a **balance**: a plus or minus number of minutes, for example +50 or −130.
 
 The balance never cuts or pays anything by itself. It only becomes money when you settle it at payroll, and you choose how much to settle. Only you see it: staff do not see minutes or balances in their app or in a ping, and managers do not see them either. If you settle some minutes, the payslip shows one line, **Time adjustment**, with the amount only. Time lost to a break that ran over is shown to you on the day but is not a credit and costs nothing.
@@ -227,6 +234,9 @@ The usual payroll warnings (more than 48 hours in a week, pay below the minimum 
 
 ### Pay legal overtime at 2×
 
+> **Ships with the next release.** The check that counts overtime beyond 9 hours a day or 48 hours a week at twice the rate in the ledger is not live in your app yet.
+
+
 The law says overtime beyond 9 hours a day or 48 hours a week must be paid at twice the normal rate. **Pay legal overtime at 2×** is **on** by default. With it on, approved overtime beyond those limits counts twice in the ledger (the "legal 2×" entry), so it is worth twice as much whenever you settle it, or when it cancels late and early minutes. Priya's 120 minutes above are an example.
 
 At the Settle credits step, the payslip preview and Finalise, you see "120 min of overtime beyond 9 h a day or 48 h a week count at 2×, as the law requires." If you turn the setting off you see a warning instead: "Overtime beyond 9 h a day or 48 h a week must be paid at 2× by law. 120 min this month count at 1×." The warning stays until you turn the setting on again. Changing it asks for your PIN, is recorded, and applies to every day that is not locked. Have your CA confirm this before the first real payroll.
@@ -238,6 +248,9 @@ At the Settle credits step, the payslip preview and Finalise, you see "120 min o
 You can leave one person out in her profile.
 
 ## Roll-call and step-outs
+
+> **Ships with the next release.** Roll-call, step-outs and the Presence settings are not live in your app yet. Staff will not see **Step out** until it is.
+
 
 The punch tells the app when someone arrived and left. Roll-call and step-outs tell it about the time in between. The app does not track anyone's phone in the background: it cannot, and the reasons are in [ADR-18](../decisions/0018-presence-by-roll-call-and-step-out-not-background-location.md). People are found away in two human ways.
 
@@ -313,7 +326,7 @@ You see one row per person: paid days, unpaid days, late and early minutes, over
 - **Change advance recovery for this month** (lower it; the rest moves on).
 - **Recompute** after you change anything in attendance.
 
-With Time credits on, the **Settle credits** step comes with the draft: see [Settle credits at payroll](#settle-credits-at-payroll).
+With Time credits on (ships with the next release), the **Settle credits** step comes with the draft: see [Settle credits at payroll](#settle-credits-at-payroll).
 
 The app warns about: pay below the minimum wage you entered, more than 48 hours in a week, too much overtime in a quarter, and deductions reaching half of a salary.
 
@@ -359,8 +372,8 @@ Everything is in **Settings**. Each change shows a line about what it does, and 
 | Shifts and roster | Shift templates, weekly off, the 48-hour warning |
 | Holidays and no-leave days | Per year; for each holiday, what happens if someone works (comp-off, extra pay, or both) |
 | Attendance rules | Grace, early-leave allowance, half-day and absent limits, make-up time, automatic break, break buttons, PIN on every check-in, selfies, how careful the checks are |
-| Time credits | The switch and start date, **Pay legal overtime at 2×** (PIN) |
-| Presence | Roll-call times, who may do roll-calls, the switch, the optional location hint (PIN to switch on or off) |
+| Time credits (ships with the next release) | The switch and start date, **Pay legal overtime at 2×** (PIN) |
+| Presence (ships with the next release) | Roll-call times, who may do roll-calls, the switch, the optional location hint (PIN to switch on or off) |
 | Pay rules | Divisor, overtime rules, work on week off, advances, pay day, minimum wage, fines, statutory items |
 | Leave policy | Types, yearly days, notice, when leave can first be used, comp-off expiry |
 | Notifications | Which pings you get, quiet hours (21:30 to 08:00), summary only |
@@ -399,9 +412,9 @@ Pings come as a message on your phone and as a list in the inbox. The inbox is a
 | 21:00, people not checked out | "2 people haven't checked out" |
 | Leave, fixes, venue requests | When they arrive |
 | Many wrong PINs on one account | "Several wrong PIN tries on Priya's account" |
-| Roll-call time (default 12:00, 15:00, 18:00) | A reminder to do the roll-call, and "Roll-call at 15:00 not done" after 30 minutes |
-| A step-out waits for you | "Priya stepped out 15:30–16:10" |
-| Still checked in after the shift with an away time open | "Priya may have left without checking out" |
+| Roll-call time (default 12:00, 15:00, 18:00; ships with the next release) | A reminder to do the roll-call, and "Roll-call at 15:00 not done" after 30 minutes |
+| A step-out waits for you (ships with the next release) | "Priya stepped out 15:30–16:10" |
+| Still checked in after the shift with an away time open (ships with the next release) | "Priya may have left without checking out" |
 | 1st of the month | Payroll ready |
 | The 5th | Salaries not marked paid |
 
@@ -432,4 +445,5 @@ Quiet hours are 21:30 to 08:00. Pings in that time wait and arrive at 08:00 as o
 - **You think someone else is using an account:** **Settings**, **Security**, **Sign out others**; and tell Harsh.
 - **Something looks wrong in the numbers:** open the day or the payslip and read the formula. If it still looks wrong, tell Harsh with the date and the person's name.
 - **The app does not load:** try again in a minute. Staff check-ins are saved on their phones and are sent when the app is back.
+- **A payslip looks wrong, a push does not arrive, or a location is wrong:** Harsh has a [troubleshooting page](../runbooks/troubleshooting.md) for these. Most can be fixed in the app, and it says which.
 - **Anything else:** WhatsApp Harsh.
