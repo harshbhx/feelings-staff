@@ -134,7 +134,7 @@ export async function onboardPhone(
   await joinOnPhone(page, p.phone, staff.code, p.pin);
   await approvePhone(owner, staff.id);
   await expect(
-    page.getByRole('heading', { level: 1, name: new RegExp(p.name.split(' ')[0]) }),
+    page.getByRole('heading', { level: 1, name: new RegExp(p.name.split(' ')[0] ?? p.name) }),
   ).toBeVisible({
     timeout: 30_000,
   });
