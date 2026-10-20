@@ -302,6 +302,7 @@ function PersonRow({
               {hints.map((h) => (
                 <Badge
                   key={h.kind}
+                  className="max-w-full whitespace-normal"
                   tone={h.kind === 'seems_away' ? 'warning' : 'neutral'}
                   icon={HINT_ICON[h.kind]}
                 >
