@@ -3,12 +3,18 @@ import { Button } from '@fs/ui';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouteError } from 'react-router';
-import { isChunkError, recoverFromStaleChunk } from '../pwa/chunk-reload';
 
-/** A chunk-load failure reloads once by itself (the guard in chunk-reload.ts). */
+declare global {
+  interface Window {
+    /** public/recover.js */
+    __fsRecover?: (error?: unknown) => boolean;
+  }
+}
+
+/** A chunk-load failure reloads once by itself (the guard lives in public/recover.js). */
 export function useStaleChunkRecovery(error: unknown): void {
   useEffect(() => {
-    if (isChunkError(error)) recoverFromStaleChunk();
+    window.__fsRecover?.(error);
   }, [error]);
 }
 

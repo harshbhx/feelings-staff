@@ -1,8 +1,30 @@
-/** Stale-chunk recovery guard: one reload per session, only for chunk-load errors. */
-import { describe, expect, it } from 'vitest';
-import { claimReload, isChunkError, RELOAD_WINDOW_MS } from './chunk-reload';
+/** Stale-chunk recovery (public/recover.js): one reload per session, only for chunk-load errors. */
 
-function fakeStorage() {
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import source from '../../public/recover.js?raw';
+
+type Recover = (error?: unknown) => boolean;
+
+function load(storage: Pick<Storage, 'getItem' | 'setItem'>) {
+  const listeners: Record<string, (e: { preventDefault(): void }) => void> = {};
+  const reload = vi.fn();
+  const fakeWindow = {
+    sessionStorage: storage,
+    navigator: {},
+    caches: {
+      keys: async () => ['workbox-precache-v2-x', 'api-v1'],
+      delete: vi.fn(async () => true),
+    },
+    location: { reload },
+    addEventListener: (name: string, fn: (e: { preventDefault(): void }) => void) => {
+      listeners[name] = fn;
+    },
+  } as unknown as Record<string, unknown>;
+  new Function('window', source)(fakeWindow);
+  return { recover: fakeWindow.__fsRecover as Recover, listeners, reload, fakeWindow };
+}
+
+function memory() {
   const map = new Map<string, string>();
   return {
     getItem: (k: string) => map.get(k) ?? null,
@@ -11,30 +33,45 @@ function fakeStorage() {
 }
 
 describe('stale chunk recovery', () => {
-  it('X-02.9 recognises the chunk-load errors of Chrome, Safari and Firefox', () => {
+  beforeEach(() => vi.useRealTimers());
+
+  it('X-02.9 only chunk-load errors start a recovery', () => {
+    const { recover } = load(memory());
+    expect(recover(new Error('Network down'))).toBe(false);
     expect(
-      isChunkError(new TypeError('Failed to fetch dynamically imported module: /assets/a.js')),
+      recover(new TypeError('Failed to fetch dynamically imported module: /assets/a.js')),
     ).toBe(true);
-    expect(isChunkError(new TypeError('Importing a module script failed.'))).toBe(true);
-    expect(isChunkError(new Error('error loading dynamically imported module'))).toBe(true);
-    expect(isChunkError(new Error('Network down'))).toBe(false);
-    expect(isChunkError(undefined)).toBe(false);
   });
 
-  it('X-02.9 reloads once per session, again only after the window', () => {
-    const s = fakeStorage();
-    expect(claimReload(s, 1_000)).toBe(true);
-    expect(claimReload(s, 2_000)).toBe(false);
-    expect(claimReload(s, 1_000 + RELOAD_WINDOW_MS)).toBe(true);
+  it('X-02.9 reloads once per session and deletes only the precached shell', async () => {
+    const { recover, listeners, reload, fakeWindow } = load(memory());
+    const preventDefault = vi.fn();
+    listeners['vite:preloadError']?.({ preventDefault });
+    expect(preventDefault).toHaveBeenCalledOnce();
+    expect(recover()).toBe(false);
+    await vi.waitFor(() => expect(reload).toHaveBeenCalledOnce());
+    const del = (fakeWindow.caches as { delete: ReturnType<typeof vi.fn> }).delete;
+    expect(del).toHaveBeenCalledWith('workbox-precache-v2-x');
+    expect(del).not.toHaveBeenCalledWith('api-v1');
+  });
+
+  it('X-02.9 reloads again only after the guard window', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const { recover } = load(memory());
+    expect(recover()).toBe(true);
+    expect(recover()).toBe(false);
+    vi.setSystemTime(1_000_000 + 11 * 60 * 1000);
+    expect(recover()).toBe(true);
   });
 
   it('X-02.9 never reloads when storage is unavailable', () => {
-    const broken = {
+    const { recover } = load({
       getItem: () => {
         throw new Error('blocked');
       },
       setItem: () => undefined,
-    };
-    expect(claimReload(broken, 1)).toBe(false);
+    });
+    expect(recover()).toBe(false);
   });
 });
