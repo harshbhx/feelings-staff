@@ -36,6 +36,7 @@ import { type SiteRow, salonSites } from './door';
 import { createDutyStmts, DUTY_MAX_MS } from './duty';
 import { decideLeave, leaveBalances, leaveRequestViews, lockedMonths, monthName } from './leave';
 import type { Ctx } from './ports';
+import type { AwayRow } from './presence-rows';
 import {
   commitDayChange,
   insertPunchStmt,
@@ -145,7 +146,14 @@ export async function listActions(ctx: Ctx, only?: ActionType): Promise<ActionsV
   const offsite = pending.filter((p) => p.pending_reason === 'offsite_unplanned');
   const plain = pending.filter((p) => p.pending_reason !== 'offsite_unplanned');
 
+  const pendingAway = wants('away')
+    ? await ctx.db.all<AwayRow>(
+        `SELECT * FROM away_intervals WHERE org_id = ?org AND state = 'pending' AND end_ts IS NOT NULL
+          ORDER BY end_ts DESC LIMIT 200`,
+      )
+    : [];
   const people = await briefs(ctx, [
+    ...pendingAway.map((a) => a.user_id),
     ...punches.map((p) => p.user_id),
     ...autoOuts.map((p) => p.user_id),
     ...devices.map((d) => d.user_id),
@@ -322,6 +330,25 @@ export async function listActions(ctx: Ctx, only?: ActionType): Promise<ActionsV
           createdAt: a.created_at,
         },
         openBalancePaise: open?.open ?? 0,
+      });
+    }
+  }
+
+  if (wants('away')) {
+    for (const a of pendingAway) {
+      items.push({
+        id: a.id,
+        type: 'away',
+        createdAt: a.end_ts ?? a.created_at,
+        user: who(a.user_id),
+        userId: a.user_id,
+        workDate: a.work_date,
+        startTs: a.start_ts,
+        endTs: a.end_ts ?? a.start_ts,
+        minutes: a.minutes,
+        reason: a.reason,
+        staffNote: a.staff_note,
+        backMissing: a.back_missing === 1,
       });
     }
   }
@@ -599,8 +626,17 @@ export async function decideAutoClose(
   date: string,
   body: { keep: true } | { outTs: number } | { useAwayStart: true },
 ): Promise<void> {
-  // "Use the away start as check-out" arrives with the presence API (WP-9).
-  if ('useAwayStart' in body) fail('NOT_IMPLEMENTED');
+  // "Use the away start as check-out" (PRD 4.18.6): the open or auto-closed away interval's start.
+  if ('useAwayStart' in body) {
+    const away = await ctx.db.first<{ start_ts: number }>(
+      `SELECT start_ts FROM away_intervals WHERE org_id = ?org AND user_id = ? AND work_date = ?
+          AND (end_ts IS NULL OR end_reason = 'auto_close') ORDER BY start_ts DESC LIMIT 1`,
+      userId,
+      date,
+    );
+    if (!away) fail('CONFLICT', 'There is no away time to use.');
+    return decideAutoClose(ctx, userId, date, { outTs: away.start_ts });
+  }
   await assertOpenMonth(ctx, date);
   const auto = await ctx.db.first<PunchRow>(
     `SELECT * FROM punches WHERE org_id = ?org AND user_id = ? AND work_date = ? AND source = 'auto'

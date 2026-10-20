@@ -47,6 +47,7 @@ import { creditStmts } from './credit-entries';
 import { legalPlan } from './credit-legal';
 import type { DutyRow } from './duty';
 import type { Ctx, DayService } from './ports';
+import { syncAwayRows } from './presence-rows';
 import type { PunchRow } from './punch';
 
 // ---- Rows ------------------------------------------------------------------------------------
@@ -70,6 +71,8 @@ export interface ProfileRow {
   ot_rate_override_json: string | null;
   /** Time credits: null follows the salon, 0 excludes this person (PRD 7.17.1). */
   time_credits: number | null;
+  /** Presence: null follows the salon, 0 excludes this person (PRD 4.18.7). */
+  presence_enabled: number | null;
 }
 
 export interface TemplateRow {
@@ -267,7 +270,8 @@ export async function loadDayData(
     ctx.db.all<ProfileRow>(
       `SELECT p.user_id, u.name, u.role, u.status, u.phone_e164, p.designation, p.employee_code, p.join_date,
               p.exit_date, p.default_template_id, p.week_off_dow, p.selfie_required, p.strong_mode,
-              p.enrolled_photo_key, p.divisor_override, p.ot_rate_override_json, p.time_credits
+              p.enrolled_photo_key, p.divisor_override, p.ot_rate_override_json, p.time_credits,
+              p.presence_enabled
          FROM staff_profiles p JOIN users u ON u.id = p.user_id
         WHERE p.org_id = ?org ${userFilter('p.user_id')}`,
       ...bind(),
@@ -688,8 +692,18 @@ export async function dayStmts(
         (d) => (profile ? creditsEnabledFor(data.settings, profile, d) : false),
       )
     : { legalMin: 0, stmts: [] };
+  // Presence first: it closes and re-clips away intervals, which the Time credits entries read.
+  const awayMin = await syncAwayRows(ctx, c, {
+    breakPunches: data.settings.attendance.breakPunches,
+  });
   return [
     upsertDayStmt(ctx, c, ctx.now()),
+    ctx.db.stmt(
+      'UPDATE attendance_days SET away_min = ? WHERE org_id = ?org AND user_id = ? AND work_date = ?',
+      awayMin,
+      c.userId,
+      c.date,
+    ),
     ...compOffStmts(ctx, data, c),
     ...(await creditStmts(ctx, c, {
       otSourceId: decision?.id ?? windowsFor(data, c.userId, c.date)[0]?.refId ?? null,
