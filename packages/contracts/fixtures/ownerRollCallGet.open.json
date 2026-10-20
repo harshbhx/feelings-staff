@@ -1,0 +1,58 @@
+{
+  "id": "01K8WP9RC40000000000000000",
+  "slotTime": "10:30",
+  "people": [
+    {
+      "userId": "01K8VQK1MQ1GQKWX6D0EBBE455",
+      "name": "Meena Chavda",
+      "inAt": 1792383912000,
+      "state": "here"
+    },
+    {
+      "userId": "01K8CX6TF7P9TEP6QNEP3FSBY7",
+      "name": "Pooja Bhatt",
+      "inAt": 1792384085000,
+      "state": "here"
+    },
+    {
+      "userId": "01K86AFQDXWDHQ8238N67SVDDK",
+      "name": "Priya Solanki",
+      "inAt": 1792384337000,
+      "state": "here"
+    },
+    {
+      "userId": "01K860ABG2KZEJ0J3KGQ5S997H",
+      "name": "Dhara Gohil",
+      "inAt": 1792384552000,
+      "state": "away_open",
+      "awaySince": 1792385640000,
+      "hint": "stepped_out",
+      "hintDetail": "Lunch outside, since 10:24"
+    },
+    {
+      "userId": "01K87QPZMP5513SAQDEKNN2B17",
+      "name": "Hetal Dave",
+      "inAt": 1792384770000,
+      "state": "on_break"
+    },
+    {
+      "userId": "01K87R133CAYV58WCHEDPSC8TQ",
+      "name": "Jinal Kotak",
+      "inAt": 1792385103000,
+      "state": "here"
+    },
+    {
+      "userId": "01K808WS88WK4F356DMX0P8VSB",
+      "name": "Sejal Makwana",
+      "inAt": 1792385504000,
+      "state": "here",
+      "hint": "seems_away"
+    },
+    {
+      "userId": "01K8EZTHPNQTWAVCVVCWXBXHMS",
+      "name": "Neha Parmar",
+      "inAt": 1792385921000,
+      "state": "here"
+    }
+  ]
+}
