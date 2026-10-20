@@ -1,11 +1,11 @@
 /**
  * Owner panel routes under /o (PRD 5.2). Owner: WP-6.
  *
- * Every screen is its own lazy chunk (PRD 11.10: each owner route chunk <= 120 KB gzip), and the
- * shell is lazy too, so nothing here adds to the staff app's initial bundle. `handle.titleKey` is the
+ * Every screen is its own lazy chunk (PRD 11.10: each owner route chunk <= 120 KB gzip). This table is
+ * itself loaded on the first visit under /o (router.tsx), so nothing here adds to the staff app's
+ * initial bundle. `handle.titleKey` is the
  * header title while a screen loads; screens may set a more specific title themselves.
  */
-import { lazy, Suspense } from 'react';
 import type { RouteObject } from 'react-router';
 import { OwnerOnly } from './shell/OwnerOnly';
 import { RouteError } from './shell/RouteError';
@@ -136,7 +136,7 @@ export const ownerRoutes: RouteObject[] = [
   {
     path: 'inbox',
     ...h('owner:screens.inbox'),
-    lazy: () => import('../inbox').then((m) => ({ Component: m.InboxScreen })),
+    lazy: () => import('../inbox/screen').then((m) => ({ Component: m.InboxScreen })),
   },
   {
     path: 'more',
@@ -150,14 +150,3 @@ export const ownerRoutes: RouteObject[] = [
     lazy: () => import('./settings/SettingsRoutes').then((m) => ({ Component: m.SettingsRoutes })),
   },
 ];
-
-const LazyShell = lazy(() => import('./shell/OwnerShell').then((m) => ({ default: m.OwnerShell })));
-
-/** Layout around owner routes: bottom tabs on phones, left rail from 64rem, header with the bell. */
-export function OwnerShell() {
-  return (
-    <Suspense fallback={null}>
-      <LazyShell />
-    </Suspense>
-  );
-}

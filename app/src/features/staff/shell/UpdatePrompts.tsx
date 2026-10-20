@@ -3,25 +3,29 @@
  * open or a punch is queued (register.ts decides `canPromptNow`); a 426 from the server shows the
  * full-screen "Please update" with Update now.
  */
-import { Button, Toast } from '@fs/ui';
+import { Button, useToast } from '@fs/ui';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { applyUpdate, useUpdateState } from '../../../pwa/register';
 
 export function UpdateToast() {
   const { t } = useTranslation();
+  const toast = useToast();
   const update = useUpdateState();
-  return (
-    <Toast
-      open={update.canPromptNow && !update.upgradeRequired}
-      title={t('staff:shell.update')}
-      duration={Number.POSITIVE_INFINITY}
-      action={{
+  const ready = update.canPromptNow && !update.upgradeRequired;
+  useEffect(() => {
+    if (!ready) return;
+    toast({
+      title: t('staff:shell.update'),
+      duration: Number.POSITIVE_INFINITY,
+      action: {
         label: t('staff:shell.updateAction'),
         altText: t('staff:shell.updateAction'),
         onClick: () => void applyUpdate(),
-      }}
-    />
-  );
+      },
+    });
+  }, [ready, toast, t]);
+  return null;
 }
 
 export function UpgradeOverlay() {
