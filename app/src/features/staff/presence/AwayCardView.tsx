@@ -8,13 +8,14 @@ import { Badge, Button, Icon } from '@fs/ui';
 import { lazy, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useFmt } from '../lib/format';
+import { withPresenceCopy } from './copy';
 import type { AwayCard as Card } from './presence-model';
 
 const AwayNoteSheet = lazy(() =>
   import('./AwayNoteSheet').then((m) => ({ default: m.AwayNoteSheet })),
 );
 
-export function AwayCard({ card }: { card: Card }) {
+function AwayCardView({ card }: { card: Card }) {
   const { t } = useTranslation();
   const fmt = useFmt();
   const [noteOpen, setNoteOpen] = useState(false);
@@ -74,3 +75,5 @@ export function AwayCard({ card }: { card: Card }) {
     </section>
   );
 }
+
+export const AwayCard = withPresenceCopy(AwayCardView);
