@@ -4,7 +4,7 @@
  * with the joining photo".
  */
 import type { OwnerPunchView, SiteView } from '@fs/contracts';
-import { Button, Icon, Sheet } from '@fs/ui';
+import { Badge, Button, Sheet } from '@fs/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../../../api/provider';
@@ -17,17 +17,20 @@ export function RiskReasons({ punch }: { punch: OwnerPunchView }) {
   const good = punch.riskReasons.filter((r) => POSITIVE_SIGNALS.includes(r));
   if (worries.length === 0 && good.length === 0) return null;
   return (
-    <ul className="grid gap-1 text-sm">
+    // WP-10: worries in the warning tint, passed checks in the success tint; red stays for errors.
+    <ul className="flex flex-wrap gap-1.5">
       {worries.map((r) => (
-        <li key={r} className="flex items-start gap-2 text-text-body">
-          <Icon name="warning-circle" className="mt-0.5 size-5 shrink-0 text-accent" />
-          <span>{t(riskKey(r))}</span>
+        <li key={r} className="flex max-w-full">
+          <Badge tone="warning" icon="warning-circle" className="whitespace-normal">
+            {t(riskKey(r))}
+          </Badge>
         </li>
       ))}
       {good.map((r) => (
-        <li key={r} className="flex items-start gap-2 text-text-muted">
-          <Icon name="check-circle" className="mt-0.5 size-5 shrink-0 text-present" />
-          <span>{t(riskKey(r))}</span>
+        <li key={r} className="flex max-w-full">
+          <Badge tone="success" icon="check-circle" className="whitespace-normal">
+            {t(riskKey(r))}
+          </Badge>
         </li>
       ))}
     </ul>

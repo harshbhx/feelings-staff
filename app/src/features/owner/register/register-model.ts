@@ -114,3 +114,11 @@ export function monthNav(month: string, current: string): { prev: string; next: 
 export function isSunday(date: string): boolean {
   return weekday(date) === 0;
 }
+
+/** The whole salon's totals for the month so far, for the summary bar over the grid (WP-10). */
+export function monthTotals(view: RegisterView): Record<TotalColumn, number> {
+  const out = Object.fromEntries(TOTAL_COLUMNS.map((c) => [c, 0])) as Record<TotalColumn, number>;
+  for (const row of view.rows)
+    for (const c of TOTAL_COLUMNS) out[c] = Math.round((out[c] + totalValue(row, c)) * 10) / 10;
+  return out;
+}
