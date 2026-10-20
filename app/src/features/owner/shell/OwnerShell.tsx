@@ -114,7 +114,8 @@ function Header() {
           className="line-clamp-2 min-w-0 flex-1 text-balance font-extrabold text-text text-xl leading-snug tracking-display"
           data-testid="owner-title"
         >
-          {title ?? t(titleKey)}
+          {/* "Neha Parmar · Mon, 19 Oct": the dot stays on the first line when the title wraps. */}
+          {(title ?? t(titleKey)).replaceAll(' · ', '\u00a0· ')}
         </h1>
         <InboxBell />
       </div>
