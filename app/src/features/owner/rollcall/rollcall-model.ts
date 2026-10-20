@@ -3,13 +3,7 @@
  * each defaulting to Here, except someone whose away interval is still open, who stays Not here
  * (the mark continues the interval) until the owner taps Here to end it. Done sends the marks.
  */
-import {
-  type AwayReason,
-  HHMM,
-  type RollCallPerson,
-  type RollCallSlot,
-  type RollCallSubmit,
-} from '@fs/contracts';
+import type { AwayReason, RollCallPerson, RollCallSlot, RollCallSubmit } from '@fs/contracts';
 
 export type Mark = 'here' | 'not_here';
 
