@@ -25,8 +25,8 @@ test.describe('stale chunk recovery', () => {
     page.on('load', () => {
       navigations += 1;
     });
-    // Block the sign-in screen's lazy chunk for the first request only: the "deleted file" case.
-    await page.route(/\/assets\/sign-in[^/]*\.js$/i, (route) => {
+    // Block the first lazy screen chunk (sign-in, or the install gate on iPhone) for the first request only: the "deleted file" case.
+    await page.route(/\/assets\/(?:sign-in|InstallGate)[^/]*\.js$/i, (route) => {
       blocked += 1;
       return blocked === 1 ? route.abort() : route.continue();
     });
