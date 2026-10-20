@@ -1,6 +1,6 @@
 /**
  * Owner navigation (PRD 5.2): phone tabs Today · Needs action · Register · Staff · More; More holds
- * Payroll, Roster, Advances, Reports, Inbox, Show door code, Settings. The desktop rail lists all.
+ * Payroll, Credits (owner only), Advances, Reports, Roster, Inbox, Show door code, Settings. The desktop rail lists all.
  * Managers see only what their permissions allow (PRD 10.2).
  */
 import type { Me, Permission } from '@fs/contracts';
@@ -49,6 +49,16 @@ export const MORE: readonly NavItem[] = [
     needs: 'payroll',
     group: 'money',
     hintKey: 'owner:more.hints.payroll',
+  },
+  {
+    // Time credits are owner only (PRD 7.17.9): managers never see the item.
+    key: 'credits',
+    to: '/o/credits',
+    labelKey: 'owner:nav.credits',
+    icon: 'hourglass',
+    needs: 'owner',
+    group: 'money',
+    hintKey: 'owner:more.hints.credits',
   },
   {
     key: 'advances',

@@ -26,6 +26,7 @@ import type { TFunction } from 'i18next';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
+import { useMe } from '../../../api/hooks';
 import { isStepUpCancelled } from '../../auth/step-up';
 import {
   useFinalise,
@@ -37,6 +38,7 @@ import {
 } from '../api/payroll';
 import { Meta, Section, Tag } from '../components/layout';
 import { QueryView, useErrorText } from '../components/states';
+import { SettleCreditsCard } from '../credits/SettleCreditsCard';
 import { days, money, monthLabel, shortDate, todayIst } from '../lib/format';
 import { useOwnerTitle } from '../shell/chrome';
 import { PaidSheet } from './PaidSheet';
@@ -73,6 +75,9 @@ function RunBody({ view }: { view: PayrollRunView }) {
   const actions = runActions(view);
   const w = runWord(run);
   const open = blockerCount(view);
+  // Time credits are owner only (PRD 7.17.9); the step needs a saved run, not "so far".
+  const me = useMe();
+  const credits = !run.preview && me.data?.user.role === 'owner';
   const lineWarnings = view.lines.flatMap((l) =>
     l.warnings.map((text) => ({ who: l.user.name, text })),
   );
@@ -107,6 +112,8 @@ function RunBody({ view }: { view: PayrollRunView }) {
           </ul>
         </Section>
       ) : null}
+
+      {credits ? <SettleCreditsCard runId={run.id} final={run.status !== 'draft'} /> : null}
 
       <div className="flex flex-wrap gap-2">
         {actions.finalise ? <FinaliseButton view={view} month={month} blockers={open} /> : null}
