@@ -46,6 +46,7 @@ test.afterEach(async ({ setServerClock }) => {
 test.describe('E2E-02 to E2E-16 a working day, then payroll', () => {
   test('E2E-04 E2E-14 E2E-16 join, check in late, stay late, overtime decision, payroll, payslip', async ({
     page,
+    context,
     request,
     reset,
     setServerClock,
@@ -77,17 +78,18 @@ test.describe('E2E-02 to E2E-16 a working day, then payroll', () => {
     // (makeup), so the rest is the overtime candidate; the owner approves 30 of it.
     await setServerClock(ist(WORK_DATE, '21:15'));
     owner = await ownerSession(request, seeded.owner);
+    await context.setGeolocation({ latitude: 22.460672, longitude: 70.056548, accuracy: 23 });
     await page.reload();
     await punch(page, 'out', PIN);
     // The phone's own clock is weeks away from the pinned server clock, so the server flags the
-    // punches (and may hold the second one for approval): the owner clears them first (E2E-05 path).
-    const all = await owner.ok<ActionsView>('GET', '/owner/actions');
-    for (const item of all.items) {
-      if (item.user.id !== me.id) continue;
-      if (item.type === 'pending_punch') {
-        await owner.ok('POST', `/owner/punches/${item.punch.id}/review`, { decision: 'approve' });
-      } else if (item.type === 'flagged_punch') {
-        await owner.ok('POST', `/owner/punches/${item.punch.id}/review`, { decision: 'clear' });
+    // punches and may hold the check-out for proof (a fixed test location also repeats exactly).
+    // The owner clears what is still open on the day by id (the E2E-05 path), then decides overtime.
+    const open = await owner.ok<OwnerDayDetail>('GET', `/owner/days/${me.id}/${WORK_DATE}`);
+    for (const p of open.punches) {
+      if (p.status === 'pending') {
+        await owner.ok('POST', `/owner/punches/${p.id}/review`, { decision: 'approve' });
+      } else if (p.status === 'flagged') {
+        await owner.ok('POST', `/owner/punches/${p.id}/review`, { decision: 'clear' });
       }
     }
     const actions = await owner.ok<ActionsView>('GET', '/owner/actions?type=overtime');
