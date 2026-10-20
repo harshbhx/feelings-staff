@@ -67,20 +67,11 @@ export const routes: RouteObject[] = [
 ];
 
 export function createRouter() {
-  // One root error page (its own chunk) for every area, including a failed load of the owner routes.
-  return createBrowserRouter(
-    [
-      {
-        lazy: () => import('./app/RouteErrorPage'),
-        children: routes,
-      },
-    ],
-    {
-      async patchRoutesOnNavigation({ path, patch }) {
-        if (path !== '/o' && !path.startsWith('/o/')) return;
-        const { ownerRoutes } = await import('./features/owner/routes');
-        patch('owner', ownerRoutes);
-      },
+  return createBrowserRouter(routes, {
+    async patchRoutesOnNavigation({ path, patch }) {
+      if (path !== '/o' && !path.startsWith('/o/')) return;
+      const { ownerRoutes } = await import('./features/owner/routes');
+      patch('owner', ownerRoutes);
     },
-  );
+  });
 }
