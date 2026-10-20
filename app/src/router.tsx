@@ -6,7 +6,6 @@ import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet, type RouteObject } from 'react-router';
 import { RequireRole } from './app/guards';
 import { WithNamespaces } from './app/i18n';
-import { RouteErrorPage } from './app/RouteErrorPage';
 import { authRoutes } from './features/auth/routes';
 import { doorRoutes } from './features/door/routes';
 import { kitRoutes } from './features/kit/routes';
@@ -17,6 +16,12 @@ import { StaffShell, staffRoutes } from './features/staff/routes';
 // table is added to the router on the first visit under /o (see createRouter).
 const LazyOwnerShell = lazy(() =>
   import('./features/owner/shell/OwnerShell').then((m) => ({ default: m.OwnerShell })),
+);
+
+// Loaded only when something fails; a stale-chunk failure of this very file is caught by the
+// vite:preloadError listener (pwa/chunk-reload.ts), so it never needs to render.
+const LazyRouteError = lazy(() =>
+  import('./app/RouteErrorPage').then((m) => ({ default: m.RouteErrorPage })),
 );
 
 const OWNER_NS = ['owner', 'payslip'] as const;
@@ -69,11 +74,23 @@ export const routes: RouteObject[] = [
 
 export function createRouter() {
   // One root error page for every area, including a failed lazy load of the owner route table.
-  return createBrowserRouter([{ errorElement: <RouteErrorPage />, children: routes }], {
-    async patchRoutesOnNavigation({ path, patch }) {
-      if (path !== '/o' && !path.startsWith('/o/')) return;
-      const { ownerRoutes } = await import('./features/owner/routes');
-      patch('owner', ownerRoutes);
+  return createBrowserRouter(
+    [
+      {
+        errorElement: (
+          <Suspense fallback={null}>
+            <LazyRouteError />
+          </Suspense>
+        ),
+        children: routes,
+      },
+    ],
+    {
+      async patchRoutesOnNavigation({ path, patch }) {
+        if (path !== '/o' && !path.startsWith('/o/')) return;
+        const { ownerRoutes } = await import('./features/owner/routes');
+        patch('owner', ownerRoutes);
+      },
     },
-  });
+  );
 }
