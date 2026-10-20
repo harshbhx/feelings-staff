@@ -18,6 +18,8 @@ export default defineConfig({
   build: {
     manifest: true,
     target: 'es2022',
+    // Diagnostic only (scripts/size-breakdown.mjs); source maps stay out of normal builds.
+    sourcemap: process.env.SIZE_ANALYZE === '1' ? 'hidden' : false,
   },
   server: { port: 5173 },
   preview: { port: 8787 },
