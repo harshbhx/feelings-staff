@@ -49,7 +49,7 @@ export function PrivacyScreen() {
           {data.isError && !data.data ? (
             <QueryError
               error={data.error}
-              message={t('staff:privacy.loadError')}
+              message={t('errors:generic')}
               onRetry={() => void data.refetch()}
             />
           ) : !data.data ? (
