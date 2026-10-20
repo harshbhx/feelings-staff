@@ -4,7 +4,8 @@ import { Icon, type IconName } from '../icons/Icon';
 import { cx } from '../lib/cx';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger-secondary';
-export type ButtonSize = 'md' | 'sm';
+/** `lg` (56 px) is the staff Today hero: the one Check in / Check out (WP-10). */
+export type ButtonSize = 'lg' | 'md' | 'sm';
 
 export interface ButtonProps extends ComponentProps<'button'> {
   /**

@@ -4,12 +4,12 @@
  * button on this screen is "Approve selected"; per-item actions are outline buttons.
  */
 import type { ActionItem, ActionsView, ActionType } from '@fs/contracts';
-import { Button, ChipGroup, useToast } from '@fs/ui';
+import { Button, Card, ChipGroup, useToast } from '@fs/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { useActions, useBulkApprove } from '../api/attendance';
-import { CHIPS_WRAP, Section, useNow } from '../components/layout';
+import { CHIPS_WRAP, useNow } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { ActionCard } from './ActionCard';
 import {
@@ -110,13 +110,19 @@ function Queue({ view }: { view: ActionsView }) {
         />
       ) : null}
 
-      <div className="grid gap-8 xl:grid-cols-2 xl:items-start xl:gap-x-12">
+      <div className="grid gap-5 xl:grid-cols-2 xl:items-start xl:gap-6">
         {groups.map((g) => (
-          <Section
+          <Card
             key={g.type}
-            title={t(`owner:actions.types.${g.type}`)}
-            count={g.items.length}
-            className="grid gap-1"
+            flush
+            title={
+              <>
+                {t(`owner:actions.types.${g.type}`)}
+                <span className="ml-2 font-semibold text-sm text-text-muted tabular-nums">
+                  {g.items.length}
+                </span>
+              </>
+            }
           >
             <ul className="grid">
               {g.items.map((item) => (
@@ -130,7 +136,7 @@ function Queue({ view }: { view: ActionsView }) {
                 />
               ))}
             </ul>
-          </Section>
+          </Card>
         ))}
       </div>
 

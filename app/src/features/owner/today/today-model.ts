@@ -125,3 +125,32 @@ export function liveWorkedMin(row: BoardInRow, updatedAt: number, now: number): 
   const drift = Math.max(0, Math.floor((now - updatedAt) / 60_000));
   return row.workedMin + drift;
 }
+
+export interface DayProgress {
+  /** Came in today (still in or checked out). */
+  inCount: number;
+  onTime: number;
+  late: number;
+  notInYet: number;
+  dueLater: number;
+  /** Working today: in + not in yet + due later. Leave and week off are not counted. */
+  total: number;
+  /** Everyone on the board, away included ("11 everyone"). */
+  everyone: number;
+}
+
+/** "8 of 10 in" and its parts, for the progress strip over the counters (WP-10). */
+export function dayProgress(board: TodayBoard): DayProgress {
+  const c = board.counters;
+  const dueLater = board.notIn.filter((r) => r.state === 'due_later').length;
+  const late = Math.min(c.late, c.present);
+  return {
+    inCount: c.present,
+    onTime: c.present - late,
+    late,
+    notInYet: c.notInYet,
+    dueLater,
+    total: c.present + c.notInYet + dueLater,
+    everyone: c.present + board.notIn.length + board.away.length,
+  };
+}
