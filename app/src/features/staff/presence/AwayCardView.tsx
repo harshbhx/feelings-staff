@@ -2,7 +2,7 @@
  * The away card on Today (PRD 4.18.4, S-24.2 and S-24.3): "You're out since 15:30 · Lunch outside"
  * after Step out, or "Urmi marked you away since 15:00" after a roll-call Not here, with one note
  * for the owner. **I'm back** sits in the action bar as the one sindoor button while the person is
- * out (`useImBack`). Only times, minutes and the chosen reason; never credits or rupees.
+ * out. Only times, minutes and the chosen reason; never credits or rupees.
  */
 import { Badge, Button, Icon } from '@fs/ui';
 import { lazy, Suspense, useState } from 'react';

@@ -18,17 +18,17 @@ import {
   Skeleton,
   SkeletonGroup,
   StatusChip,
+  useToast,
 } from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
-import { mockChoice } from '../../../api/provider';
+import { mockChoice, useApi } from '../../../api/provider';
 import { useQueue } from '../../../pwa/queue';
 import { staffKeys, useOwnerName, useStaffMe, useToday } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
 import { useNow } from '../lib/use-now';
-import { useImBack } from '../presence/AwayCard';
 import { deferNotice, noticeDeferred, presenceKey, usePresence } from '../presence/api';
 import { presenceUi } from '../presence/presence-model';
 import type { FrozenSheet } from '../punch/frozen';
@@ -123,7 +123,18 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
   // Presence: Step out next to Check out, the away card with I'm back, the notice once.
   const presence = usePresence();
   const pres = presenceUi(model, presence.data, { duty: view.duty, now, ownerName: owner });
-  const imBack = useImBack();
+  const toast = useToast();
+  const api = useApi();
+  const { i18n } = useTranslation();
+  const [backBusy, setBackBusy] = useState(false);
+  // I'm back: the work is in `im-back.ts`, loaded on the first tap.
+  const onBack = () => {
+    hapticTick();
+    setBackBusy(true);
+    void import('../presence/im-back')
+      .then((m) => m.imBack({ api, qc, toast, i18n, owner }))
+      .finally(() => setBackBusy(false));
+  };
   const [stepOutOpen, setStepOutOpen] = useState(false);
   const [stepOutMounted, setStepOutMounted] = useState(false);
   if (stepOutOpen && !stepOutMounted) setStepOutMounted(true);
@@ -269,10 +280,10 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
               size="lg"
               block={!pres.card}
               icon={pres.card || model.primary !== 'check_out' ? 'sign-in' : 'sign-out'}
-              loading={Boolean(pres.card) && imBack.busy}
+              loading={Boolean(pres.card) && backBusy}
               onClick={() => {
                 // One 8 ms tick under the thumb (Android; never with reduced motion), PRD 12.8.
-                if (pres.card) return imBack.run();
+                if (pres.card) return onBack();
                 hapticTick();
                 setSheetOpen(true);
               }}
