@@ -57,15 +57,11 @@ jobs:
       - name: Build
         if: ${{ !cancelled() }}
         run: pnpm build
-        env:
-          SIZE_ANALYZE: '1'
       - name: Size budgets
         if: ${{ !cancelled() }}
         run: pnpm size
-      - name: Size breakdown (diagnostic)
-        if: ${{ !cancelled() }}
-        continue-on-error: true
-        run: node scripts/size-breakdown.mjs
+        env:
+          SIZE_BUDGET_JS_STRICT: '1'
       - name: Upload the build (main only, for preview deploys from the VM)
         if: ${{ success() && github.ref == 'refs/heads/main' }}
         uses: actions/upload-artifact@v4
