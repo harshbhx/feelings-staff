@@ -27,8 +27,12 @@ export interface StatChipGroupProps {
   defaultValue?: string | undefined;
   onValueChange?: ((value: string) => void) | undefined;
   name?: string | undefined;
-  /** `scroll` (default) keeps one swipeable row on phones and wraps from 64rem; `wrap` always wraps. */
-  layout?: 'scroll' | 'wrap' | undefined;
+  /**
+   * `tiles` (default): on phones every count is a tile in a two- or three-column grid (the number
+   * over its word), so nothing is cut off at the screen edge; pills that wrap from 48rem.
+   * `wrap`: pills that wrap at every width. `scroll`: one swipeable row on phones.
+   */
+  layout?: 'tiles' | 'wrap' | 'scroll' | undefined;
   className?: string | undefined;
 }
 
@@ -50,7 +54,7 @@ export function StatChipGroup({
   defaultValue,
   onValueChange,
   name,
-  layout = 'scroll',
+  layout = 'tiles',
   className,
 }: StatChipGroupProps) {
   const id = useId();
