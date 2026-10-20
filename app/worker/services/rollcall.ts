@@ -120,6 +120,8 @@ export async function todayRollCall(
   ctx: Ctx,
   date: string,
 ): Promise<{ id: string; slotTime: string; status: RollCallSlotStatus } | null> {
+  // Presence off: an unfinished roll-call is not offered on Today (same as the day endpoint).
+  if (!(await loadOrg(ctx)).settings.presence.enabled) return null;
   const rows = await ctx.db.all<RollCallRow>(
     'SELECT * FROM roll_calls WHERE org_id = ?org AND work_date = ? ORDER BY slot_ts DESC',
     date,
@@ -356,7 +358,12 @@ export async function rollCallSubmit(
             end_reason: 'roll_call_here',
             ...(current.source === 'roll_call'
               ? { state: 'confirmed' as const }
-              : { back_missing: 1, state: 'pending' as const }),
+              : {
+                  back_missing: 1,
+                  state: (computeFrom(inputs, p.userId, rc.work_date)?.creditsOn
+                    ? 'pending'
+                    : 'ignored') as 'pending' | 'ignored',
+                }),
           },
           'id = ?',
           current.id,

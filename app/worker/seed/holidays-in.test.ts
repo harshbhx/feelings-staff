@@ -27,6 +27,15 @@ describe('generated India holiday suggestions', () => {
   it('the seeded list has unique dates (holidays_org_date index) and includes 2027', () => {
     const dates = SEED_HOLIDAYS.map((h) => h.date);
     expect(new Set(dates).size).toBe(dates.length);
-    expect(HOLIDAYS_2027.length).toBeGreaterThan(0);
+    // The 2026 list is hand-written (8 rows, lunar festivals included), 2027 is generated (9).
+    expect(SEED_HOLIDAYS.filter((h) => h.date.startsWith('2026-'))).toHaveLength(8);
+    expect(SEED_HOLIDAYS.filter((h) => h.date.startsWith('2027-'))).toEqual(HOLIDAYS_2027);
+    expect(HOLIDAYS_2027).toHaveLength(9);
+    expect(SEED_HOLIDAYS).toHaveLength(17);
+    for (const h of SEED_HOLIDAYS) {
+      expect(HolidayCreate.safeParse({ ...h, paid: true }).success, `${h.date} ${h.name}`).toBe(
+        true,
+      );
+    }
   });
 });

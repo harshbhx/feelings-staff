@@ -537,16 +537,21 @@ async function presenceRules(r: RuleEnv): Promise<void> {
     }
   }
 
-  const data = await loadDayData(ctx, null, date, date);
   const open = await ctx.db.all<{ user_id: string; start_ts: number }>(
     'SELECT user_id, start_ts FROM away_intervals WHERE org_id = ?org AND work_date = ? AND end_ts IS NULL',
     date,
   );
+  // Each person's latest check decides: an older `outside` after a later `inside` is not a hint.
   const outside = await ctx.db.all<{ user_id: string; check_ts: number }>(
-    `SELECT user_id, MAX(check_ts) AS check_ts FROM presence_checks
-      WHERE org_id = ?org AND work_date = ? AND result = 'outside' GROUP BY user_id`,
+    `SELECT c.user_id, c.check_ts FROM presence_checks c
+      WHERE c.org_id = ?org AND c.work_date = ? AND c.result = 'outside'
+        AND c.check_ts = (SELECT MAX(l.check_ts) FROM presence_checks l
+                           WHERE l.org_id = c.org_id AND l.user_id = c.user_id
+                             AND l.work_date = c.work_date)`,
     date,
   );
+  if (open.length === 0 && outside.length === 0) return;
+  const data = await loadDayData(ctx, null, date, date);
   const since = new Map<string, number>();
   for (const o of outside) since.set(o.user_id, o.check_ts);
   for (const o of open)

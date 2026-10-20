@@ -79,7 +79,8 @@ if (signIn.status === 200) {
     settings: { timeCredits: { startDate: rangeStart } },
   });
   if (cred.status !== 200) {
-    console.warn(`credits start date: ${cred.status} ${cred.json?.error?.code ?? ''}`);
+    console.error(`credits start date: ${cred.status} ${cred.json?.error?.code ?? ''}`);
+    process.exit(1);
   } else {
     console.info(`Time credits start on ${rangeStart}.`);
   }

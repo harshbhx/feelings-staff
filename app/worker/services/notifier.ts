@@ -305,7 +305,7 @@ interface Prefs {
  * Email is on by default for the owner's N24 and N30 (PRD 6). The staff payslip email (N25) is
  * opt-in: the PRD lists in-app and push for it, so email only goes to people who switch it on.
  */
-const EMAIL_DEFAULT_ON: NotifyEventType[] = ['payroll_draft_ready', 'weekly_digest'];
+export const EMAIL_DEFAULT_ON: NotifyEventType[] = ['payroll_draft_ready', 'weekly_digest'];
 const EMAIL_TYPES: NotifyEventType[] = ['payroll_draft_ready', 'payslip_ready', 'weekly_digest'];
 
 async function emailLines(
