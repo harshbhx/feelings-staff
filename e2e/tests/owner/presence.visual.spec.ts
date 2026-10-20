@@ -60,7 +60,7 @@ test.describe('owner presence', () => {
     await expect(page).toHaveScreenshot('owner-today-rollcall-missed.png', { fullPage: true });
   });
 
-  test('OWN-PRES O-30.2 roll-call: everyone checked in defaults to Here, axe clean', async ({
+  test('OWN-PRES O-30.2 roll-call: people checked in default to Here and Dhara stays Not here while away, axe clean', async ({
     page,
     checkA11y,
   }) => {

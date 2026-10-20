@@ -39,6 +39,7 @@ describe('Time credits view models (O-29)', () => {
     expect(estimateWord(4480, 50)).toBe('worth');
     expect(estimateWord(-9630, -130)).toBe('cut');
     expect(estimateWord(0, 0)).toBe('none');
+    expect(estimateWord(40, 1)).toBe('none');
   });
 
   it('O-29.7 the Credits list sorts by balance and filters plus or minus', () => {

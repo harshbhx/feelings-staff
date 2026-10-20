@@ -144,13 +144,15 @@ export function dayProgress(board: TodayBoard): DayProgress {
   const c = board.counters;
   const dueLater = board.notIn.filter((r) => r.state === 'due_later').length;
   const late = Math.min(c.late, c.present);
+  // `counters.notInYet` counts every `notIn` row, due-later people included: split them out once.
+  const notInYet = Math.max(0, c.notInYet - dueLater);
   return {
     inCount: c.present,
     onTime: c.present - late,
     late,
-    notInYet: c.notInYet,
+    notInYet,
     dueLater,
-    total: c.present + c.notInYet + dueLater,
+    total: c.present + notInYet + dueLater,
     everyone: c.present + board.notIn.length + board.away.length,
   };
 }

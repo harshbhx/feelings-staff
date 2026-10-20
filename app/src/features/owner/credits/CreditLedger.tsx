@@ -250,7 +250,7 @@ function LedgerList({
   const words = useRowWords();
   const minText = useMinText();
   return (
-    <ul className="grid max-w-(--container-narrow)" data-testid="credits-ledger">
+    <ul className="grid max-w-(--container-narrow)" data-testid="credits-ledger-list">
       {rows.map((r) => (
         <li
           key={rowKey(r)}

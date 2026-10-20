@@ -65,6 +65,9 @@ const afterPresence = () => [
   ownerKeys.rollCallsAll(),
   ownerKeys.actionsAll(),
   ownerKeys.registerAll(),
+  // Roll-call and away edits change the credit ledger and what payroll will cut.
+  ownerKeys.creditsAll(),
+  ownerKeys.payrollAll(),
 ];
 
 /** Done: save the roll-call, or save it again to edit the marks (`rollcall.edit`). */

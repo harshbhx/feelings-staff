@@ -50,7 +50,13 @@ function useDropFromQueues() {
   };
 }
 
-const afterDecision = () => [ownerKeys.actionsAll(), ownerKeys.today(), ownerKeys.registerAll()];
+const afterDecision = () => [
+  ownerKeys.actionsAll(),
+  ownerKeys.today(),
+  ownerKeys.registerAll(),
+  // An away decision moves the credits overview (pending step-outs, confirmed deductions).
+  ownerKeys.creditsAll(),
+];
 
 /** A decision on one Needs-action item (PRD 4.12). `id` is the queue item id. */
 export type Decision =
