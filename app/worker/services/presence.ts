@@ -460,9 +460,10 @@ export async function presenceCheck(
       result = fence === 'pass' ? 'inside' : fence === 'outside' ? 'outside' : 'edge';
     }
   }
+  const checkId = ulid(now);
   await ctx.db.batch([
     ctx.db.insert('presence_checks', {
-      id: ulid(now),
+      id: checkId,
       user_id: user.id,
       work_date: sess.workDate,
       check_ts: now,
@@ -475,6 +476,13 @@ export async function presenceCheck(
       device_id: device.id,
       idempotency_key: body.idempotencyKey,
       created_at: now,
+    }),
+    ctx.services.audit.stmt(ctx, {
+      category: 'change',
+      action: 'presence.check',
+      entity: 'presence_check',
+      entityId: checkId,
+      after: { workDate: sess.workDate, result, fence, distanceM },
     }),
   ]);
   return { result };
