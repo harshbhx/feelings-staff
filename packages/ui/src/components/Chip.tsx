@@ -117,8 +117,11 @@ interface ChipGroupBase {
   name?: string | undefined;
   disabled?: boolean | undefined;
   required?: boolean | undefined;
-  /** `wrap` (default) flows pills onto lines; `grid` sets cards in two columns; `scroll` keeps one swipeable row. */
-  layout?: 'wrap' | 'grid' | 'scroll' | undefined;
+  /**
+   * `wrap` (default) flows pills onto lines; `grid` sets cards in two columns; `scroll` keeps one
+   * swipeable row; `segmented` splits one blush track evenly between a few short radios.
+   */
+  layout?: 'wrap' | 'grid' | 'scroll' | 'segmented' | undefined;
   className?: string | undefined;
 }
 

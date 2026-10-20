@@ -221,13 +221,13 @@ function SettleRow({
         </p>
       )}
 
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-1 tabular-nums xl:grid-cols-[auto_minmax(0,1fr)] xl:gap-x-4">
+      <dl className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-6 gap-y-1 tabular-nums xl:grid-cols-[auto_minmax(0,1fr)] xl:gap-x-4">
         <dt className="text-sm text-text-muted">{t('owner:credits.settle.money')}</dt>
-        <dd className="font-bold text-text xl:text-right" data-testid="settle-money">
+        <dd className="text-right font-bold text-text" data-testid="settle-money">
           {moneyText}
         </dd>
         <dt className="text-sm text-text-muted">{t('owner:credits.settle.after')}</dt>
-        <dd className="font-bold text-text xl:text-right">{minText(after)}</dd>
+        <dd className="text-right font-bold text-text">{minText(after)}</dd>
       </dl>
 
       {kept > 0 || !saved || warnings.length > 0 ? (

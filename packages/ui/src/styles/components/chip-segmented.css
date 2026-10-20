@@ -1,0 +1,55 @@
+/*
+ * ChipGroup `segmented` (PRD 12.6): a few short radios share one blush track evenly. Its own file so
+ * these more specific overrides sit after chip.css without fighting its selector order.
+ */
+@layer components {
+  /*
+   * Segmented: a few short radios share one blush track evenly (Active · Invited · Left · All), so
+   * all of them fit a 390 px phone. The chosen one is a white segment, like the segmented tabs.
+   */
+  .fs-chip-group__items[data-layout="segmented"] {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 0.25rem;
+    max-width: 30rem;
+    padding: 0.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    background: var(--bg-soft);
+  }
+
+  .fs-chip-group__items[data-layout="segmented"] .fs-chip__face {
+    justify-content: center;
+    padding: 0.4rem 0.5rem;
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .fs-chip-group__items[data-layout="segmented"] .fs-chip__mark {
+    display: none;
+  }
+
+  .fs-chip-group__items[data-layout="segmented"] .fs-chip__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .fs-chip-group__items[data-layout="segmented"] .fs-chip__input:checked + .fs-chip__face {
+    border-color: transparent;
+    background: var(--bg);
+    box-shadow: 0 0 0 1px var(--border-strong);
+    color: var(--text);
+    font-weight: var(--weight-strong);
+  }
+
+  .fs-chip-group__items[data-layout="segmented"]
+    .fs-chip:hover:not([data-disabled])
+    .fs-chip__input:not(:checked)
+    + .fs-chip__face {
+    border-color: transparent;
+    color: var(--text);
+  }
+}

@@ -1266,6 +1266,7 @@
       "month": "This month",
       "monthLine": "{{present}} present · {{half}} half · {{absent}} absent · {{late}} min late",
       "openRegister": "Open this month",
+      "openCredits": "Open credits",
       "salaryNow": "{{amount}} a {{basis}} from {{date}}",
       "salaryHistory": "Earlier",
       "changeSalary": "Change salary",

@@ -143,7 +143,7 @@ function Header({
           <p className="mt-2 text-text-body">{t('owner:credits.ledger.nothingUntil')}</p>
         </div>
       </Card>
-      <div className="flex flex-wrap gap-2">{children}</div>
+      <div className="flex flex-wrap gap-2 max-sm:*:grow">{children}</div>
     </div>
   );
 }

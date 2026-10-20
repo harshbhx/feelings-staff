@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { StaffStatusFilter } from '../api/keys';
 import { useStaffList } from '../api/staff';
-import { CHIPS_WRAP, Meta, WRAP_ROW } from '../components/layout';
+import { Meta, NoBreakParts, WRAP_ROW } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { shortDate } from '../lib/format';
 
@@ -49,8 +49,7 @@ export function StaffListScreen() {
         type="radio"
         legend={t('owner:staff.filterLabel')}
         legendHidden
-        layout="scroll"
-        className={CHIPS_WRAP}
+        layout="segmented"
         value={filter}
         onValueChange={(v) => setFilter(v as StaffStatusFilter)}
         options={FILTERS.map((f) => ({ value: f, label: t(`owner:staff.filters.${f}`) }))}
@@ -80,7 +79,7 @@ export function StaffListScreen() {
             <Meta>{t('owner:staff.count', { count: rows.length })}</Meta>
             <List>
               {rows.map((s) => (
-                <StaffListRow key={s.id} row={s} />
+                <StaffListRow key={s.id} row={s} filter={filter} />
               ))}
             </List>
           </div>
@@ -90,7 +89,7 @@ export function StaffListScreen() {
   );
 }
 
-function StaffListRow({ row }: { row: StaffRow }) {
+function StaffListRow({ row, filter }: { row: StaffRow; filter: StaffStatusFilter }) {
   const { t } = useTranslation();
   const trailing =
     row.status === 'exited' ? (
@@ -108,7 +107,8 @@ function StaffListRow({ row }: { row: StaffRow }) {
       <StatusChip status="flag" label={t('owner:staff.device.pending')} />
     ) : row.deviceState === 'none' ? (
       <StatusChip status="waiting" label={t('owner:staff.device.none')} />
-    ) : (
+    ) : filter === 'active' ? null : (
+      // Under the Active filter every row would say "Active": only the exceptions get a chip.
       <StatusChip status="present" label={t('owner:staff.statusWord.active')} />
     );
   return (
@@ -117,7 +117,7 @@ function StaffListRow({ row }: { row: StaffRow }) {
       className={WRAP_ROW}
       leading={<Avatar name={row.name} />}
       title={row.name}
-      subtitle={[row.designation, row.employeeCode].filter(Boolean).join(' · ')}
+      subtitle={<NoBreakParts parts={[row.designation, row.employeeCode]} />}
       trailing={trailing}
     >
       <Link to={`/o/staff/${row.id}`} />

@@ -42,7 +42,7 @@ import { SettleCreditsCard } from '../credits/SettleCreditsCard';
 import { days, money, monthLabel, shortDate, todayIst } from '../lib/format';
 import { useOwnerTitle } from '../shell/chrome';
 import { PaidSheet } from './PaidSheet';
-import { blockerCount, runActions, runWord } from './run-model';
+import { blockerCount, personWarnings, runActions, runWord } from './run-model';
 
 export function PayrollRunScreen() {
   const { runId = '' } = useParams();
@@ -78,9 +78,7 @@ function RunBody({ view }: { view: PayrollRunView }) {
   // Time credits are owner only (PRD 7.17.9); the step needs a saved run, not "so far".
   const me = useMe();
   const credits = !run.preview && me.data?.user.role === 'owner';
-  const lineWarnings = view.lines.flatMap((l) =>
-    l.warnings.map((text) => ({ who: l.user.name, text })),
-  );
+  const lineWarnings = personWarnings(view.lines, view.warnings);
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
@@ -115,7 +113,7 @@ function RunBody({ view }: { view: PayrollRunView }) {
 
       {credits ? <SettleCreditsCard runId={run.id} final={run.status !== 'draft'} /> : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 max-sm:*:grow">
         {actions.finalise ? <FinaliseButton view={view} month={month} blockers={open} /> : null}
         {actions.markAllPaid ? <MarkAllPaid runId={run.id} /> : null}
         {actions.recompute ? <RecomputeButton runId={run.id} /> : null}
