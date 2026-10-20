@@ -57,6 +57,7 @@ export const ICON_NAMES = [
   'dots-three',
   'pencil-simple',
   'trash',
+  'hand-coins',
 ] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];
