@@ -16,6 +16,7 @@ import type { Env } from '../env';
 import { hashPassword, hashPin, PASSWORD_ITERATIONS, randomToken } from '../lib/crypto';
 import { ulid } from '../lib/ulid';
 import { seedDemo } from './demo';
+import { HOLIDAYS_IN_GJ } from './holidays-in';
 import { seedPayrollOctober } from './payroll-october';
 
 export const TEST_OWNER = {
@@ -35,6 +36,18 @@ export const HOLIDAYS_2026 = [
   { date: '2026-10-20', name: 'Dussehra', workedComp: 'extra_pay' },
   { date: '2026-11-08', name: 'Diwali', workedComp: 'extra_pay' },
 ] as const;
+
+/**
+ * 2027 suggestions from the generated India (Gujarat) list. Lunar festivals are not in
+ * that data, so the owner adds them in Settings, Holidays (docs/data-model.md).
+ */
+export const HOLIDAYS_2027 = HOLIDAYS_IN_GJ.filter((h) => h.date.startsWith('2027-')).map((h) => ({
+  date: h.date,
+  name: h.name,
+  workedComp: 'extra_pay' as const,
+}));
+
+export const SEED_HOLIDAYS = [...HOLIDAYS_2026, ...HOLIDAYS_2027];
 
 export const LEAVE_TYPES = [
   {
@@ -190,7 +203,7 @@ export async function seedBasicSalon(s: SeedContext): Promise<BasicSalon> {
     );
   });
 
-  for (const h of HOLIDAYS_2026) {
+  for (const h of SEED_HOLIDAYS) {
     stmts.push(
       db
         .prepare(
