@@ -113,7 +113,9 @@ export function useSettleCredit(runId: string) {
                       settleMin: v.settleMin,
                       appliedMin: res.settlement.appliedMin,
                       amountPaise: res.settlement.amountPaise,
-                      stayMin: r.balanceMin - res.settlement.appliedMin,
+                      // The server's balance wins over the row's, which an adjustment may have moved.
+                      balanceMin: res.settlement.balanceMin,
+                      stayMin: res.settlement.balanceMin - res.settlement.appliedMin,
                     }
                   : r,
               ),

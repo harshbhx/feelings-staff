@@ -9,10 +9,11 @@ export type Mark = 'here' | 'not_here';
 
 export type Marks = Readonly<Record<string, Mark>>;
 
-/** The starting mark of each person: Here, or Not here while an away interval is open. */
+/** The starting mark of each person: the saved one, else Here, or Not here while away. */
 export function initialMarks(people: readonly RollCallPerson[]): Record<string, Mark> {
   const marks: Record<string, Mark> = {};
-  for (const p of people) marks[p.userId] = p.state === 'away_open' ? 'not_here' : 'here';
+  for (const p of people)
+    marks[p.userId] = p.mark ?? (p.state === 'away_open' ? 'not_here' : 'here');
   return marks;
 }
 
@@ -85,11 +86,14 @@ export function canOpenSlot(slot: Pick<RollCallSlot, 'status'>): boolean {
 
 export const AWAY_REASONS: readonly AwayReason[] = ['personal', 'lunch', 'errand', 'other'];
 
+// Same shape as the contract's `HHMM` (a runtime import would widen the shared chunk).
 const HHMM = /^([01]\d|2[0-3]):([0-5]\d)$/;
+const isHHMM = (v: string) => HHMM.test(v);
+const HHMM_PARTS = /^(\d\d):(\d\d)$/;
 
 /** Epoch ms of `HH:MM` IST on a work date, or null for a time that is not a time. */
 export function istTs(workDate: string, hhmm: string): number | null {
-  const m = HHMM.exec(hhmm);
+  const m = isHHMM(hhmm) ? HHMM_PARTS.exec(hhmm) : null;
   if (!m) return null;
   const base = Date.parse(`${workDate}T00:00:00+05:30`);
   if (!Number.isFinite(base)) return null;
@@ -101,10 +105,10 @@ export type TimesProblem = 'none' | 'tooMany' | 'invalid' | 'order' | 'afterClos
 
 export function checkRollCallTimes(times: readonly string[], closingTime?: string): TimesProblem {
   if (times.length < 1 || times.length > 4) return 'tooMany';
-  if (times.some((t) => !HHMM.test(t))) return 'invalid';
+  if (times.some((t) => !isHHMM(t))) return 'invalid';
   for (let i = 1; i < times.length; i += 1)
     if ((times[i] ?? '') <= (times[i - 1] ?? '')) return 'order';
-  if (closingTime && HHMM.test(closingTime) && times.some((t) => t >= closingTime))
+  if (closingTime && isHHMM(closingTime) && times.some((t) => t >= closingTime))
     return 'afterClosing';
   return 'none';
 }
@@ -113,7 +117,7 @@ export function checkRollCallTimes(times: readonly string[], closingTime?: strin
 export function nextTime(times: readonly string[], closingTime = '20:00'): string | null {
   if (times.length >= 4) return null;
   const last = times[times.length - 1] ?? '10:00';
-  const m = HHMM.exec(last);
+  const m = isHHMM(last) ? HHMM_PARTS.exec(last) : null;
   if (!m) return null;
   const mins = Number(m[1]) * 60 + Number(m[2]) + 60;
   const h = Math.floor(mins / 60);

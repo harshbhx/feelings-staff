@@ -33,10 +33,12 @@ export function awayPatch(
   away: AwayToEdit,
   draft: { start: string; end: string; reason: AwayReason | null; state: Counted | null },
   editReason: string,
-): AwayPatch | 'endBeforeStart' | 'badTime' {
+): AwayPatch | 'endBeforeStart' | 'badTime' | 'endMissing' {
   const startTs = istTs(away.workDate, draft.start);
   const endTs = draft.end === '' ? null : istTs(away.workDate, draft.end);
   if (startTs === null || (draft.end !== '' && endTs === null)) return 'badTime';
+  // A closed interval keeps an end time: clearing it is not something the API can express.
+  if (draft.end === '' && away.endTs !== null) return 'endMissing';
   if (endTs !== null && endTs <= startTs) return 'endBeforeStart';
   const patch: AwayPatch = { editReason };
   if (draft.start !== clock(away.startTs)) patch.startTs = startTs;
@@ -69,7 +71,23 @@ export function EditAwaySheet({
     away.state === 'pending' || away.state === 'open' ? null : away.state,
   );
   const [why, setWhy] = useState('');
-  const [problem, setProblem] = useState<'why' | 'endBeforeStart' | 'badTime' | null>(null);
+  const [problem, setProblem] = useState<
+    'why' | 'endBeforeStart' | 'badTime' | 'endMissing' | null
+  >(null);
+
+  const reset = () => {
+    setStart(clock(away.startTs));
+    setEnd(away.endTs === null ? '' : clock(away.endTs));
+    setReason(away.reason);
+    setState(away.state === 'pending' || away.state === 'open' ? null : away.state);
+    setWhy('');
+    setProblem(null);
+  };
+  const onOpenChange = (o: boolean) => {
+    // Every way out (Cancel, Esc, overlay) drops the draft; opening starts from the fresh values.
+    reset();
+    setOpen(o);
+  };
 
   const submit = () => {
     if (!why.trim()) return setProblem('why');
@@ -93,7 +111,7 @@ export function EditAwaySheet({
   return (
     <Sheet
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={onOpenChange}
       title={t('owner:presence.edit.title', { name: first })}
       description={dayLabel(away.workDate)}
       trigger={
@@ -129,7 +147,11 @@ export function EditAwaySheet({
             label={t('owner:presence.edit.end')}
             hint={away.endTs === null ? t('owner:presence.edit.endOpen') : undefined}
             error={
-              problem === 'endBeforeStart' ? t('owner:presence.edit.endBeforeStart') : undefined
+              problem === 'endBeforeStart'
+                ? t('owner:presence.edit.endBeforeStart')
+                : problem === 'endMissing'
+                  ? t('owner:presence.edit.endMissing')
+                  : undefined
             }
           >
             <TimeField
@@ -188,7 +210,7 @@ export function EditAwaySheet({
           >
             {t('owner:presence.edit.save')}
           </Button>
-          <Button variant="ghost" onClick={() => setOpen(false)}>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
             {t('owner:common.cancel')}
           </Button>
         </div>

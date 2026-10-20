@@ -67,12 +67,17 @@ function Settle({ view, rows }: { view: PayrollRunView; rows: CreditsSettleRow[]
     setSaving(true);
     const left: Record<string, number> = {};
     let failed: unknown = null;
-    for (const r of changed) {
+    for (const [i, r] of changed.entries()) {
       try {
         await settle.mutateAsync({ userId: r.userId, settleMin: chosen(r) });
       } catch (e) {
         failed = failed ?? e;
         left[r.userId] = chosen(r);
+        if (isStepUpCancelled(e)) {
+          // The PIN was cancelled: stop here and keep every unsaved choice for the next try.
+          for (const rest of changed.slice(i + 1)) left[rest.userId] = chosen(rest);
+          break;
+        }
       }
     }
     setDrafts(left);

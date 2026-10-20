@@ -30,8 +30,9 @@ export function roughRupees(paise: number): number {
 export type EstimateWord = 'worth' | 'cut' | 'none';
 
 export function estimateWord(paise: number, min: number): EstimateWord {
-  if (min > 0 && paise !== 0) return 'worth';
-  if (min < 0 && paise !== 0) return 'cut';
+  // A balance that rounds to ₹0 reads as nothing, not "about ₹0".
+  if (min > 0 && roughRupees(paise) !== 0) return 'worth';
+  if (min < 0 && roughRupees(paise) !== 0) return 'cut';
   return 'none';
 }
 

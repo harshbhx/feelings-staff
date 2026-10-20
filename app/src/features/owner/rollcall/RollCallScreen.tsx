@@ -152,8 +152,6 @@ function Marking({ view, slot }: { view: RollCallView; slot: RollCallSlot | null
   const time = view.slotTime;
   useOwnerTitle(t('owner:presence.view.title', { time }), '/o/today');
 
-  if (view.people.length === 0) return <Empty>{t('owner:presence.view.empty')}</Empty>;
-
   const done = () => {
     // The hook adds one idempotency key per Done (a repeat tap reuses it).
     const { notHere, here } = submitBody(view.people, marks, '');
@@ -196,19 +194,23 @@ function Marking({ view, slot }: { view: RollCallView; slot: RollCallSlot | null
         </Meta>
       </div>
 
-      <fieldset className="grid">
-        <legend className="sr-only">{t('owner:presence.view.legend', { time })}</legend>
-        <ul className="fs-list" data-framed="">
-          {view.people.map((p) => (
-            <PersonRow
-              key={p.userId}
-              person={p}
-              mark={marks[p.userId] ?? 'here'}
-              onToggle={() => setMarks((m) => toggleMark(m, p.userId))}
-            />
-          ))}
-        </ul>
-      </fieldset>
+      {view.people.length === 0 ? (
+        <Empty>{t('owner:presence.view.empty')}</Empty>
+      ) : (
+        <fieldset className="grid">
+          <legend className="sr-only">{t('owner:presence.view.legend', { time })}</legend>
+          <ul className="fs-list" data-framed="">
+            {view.people.map((p) => (
+              <PersonRow
+                key={p.userId}
+                person={p}
+                mark={marks[p.userId] ?? 'here'}
+                onToggle={() => setMarks((m) => toggleMark(m, p.userId))}
+              />
+            ))}
+          </ul>
+        </fieldset>
+      )}
 
       <div className="fixed inset-x-0 bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom))] z-20 border-border border-t bg-(--bg-glass) backdrop-blur-[10px] xl:bottom-0 xl:left-(--owner-rail-w)">
         <section

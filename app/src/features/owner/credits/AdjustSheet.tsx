@@ -131,7 +131,11 @@ export function AdjustSheet({ userId, entry, open, onOpenChange }: AdjustSheetPr
             {busy ? t('owner:common.saving') : cta}
           </Button>
           <Button
-            onClick={() => (mode.kind === 'add' ? onOpenChange(false) : setMode({ kind: 'add' }))}
+            onClick={() => {
+              if (mode.kind === 'add') return onOpenChange(false);
+              setMode({ kind: 'add' });
+              setDraft(draftFor(0));
+            }}
           >
             {t('owner:common.cancel')}
           </Button>

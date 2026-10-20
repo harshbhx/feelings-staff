@@ -31,7 +31,10 @@ export function presencePatch(
 ): OrgSettingsPatch | null {
   const p: NonNullable<OrgSettingsPatch['presence']> = {};
   if (draft.enabled !== saved.enabled) p.enabled = draft.enabled;
-  if (JSON.stringify(draft.rollCallTimes) !== JSON.stringify(saved.rollCallTimes))
+  if (
+    JSON.stringify(draft.rollCallTimes) !== JSON.stringify(saved.rollCallTimes) &&
+    (draft.enabled || checkRollCallTimes(draft.rollCallTimes) === 'none')
+  )
     p.rollCallTimes = draft.rollCallTimes;
   if (draft.stepOut !== saved.stepOut) p.stepOut = draft.stepOut;
   if (draft.quietDuringBreaks !== saved.quietDuringBreaks)
@@ -56,7 +59,8 @@ function PresenceForm({ view }: { view: SettingsView }) {
   const [round, setRound] = useState(0);
   const set = (part: Partial<PresenceSettings>) => setDraft((d) => ({ ...d, ...part }));
   const times = draft.rollCallTimes;
-  const problem = checkRollCallTimes(times, closing);
+  // Times only matter while presence is on: switching it off must work with a bad draft.
+  const problem = draft.enabled ? checkRollCallTimes(times, closing) : 'none';
   const changes = presencePatch(saved, draft);
   const pin = draft.enabled !== saved.enabled;
   const reset = () => {
