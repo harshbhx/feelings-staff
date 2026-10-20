@@ -111,20 +111,11 @@ function Body({ data }: { data: MyData }) {
         )}
       </section>
 
-      <section aria-labelledby="md-presence" className="flex flex-col gap-2">
-        <h2 id="md-presence" className="text-base">
-          {t('staff:myData.presence')}
-        </h2>
-        <List framed>
-          <ListRow
-            asChild
-            title={t('staff:myData.presenceRow')}
-            subtitle={t('staff:myData.presenceHint')}
-          >
-            <Link to="/me/data/presence" />
-          </ListRow>
-        </List>
-      </section>
+      <List framed>
+        <ListRow asChild title={t('staff:myData.presence')}>
+          <Link to="/me/data/presence" />
+        </ListRow>
+      </List>
 
       <section aria-labelledby="md-selfies" className="flex flex-col gap-2">
         <h2 id="md-selfies" className="text-base">

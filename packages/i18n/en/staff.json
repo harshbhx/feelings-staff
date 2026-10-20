@@ -569,8 +569,7 @@
   "myData": {
     "lead": "What the app keeps about you, and for how long.",
     "punches": "Check-ins and check-outs",
-    "presence": "Time away from the salon",
-    "presenceHint": "Roll-call marks, step-outs and location checks",
+    "presence": "Presence",
     "punchRow": "{{kind}} · {{date}} {{time}}",
     "fence": {
       "pass": "Inside",
@@ -609,8 +608,7 @@
       "break_end": "Break ended"
     },
     "punchesNone": "No check-ins yet.",
-    "correctionText": "Hello {{owner}}, something in My data looks wrong:",
-    "presenceRow": "Presence"
+    "correctionText": "Hello {{owner}}, something in My data looks wrong:"
   },
   "privacy": {
     "lead": "Feelings Beauty Care uses this app to record attendance and pay. Here is what it keeps and why.",

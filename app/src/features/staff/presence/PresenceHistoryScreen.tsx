@@ -29,7 +29,7 @@ import { usePresenceHistory } from './sheet-api';
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
 
-function PresenceHistory() {
+function HistoryScreenView() {
   const { t } = useTranslation();
   const fmt = useFmt();
   const owner = useOwnerName();
@@ -182,4 +182,4 @@ function HistoryRow({ item, fmt, t }: { item: HistoryItem; fmt: Fmt; t: TFunctio
   }
 }
 
-export const PresenceHistoryScreen = withPresenceCopy(PresenceHistory);
+export const PresenceHistoryScreen = withPresenceCopy(HistoryScreenView);
