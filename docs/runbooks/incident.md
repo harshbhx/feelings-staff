@@ -55,7 +55,7 @@ Answer: what data, which people, which period, and who could have seen it.
 ## 3. Tell Urmi and the Board
 
 - **Urmi first, the same day.** She is the data fiduciary under the DPDP Act. Tell her in plain words: what happened, what data, which people, what you have done, what you do next. Do not wait for a perfect picture.
-- **Affected staff.** Urmi tells them, in plain language and in their language (English or Gujarati). Offer to help write the message. Say what was involved, what it means for them, what they should do (for example "change your PIN") and who to ask.
+- **Affected staff.** Urmi tells them, in plain language (the app is English only for now). Offer to help write the message. Say what was involved, what it means for them, what they should do (for example "change your PIN") and who to ask.
 - **Data Protection Board.** If personal data was breached, the DPDP Rules ask for an intimation to the Board without delay and a detailed report within 72 hours. Help Urmi draft both: nature and extent of the breach, when it happened, the likely consequences, what was done to contain it, and the contact for questions. Keep a copy in the ops log folder you use (not in the repo if it names people).
 - Most DPDP obligations apply from 13 May 2027; the app is built to them already, so follow this process now.
 

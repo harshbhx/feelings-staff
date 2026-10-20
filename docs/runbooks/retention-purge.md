@@ -31,10 +31,10 @@ The same table is in the [data model](../data-model.md#retention). The "location
 
 - **Nightly job**, 03:00 IST (`30 21 * * *` UTC). Besides closing the previous work date, it performs every nightly row of the table above, in batches of 500 statements per D1 batch.
 - **Monthly purge**, on the 1st, does the five-year deletes.
-- **R2 lifecycle rules** delete selfies after 30 days, exports after 7 and (P1) backups after 90. They are created once by `scripts/r2-lifecycle.ts` (WP-8, not in the repo yet) and verified by a CI check that lists the bucket's rules. Until the script lands, set the rules in the dashboard by hand.
+- **R2 lifecycle rules** delete selfies after 30 days, exports after 7 and (P1) backups after 90. They are created once with `gh workflow run r2-lifecycle -f mode=apply` (it runs `scripts/r2-lifecycle.ts`), and the same workflow runs in `check` mode every Monday and fails if a rule is missing.
 - The job writes a summary row to `audit_log` (`actor_type = system`, `action = retention.purge`) with counts, and logs one structured line per organisation with counts and duration.
 - It is **idempotent**: each action is guarded by a `cron_runs` row, so a retry does not repeat it and a failed run catches up on the next tick.
-- Cron jobs run only on the production Worker, not on previews. The job bodies belong to WP-8; until they land the scheduled handler does nothing (`implemented: false`).
+- Cron jobs run only on the production Worker, not on previews.
 
 ## Check that it works
 

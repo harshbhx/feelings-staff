@@ -23,6 +23,9 @@ One Cloudflare Worker serves the React SPA, the Hono API at `/api/v1` and the cr
 
 | Document | What is in it |
 |---|---|
+| [`docs/README.md`](docs/README.md) | Index of all documentation |
+| [`docs/guides/production-setup.md`](docs/guides/production-setup.md) | Step-by-step production setup, first sign-in to staff phones |
+| [`docs/faq.md`](docs/faq.md) | One-page FAQ |
 | [`docs/PRD.md`](docs/PRD.md) | Product requirements. Everything we build traces back to it. |
 | [`docs/architecture.md`](docs/architecture.md) | Overview with diagrams, package map and owners |
 | [`docs/decisions/`](docs/decisions/README.md) | Architecture decision records, ADR-01 to ADR-16 |
@@ -30,6 +33,9 @@ One Cloudflare Worker serves the React SPA, the Hono API at `/api/v1` and the cr
 | [`docs/deploy.md`](docs/deploy.md) | Go-live, rollback and the preview environment |
 | [`docs/api.md`](docs/api.md) | API reference, errors and conventions |
 | [`docs/data-model.md`](docs/data-model.md) | Tables, retention, R2 layout, migrations |
+| [`docs/runbooks/operations.md`](docs/runbooks/operations.md) | Daily, weekly and monthly checks, payroll month close |
+| [`docs/runbooks/troubleshooting.md`](docs/runbooks/troubleshooting.md) | Something is wrong: check-in, location, lost phone, payslip, push |
+| [`docs/runbooks/update-rollback.md`](docs/runbooks/update-rollback.md) | Updating and rolling back |
 | [`docs/runbooks/incident.md`](docs/runbooks/incident.md) | When something is wrong |
 | [`docs/runbooks/backup-restore.md`](docs/runbooks/backup-restore.md) | Backups and restores |
 | [`docs/runbooks/retention-purge.md`](docs/runbooks/retention-purge.md) | What is deleted and when; purge on request |

@@ -4,6 +4,10 @@ For Urmi. This guide shows you how to set up Feelings Staff, add your team, see 
 
 Harsh looks after the system behind the app. You never need to touch any of that.
 
+Everything in this guide is live in your app. The app is in English only for now.
+
+If something does not work, start with [When something is wrong](#when-something-is-wrong), and see the [FAQ](../faq.md).
+
 <!-- Source: PRD sections 4 to 6 and 10. Update this guide when the copy on a screen changes. -->
 
 Contents: [Sign in](#sign-in) · [Set up the app first time](#set-up-the-app-first-time) · [Add staff and approve phones](#add-staff-and-approve-phones) · [Today](#today) · [Needs action](#needs-action) · [The register](#the-register) · [Roster and venue duties](#roster-and-venue-duties) · [The door code](#the-door-code) · [Advances](#advances) · [Time credits](#time-credits) · [Roll-call and step-outs](#roll-call-and-step-outs) · [Payroll at month end](#payroll-at-month-end) · [Exports](#exports) · [Settings](#settings) · [Your own sign-in and security](#your-own-sign-in-and-security) · [Notifications you get](#notifications-you-get) · [What the app never does](#what-the-app-never-does) · [Good to know](#good-to-know) · [When something is wrong](#when-something-is-wrong)
@@ -23,14 +27,14 @@ Contents: [Sign in](#sign-in) · [Set up the app first time](#set-up-the-app-fir
 
 ## Set up the app first time
 
-The first time you sign in, you see **Setup**: "Five quick things, then you're ready." You can skip a step and finish it later in Settings.
+The first time you sign in, you see **Setup**: "A few quick things, then you're ready." There are eight steps. You can skip a step and finish it later in Settings.
 
 <!-- screenshot: owner-setup-checklist -->
 
 1. **Salon.** Name, address and phone. They are filled in already; check them.
 2. **Location.** A map shows the salon with a circle of 100 m. Tap **Looks right**, or **Calibrate** (see below).
 3. **Opening hours and shifts.** Five shifts are ready: Full day 10:00 to 20:00 (60 minutes unpaid break), Sunday 10:00 to 13:00, Morning 10:00 to 15:00, Evening 15:00 to 20:00, and Split 10:00 to 14:00 with 17:00 to 21:00. Change or remove them.
-4. **Holidays.** 26 January, 15 August and 2 October are in, with Uttarayan, Holi, Janmashtami, Dussehra and Diwali suggested with this year's dates. You can add days when people should not take leave (wedding season).
+4. **Holidays.** The national holidays (Republic Day 26 January, Independence Day 15 August, Gandhi Jayanti 2 October) and five festivals (Uttarayan, Holi, Janmashtami, Dussehra, Diwali) are added with this year's dates, and next year's national and Gujarat holidays are suggested too. The festivals that follow the moon (Holi, Janmashtami, Dussehra, Diwali) are not in next year's list: add them in **Settings → Holidays** when the dates are known. You can also add days when people should not take leave (wedding season).
 5. **Pay rules.** Each rule has one line that says what it does. Tap **Use these** or change them. See [Payroll at month end](#payroll-at-month-end) for what the defaults are.
 6. **Selfie on check-in.** Off or on. It is off to begin with. You can also turn it on for one person.
 7. **Add your first staff member.**
@@ -54,7 +58,7 @@ You can have up to **15 active** staff in the app.
 ### Add a person
 
 1. **Staff**, then **Add staff**.
-2. Fill in: name, mobile number, role (Stylist, Beautician, Makeup artist, Mehndi artist, Nail technician, Receptionist, Helper, Trainer, Trainee, Other), joining date, salary (monthly or daily), shift, weekly off, language (English or Gujarati), and whether a selfie is needed.
+2. Fill in: name, mobile number, role (Stylist, Beautician, Makeup artist, Mehndi artist, Nail technician, Receptionist, Helper, Trainer, Trainee, Other), joining date, salary (monthly or daily), shift, weekly off, language (English only for now; Gujarati is not ready), and whether a selfie is needed.
 3. Tick that the person is **18 or older**. The app does not support anyone under 18 yet.
 4. Tap **Save and invite**. The share sheet opens with a ready message, for example:
 
@@ -122,7 +126,7 @@ One list for everything that waits for your decision. Newest first, grouped by k
 | Overtime | The day, minutes, and "approved in advance" if it was a venue duty | **Approve all**, **Approve part** (in 15-minute steps) or **Reject** |
 | Venue request | The place, map and note | **Approve**, **Approve and let others check in here**, or **Reject** |
 | Day closed by the app | The day and the time the app used | **Keep 20:00** or **Change time** |
-| Away interval | A step-out that is waiting: name, times, reason, minutes, her note | **Confirm**, **Mark as work** or **Ignore** (see [Roll-call and step-outs](#roll-call-and-step-outs)) |
+| Away interval ("Stepped out") | A step-out that is waiting: name, times, reason, minutes, her note | **Confirm**, **Mark as work** or **Ignore** (see [Roll-call and step-outs](#roll-call-and-step-outs)) |
 
 - To approve several of the same kind, tap them and choose **Approve selected**. (Phones are always one by one.)
 - Every decision is written down and the staff member gets a message.
@@ -193,11 +197,11 @@ Why it exists: someone can arrive 10 minutes late every day (70 minutes in a wee
 - Sort by balance, or filter by plus or minus.
 - Nothing on this screen changes pay.
 
-Tap a person to open her **ledger**: every entry, newest first on a phone. Each line shows the date, the kind (late, early, away, overtime, legal 2×, adjusted, settled), the minutes, the running balance, where it came from and who confirmed it. Late and early entries say "automatic". At the top it says "Nothing is cut or paid until you settle it at payroll." You can filter by kind and date, show only what is not settled yet, and **Export CSV** (PIN).
+Tap a person to open her **ledger**: every entry, newest first on a phone. Each line shows the date, the kind (late, early, away, overtime, legal 2×, adjusted, settled), the minutes, the running balance, where it came from and who confirmed it. Late and early entries say "automatic". At the top it says "Nothing is cut or paid until you settle it at payroll." You can filter by kind and date, show only what is not settled yet, and **Export CSV** (PIN). The export is one month at a time. The file is made in the background and you find it in **Reports**.
 
 ### Adjust an entry
 
-Tap an entry, then **Adjust minutes**, type the change and a reason. For example, you excuse a late of 10 minutes: adjust that day's late entry by +10, reason "approved by Urmi". The original entry stays visible with your change and your reason under it, so the history is always readable. You can change or remove an adjustment later. You can do this any time; in a month that is already finalised the change counts in the next payroll.
+Open the person's ledger and tap **Adjust or see history** on an entry, or tap **Adjust minutes** at the top. Choose **Add minutes** or **Take away minutes**, type the minutes and a reason, and tap **Save adjustment**. For example, you excuse a late of 10 minutes: add 10 minutes to that day's late entry, reason "approved by Urmi". The original entry stays visible with your change and your reason under it, so the history is always readable. Later you can **Change** an adjustment or **Void** it (with a reason); a voided adjustment stays in the history. You can do this any time; in a month that is already finalised the change counts in the next payroll.
 
 ### A worked example
 
@@ -216,9 +220,10 @@ The Credits screen says "worth about ₹152". At payroll you can settle 0 (nothi
 
 In the payroll run, the **Settle credits** step lists everyone who has a balance at the end of the month. For each person you see her balance and its money, a stepper, the money it makes and the "balance after".
 
-- The stepper moves in steps of 5 minutes. You can also type an exact number. **0** sets it back to nothing. **Suggested** sets the whole balance.
+- The stepper (**5 min less**, **5 min more**) moves in steps of 5 minutes. You can also type an exact number. **Settle 0** sets it back to nothing. **Suggested** sets the whole balance.
+- Tap **Save settlements** to keep your choices. The card then says how many minutes you settled. **Undo changes** goes back to what was last saved.
 - **The default is 0.** Nothing is settled unless you choose it.
-- A minus settlement is a deduction. It follows the same rule as other deductions: no more than half of the salary can be cut in a month. Minutes that do not fit stay on the balance, with a note such as "20 min stay on the balance".
+- A minus settlement is a deduction. It follows the same rule as other deductions: a cut stays within half of the month's pay. Minutes that do not fit stay on the balance, with a note such as "20 min stay on the balance".
 - A plus settlement is an earning.
 - You can change the step until you tap **Finalise**. On Finalise the settlement becomes the payslip line and the balance goes down by that many minutes. If you **Reopen** the month, the settlement is voided and the stepper comes back with the same values.
 - What you do not settle carries over to next month. There is no reset.
@@ -245,10 +250,10 @@ The punch tells the app when someone arrived and left. Roll-call and step-outs t
 
 You, or a manager you allow, check who is here two or three times a shift.
 
-- **Times.** Settings → Presence. The default is 12:00, 15:00 and 18:00. You can have one to four, any time inside opening hours. A change applies from the next one.
-- At each time you get a gentle ping. If it is not done within 30 minutes, **Today** says "Roll-call at 15:00 not done". Nothing is assumed if you miss one.
-- **Today → Roll-call** lists everyone who is checked in at that moment. Everyone is set to **Here**. Tap a row to switch it to **Not here**. The row can carry a hint: "Seems away", "Stepped out 14:40, lunch outside", "On break", "On duty at a venue". People on leave, off duty or not checked in are not listed.
-- Tap **Done**. Everyone left on Here is recorded as here. It takes about 20 seconds. You can reopen and change it until the day is locked.
+- **Times.** Settings → Presence. The default is 12:00, 15:00 and 18:00. You can have one to four, in order and before closing time. A change applies from the next one.
+- At each time you get a gentle ping, "Roll-call time". **Today** shows a card, "Roll-call at 15:00 is open", with **Start roll-call**. If it is not done within 30 minutes, you get a second ping and the card says "Roll-call at 15:00 not done" with **Do it now**. Nothing is assumed if you miss one. **More → Roll-call** lists all of today's roll-calls: Later, Open, Done (and by whom) or Not done.
+- The roll-call lists everyone who is checked in at that moment ("Who's not here?"). Everyone is set to **Here**. Tap only the people who are not at the salon to switch them to **Not here**. A row can carry a hint: "Seems away", "Stepped out 14:40", "Away since 15:00" or "On break". People on leave, off duty or not checked in are not listed.
+- Tap **Done**. It says, for example, "Roll-call at 15:00 saved: 5 here, 1 not here". It takes about 20 seconds. You can open a done roll-call, change a mark and tap **Done** again until payroll is finalised.
 
 <!-- screenshot: owner-roll-call -->
 
@@ -258,7 +263,7 @@ If someone is already away, the row says "Away since 15:00" and you tap **Here**
 
 ### Edit an away time
 
-Open it from **Today**, the day detail or **Needs action**, and change the start, the end, the reason or the work flag. The old and new values are recorded, and the minutes and the ledger entry follow. Managers with the roll-call permission can do this too. Overlapping away times of one person merge into one. Away times under 5 minutes are dropped. A day that is locked can only be changed by you, and the change counts in the next payroll.
+Open it from **Today**, the day detail or **Needs action** (**Edit times**). Change **Out from**, **Back at**, the reason, and how it counts: **Away** takes the minutes off, **Work** and **Ignore** take nothing off. Say why in a few words; it is kept with the old and new times. The old and new values are recorded, and the minutes and the ledger entry follow. Managers with the roll-call permission can do this too. Overlapping away times of one person merge into one. Away times under 5 minutes are dropped. A day that is locked can only be changed by you, and the change counts in the next payroll.
 
 ### Decide a step-out
 
@@ -278,7 +283,17 @@ With Time credits off, away times are only information: no minutes, and nothing 
 
 ### Presence settings and consent
 
-**Settings → Presence** has the roll-call times, who may do roll-calls, and the on and off switches. Each person sees a short notice once and taps to accept. If she does not, she can still check in and out and use Step out, and her profile says "Priya has not accepted presence tracking". An optional check can raise "Seems away" while her app happens to be open on screen. It never asks for location, never creates minutes by itself, and stores no route.
+**Settings → Presence** has:
+
+- **Presence tracking**, the main switch. Off means no roll-calls, no Step out and nothing recorded. Changing it asks for your PIN.
+- **Roll-call times**, one to four.
+- **Step out button for staff**. Off hides Step out and I'm back; roll-call still works.
+- **Quiet location check while the app is open**, off to begin with. When on, every 30 minutes (you can change how often), only while the app is on screen and location is already allowed. It can only show you "Seems away" and never costs minutes.
+- **Pause during breaks**, on to begin with: no checks and no away minutes inside the break.
+
+Managers who have the roll-call permission can do roll-calls too: set it under **Settings → People and roles**.
+
+Each person sees a short notice once, "When you are not at the salon", and taps **OK, I understand** or **Not now**. If she does not accept, she can still check in and out and use Step out. An optional check can raise "Seems away" while her app happens to be open on screen. It never asks for location, never creates minutes by itself, and stores no route.
 
 ## Payroll at month end
 
@@ -313,7 +328,7 @@ You see one row per person: paid days, unpaid days, late and early minutes, over
 - **Change advance recovery for this month** (lower it; the rest moves on).
 - **Recompute** after you change anything in attendance.
 
-With Time credits on, the **Settle credits** step comes with the draft: see [Settle credits at payroll](#settle-credits-at-payroll).
+With Time credits on (the default), the **Settle credits** step comes with the draft: see [Settle credits at payroll](#settle-credits-at-payroll).
 
 The app warns about: pay below the minimum wage you entered, more than 48 hours in a week, too much overtime in a quarter, and deductions reaching half of a salary.
 
@@ -359,8 +374,8 @@ Everything is in **Settings**. Each change shows a line about what it does, and 
 | Shifts and roster | Shift templates, weekly off, the 48-hour warning |
 | Holidays and no-leave days | Per year; for each holiday, what happens if someone works (comp-off, extra pay, or both) |
 | Attendance rules | Grace, early-leave allowance, half-day and absent limits, make-up time, automatic break, break buttons, PIN on every check-in, selfies, how careful the checks are |
-| Time credits | The switch and start date, **Pay legal overtime at 2×** (PIN) |
-| Presence | Roll-call times, who may do roll-calls, the switch, the optional location hint (PIN to switch on or off) |
+| Time credits | The switch (PIN), **Start counting from**, **Pay legal overtime at 2×** (PIN) |
+| Presence | The **Presence tracking** switch (PIN), roll-call times, the **Step out button for staff**, the optional quiet location check, **Pause during breaks**. Who may do roll-calls is under People and roles. |
 | Pay rules | Divisor, overtime rules, work on week off, advances, pay day, minimum wage, fines, statutory items |
 | Leave policy | Types, yearly days, notice, when leave can first be used, comp-off expiry |
 | Notifications | Which pings you get, quiet hours (21:30 to 08:00), summary only |
@@ -399,11 +414,13 @@ Pings come as a message on your phone and as a list in the inbox. The inbox is a
 | 21:00, people not checked out | "2 people haven't checked out" |
 | Leave, fixes, venue requests | When they arrive |
 | Many wrong PINs on one account | "Several wrong PIN tries on Priya's account" |
-| Roll-call time (default 12:00, 15:00, 18:00) | A reminder to do the roll-call, and "Roll-call at 15:00 not done" after 30 minutes |
-| A step-out waits for you | "Priya stepped out 15:30–16:10" |
+| Roll-call time (default 12:00, 15:00, 18:00) | "Roll-call time: Who's not here? It takes about 20 seconds.", and "Roll-call at 15:00 not done" if it is still not done after 30 minutes |
+| Someone steps out | "Priya stepped out" with the reason and the time, then "Priya stepped out 15:30–16:10" when she is back and it waits for you |
 | Still checked in after the shift with an away time open | "Priya may have left without checking out" |
 | 1st of the month | Payroll ready |
 | The 5th | Salaries not marked paid |
+
+**Emails.** Three notices also come by email: the payroll draft ("October payroll is ready to check") and the **weekly digest** every Monday from 09:00 (last week's late arrivals, absent days, approved overtime, what waits for your decision, and the Time credits balances), and, if switched on for a person, the "Your payslip is ready" notice. Each has a button that opens the app. The owner gets the payroll and digest emails by default. There is no email switch on a screen yet: ask Harsh if you want them off or on for someone. Sign-in emails (the link and code) are separate and always sent. If an email does not arrive, look in spam first.
 
 Quiet hours are 21:30 to 08:00. Pings in that time wait and arrive at 08:00 as one summary, except a new phone. On an iPhone, add the app to your home screen to get pings at all. You can turn each kind on or off in Settings. Security alerts cannot be turned off.
 
@@ -431,5 +448,6 @@ Quiet hours are 21:30 to 08:00. Pings in that time wait and arrive at 08:00 as o
 - **A person lost their phone:** **Staff**, the person, **Devices**, **Revoke**. They join again with a new invite.
 - **You think someone else is using an account:** **Settings**, **Security**, **Sign out others**; and tell Harsh.
 - **Something looks wrong in the numbers:** open the day or the payslip and read the formula. If it still looks wrong, tell Harsh with the date and the person's name.
-- **The app does not load:** try again in a minute. Staff check-ins are saved on their phones and are sent when the app is back.
+- **The app does not load, or says "We couldn't load this.":** tap **Try again**. This can happen once right after Harsh updates the app: the app then reloads by itself. If it keeps happening, try again in a minute. Staff check-ins are saved on their phones and are sent when the app is back.
+- **A payslip looks wrong, a push does not arrive, or a location is wrong:** Harsh has a [troubleshooting page](../runbooks/troubleshooting.md) for these. Most can be fixed in the app, and it says which.
 - **Anything else:** WhatsApp Harsh.

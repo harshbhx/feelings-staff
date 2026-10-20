@@ -32,9 +32,9 @@ Each `d1 create` prints a `database_id`. Put them into the config in one PR (con
 | `app/wrangler.jsonc` | `previews.d1_databases[0].database_id` | the `fbc-staff-preview` id |
 | `app/wrangler.preview-migrations.jsonc` | `d1_databases[0].database_id` | the `fbc-staff-preview` id |
 
-The placeholders today are `00000000-0000-0000-0000-000000000000` (production) and `00000000-0000-0000-0000-000000000001` (preview). While they are in place, deploys and previews fail on purpose.
+The placeholders today are `00000000-0000-0000-0000-000000000000` (production; the preview ids are already set). While they are in place, deploys and previews fail on purpose.
 
-The R2 buckets stay private. Do not add a public URL or a custom domain to them. Lifecycle rules (selfies 30 days, exports 7 days, backups 90 days) are created by `scripts/r2-lifecycle.ts`, which belongs to WP-8 and is not in the repo yet. Until it lands, add the three rules by hand (Dashboard, R2, the bucket, Settings, Object lifecycle rules) and check them with the [retention runbook](runbooks/retention-purge.md).
+The R2 buckets stay private. Do not add a public URL or a custom domain to them. Lifecycle rules (selfies 30 days, exports 7 days, backups 90 days) are created by `scripts/r2-lifecycle.ts`. Once the API token from step 2 exists, run `gh workflow run r2-lifecycle -f mode=apply`, then `-f mode=check`. The workflow also checks every Monday. More in the [retention runbook](runbooks/retention-purge.md).
 
 Also set the owner's email in the same PR: `OWNER_BOOTSTRAP_EMAIL` in `vars` of `app/wrangler.jsonc` (Urmi's own email, PRD Q18). Only this address can request the first sign-in link.
 
@@ -84,7 +84,7 @@ Optional secrets, only if you use them: `RESEND_API_KEY` (when `EMAIL_PROVIDER=r
 
 ## 4. Email
 
-Owner sign-in links and codes are sent by Cloudflare Email Service ([ADR-09](decisions/0009-email-through-cloudflare-email-service.md)).
+Owner sign-in links and codes, and the payroll and weekly digest emails, are sent by Cloudflare Email Service in production ([ADR-09](decisions/0009-email-through-cloudflare-email-service.md)). Preview (`EMAIL_PROVIDER=outbox`) never sends: messages go to the outbox. `feelingsbeautycare.in` is already enabled for Email Sending in the DualMind Labs Cloudflare account and its DNS records are live; do the steps below only for a different account.
 
 1. Dashboard, Compute, Email Service, Email Sending, Onboard Domain, choose `feelingsbeautycare.in`.
 2. Cloudflare adds SPF, DKIM and DMARC records on the `cf-bounce` subdomain, so the existing Email Routing MX records are not touched. Wait until the domain shows as verified.
@@ -137,8 +137,6 @@ curl -sS -X POST https://staff.feelingsbeautycare.in/api/v1/setup \
 3. Close the shell, or `unset SETUP_TOKEN`.
 4. Send Urmi the sign-in page, `https://staff.feelingsbeautycare.in/auth/owner`. She enters her email, gets a link and a 6-digit code, and signs in. Then follow the first-run checklist in the [owner guide](guides/owner.md#set-up-the-app-first-time).
 5. Write one line in the [ops log](ops-log.md): date, "owner bootstrapped".
-
-The setup endpoint belongs to WP-3; until that package lands it answers 501.
 
 ## 8. Switch off workers.dev
 

@@ -513,7 +513,6 @@
     "noPunches": "No check-ins or check-outs on this day."
   },
   "payslips": {
-    "row": "{{month}} · {{net}}",
     "paid": "Paid {{date}} by {{mode}}",
     "notPaid": "Not marked paid yet",
     "revision": "Revision {{n}}",

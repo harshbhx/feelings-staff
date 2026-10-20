@@ -102,14 +102,20 @@ function Body({ view }: { view: PayslipView }) {
       </Card>
 
       <Card title={t('staff:payslips.days')}>
-        <dl className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 text-sm tabular">
-          <dt className="text-text-muted">{t('payslip:days.inMonth')}</dt>
+        <dl className="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-1 text-sm tabular">
+          <dt className="whitespace-nowrap text-text-muted">{t('payslip:days.inMonth')}</dt>
           <dd className="text-right">{r.daysInMonth}</dd>
-          <dt className="text-text-muted">{t('payslip:days.paid')}</dt>
+          <dt className="whitespace-nowrap text-text-muted">{t('payslip:days.paid')}</dt>
           <dd className="text-right">{c.paidDays}</dd>
-          <dt className="text-text-muted">{t('payslip:days.counts')}</dt>
-          <dd className="text-right">{`P ${c.P} · H ${c.H} · A ${c.A} · L ${c.L} · WO ${c.WO} · HO ${c.HO}`}</dd>
-          <dt className="text-text-muted">{t('payslip:rate', { days: r.divisorDays })}</dt>
+          <dt className="whitespace-nowrap text-text-muted">{t('payslip:days.counts')}</dt>
+          <dd className="flex flex-wrap justify-end gap-x-3">
+            {(['P', 'H', 'A', 'L', 'WO', 'HO'] as const).map((k) => (
+              <span key={k} className="whitespace-nowrap">{`${k} ${c[k]}`}</span>
+            ))}
+          </dd>
+          <dt className="whitespace-nowrap text-text-muted">
+            {t('payslip:rate', { days: r.divisorDays })}
+          </dt>
           <dd className="text-right">{fmt.rupees(r.dailyRatePaise)}</dd>
         </dl>
       </Card>
