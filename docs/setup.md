@@ -124,7 +124,8 @@ Never commit `.dev.vars`, and never paste real secrets into chats, issues, PRs o
   2. Wait until the domain shows as verified. Until then sends fail.
   3. Change `EMAIL_FROM` and the binding's `allowed_sender_addresses` in `app/wrangler.jsonc` to an address on that domain, in a pull request.
   4. After the deploy, request a sign-in link for the owner email at `/auth/owner` and check it arrives (and is not in spam).
-  5. Fallback if Email Sending misbehaves: set `EMAIL_PROVIDER=resend` and the `RESEND_API_KEY` secret; the owner can also use password and PIN.
+  5. Email Routing for the same domain (`wrangler email routing rules list feelingsbeautycare.in`) makes the addresses exist for receiving: `urmi@` (the owner's sign-in address) and `staff@` (the sender, so replies land somewhere) each have a forward rule to a verified destination address (Email Routing, Destination addresses; the owner of that inbox must click the confirmation mail). Change the `urmi@` rule to Urmi's own inbox once she has one verified: `wrangler email routing addresses create <inbox>` then `wrangler email routing rules` to update.
+  6. Fallback if Email Sending misbehaves: set `EMAIL_PROVIDER=resend` and the `RESEND_API_KEY` secret; the owner can also use password and PIN.
   Full production steps: [deploy.md, Email](deploy.md#4-email).
 
 ## Mock mode

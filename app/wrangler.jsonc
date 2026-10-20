@@ -27,7 +27,7 @@
   "send_email": [
     {
       "name": "EMAIL",
-      "allowed_sender_addresses": ["staff@feelingsbeautycare.in", "no-reply@feelingsbeautycare.in"]
+      "allowed_sender_addresses": ["staff@feelingsbeautycare.in"]
     }
   ],
   "ratelimits": [
@@ -46,7 +46,7 @@
     "EMAIL_FROM": "Feelings Staff <staff@feelingsbeautycare.in>",
     "VAPID_PUBLIC_KEY": "",
     "VAPID_SUBJECT": "mailto:staff@feelingsbeautycare.in",
-    "OWNER_BOOTSTRAP_EMAIL": ""
+    "OWNER_BOOTSTRAP_EMAIL": "urmi@feelingsbeautycare.in"
   },
   "previews": {
     "vars": {
@@ -75,10 +75,7 @@
     "send_email": [
       {
         "name": "EMAIL",
-        "allowed_sender_addresses": [
-          "staff@feelingsbeautycare.in",
-          "no-reply@feelingsbeautycare.in"
-        ]
+        "allowed_sender_addresses": ["staff@feelingsbeautycare.in"]
       }
     ],
     "ratelimits": [
