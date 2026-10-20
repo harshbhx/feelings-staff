@@ -20,7 +20,6 @@ const LazyOwnerShell = lazy(() =>
 
 const OWNER_NS = ['owner', 'payslip'] as const;
 const DOOR_NS = ['door'] as const;
-const PUBLIC_NS = ['owner', 'payslip'] as const;
 const KIT_NS = ['owner', 'payslip', 'door'] as const;
 
 /** A path-less layout route that loads the copy an area needs before it renders. */
@@ -38,7 +37,7 @@ function withNamespaces(ns: Parameters<typeof WithNamespaces>[0]['ns'], children
 export const routes: RouteObject[] = [
   ...authRoutes,
   withNamespaces(DOOR_NS, doorRoutes),
-  withNamespaces(PUBLIC_NS, publicRoutes),
+  withNamespaces(OWNER_NS, publicRoutes),
   withNamespaces(KIT_NS, kitRoutes),
   {
     id: 'owner',
