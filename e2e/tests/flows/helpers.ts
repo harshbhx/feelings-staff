@@ -34,7 +34,10 @@ export async function ownerSession(request: APIRequestContext, creds: OwnerCreds
     keySeq += 1;
     const res = await request.fetch(`${BASE}${path}`, {
       method,
-      headers: { ...HEADERS, ...(method === 'GET' ? {} : { 'Idempotency-Key': `xf-${Date.now()}-${keySeq}` }) },
+      headers: {
+        ...HEADERS,
+        ...(method === 'GET' ? {} : { 'Idempotency-Key': `xf-${Date.now()}-${keySeq}` }),
+      },
       ...(data === undefined ? {} : { data }),
     });
     const text = await res.text();
@@ -187,7 +190,14 @@ export async function punch(page: Page, kind: 'in' | 'out', pin: string) {
   if (await problem.isVisible()) {
     throw new Error(`${label} failed: ${await problem.getAttribute('data-punch-reason')}`);
   }
-  await sheet.getByRole('button', { name: 'Done' }).click();
+  // The success view has no button: it closes by itself. The other end states have "Done".
+  const done = sheet.getByRole('button', { name: 'Done' });
+  if (await done.isVisible()) await done.click();
+  else
+    await expect(sheet)
+      .toBeHidden({ timeout: 20_000 })
+      .catch(() => page.keyboard.press('Escape'));
+  await expect(sheet).toBeHidden({ timeout: 10_000 });
 }
 
 /** IST wall time on a date as epoch ms. */

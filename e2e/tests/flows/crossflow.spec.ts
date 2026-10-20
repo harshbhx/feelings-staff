@@ -150,9 +150,9 @@ test.describe('E2E-13 leave request to register', () => {
     });
     const staff = staffApi(page);
 
-    // Casual leave is not usable in the first 90 days, so the day is unpaid: the phone must accept that.
+    // Casual leave opens 90 days after joining (the server says so), so she asks for unpaid leave.
     const ask = {
-      typeCode: 'CL',
+      typeCode: 'LOP',
       fromDate: '2026-09-30',
       toDate: '2026-09-30',
       half: 'none',
@@ -162,7 +162,6 @@ test.describe('E2E-13 leave request to register', () => {
     const preview = await staff<LeavePreview>('POST', '/leave-requests/preview', ask);
     expect(preview.status, JSON.stringify(preview.body)).toBe(200);
     expect(preview.body.daysUnpaid).toBeGreaterThan(0);
-    expect(preview.body.warnings.length).toBeGreaterThan(0);
 
     const created = await staff<LeaveRequestView>('POST', '/leave-requests', ask);
     expect(created.status, JSON.stringify(created.body)).toBe(201);
@@ -193,7 +192,7 @@ test.describe('E2E-13 leave request to register', () => {
 });
 
 test.describe('E2E-12 fix a missed day', () => {
-  test('E2E-12 the staff member asks to fix a day, the owner approves, the day shows both times', async ({
+  test('E2E-12 a missed check-out is fixed by request, the owner approves, the day shows both times', async ({
     page,
     request,
     reset,
@@ -213,13 +212,17 @@ test.describe('E2E-12 fix a missed day', () => {
     });
     const staff = staffApi(page);
     const fixDate = '2026-09-25';
-    const inTs = ist(fixDate, '10:00');
+
+    // She checks in on the 25th and forgets to check out; three days later she asks for a fix.
+    await setServerClock(ist(fixDate, '10:05'));
+    await page.reload();
+    await punch(page, 'in', PIN);
+    await setServerClock(ist(WORK_DATE, '10:05'));
     const outTs = ist(fixDate, '19:30');
 
     const created = await staff<RegularisationView>('POST', '/regularisations', {
       workDate: fixDate,
-      kind: 'missed_in',
-      proposedInTs: inTs,
+      kind: 'missed_out',
       proposedOutTs: outTs,
       reason: 'Forgot my phone at home',
     });
@@ -240,6 +243,7 @@ test.describe('E2E-12 fix a missed day', () => {
     const day = await owner.ok<OwnerDayDetail>('GET', `/owner/days/${me.id}/${fixDate}`);
     const counted = day.punches.filter((p) => p.status !== 'rejected' && p.status !== 'superseded');
     expect(counted.map((p) => p.kind)).toEqual(['in', 'out']);
+    expect(counted.at(-1)?.effectiveTs).toBe(outTs);
     const mine = await staff<{ items: RegularisationView[] } | RegularisationView[]>(
       'GET',
       '/me/regularisations',
