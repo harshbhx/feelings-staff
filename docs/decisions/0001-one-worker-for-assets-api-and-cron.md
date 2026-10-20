@@ -11,7 +11,7 @@ The reference site (the salon's marketing website) runs on Cloudflare Pages with
 Run one Worker, `feelings-staff`, that serves everything:
 
 - Static assets from the Vite build, with `not_found_handling: "single-page-application"`.
-- `run_worker_first: ["/api/*", "/v/*", "/q/*", "/__kit"]`, so these paths reach the Worker code and everything else is served straight from assets.
+- `run_worker_first: ["/api/*", "/v/*", "/q/*", "/__kit", "/assets/*"]`, so these paths reach the Worker code and everything else is served straight from assets.
 - The Hono API under `/api/v1`.
 - `scheduled()` for the two cron triggers (see [ADR-10](0010-two-crons-and-an-idempotency-table-no-queues-in-v1.md)).
 
