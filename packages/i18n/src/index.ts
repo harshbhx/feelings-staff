@@ -72,7 +72,6 @@ const lazyCatalogs: Record<AppLang, Partial<Record<Namespace, Loader>>> = {
     payslip: () => import('../gu/payslip.json'),
     auth: () => import('../gu/auth.json'),
     door: () => import('../gu/door.json'),
-    presence: () => import('../gu/presence.json'),
     ui: () => import('../gu/ui.json'),
   },
 };
