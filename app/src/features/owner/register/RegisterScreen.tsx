@@ -1,19 +1,28 @@
 /**
- * Register (PRD 5.2, O-05). Desktop: a real table, staff x days, sticky header row and first column,
- * each cell a letter + icon + tint linking to the day, row totals from the engine, arrow keys move
- * between cells. Phone: each person with this week's 7-day strip; tap a name for their whole month.
+ * Register (PRD 5.2, O-05). One real table on every size: staff x days, sticky header row and first
+ * column, each cell a letter + icon + tint linking to the day, row totals from the engine, arrow
+ * keys move between cells. Future days stay narrow and the grid opens scrolled to today, so a phone
+ * shows the last week for everyone at once (WP-10). A month summary sits on top; on a phone a name
+ * opens that person's month as week strips.
  */
 import type { RegisterView } from '@fs/contracts';
 import { istDate, weekday } from '@fs/contracts';
-import { Banner, Button, ChipGroup, Icon, IconButton, Skeleton, SkeletonGroup } from '@fs/ui';
-import type { TFunction } from 'i18next';
-import { type KeyboardEvent, useState } from 'react';
+import {
+  Badge,
+  Banner,
+  Button,
+  Icon,
+  IconButton,
+  Skeleton,
+  SkeletonGroup,
+  StatusChip,
+} from '@fs/ui';
+import { type KeyboardEvent, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
 import { useRegister } from '../api/attendance';
-import { Meta } from '../components/layout';
 import { Empty, QueryView } from '../components/states';
-import { dayLabel, days, monthLabel, shortDate } from '../lib/format';
+import { dayLabel, days, monthLabel } from '../lib/format';
 import { CHIP_ICON, type ChipStatus, LATE_META, TINT } from '../lib/status';
 import { useOwnerTitle } from '../shell/chrome';
 import {
@@ -21,9 +30,10 @@ import {
   cellDetail,
   cellModel,
   monthNav,
+  monthTotals,
   type RegisterRow,
-  stripIndexFor,
   TOTAL_COLUMNS,
+  type TotalColumn,
   totalValue,
   weekStrips,
 } from './register-model';
@@ -74,15 +84,14 @@ export function RegisterScreen() {
         {(view) => (
           <>
             {view.locked ? <Banner icon="lock">{t('owner:register.locked')}</Banner> : null}
-            <div className="hidden xl:block">
-              <Grid view={view} today={today} />
-            </div>
-            <div className="xl:hidden">
-              {person ? (
+            {person ? (
+              <div className="xl:hidden">
                 <PersonMonth view={view} userId={person} />
-              ) : (
-                <PhoneList view={view} today={today} />
-              )}
+              </div>
+            ) : null}
+            <div className={person ? 'hidden xl:grid xl:gap-5' : 'grid gap-5'}>
+              <MonthSummary view={view} />
+              <Grid view={view} today={today} />
             </div>
             <Legend />
           </>
@@ -124,6 +133,24 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
   const { t } = useTranslation();
   const cellText = useCellText();
   const [focus, setFocus] = useState<[number, number]>([0, 0]);
+  const [params, setParams] = useSearchParams();
+  const box = useRef<HTMLDivElement>(null);
+  const openPerson = (id: string) => {
+    const next = new URLSearchParams(params);
+    next.set('user', id);
+    setParams(next);
+  };
+
+  // Open on today: on a phone the last week shows for everyone; past days scroll back.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once per month shown
+  useLayoutEffect(() => {
+    const el = box.current;
+    const th = el?.querySelector<HTMLElement>('th[data-today]');
+    const first = el?.querySelector<HTMLElement>('thead th');
+    if (!el || !th || !first) return;
+    const end = th.offsetLeft + th.offsetWidth + 2 * 28;
+    el.scrollLeft = Math.max(0, end - el.clientWidth);
+  }, [view.month]);
   const rows = view.rows.length;
   const cols = view.dates.length;
 
@@ -163,7 +190,10 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
   };
 
   return (
-    <div className="relative max-h-[calc(100dvh-14rem)] overflow-auto rounded-md border border-border">
+    <div
+      ref={box}
+      className="relative overflow-auto rounded-md border border-border xl:max-h-[calc(100dvh-14rem)]"
+    >
       <table className="border-separate border-spacing-0 text-sm">
         <caption className="sr-only">
           {t('owner:register.caption', { month: monthLabel(view.month) })}
@@ -172,18 +202,20 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
           <tr>
             <th
               scope="col"
-              className="sticky top-0 left-0 z-30 min-w-44 border-border border-r border-b bg-bg px-3 py-2 text-left font-semibold text-text-muted text-xs"
+              className="sticky top-0 left-0 z-30 w-30 min-w-30 border-border border-r border-b bg-bg px-3 py-2 text-left font-semibold text-text-muted text-xs xl:w-auto xl:min-w-44"
             >
               {t('owner:register.staffColumn')}
             </th>
             {view.dates.map((d) => {
               const isToday = d === today;
               const sunday = weekday(d) === 0;
+              const future = d > today;
               return (
                 <th
                   key={d}
                   scope="col"
-                  className={`sticky top-0 z-20 w-10 border-border border-b px-0.5 py-1.5 text-center font-semibold text-xs ${sunday ? 'bg-bg-soft' : 'bg-bg'} ${isToday ? 'text-text' : 'text-text-muted'}`}
+                  data-today={isToday ? '' : undefined}
+                  className={`sticky top-0 z-20 border-border border-b px-0.5 py-1.5 text-center font-semibold text-xs ${future ? 'w-7' : 'w-10'} ${sunday ? 'bg-bg-soft' : 'bg-bg'} ${isToday ? 'text-text' : 'text-text-muted'}`}
                   aria-label={dayLabel(d)}
                 >
                   <span className="block leading-tight">{Number(d.slice(8))}</span>
@@ -214,11 +246,19 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
             <tr key={row.user.id}>
               <th
                 scope="row"
-                className="sticky left-0 z-10 border-border border-r border-b bg-bg px-3 py-1 text-left font-bold text-text"
+                className="sticky left-0 z-10 max-w-30 border-border border-r border-b bg-bg px-2.5 py-1 text-left font-bold text-sm text-text xl:max-w-none xl:px-3 xl:text-base"
               >
-                <span className="block truncate">{row.user.name}</span>
+                <button
+                  type="button"
+                  onClick={() => openPerson(row.user.id)}
+                  className="-mx-1 flex min-h-11 w-[calc(100%+0.5rem)] items-center rounded-sm px-1 text-left xl:hidden"
+                >
+                  <span className="block truncate">{row.user.name}</span>
+                  <span className="sr-only">{t('owner:register.openMonth')}</span>
+                </button>
+                <span className="hidden truncate xl:block">{row.user.name}</span>
                 {row.user.designation ? (
-                  <span className="block truncate font-normal text-text-muted text-xs">
+                  <span className="hidden truncate font-normal text-text-muted text-xs xl:block">
                     {row.user.designation}
                   </span>
                 ) : null}
@@ -250,7 +290,7 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
                         ) : null}
                       </Link>
                     ) : (
-                      <span className="inline-block h-11 w-9">
+                      <span className="inline-block h-11 w-6">
                         <span className="sr-only">{label}</span>
                       </span>
                     )}
@@ -322,72 +362,61 @@ function Strip({
   );
 }
 
-function totalsLine(row: RegisterRow, t: TFunction) {
-  return TOTAL_COLUMNS.filter((c) => totalValue(row, c) > 0)
-    .map((c) =>
-      t(`owner:register.line.${c}`, {
-        n: c === 'otHours' ? totalValue(row, c).toFixed(1) : days(totalValue(row, c)),
-      }),
-    )
-    .join(' · ');
+function rowTotals(row: RegisterRow): Record<TotalColumn, number> {
+  return Object.fromEntries(TOTAL_COLUMNS.map((c) => [c, totalValue(row, c)])) as Record<
+    TotalColumn,
+    number
+  >;
 }
 
-function PhoneList({ view, today }: { view: RegisterView; today: string }) {
+const TOTAL_STATUS: Record<TotalColumn, 'present' | 'half' | 'absent' | 'leave' | 'late'> = {
+  present: 'present',
+  half: 'half',
+  absent: 'absent',
+  leave: 'leave',
+  lateMin: 'late',
+  otHours: 'present',
+  lop: 'absent',
+};
+
+/** Totals as tinted chips (colour + icon + word), only the ones that are not zero. */
+function TotalChips({ totals }: { totals: Record<TotalColumn, number> }) {
   const { t } = useTranslation();
-  const [params, setParams] = useSearchParams();
-  const first = view.rows[0];
-  const stripsOfFirst = first ? weekStrips(view, first) : [];
-  const [week, setWeek] = useState(() => stripIndexFor(stripsOfFirst, today));
-  const weekStart = stripsOfFirst[week]?.start ?? view.dates[0] ?? today;
-
-  const openPerson = (id: string) => {
-    const next = new URLSearchParams(params);
-    next.set('user', id);
-    setParams(next);
-  };
-
   return (
-    <div className="grid gap-4">
-      <ChipGroup
-        type="radio"
-        legend={t('owner:register.week', { date: shortDate(weekStart) })}
-        legendHidden
-        layout="scroll"
-        value={String(week)}
-        onValueChange={(v) => setWeek(Number(v))}
-        options={stripsOfFirst.map((s, i) => ({
-          value: String(i),
-          label: t('owner:register.week', {
-            date: shortDate(s.days.find((d) => d !== null)?.date ?? s.start),
-          }),
-        }))}
-      />
-      <ul className="grid">
-        {view.rows.map((row) => {
-          const strip = weekStrips(view, row)[week];
-          return (
-            <li
-              key={row.user.id}
-              className="grid gap-2 border-border border-t py-4 first:border-t-0"
-            >
-              <button
-                type="button"
-                onClick={() => openPerson(row.user.id)}
-                className="flex min-h-11 items-center justify-between gap-3 text-left"
-              >
-                <span className="grid">
-                  <span className="font-bold text-text">{row.user.name}</span>
-                  <span className="text-sm text-text-muted tabular-nums">{totalsLine(row, t)}</span>
-                </span>
-                <span className="sr-only">{t('owner:register.openMonth')}</span>
-                <Icon name="caret-right" className="size-5 shrink-0 text-text-muted" />
-              </button>
-              {strip ? <Strip row={row} strip={strip} name={row.user.name} /> : null}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    <ul className="flex flex-wrap gap-1.5">
+      {TOTAL_COLUMNS.filter((c) => totals[c] > 0).map((c) => {
+        const n = c === 'otHours' ? totals[c].toFixed(1) : days(totals[c]);
+        const word = t(`owner:register.line.${c}`, { n });
+        return (
+          <li key={c} className="flex">
+            {c === 'otHours' ? (
+              <Badge tone="success" icon="clock">
+                {word}
+              </Badge>
+            ) : c === 'lop' ? (
+              <Badge tone="neutral" icon="currency-inr">
+                {word}
+              </Badge>
+            ) : (
+              <StatusChip status={TOTAL_STATUS[c]} label={word} />
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function MonthSummary({ view }: { view: RegisterView }) {
+  const { t } = useTranslation();
+  return (
+    <section
+      aria-label={t('owner:register.summary')}
+      className="grid gap-2 rounded-md border border-border bg-bg px-4 py-3"
+    >
+      <h2 className="font-semibold text-sm text-text-muted">{t('owner:register.summary')}</h2>
+      <TotalChips totals={monthTotals(view)} />
+    </section>
   );
 }
 
@@ -409,7 +438,7 @@ function PersonMonth({ view, userId }: { view: RegisterView; userId: string }) {
           {t('owner:shell.back')}
         </Button>
       </div>
-      <Meta>{totalsLine(row, t)}</Meta>
+      <TotalChips totals={rowTotals(row)} />
       <ol className="grid gap-3">
         {weekStrips(view, row).map((s) => (
           <li key={s.start}>

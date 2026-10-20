@@ -6,7 +6,7 @@ If you get stuck at any point, ask Urmi. Every screen in the app has a way to re
 
 <!-- Source: PRD sections 4 to 6 (flows, screens, messages). Update this guide when the copy on a screen changes. -->
 
-Contents: [What the app does](#what-the-app-does) · [Put the app on your phone](#put-the-app-on-your-phone) · [Join with your code](#join-with-your-code) · [Check in and check out](#check-in-and-check-out) · [What the messages mean](#what-the-messages-mean) · [The door code](#the-door-code) · [Wedding and venue days](#wedding-and-venue-days) · [No internet](#no-internet) · [Your month](#your-month) · [Ask for leave](#ask-for-leave) · [Fix a day](#fix-a-day) · [Advances](#advances) · [Your payslip](#your-payslip) · [Me: your phone, language and data](#me-your-phone-language-and-data) · [New phone, forgot PIN](#new-phone-forgot-pin) · [Questions](#questions)
+Contents: [What the app does](#what-the-app-does) · [Put the app on your phone](#put-the-app-on-your-phone) · [Join with your code](#join-with-your-code) · [Check in and check out](#check-in-and-check-out) · [Step out and I'm back](#step-out-and-im-back) · [What the messages mean](#what-the-messages-mean) · [The door code](#the-door-code) · [Wedding and venue days](#wedding-and-venue-days) · [No internet](#no-internet) · [Your month](#your-month) · [Ask for leave](#ask-for-leave) · [Fix a day](#fix-a-day) · [Advances](#advances) · [Your payslip](#your-payslip) · [Me: your phone, language and data](#me-your-phone-language-and-data) · [New phone, forgot PIN](#new-phone-forgot-pin) · [Questions](#questions)
 
 ## What the app does
 
@@ -107,6 +107,35 @@ The app asks before it lets you check in: "Today is your week off. Check in anyw
 ### If you forget to check out
 
 About 30 minutes after your shift ends, you get "Still at work? Check out when you leave." If you never check out, the app closes your day at the end of your shift, tells you ("We closed your day at 20:00"), and gives you a **Fix the time** button if you stayed longer.
+
+## Step out and I'm back
+
+If you leave the salon during your shift, for lunch, the bank or something personal, tell the app. It takes two taps and keeps the record fair for you.
+
+<!-- screenshot: staff-step-out -->
+
+1. On **Today**, under the red **Check out** button, tap **Step out**.
+2. Choose a reason: **Personal**, **Lunch outside**, **Work errand** or **Other**. You can add a note, for example "Bank for the salon".
+3. Today now says "You're out since 15:30" with **I'm back**.
+4. When you return, tap **I'm back**. You see "Welcome back. You were out 40 min."
+
+The time is the salon server's time, not your phone's. If you forget to tap **I'm back**, the app closes it when you check out, or when Urmi's next roll-call finds you here, and tells Urmi that **I'm back** is missing.
+
+Urmi sees every step-out and decides about it. A work errand for the salon is not counted against you when she marks it as work. Time spent away that she confirms is counted as time not worked.
+
+### If Urmi marked you away
+
+Urmi or a manager checks who is in the salon two or three times a shift. If you were not here at that moment, **Today** shows "Urmi marked you away since 15:00" with **I'm back**. Tap it when you return. If the mark is wrong, add a note and tell Urmi.
+
+### Add a note
+
+For any away time today you can add a note. It goes to Urmi with the item. For example, "Customer asked me to fetch the colour from the shop."
+
+### What you can see
+
+**Me → My data → Presence** lists your own roll-call marks (Here, Not here), your step-outs with reasons, and each away time with its state: Waiting, Counted, Work or Ignored. If Urmi changes one, you see it change there.
+
+The first time, the app shows a short notice and asks you to accept. If you do not, you can still check in, check out and use **Step out**. The app never asks for your location for this and does not follow you. If it is open on screen, it may check once in a while whether you are at the salon, and it only tells Urmi "seems away"; it does not take any time off by itself.
 
 ## What the messages mean
 
@@ -217,6 +246,8 @@ After Urmi finishes the month, you get "Your October payslip is ready".
 4. The PDF has a small code. Anyone who scans it sees only your first name's initial, the month, the amount and the version. Nothing else.
 
 If the PDF says "Preparing the PDF...", wait a minute. The online payslip is always there.
+
+If Urmi has settled time for the month, you see one line, **Time adjustment**, with an amount and "settled by Urmi for time not worked in October" for a cut, or "settled by Urmi for extra time worked in October" for extra time. It is part of your pay like any other line. Ask Urmi if you want to know how it was worked out.
 
 If you think a line is wrong, talk to Urmi. Every number comes from your check-ins, so you can see why.
 

@@ -7,6 +7,7 @@
 import {
   type Adjustment,
   type AdvanceSchedule,
+  addDays,
   type CarryForward,
   daysInMonth,
   type Fine,
@@ -16,6 +17,7 @@ import {
   type PayrollBlocker,
   type PayslipResult,
   type PersonPay,
+  weekday,
 } from '@fs/contracts';
 import {
   advanceInstalment,
@@ -24,6 +26,7 @@ import {
   dailyRate,
   divisorDays,
   lateFines,
+  legalOtBand,
   payRulesFromSettings,
   salaryParts,
 } from '@fs/engine';
@@ -238,7 +241,7 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
   );
   const ids = eligible.map((p) => p.user_id);
 
-  const [salaryRows, adjustmentRows, quarterRows, carried, schedules, balances, drafts] =
+  const [salaryRows, adjustmentRows, quarterRows, carried, schedules, balances, drafts, edgeRows] =
     await Promise.all([
       ctx.db.all<SalaryHistoryRow>(
         'SELECT user_id, effective_from, salary_type, amount_paise FROM salary_history WHERE org_id = ?org AND effective_from <= ?',
@@ -262,7 +265,30 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
       o.runId
         ? draftSettlements(ctx, o.runId)
         : Promise.resolve(new Map<string, CreditSettlementRow>()),
+      // Days of the ISO weeks that start before or end after the month, for the legal band.
+      ctx.db.all<{
+        user_id: string;
+        work_date: string;
+        total_min: number;
+        ot_approved_min: number;
+      }>(
+        `SELECT user_id, work_date, total_min, ot_approved_min FROM attendance_days
+          WHERE org_id = ?org AND ((work_date >= ? AND work_date < ?) OR (work_date > ? AND work_date <= ?))`,
+        addDays(from, -((weekday(from) + 6) % 7)),
+        from,
+        to,
+        addDays(to, (7 - weekday(to)) % 7),
+      ),
     ]);
+  const edgeDays = new Map<
+    string,
+    { workDate: string; totalMin: number; otApprovedMin: number }[]
+  >();
+  for (const r of edgeRows) {
+    const list = edgeDays.get(r.user_id) ?? [];
+    list.push({ workDate: r.work_date, totalMin: r.total_min, otApprovedMin: r.ot_approved_min });
+    edgeDays.set(r.user_id, list);
+  }
   const rules = payRulesFromSettings(settings);
   const holidays = data.holidays.filter((h) => h.date >= from && h.date <= to);
   const quarterMin = new Map(quarterRows.map((r) => [r.user_id, r.min]));
@@ -350,6 +376,21 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
       o.runId !== null && chosen !== 0 && balanceMin !== 0
         ? { balanceMin, settleMin: chosen, rate }
         : null;
+    // Legal-band overtime of the month on Time credits days (PRD 7.17.7), for the warnings.
+    const creditDays = days.filter((c) => c.creditsOn);
+    // Every day of each ISO week goes into the band, credits on or not, and the days of a week that
+    // spans the month edge come from the neighbouring months (see `legalOtBand`).
+    const creditDates = new Set(creditDays.map((c) => c.date));
+    const legalMin = legalOtBand([
+      ...(edgeDays.get(profile.user_id) ?? []),
+      ...days.map((c) => ({
+        workDate: c.date,
+        totalMin: c.result.totalMin ?? c.result.workedMin,
+        otApprovedMin: c.otApprovedMin,
+      })),
+    ])
+      .filter((b) => creditDates.has(b.workDate))
+      .reduce((s, b) => s + b.legalMin, 0);
     const result = computePayslip({
       person,
       month,
@@ -366,7 +407,8 @@ export async function calcRun(ctx: Ctx, o: CalcOptions): Promise<RunCalc> {
         quarterlyOtHours: settings.overtime.quarterlyOtWarnHours,
       },
       quarterOtMinBefore: quarterMin.get(profile.user_id) ?? 0,
-      creditDays: days.filter((c) => c.creditsOn).map((c) => c.date),
+      creditDays: creditDays.map((c) => c.date),
+      legalOt: { minutes: legalMin, pay2x: settings.timeCredits.legalOt2x },
       settlement,
     });
     people.push({

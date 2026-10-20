@@ -44,6 +44,7 @@ import { fail } from '../lib/errors';
 import { loadOrg } from '../lib/settings';
 import { ulid } from '../lib/ulid';
 import { creditStmts } from './credit-entries';
+import { legalPlan } from './credit-legal';
 import type { DutyRow } from './duty';
 import type { Ctx, DayService } from './ports';
 import type { PunchRow } from './punch';
@@ -673,13 +674,29 @@ export async function dayStmts(
   c: Computed,
 ): Promise<D1PreparedStatement[]> {
   const decision = data.otDecisions.get(dayKey(c.userId, c.date));
+  const profile = data.people.get(c.userId);
+  const legalOn = c.creditsOn && data.settings.timeCredits.legalOt2x;
+  const legal = legalOn
+    ? await legalPlan(
+        ctx,
+        c.userId,
+        {
+          date: c.date,
+          totalMin: c.result.totalMin ?? c.result.workedMin,
+          otApprovedMin: c.otApprovedMin,
+        },
+        (d) => (profile ? creditsEnabledFor(data.settings, profile, d) : false),
+      )
+    : { legalMin: 0, stmts: [] };
   return [
     upsertDayStmt(ctx, c, ctx.now()),
     ...compOffStmts(ctx, data, c),
     ...(await creditStmts(ctx, c, {
       otSourceId: decision?.id ?? windowsFor(data, c.userId, c.date)[0]?.refId ?? null,
       otConfirmedBy: decision?.decided_by ?? null,
+      legalOtMin: legal.legalMin,
     })),
+    ...legal.stmts,
   ];
 }
 

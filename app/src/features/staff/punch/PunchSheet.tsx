@@ -597,11 +597,21 @@ function Success({
       : t('staff:punch.successSalonNoDistance');
   return (
     <div className="flex flex-col items-start gap-3 py-2" data-success="">
-      {/* Status is colour + icon + word (PRD 12.11); the bindi lands once as the time's full stop (12.9). */}
-      <StatusChip
-        status="present"
-        label={kind === 'out' ? t('staff:today.status.done') : t('staff:today.status.in')}
-      />
+      {/* Status is colour + icon + word (PRD 12.11); the bindi lands once as the time's full stop (12.9).
+          WP-10: the check disc scales in once with it (opacity + transform, gone with reduced motion). */}
+      <div className="flex items-center gap-3">
+        <span
+          className="staff-success-check"
+          data-land={frozen ? undefined : ''}
+          aria-hidden="true"
+        >
+          <Icon name="check-circle" />
+        </span>
+        <StatusChip
+          status="present"
+          label={kind === 'out' ? t('staff:today.status.done') : t('staff:today.status.in')}
+        />
+      </div>
       <p className="staff-bignum flex items-end gap-1.5" aria-hidden="true">
         {time}
         <Bindi size="success" land={!frozen} className="mb-1" />

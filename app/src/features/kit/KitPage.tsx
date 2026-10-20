@@ -27,6 +27,7 @@ import {
   RailItem,
   RailNav,
   Sheet,
+  ShiftTimeline,
   Skeleton,
   SkeletonGroup,
   SkeletonList,
@@ -216,6 +217,11 @@ function Buttons() {
             <Button variant="ghost">Cancel</Button>
             <Button variant="danger-secondary">Reject</Button>
           </div>
+        </Specimen>
+        <Specimen label="Hero, 56 px (staff Today's one Check in)">
+          <Button variant="secondary" size="lg" block icon="sign-in">
+            Check in
+          </Button>
         </Specimen>
         <Specimen label="Small, 40 px (44 px target)">
           <div className="flex flex-wrap gap-3">
@@ -475,6 +481,17 @@ function Stats() {
                 { key: 'h', value: 1, tone: 'half', label: '1 half day' },
                 { key: 'a', value: 1, tone: 'absent', label: '1 absent' },
               ]}
+            />
+          </Specimen>
+          <Specimen label="Shift timeline (staff Today)">
+            <ShiftTimeline
+              start={600}
+              end={1200}
+              startLabel="10:00"
+              endLabel="20:00"
+              now={642}
+              worked={[{ from: 602, to: 642 }]}
+              description="Shift 10:00 to 20:00, now 10:42, worked from 10:02"
             />
           </Specimen>
         </div>

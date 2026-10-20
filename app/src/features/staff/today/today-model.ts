@@ -43,6 +43,8 @@ export interface TodayModel {
   /** Time of the last check-out, when done. */
   outTs: number | null;
   lastPunch: PunchView | null;
+  /** The last three visible punches, newest first (Today's "Today so far", WP-10). */
+  recentPunches: PunchView[];
   /** The punch waiting for a door code or the owner. */
   pendingPunch: PunchView | null;
   /** The newest queued punch that changes the state. */
@@ -159,6 +161,7 @@ export function buildTodayModel(
     inSinceTs,
     outTs,
     lastPunch,
+    recentPunches: visible.slice(-3).reverse(),
     pendingPunch: pending,
     queued,
     shiftStartTs: view.schedule.startTs,

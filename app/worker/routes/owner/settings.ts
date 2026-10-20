@@ -65,6 +65,7 @@ function needsStepUp(before: OrgSettings, after: OrgSettings): boolean {
     before.risk.flagAt !== after.risk.flagAt ||
     before.risk.proofAt !== after.risk.proofAt ||
     before.timeCredits.enabled !== after.timeCredits.enabled ||
+    before.timeCredits.legalOt2x !== after.timeCredits.legalOt2x ||
     before.presence.enabled !== after.presence.enabled
   );
 }

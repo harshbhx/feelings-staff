@@ -42,6 +42,7 @@ import {
   type PayslipRow,
   payslipView,
   snapshotOf,
+  staffSafePayslip,
 } from './payslip';
 import { generateRunPdfs } from './payslip-pdf';
 import type { Ctx, PayrollService } from './ports';
@@ -334,6 +335,9 @@ export async function personView(ctx: Ctx, run: RunRow, userId: string): Promise
     );
   }
   const extras = await personExtras(ctx, run, userId, base.result, phone, adj);
+  // Time credits are owner only (PRD 7.17.9): a manager with `payroll` gets the neutral
+  // "Time adjustment" line, never the minutes, the balance or the word "credits".
+  if (ctx.user?.role !== 'owner') base = await staffSafePayslip(ctx, base);
   const share = base.verifyUrl ? `Your ${monthName(run.month)} salary slip: ${base.verifyUrl}` : '';
   const digits = extras.phone?.replace(/\D/g, '') ?? '';
   return {

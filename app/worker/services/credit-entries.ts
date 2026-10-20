@@ -81,6 +81,8 @@ export interface CreditDayContext {
   otSourceId: string | null;
   /** Who decided the overtime; null for an automatic (pre-approved) one. */
   otConfirmedBy: string | null;
+  /** `legal_d` of the day (PRD 7.17.7); 0 when "Pay legal overtime at 2x" is off. */
+  legalOtMin: number;
 }
 
 const COUNTED = new Set(['accepted', 'flagged']);
@@ -122,6 +124,7 @@ export async function creditStmts(
     lateSourceId: firstIn?.id ?? null,
     earlySourceId: lastOut?.id ?? null,
     otSourceId: dayCtx.otSourceId,
+    legalOtMin: dayCtx.legalOtMin,
   };
   const away: ConfirmedAway[] = awayRows.map((a) => ({
     id: a.id as Id,
@@ -135,7 +138,7 @@ export async function creditStmts(
   const confirmedBy = (d: CreditEntryDraft): string | null =>
     d.kind === 'away'
       ? (away.find((a) => a.id === d.sourceId)?.confirmedBy ?? null)
-      : d.kind === 'ot'
+      : d.kind === 'ot' || d.kind === 'ot_legal'
         ? dayCtx.otConfirmedBy
         : null;
 
