@@ -34,7 +34,7 @@ export async function ownerSession(request: APIRequestContext, creds: OwnerCreds
     keySeq += 1;
     const res = await request.fetch(`${BASE}${path}`, {
       method,
-      headers: { ...HEADERS, ...(method === 'GET' ? {} : { 'Idempotency-Key': `xf-${keySeq}` }) },
+      headers: { ...HEADERS, ...(method === 'GET' ? {} : { 'Idempotency-Key': `xf-${Date.now()}-${keySeq}` }) },
       ...(data === undefined ? {} : { data }),
     });
     const text = await res.text();
