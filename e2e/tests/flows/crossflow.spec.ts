@@ -175,6 +175,8 @@ test.describe('E2E-13 leave request to register', () => {
       toDate: '2026-09-30',
       half: 'none',
       reason: 'Family function',
+      // Unpaid leave has no paid days to split, so there is nothing to accept.
+      acceptUnpaidSplit: false,
     };
     const preview = await staff<LeavePreview>('POST', '/leave-requests/preview', ask);
     expect(preview.status, JSON.stringify(preview.body)).toBe(200);
