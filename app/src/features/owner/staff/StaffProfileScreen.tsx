@@ -165,8 +165,9 @@ function CreditsLine({ userId, open }: { userId: string; open: () => void }) {
   const { t } = useTranslation();
   const estimate = useEstimateText();
   const overview = useCreditsOverview();
+  // Credits switched off: no line. Otherwise the way in is always here, the balance once known.
+  if (overview.data && !overview.data.enabled) return null;
   const row = overview.data?.staff.find((r) => r.userId === userId);
-  if (!overview.data?.enabled || !row) return null;
   return (
     <Section
       title={t('owner:staff.profile.tabs.credits')}
@@ -176,9 +177,11 @@ function CreditsLine({ userId, open }: { userId: string; open: () => void }) {
         </Button>
       }
     >
-      <p className="text-text-body">
-        <Balance min={row.balanceMin} /> · {estimate(row.estimatePaise, row.balanceMin)}
-      </p>
+      {row ? (
+        <p className="text-text-body">
+          <Balance min={row.balanceMin} /> · {estimate(row.estimatePaise, row.balanceMin)}
+        </p>
+      ) : null}
     </Section>
   );
 }
