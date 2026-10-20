@@ -4,6 +4,7 @@
   "details": "Details",
   "requestId": "Request id {{id}}",
   "loadFailed": "We couldn't load this.",
+  "reload": "Reload the page",
   "code": {
     "VALIDATION": "Some details need fixing.",
     "BAD_REQUEST": "We couldn't read that request.",

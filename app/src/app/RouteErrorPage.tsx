@@ -19,7 +19,7 @@ export function useStaleChunkRecovery(error: unknown): void {
 }
 
 export function RouteErrorPage() {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('errors');
   useStaleChunkRecovery(useRouteError());
   return (
     <main
@@ -27,10 +27,10 @@ export function RouteErrorPage() {
       className="mx-auto grid min-h-dvh max-w-sm content-center gap-3 p-6"
       data-testid="route-error"
     >
-      <h1 className="text-xl font-bold text-text">{t('app.errorTitle')}</h1>
-      <p className="text-text-body">{t('app.errorBody')}</p>
+      <h1 className="text-xl font-bold text-text">{t('loadFailed')}</h1>
+      <p className="text-text-body">{t('generic')}</p>
       <div>
-        <Button onClick={() => window.location.reload()}>{t('app.reload')}</Button>
+        <Button onClick={() => window.location.reload()}>{t('reload')}</Button>
       </div>
     </main>
   );
