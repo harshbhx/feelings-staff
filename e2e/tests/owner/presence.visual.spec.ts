@@ -92,7 +92,9 @@ test.describe('owner presence', () => {
     await expect(sejal).toHaveAttribute('data-mark', 'here');
     await sejal.click();
     await page.getByRole('button', { name: 'Done' }).click();
-    await expect(page.getByText('Roll-call at 10:30 saved: 6 here, 2 not here.')).toBeVisible();
+    await expect(
+      page.getByText('Roll-call at 10:30 saved: 6 here, 2 not here.', { exact: true }),
+    ).toBeVisible();
     await expect(page).toHaveURL(/\/o\/today/);
   });
 
@@ -174,7 +176,9 @@ test.describe('owner presence', () => {
     await expect(sheet.getByText('Back at must be after Out from.')).toBeVisible();
     await sheet.getByLabel('Back at').fill('10:15');
     await sheet.getByRole('button', { name: 'Save change' }).click();
-    await expect(page.getByText("Saved. Pooja's time away is updated.")).toBeVisible();
+    await expect(
+      page.getByText("Saved. Pooja's time away is updated.", { exact: true }),
+    ).toBeVisible();
   });
 
   test('OWN-PRES O-30.10 Settings, Presence: times, Step out, quiet check, axe clean', async ({
@@ -182,15 +186,15 @@ test.describe('owner presence', () => {
     checkA11y,
   }) => {
     await openOwner(page, '/o/settings/presence');
-    await expect(page.getByLabel('Roll-call 1')).toHaveValue('12:00');
-    await expect(page.getByLabel('Roll-call 3')).toHaveValue('18:00');
+    await expect(page.getByRole('textbox', { name: 'Roll-call 1' })).toHaveValue('12:00');
+    await expect(page.getByRole('textbox', { name: 'Roll-call 3' })).toHaveValue('18:00');
     await noCrash(page);
     await expect(page).toHaveScreenshot('owner-settings-presence.png', { fullPage: true });
     await checkA11y();
     await page.getByRole('button', { name: 'Add a time' }).click();
-    await expect(page.getByLabel('Roll-call 4')).toHaveValue('19:00');
+    await expect(page.getByRole('textbox', { name: 'Roll-call 4' })).toHaveValue('19:00');
     await expect(page.getByRole('button', { name: 'Add a time' })).toHaveCount(0);
-    await page.getByLabel('Roll-call 4').fill('11:00');
+    await page.getByRole('textbox', { name: 'Roll-call 4' }).fill('11:00');
     await expect(
       page.getByText('Put the times in order, each after the one before.'),
     ).toBeVisible();
