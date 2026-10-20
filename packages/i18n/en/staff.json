@@ -569,6 +569,7 @@
   "myData": {
     "lead": "What the app keeps about you, and for how long.",
     "punches": "Check-ins and check-outs",
+    "presence": "Presence",
     "punchRow": "{{kind}} · {{date}} {{time}}",
     "fence": {
       "pass": "Inside",
@@ -628,5 +629,11 @@
     "withdraw": "Take back photo consent",
     "withdrawConfirm": "Stop sharing a photo when you check in? {{owner}} may ask you to check in another way.",
     "withdrawn": "Photo consent withdrawn."
+  },
+  "presence": {
+    "stepOut": "Step out",
+    "back": {
+      "button": "I'm back"
+    }
   }
 }

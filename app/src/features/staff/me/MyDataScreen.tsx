@@ -7,6 +7,7 @@
 import { formatIndianPhone, type MyData } from '@fs/contracts';
 import { Badge, Button, Card, EmptyState, List, ListRow, SkeletonList } from '@fs/ui';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 import { telLink, waLink } from '../../owner/lib/share';
 import { useMyData, useOwnerName } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
@@ -109,6 +110,12 @@ function Body({ data }: { data: MyData }) {
           <EmptyState>{t('staff:myData.punchesNone')}</EmptyState>
         )}
       </section>
+
+      <List framed>
+        <ListRow asChild title={t('staff:myData.presence')}>
+          <Link to="/me/data/presence" />
+        </ListRow>
+      </List>
 
       <section aria-labelledby="md-selfies" className="flex flex-col gap-2">
         <h2 id="md-selfies" className="text-base">

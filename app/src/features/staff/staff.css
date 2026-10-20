@@ -93,6 +93,7 @@
 
   .staff-actionbar__inner > * {
     flex: 1;
+    min-width: 0;
   }
 
   /* Fixed to the bottom under the action bar; the kit's TabBar draws the hairline and glass. */
