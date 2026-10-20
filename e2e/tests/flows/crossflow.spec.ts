@@ -73,8 +73,9 @@ test.describe('E2E-02 to E2E-16 a working day, then payroll', () => {
     expect(row?.lateMin).toBeGreaterThan(0);
     expect(row?.place).toBe('inside');
 
-    // E2E-14: she leaves 45 minutes after the shift ends; the owner approves 30 of them.
-    await setServerClock(ist(WORK_DATE, '20:45'));
+    // E2E-14: she leaves 75 minutes after the shift ends. The engine first makes up her late minutes
+    // (makeup), so the rest is the overtime candidate; the owner approves 30 of it.
+    await setServerClock(ist(WORK_DATE, '21:15'));
     owner = await ownerSession(request, seeded.owner);
     await page.reload();
     await punch(page, 'out', PIN);
