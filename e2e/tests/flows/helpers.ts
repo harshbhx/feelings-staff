@@ -147,6 +147,11 @@ export async function onboardPhone(
   });
   // The first Today asks for the presence notice once (PRD 4.18.1): say OK, then the home shows.
   const notice = page.getByRole('button', { name: 'OK, I understand' });
+  // The notice sheet is lazy and can open after the checks below, covering Check in for the rest
+  // of the test. Answer it whenever it shows up.
+  await page.addLocatorHandler(notice, async () => {
+    await notice.click();
+  });
   await expect(home.or(notice)).toBeVisible({ timeout: 30_000 });
   // The home heading can show before the presence answer and the lazy notice sheet arrive: let
   // both settle, then look for the notice again.
