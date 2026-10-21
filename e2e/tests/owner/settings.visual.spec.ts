@@ -16,7 +16,7 @@ const PAGES = [
   { name: 'settings-holidays', path: '/o/settings/holidays', ready: 'No-leave days' },
   { name: 'settings-security', path: '/o/settings/security', ready: 'Owner PIN' },
   { name: 'settings-audit', path: '/o/settings/audit', ready: 'Everything' },
-  { name: 'setup', path: '/o/setup', ready: 'Salon details' },
+  { name: 'setup', path: '/o/setup', ready: 'Selfie on check-in' },
   { name: 'setup-location', path: '/o/setup?step=location', ready: 'Calibrate at the counter' },
 ] as const;
 

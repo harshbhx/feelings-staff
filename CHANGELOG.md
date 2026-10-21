@@ -81,6 +81,7 @@ Also merged since (all with `ci` and `e2e` green on main):
 
 ### Changed
 
+- Settings groups its sections under four headings (The salon, People and pay, Attendance, Account and safety). Setup leads with the next step as one card and folds finished steps into one line such as "7 of 8 done"; the "Done" pills are gone.
 - The Content Security Policy no longer sends `upgrade-insecure-requests`. Every source is `'self'`, HSTS already forces HTTPS, and WebKit applies the directive to `http://localhost`, which broke the iPhone project of the CI run.
 - `CONTRIBUTING.md` now covers docs rules, labels and the PR template.
 - `docs/PRD.md` is at version 1.3 (see Appendix C). 1.2 added Time credits and presence checks; 1.3 restores the legal overtime guardrail: the Time credits setting **Pay legal overtime at 2×** is on by default, so approved overtime beyond 9 h a day or 48 h a week counts twice in the ledger and is worth 2× when it is settled or netted against late and early minutes (PRD 7.17.7).

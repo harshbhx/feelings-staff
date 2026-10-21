@@ -27,7 +27,7 @@ Contents: [Sign in](#sign-in) · [Set up the app first time](#set-up-the-app-fir
 
 ## Set up the app first time
 
-The first time you sign in, you see **Setup**: "A few quick things, then you're ready." There are eight steps. You can skip a step and finish it later in Settings.
+The first time you sign in, you see **Setup**: "A few quick things, then you're ready." There are eight steps. You can skip a step and finish it later in Settings. The next step to do is a card with one button; steps you have finished fold into one line such as "7 of 8 done", which you can open to revisit any of them. Skipped steps stay listed.
 
 <!-- screenshot: owner-setup-checklist -->
 
@@ -365,7 +365,7 @@ These are the defaults the app starts with. Change any of them in Settings. Have
 
 ## Settings
 
-Everything is in **Settings**. Each change shows a line about what it does, and every change is recorded with the old and new value.
+Everything is in **Settings**, in four groups: The salon (Salon, Location and door, Shifts and roster, Holidays), People and pay (People and roles, Pay rules, Time credits, Leave policy), Attendance (Attendance rules, Presence, Notifications) and Account and safety (Data and privacy, Security, App, Audit log). The table below lists every section. Each change shows a line about what it does, and every change is recorded with the old and new value.
 
 | Section | What is in it |
 |---|---|
