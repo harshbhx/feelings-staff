@@ -65,18 +65,17 @@ test.describe('E2E-08 selfie camera flow', () => {
       .poll(() => live.evaluate((v: HTMLVideoElement) => v.videoWidth), { timeout: 20_000 })
       .toBeGreaterThan(0);
 
-    // Take the photo; a dark retake is allowed twice, then it can be sent anyway.
+    // Take the photo. The next screen is the PIN (or a review of the still); a dark photo may be
+    // retaken twice, then sent anyway.
+    const pad = sheet.getByRole('textbox', { name: 'Enter your PIN' });
     const use = sheet.getByRole('button', { name: 'Use this photo' });
-    for (let tries = 0; tries < 3 && !(await use.isVisible()); tries += 1) {
+    for (let tries = 0; tries < 3 && !(await pad.isVisible()); tries += 1) {
       await sheet.getByRole('button', { name: 'Take photo' }).click();
-      await expect(use.or(sheet.getByRole('alert'))).toBeVisible({ timeout: 15_000 });
+      await expect(pad.or(use).or(sheet.getByRole('alert'))).toBeVisible({ timeout: 20_000 });
+      if (await use.isVisible()) await use.click();
     }
-    if (!(await use.isVisible())) {
-      await sheet.getByRole('button', { name: 'Send anyway' }).click();
-    } else {
-      await expect(sheet.getByRole('button', { name: 'Retake' })).toBeVisible();
-      await use.click();
-    }
+    const anyway = sheet.getByRole('button', { name: 'Send anyway' });
+    if (!(await pad.isVisible()) && (await anyway.isVisible())) await anyway.click();
     await expectStep(page, 'pin');
     await enterPin(page, 'in', PIN);
     await expectStep(page, 'result');
