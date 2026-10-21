@@ -3,7 +3,7 @@
  * PIN, step-up, idempotency keys) and a real staff phone driven through the join screens. The staff
  * phone keeps its own cookie in the page, so staff API calls go through `staffApi(page)`.
  */
-import { type APIRequestContext, errors, type Page } from '@playwright/test';
+import { type APIRequestContext, type Browser, errors, type Page } from '@playwright/test';
 import { expect } from '../../fixtures';
 
 const HEADERS = { 'X-FS-Client': '0.1.0', Origin: 'http://localhost:8787' };
@@ -278,6 +278,30 @@ export async function expectStep(page: Page, ...steps: PunchStep[]) {
       },
     )
     .toMatch(new RegExp(`^(${steps.join('|')})$`));
+}
+
+const ANDROID_UA =
+  'Mozilla/5.0 (Linux; Android 14; Redmi Note 12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
+
+/** A second phone: its own browser context (own cookie, own device) at a given place. */
+export async function newPhone(
+  browser: Browser,
+  baseURL: string,
+  geo: { latitude: number; longitude: number; accuracy: number },
+) {
+  const context = await browser.newContext({
+    baseURL,
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+    userAgent: ANDROID_UA,
+    locale: 'en-IN',
+    timezoneId: 'Asia/Kolkata',
+    geolocation: geo,
+    permissions: ['geolocation'],
+  });
+  return { context, page: await context.newPage() };
 }
 
 /** IST wall time on a date as epoch ms. */
