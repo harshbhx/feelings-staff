@@ -72,8 +72,9 @@ export interface RelyingParty {
  * OWNER_HOST is unset) this answers NOT_FOUND, so no passkey route exists there.
  */
 export function ownerRelyingParty(c: Context<AppEnv>): RelyingParty {
-  if (surfaceOf(c.env, new URL(c.req.url)) !== 'owner') fail('NOT_FOUND');
-  const origin = ownerOrigin(c.env);
+  const url = new URL(c.req.url);
+  if (surfaceOf(c.env, url) !== 'owner') fail('NOT_FOUND');
+  const origin = ownerOrigin(c.env, url);
   return { id: new URL(origin).hostname, origin };
 }
 

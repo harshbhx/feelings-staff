@@ -10,6 +10,12 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
+Owner access, passkey core (slice 4, off until `OWNER_HOST` is set):
+
+- On the owner host the owner signs in with a passkey ("Use your fingerprint", or "Use Face ID" on an iPhone). The first device is enrolled after the existing email code ("Make this phone your key"), with a name for the phone. From then on that owner gets no email code and no password sign-in on the owner host. A passkey session lasts 12 hours idle and 7 days at most and ends when the passkey is removed.
+- Migration `0004_owner_access.sql`: owner passkeys, device requests, recovery codes and single-use passkey challenges, `users.passkey_enrolled_at`, `sessions.passkey_id`. The nightly purge covers the new tables.
+- `@simplewebauthn/server` 13.3.3 in the Worker (user verification required, attestation none, ES256 and RS256, counter check, 20 challenges per IP per 15 minutes). While `OWNER_HOST` is unset the passkey routes answer 404 and sign-in is unchanged.
+
 Owner access, contracts (`contracts-v1.3`, [owner access](docs/owner-access.md#api)):
 
 - 12 owner-host endpoints for passkeys: sign-in and confirm challenges, first-device enrolment, device requests with a 6-digit code (create, poll, list, approve or decline), the device list (rename, remove) and recovery. WebAuthn JSON schemas, fixtures with UI-state variants. Nothing is built behind them yet: they answer 501 (404 on the staff host when `OWNER_HOST` is set).

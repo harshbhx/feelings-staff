@@ -12,7 +12,9 @@ import type {
   OwnerPasskeyOptions,
 } from '@fs/contracts';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { runJob } from '../../cron';
 import { createApp } from '../../index';
+import { ownerOrigin } from '../../lib/hosts';
 import { hashToken } from '../../middleware/session';
 import { setServiceOverridesForTests } from '../../services/registry';
 import { fakeEmail, fakeNotifier } from '../../test/fakes';
@@ -27,6 +29,7 @@ const EMAIL = 'owner@feelings.test';
 const START = Date.parse('2026-10-19T10:42:00+05:30');
 const MIN = 60_000;
 const HOUR = 60 * MIN;
+const DAY = 24 * HOUR;
 const NO_ID = '01JBZZZZZZZZZZZZZZZZZZZZZZ';
 
 let s: Scenario;
@@ -221,6 +224,22 @@ describe('PK-1 everything is off unless OWNER_HOST is set', () => {
       const r = await req(path, { host: STAFF_HOST, method, body });
       expect(r.status, `${method} ${path}`).toBe(404);
     }
+  });
+
+  it('PK-1.4 the owner origin follows APP_ORIGIN, or the request when APP_ORIGIN is empty', () => {
+    expect(ownerOrigin({ APP_ORIGIN: 'https://staff.test', OWNER_HOST: HOST })).toBe(ORIGIN);
+    expect(
+      ownerOrigin({ APP_ORIGIN: 'http://localhost:8787', OWNER_HOST: 'owner.example.test:8787' }),
+    ).toBe('http://owner.example.test:8787');
+    // The local preview (e2e) leaves APP_ORIGIN empty and serves plain http.
+    const preview = { APP_ORIGIN: '', OWNER_HOST: 'owner.example.test:8787' };
+    expect(ownerOrigin(preview, new URL('http://owner.example.test:8787/api/v1/me'))).toBe(
+      'http://owner.example.test:8787',
+    );
+    expect(ownerOrigin(preview, new URL('https://owner.example.test:8787/'))).toBe(
+      'https://owner.example.test:8787',
+    );
+    expect(ownerOrigin(preview)).toBe('https://owner.example.test:8787');
   });
 
   it('PK-1.3 the email code keeps signing in on the single host, even for an owner with a passkey', async () => {
@@ -636,5 +655,55 @@ describe('PK-6 rate limits', () => {
     expect((await ask('198.51.100.4')).status).toBe(200);
     now += 15 * MIN + 1;
     expect((await ask('203.0.113.7')).status).toBe(200);
+  });
+});
+
+describe('PK-7 retention', () => {
+  it('PK-7.1 the nightly purge drops old challenges, requests, recovery codes and removed passkeys', async () => {
+    const at = START + 40 * DAY;
+    const old = (days: number) => at - days * DAY;
+    const org = s.orgId;
+    await testEnv.DB.batch([
+      db(
+        `INSERT INTO owner_passkey_challenges (id, org_id, purpose, challenge, expires_at, created_at)
+         VALUES ('CH-old', ?1, 'signin', 'c1', ?2, ?2), ('CH-new', ?1, 'signin', 'c2', ?3, ?3)`,
+        org,
+        old(8),
+        old(1),
+      ),
+      db(
+        `INSERT INTO owner_device_requests (id, org_id, code, device_name, platform, status, enrol_token_hash, expires_at, created_at)
+         VALUES ('DR-old', ?1, '111111', 'x', 'ios', 'expired', 'h1', ?2, ?2), ('DR-new', ?1, '222222', 'x', 'ios', 'pending', 'h2', ?3, ?3)`,
+        org,
+        old(31),
+        old(1),
+      ),
+      db(
+        `INSERT INTO owner_recovery_codes (id, org_id, user_id, code_hash, issued_by, expires_at, created_at)
+         VALUES ('RC-old', ?1, ?2, 'r1', 'admin', ?3, ?3), ('RC-new', ?1, ?2, 'r2', 'admin', ?4, ?4)`,
+        org,
+        s.ownerId,
+        old(31),
+        old(1),
+      ),
+      db(
+        `INSERT INTO owner_passkeys (id, org_id, user_id, credential_id, public_key, device_name, platform, created_at, removed_at)
+         VALUES ('PK-old', ?1, ?2, 'cred-old', 'k', 'x', 'ios', ?3, ?3), ('PK-kept', ?1, ?2, 'cred-kept', 'k', 'x', 'ios', ?4, ?4),
+                ('PK-live', ?1, ?2, 'cred-live', 'k', 'x', 'ios', ?3, NULL)`,
+        org,
+        s.ownerId,
+        old(400),
+        old(30),
+      ),
+    ]);
+    await runJob('nightly', testEnv, at);
+    const ids = async (table: string) =>
+      (await db(`SELECT id FROM ${table} ORDER BY id`).all<{ id: string }>()).results.map(
+        (r) => r.id,
+      );
+    expect(await ids('owner_passkey_challenges')).toEqual(['CH-new']);
+    expect(await ids('owner_device_requests')).toEqual(['DR-new']);
+    expect(await ids('owner_recovery_codes')).toEqual(['RC-new']);
+    expect(await ids('owner_passkeys')).toEqual(['PK-kept', 'PK-live']);
   });
 });

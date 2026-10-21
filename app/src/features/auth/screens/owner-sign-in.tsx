@@ -4,10 +4,12 @@
  * app), or the link itself (`?t=` signs in directly). After 60 s it offers Resend and the
  * password + owner PIN fallback. The answer to "send" never says whether the email exists.
  */
+import type { Me } from '@fs/contracts';
 import { type FormEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import { useApi } from '../../../api/provider';
+import { OWNER_ONLY } from '../../../lib/surface';
 import { describeAuthError, type ErrorCopy } from '../lib/errors';
 import { useErrorText, useFinishSignIn, useOwnerNames } from '../lib/hooks';
 import { digitsOnly, EMAIL_CODE_LENGTH, looksLikeEmail, OWNER_PIN } from '../lib/inputs';
@@ -29,10 +31,15 @@ type Mode = 'link' | 'email' | 'code' | 'password';
 const RESEND_AFTER_MS = 60_000;
 const PASSWORD_MIN = 10;
 
-export function OwnerSignInScreen() {
+/**
+ * `onSignedIn` replaces the usual "go home": on the owner host a successful code leads to the
+ * first-device enrolment (docs/owner-access.md).
+ */
+export function OwnerSignInScreen({ onSignedIn }: { onSignedIn?: (me: Me) => void } = {}) {
   const { t } = useTranslation();
   const api = useApi();
-  const finishSignIn = useFinishSignIn();
+  const goHome = useFinishSignIn();
+  const finishSignIn = onSignedIn ?? goHome;
   const names = useOwnerNames();
   const text = useErrorText(names);
   const [params, setParams] = useSearchParams();
@@ -159,7 +166,10 @@ export function OwnerSignInScreen() {
     }
   };
 
-  const footer = <TextLink to="/signin">{t('auth:common.staffSignIn')}</TextLink>;
+  // The owner host serves no staff pages, so the owner build has no staff sign-in link.
+  const footer = OWNER_ONLY ? undefined : (
+    <TextLink to="/signin">{t('auth:common.staffSignIn')}</TextLink>
+  );
 
   const emailField = (autoComplete: 'email' | 'username') => (
     <Field label={t('auth:fields.email')} error={emailError}>

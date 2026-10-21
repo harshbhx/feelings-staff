@@ -21,17 +21,23 @@ export function surfaceOf(env: { OWNER_HOST?: string }, url: URL): Surface {
   return url.host.toLowerCase() === owner ? 'owner' : 'staff';
 }
 
-/** Origin of the owner host, derived from OWNER_HOST; the staff origin while owner routing is off. */
-export function ownerOrigin(env: HostEnv): string {
+/**
+ * Origin of the owner host, derived from OWNER_HOST; the staff origin while owner routing is off.
+ * The scheme follows APP_ORIGIN. A local preview leaves APP_ORIGIN empty; then the scheme of the
+ * request (when there is one) decides, so the http e2e preview works like https production.
+ */
+export function ownerOrigin(env: HostEnv, requestUrl?: URL): string {
   const owner = ownerHost(env);
   if (!owner) return env.APP_ORIGIN;
-  const scheme = env.APP_ORIGIN.startsWith('http://') ? 'http' : 'https';
-  return `${scheme}://${owner}`;
+  const http = env.APP_ORIGIN
+    ? env.APP_ORIGIN.startsWith('http://')
+    : requestUrl?.protocol === 'http:';
+  return `${http ? 'http' : 'https'}://${owner}`;
 }
 
 /** Origins whose state-changing requests the answering host accepts (CSRF check). */
 export function allowedOrigins(env: HostEnv, url: URL): string[] {
-  return surfaceOf(env, url) === 'owner' ? [ownerOrigin(env)] : [url.origin];
+  return surfaceOf(env, url) === 'owner' ? [ownerOrigin(env, url)] : [url.origin];
 }
 
 const prefix = (path: string, base: string) => path === base || path.startsWith(`${base}/`);

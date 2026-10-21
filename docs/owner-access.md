@@ -6,7 +6,7 @@ Contents: [What changes](#what-changes) · [The two hosts](#the-two-hosts) · [C
 
 ## What changes
 
-**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default), slice 1b (split build, below) and slice 3 (the endpoint contract, [API](#api)) are built. Nothing changes in production until `OWNER_HOST` is set.
+**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default), slice 1b (split build, below), slice 3 (the endpoint contract, [API](#api)) and slice 4 (passkey core: migration 0004, first-device enrolment, passkey sign-in, the owner-host sign-in and enrolment screens) are built. Nothing changes in production until `OWNER_HOST` is set: while it is unset the passkey routes answer 404.
 
 | Today | After |
 |---|---|
@@ -59,17 +59,20 @@ Flows:
 4. **Device list.** Settings, Security: each approved device (name from the browser, platform, added, last used, "This device"), Remove (passkey plus PIN, audited). The last device cannot be removed. Removing a device revokes its sessions.
 5. **Recovery.** If every device is lost, only an admin can help: `scripts/owner-recovery.mjs` (run with Wrangler access to the production D1) issues a one-time code (shown once, stored hashed, valid 24 hours, single use, audited as `owner.recovery_issued`). On the owner host "I lost my phone" accepts the code, then the Access wall still applies, and the owner enrols a fresh first device, which removes the old passkeys.
 
+How slice 4 builds it: the RP id is `OWNER_HOST` without its port and the origin is `https://<OWNER_HOST>` (`http` only when `APP_ORIGIN` is `http`, as in the e2e preview). Sign-in is usernameless (no allow list), so it relies on the resident key. A passkey session is a normal `fs_session` cookie (host-only) with `sessions.passkey_id` set: 12 hours idle, 7 days at most, and it ends when its credential is removed. On the owner host an owner with a passkey has no other session: an email-code session cookie is refused there, and `ownerMagic` sends nothing (still 202), `ownerVerify` and `ownerPassword` answer `FORBIDDEN` with `details.reason: "passkey_enrolled"`. The first enrolment also ends the owner's email-code sessions and unused codes. The browser side is a few lines over `navigator.credentials` (`app/src/features/auth/lib/passkey.ts`), owner build only.
+
 Edge cases written down: browsers without WebAuthn (show a plain "this browser cannot use a passkey; use Chrome or Safari"), platform authenticators that sync passkeys between a person's devices (allowed; the approved-device list shows the credential, not a physical phone), clock skew, counters that stay 0 (synced passkeys; the counter check is skipped when both stored and received are 0), and a rate limit on every WebAuthn route.
 
 ## Data model
 
-New migration `0004_owner_access.sql`:
+Migration [`0004_owner_access.sql`](../migrations/0004_owner_access.sql) (details in the [data model](data-model.md#owner-access-tables-0004_owner_accesssql)):
 
 - `owner_passkeys` (`id`, `org_id`, `user_id`, `credential_id` unique, `public_key`, `sign_count`, `transports`, `device_name`, `platform`, `created_at`, `last_used_at`, `removed_at`, `removed_by`).
-- `owner_device_requests` (`id`, `org_id`, `user_id`, `code`, `device_name`, `status` pending/approved/declined/expired, `approved_by_credential`, `enrol_token_hash`, `expires_at`, `created_at`).
-- `owner_recovery_codes` (`id`, `org_id`, `user_id`, `code_hash`, `issued_by`, `expires_at`, `used_at`).
-- `users.passkey_enrolled_at` (nullable).
-- Audit actions: `owner.passkey_enrolled`, `owner.device_requested`, `owner.device_approved`, `owner.device_declined`, `owner.device_removed`, `owner.recovery_issued`, `owner.recovery_used`, `owner.signin_passkey`.
+- `owner_device_requests` (`id`, `org_id`, `user_id`, `code`, `device_name`, `platform`, `city`, `status` pending/approved/declined/expired, `approved_by_credential`, `enrol_token_hash`, `ip_hmac`, `expires_at`, `decided_at`, `used_at`, `created_at`). `platform`, `city`, `decided_at` (start of the 10-minute enrolment window) and `used_at` were added to the plan for the approval card and the token's single use.
+- `owner_recovery_codes` (`id`, `org_id`, `user_id`, `code_hash`, `issued_by`, `expires_at`, `used_at`, `created_at`).
+- `owner_passkey_challenges` (single use, 5 minutes): `purpose` (`signin`, `confirm`, `enrol`), `challenge`, and for `enrol` and `confirm` the user, the session and (for `confirm`) the one credential it accepts.
+- `users.passkey_enrolled_at` (nullable) and `sessions.passkey_id` (the credential an owner session signed in with).
+- Audit actions: `owner.passkey_enrolled`, `owner.device_requested`, `owner.device_approved`, `owner.device_declined`, `owner.device_removed`, `owner.device_renamed`, `owner.recovery_issued`, `owner.recovery_used`, `owner.signin_passkey`.
 
 ## API
 
