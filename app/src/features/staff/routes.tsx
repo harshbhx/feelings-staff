@@ -50,6 +50,7 @@ const FixItScreen = lazy(() =>
 if (typeof window !== 'undefined') browserAllowed();
 
 const PAYSLIP_NS = ['payslip'] as const;
+const NOTIFY_NS = ['notify'] as const;
 
 export const staffRoutes: RouteObject[] = [
   { index: true, element: <TodayScreen /> },
@@ -68,7 +69,15 @@ export const staffRoutes: RouteObject[] = [
       </WithNamespaces>
     ),
   },
-  { path: 'inbox', element: <InboxScreen /> },
+  {
+    // The inbox copy is its own chunk (not in the staff start catalogs); the bell's label is common.
+    path: 'inbox',
+    element: (
+      <WithNamespaces ns={NOTIFY_NS}>
+        <InboxScreen />
+      </WithNamespaces>
+    ),
+  },
   { path: 'me', element: <MeScreen /> },
   { path: 'me/data', element: <MyDataScreen /> },
   { path: 'me/data/presence', element: <PresenceHistoryScreen /> },
