@@ -162,10 +162,12 @@ test.describe('E2E-10 an unplanned venue, opened for others', () => {
       await expectStep(page, 'sent');
 
       // Needs action shows it as a request to open the venue; the owner lets the second one in too.
-      const waiting = await owner.ok<ActionsView>('GET', '/owner/actions?type=pending_punch');
-      const item = waiting.items.find((i) => i.type === 'pending_punch' && i.user.id === first.id);
+      const waiting = await owner.ok<ActionsView>('GET', '/owner/actions?type=offsite_request');
+      const item = waiting.items.find(
+        (i) => i.type === 'offsite_request' && i.user.id === first.id,
+      );
       expect(item, 'the venue request waits in Needs action').toBeTruthy();
-      if (item?.type !== 'pending_punch') throw new Error('not a pending punch');
+      if (item?.type !== 'offsite_request') throw new Error('not a venue request');
       expect(item.punch.pendingReason).toBe('offsite_unplanned');
       expect(item.punch.placeName).toBe('Patel wedding');
       const opened = await owner.ok<PunchResult>(
