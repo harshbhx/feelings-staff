@@ -51,7 +51,7 @@ export default defineConfig({
           use: {
             browserName: 'chromium',
             viewport: { width: 390, height: 844 },
-            launchOptions: { args: ['--host-resolver-rules=MAP *.example.test 127.0.0.1'] },
+            launchOptions: { args: ['--host-resolver-rules=MAP *.example.test localhost'] },
           },
         },
       ]
