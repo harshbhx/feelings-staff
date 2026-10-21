@@ -222,41 +222,37 @@
       "dueLater_one": "{{count}} due later",
       "dueLater_other": "{{count}} due later"
     },
-    "headline": {
-      "in_one": "{{count}} in",
-      "in_other": "{{count}} in",
+    "hero": {
+      "label": "How today is going",
+      "sentence": "{{parts}}.",
+      "allIn": "Everyone due is in, on time.",
       "late_one": "{{count}} late",
       "late_other": "{{count}} late",
       "notInYet_one": "{{count}} not in yet",
       "notInYet_other": "{{count}} not in yet",
+      "dueLater_one": "{{count}} due later",
+      "dueLater_other": "{{count}} due later",
+      "atVenue_one": "{{count}} at a venue",
+      "atVenue_other": "{{count}} at a venue",
       "onLeave_one": "{{count}} on leave",
       "onLeave_other": "{{count}} on leave",
-      "atVenue_one": "{{count}} at a venue",
-      "atVenue_other": "{{count}} at a venue"
+      "off_one": "{{count}} off today",
+      "off_other": "{{count}} off today"
     },
-    "counters": {
-      "label": "Filter the board",
-      "present": "Present",
-      "late": "Late",
-      "notInYet": "Not in yet",
-      "onLeave": "On leave",
-      "weekOff": "Week off",
-      "atVenue": "At a venue"
+    "views": {
+      "label": "Show who",
+      "in": "In",
+      "notIn": "Not in yet",
+      "away": "Away"
     },
-    "stats": {
-      "all": "everyone",
-      "present": "in",
-      "late": "late",
-      "notInYet": "not in yet",
-      "onLeave": "on leave",
-      "weekOff": "week off",
-      "atVenue": "at a venue"
+    "headline": {
+      "late_one": "{{count}} late",
+      "late_other": "{{count}} late",
+      "notInYet_one": "{{count}} not in yet",
+      "notInYet_other": "{{count}} not in yet"
     },
-    "filtered": "Showing {{label}} only.",
-    "showAll": "Show everyone",
     "needsAction_one": "{{count}} thing needs your OK",
     "needsAction_other": "{{count}} things need your OK",
-    "needsActionCta": "Open Needs action",
     "sections": {
       "in": "Who's in",
       "notIn": "Not in yet",
@@ -288,8 +284,9 @@
     "closed": "Salon closed today ({{name}}).",
     "before": "No one is due yet. First shift starts at {{time}}.",
     "beforeNoShift": "No one is due yet today.",
-    "emptyFilter": "No one in this group right now.",
-    "nobodyIn": "No one has checked in yet."
+    "nobodyIn": "No one has checked in yet.",
+    "nobodyNotIn": "Everyone due so far is in.",
+    "nobodyAway": "No one is off today."
   },
   "payroll": {
     "start": "Start payroll",
