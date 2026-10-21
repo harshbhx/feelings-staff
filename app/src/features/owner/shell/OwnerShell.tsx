@@ -26,6 +26,7 @@ import { type CSSProperties, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { useMe } from '../../../api/hooks';
+import { LOGO_MASK } from '../../../lib/brand';
 import { StepUpProvider } from '../../auth/step-up';
 import { InboxBell } from '../../inbox';
 import { openActionCount } from '../actions/actions-model';
@@ -123,7 +124,11 @@ function Header() {
           />
         ) : null}
         {home ? (
-          <Logo name={t('common:app.shortName')} className="mr-auto ml-0.5 xl:hidden" />
+          <Logo
+            name={t('common:app.shortName')}
+            mask={LOGO_MASK}
+            className="mr-auto ml-0.5 xl:hidden"
+          />
         ) : null}
         <h1
           className={`line-clamp-2 min-w-0 flex-1 text-balance font-extrabold text-text text-xl leading-snug tracking-display${home ? ' max-xl:sr-only' : ''}`}
@@ -254,7 +259,7 @@ function Rail({ count }: { count: number }) {
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-(--owner-rail-w) flex-col border-border border-r bg-bg xl:flex">
       <div className="flex h-16 items-center px-6">
-        <Logo name={t('common:app.shortName')} size="lg" />
+        <Logo name={t('common:app.shortName')} size="lg" mask={LOGO_MASK} />
       </div>
       <RailNav label={t('owner:nav.label')} className="flex-1 overflow-y-auto px-3 pt-1 pb-2">
         <RailGroup>{tabs.map(item)}</RailGroup>
