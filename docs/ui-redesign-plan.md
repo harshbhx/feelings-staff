@@ -284,6 +284,21 @@ Every list that loads shows skeleton rows of the final height (no layout jump), 
 - Optimistic UI must never be applied to money, check-ins or PIN-gated actions; the hook takes an explicit `optimistic: false` default for those and the review checklist asks for it.
 - Pressed and hover states are the usual source of screenshot flakes (see #85): baselines park the pointer away from controls before each shot and force states only on the kit page.
 
+## 5b. Owner access screens (addendum)
+
+Decision: [ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md). The owner app moves to its own host and signs in with passkeys. These screens are new and must use the redesigned kit and the interaction layer (section 5a); the logic slices come first, the visual treatment follows the plan's order (they are built once, in the new look, not twice).
+
+| Screen | Content | Interaction notes |
+|---|---|---|
+| Owner sign-in | Salon logo, "Welcome back, Urmi" (name from settings), one primary "Use your fingerprint" (or "Use Face ID" by platform), a tertiary "Email me a code" shown only before the first device is enrolled, a quiet line "Lost your phone?" | The primary shows the pending ring while the system sheet is open; if the sheet is cancelled the control returns with "Nothing happened. Try again." No error red for a cancel. |
+| First-device enrolment | Step 1 email code (6 boxes, auto-advance, paste support), step 2 "Make this phone your key" with a clear one-line explanation, step 3 success with the device name field prefilled ("Urmi's iPhone") | Success moment: the bindi lands once; haptic success on Android. |
+| Add this device (new device) | A large code ("482 913") and "Approve this on your other phone", a countdown in plain words ("Expires in 14 minutes"), Cancel | No spinner on the whole screen; the code card is the focus; polls quietly, announces the result in a live region. |
+| Approval card (Needs action, on an approved device) | Device name and platform, when and from where (city level only), the code to compare, two actions: Approve (primary, asks for fingerprint, then PIN) and Decline (secondary) | One primary per card; Decline is not red-armed (it is reversible by asking again); approving shows the fingerprint sheet first, the PIN pad second. |
+| Settings, Security, Devices | List rows with platform icon, name, "This device", added and last used; Remove as a destructive row action behind the same fingerprint plus PIN; the last device shows a reason instead of Remove | Disabled Remove explains why ("Add another device first"); removal collapses the row with Undo not offered (it is a security action); toast "Removed. That phone is signed out." |
+| Recovery | One field for the recovery code, a plain explanation that Harsh issues it, then the first-device enrolment | Error text names the reason (expired, used, wrong) without revealing which codes exist. |
+
+Constraints: owner screens are lazy owner-entry code (no staff budget impact); no owner screen or string may appear in the staff entry; the owner host name never appears in design files, screenshots committed to the repo or docs for staff.
+
 ## 6. CI, baselines and review process
 
 - Branch off `origin/main` in a fresh worktree, push, open a draft PR into `main`, label it `wp` through REST (`gh api -X POST repos/harshbhx/feelings-staff/issues/<n>/labels -f "labels[]=wp"`; `gh pr edit` is broken). Edit bodies with `gh api -X PATCH repos/harshbhx/feelings-staff/pulls/<n> -F body=@file.md`.

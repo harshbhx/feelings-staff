@@ -22,5 +22,7 @@ One short record per decision: what was going on, what we chose, what follows fr
 | [ADR-16](0016-mock-mode-on-localhost-for-visual-baselines.md) | Mock mode on localhost for visual baselines |
 | [ADR-17](0017-time-credits-an-owner-settled-minute-ledger-instead-of-automatic-late-and-overtime-pay.md) | Time credits: an owner-settled minute ledger instead of automatic late and overtime pay |
 | [ADR-18](0018-presence-by-roll-call-and-step-out-not-background-location.md) | Presence by roll-call and step-out, not background location |
+| [ADR-19](0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md) | Owner access on its own host, behind Cloudflare Access, with passkeys on approved devices (proposed) |
+| [ADR-20](0020-decisions-of-21-oct-2026.md) | Decisions of 21 October 2026 (distance, owner access, redesign date, photo check-in) |
 
 To add a decision, copy the newest file, use the next number, and add a row above. Do not edit an accepted record to change history; write a new one that supersedes it and mark the old one "superseded by ADR-NN".
