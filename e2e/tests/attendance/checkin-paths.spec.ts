@@ -2,8 +2,9 @@
  * Check-in paths that are not a clean pass (PRD 14.4), on a real staff phone with the owner driven
  * through the API against the real session, step-up and idempotency code. The server clock is
  * pinned to a working Monday; the phone's own clock is not, so every punch carries a clock-skew
- * signal. Scores (PRD 4.4.3): edge fix = uncertain fence 35, new phone 10, clock skew 15 = 60 (flag
- * at 30, proof above 60); a phone in a foreign time zone adds 15 = 75 (needs proof).
+ * signal. Scores (PRD 4.4.3): edge fix = uncertain fence 35, new phone 10, clock skew 15, and in CI
+ * the runner's network counts as suspect, 25: 85, which is above the default proof line (60). E2E-05
+ * raises the proof line to 90 so the same punch is only flagged; E2E-06 keeps the defaults.
  *
  *   E2E-05  check in at the edge, flagged, the owner clears the flag
  *   E2E-06  needs proof, door code typed (the fake camera cannot show a QR), accepted with the
@@ -65,6 +66,8 @@ test.describe('E2E-05 the edge of the fence', () => {
     const seeded = await reset('basic-salon');
     await setServerClock(NOW);
     const owner = await ownerSession(request, seeded.owner);
+    // Flag from 30, proof only above 90: the edge punch is flagged whatever the network adds.
+    await owner.ok('PATCH', '/owner/settings', { settings: { risk: { flagAt: 30, proofAt: 90 } } });
     await setGeo('edge');
     const me = await onboardPhone(page, owner, person(1));
 
