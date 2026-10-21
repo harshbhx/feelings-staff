@@ -65,7 +65,19 @@ export function Sheet({
           onEscapeKeyDown={block}
           onPointerDownOutside={block}
           onInteractOutside={block}
-          onOpenAutoFocus={noAutoFocus ? (e) => e.preventDefault() : undefined}
+          // A dismissible sheet opens with focus on itself, not on its close button: the X is not
+          // the thing to do, and a ring on it at open read as a red action (docs/ui-redesign-plan.md,
+          // problem 9). Tab reaches it next. Without a close button Radix focuses the first control.
+          onOpenAutoFocus={
+            noAutoFocus
+              ? (e) => e.preventDefault()
+              : dismissible
+                ? (e) => {
+                    e.preventDefault();
+                    (e.currentTarget as HTMLElement | null)?.focus();
+                  }
+                : undefined
+          }
           // Without a description Radix wants an explicit "none" (it warns otherwise).
           {...(description ? {} : { 'aria-describedby': undefined })}
         >

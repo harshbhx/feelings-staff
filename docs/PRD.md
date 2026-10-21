@@ -3005,7 +3005,7 @@ Radix primitives (Dialog, Popover, Tabs, Toast, Tooltip, Checkbox, RadioGroup, S
 
 | Component | Brand rules |
 |---|---|
-| `Button` (`primary`, `secondary`, `ghost`, `danger-secondary`; sizes 48 px and 40 px) | Pill, 700 weight, icon 1.2em with 0.55em gap, press `scale(0.98)`, hover lift 1 px and `--shadow-accent` on primary only |
+| `Button` (`primary`, `secondary`, `tertiary` (alias `ghost`), `danger-secondary`, `danger`; sizes 56, 48 and 40 px) | Pill, 700 weight, icon 1.2em with 0.55em gap. *Amended 21 Oct 2026 (UI redesign slice 1b, `docs/ui-redesign-plan.md` 5a):* primary is solid sindoor with raised inner edges; secondary a cream pill with a hairline (not an outline on white); tertiary a text button underlined on hover and focus; `danger-secondary` a red label at rest, `danger` solid red only as the last step of a confirm sheet. Hover (pointer only) steps the tone up, press is `scale(0.97)` with the tone down and the edges gone (80 ms in, 140 ms out); pending puts an inline ring in the leading icon's place, keeps the label and the width, sets `aria-busy` and ignores presses, and reads "Still trying" after 8 s; `disabledReason` shows why a control is not available (`aria-disabled`, read with it) |
 | `IconButton` | 44 px circle, `aria-label` required by the type |
 | `StatusChip` | §12.3; 13 px 700; icon + text; never clickable-looking |
 | `Chip` / `ChipGroup` | Real radios/checkboxes drawn as pills (from the website's `Chip.astro`) |
@@ -3036,9 +3036,10 @@ Phosphor regular only. Set used: `sign-in`, `sign-out`, `clock`, `check-circle`,
 
 ### 12.8 Motion
 
-- Tokens from the brand (`--ease-out`, `--ease-soft`, 140 / 220 / 420 ms). Animate opacity and transform only.
+- Tokens from the brand (`--ease-out`, `--ease-soft`, 140 / 220 / 420 ms). Animate opacity and transform only (colour for state changes is the one exception). *Amended 21 Oct 2026 (slice 1b):* the interaction tokens live in `motion.css` (`--dur-press` 80 ms, `--dur-reduced` 160 ms, `--dur-hero` 520 ms, `--dur-spin`, `--dur-breathe`, `--ease-spring`, the raised edges); `scripts/check-ui.mjs` fails on a transition of anything else and on a literal duration or curve outside the motion tokens.
 - Allowed moments: sheet slide-up (220 ms), toast fade (140 ms), press scale (0.97–0.98), screen enter fade + 8 px rise (220 ms), **the bindi landing on a successful check-in or check-out** (520 ms, `cubic-bezier(0.34, 1.5, 0.5, 1)`, from `scale(0)`), one 8 ms haptic tick on Android.
-- Not allowed: spinners on whole screens, looping animations, shimmer, confetti, number counters, parallax, auto carousels, custom cursors.
+- Not allowed: spinners on whole screens, looping animations, shimmer, confetti, number counters, parallax, auto carousels, custom cursors. *One exception (slice 1b):* the 16 px pending ring inside a pressed control while its request is out; with reduced motion it stands still.
+- Haptics (`app/src/lib/haptics.ts`): `tick` (8 ms) for check-in and approvals, `success` (two 8 ms ticks 90 ms apart) for check-out, `warn` (16 ms) for a failed check-in; the existing `tick` on the Check in, Check out, Scan, Step out and I'm back taps stays (decision 21 Oct 2026); never with reduced motion or when the person turned Vibration off in Me; a quiet no-op on iPhone.
 - Reduced motion tiers (from the brand): tier 1 (slides, lifts, the bindi spring) removed; tier 2 (enters) become 160 ms fades; tier 3 (colour and focus changes) stay. No haptics.
 
 ### 12.9 The bindi signature
@@ -3058,7 +3059,7 @@ The logo in the shell (amended 21 Oct 2026, UI redesign slice 1) is not a bindi 
 3. No gradients, glassmorphism (beyond the brand's header glass), glows, blobs, noise or 3D.
 4. No emoji in UI copy or as icons; one icon set (Phosphor regular).
 5. No "dashboard of stat cards with sparklines"; numbers appear where they are needed, with labels in words.
-6. Lists are hairline rows, not stacks of rounded shadowed cards; cards have hairlines, not drop shadows.
+6. Lists are hairline rows, not stacks of rounded shadowed cards; cards have hairlines, not drop shadows. *Amended 21 Oct 2026 (slice 1b):* buttons, the chosen segment and chips may carry the raised inner edges (a 1 px lighter top and darker bottom inside the shape); soft drop shadows stay banned.
 7. Plus Jakarta Sans only, four weights, nothing under 13 px, sentence case, tight tracking on large sizes.
 8. Real copy from this PRD, in the salon's voice; no lorem ipsum, no "Welcome back!" with a waving-hand emoji, no "Unlock your productivity".
 9. Empty states are one sentence and one action; no stock illustrations or people.
@@ -3739,3 +3740,4 @@ The two research files in `research/` carry the full citations (Code on Wages 20
 | 1.3 | 19 Oct 2026 | `attendance_days.total_min` added to §8.2.1 (the legal band's `t_d`); §7.17.9 payslip wording for a plus settlement. Examples 14 and 15 use the month's own `r_day` (December 31 days: the −100 settlement is ₹71.68; November for Priya: ₹500 a day), as §7.17.4 says. Legal overtime guardrail restored (Harsh): Time credits setting **Pay legal overtime at 2×**, default on. Approved overtime beyond 9 h a day or 48 h a week (`legal_d`, per day within the ISO week) adds an `ot_legal` entry, so those minutes count twice and are worth 2× in the estimate, netting and settlement; notice `legal_ot_2x` when on, shortfall warning `legal_ot_shortfall` when off (§7.17.7). Updated §4.13.3, §4.19, §7.1, §7.6, §7.15 examples 13 and 14 (balances +170 and −85), §7.16 (`legalOtBand`), §7.17.2, §7.17.6, §7.17.9, §8.2.1 (`ot_legal` kind, `legalOt2x` setting), §14, §17 (F10, risks, Q30) |
 | 1.4 | 21 Oct 2026 | Redesign amendments 2 and 5 (Register slice, `docs/ui-redesign-plan.md` section 4): §12.3 and §12.11 rule 12, day cells of 40 px or smaller may show colour plus a letter or late minutes without the icon; §12.5 and §12.6 `RegisterGrid`, Register two-column layout with a day panel on desktop, a person-first week list on phones, the key in a popover |
 | 1.5 | 21 Oct 2026 | UI redesign slice 1, brand layer (`docs/ui-redesign-plan.md` sections 3 and 4): §12.2 the app page is the warm band `--app-page` with white cards (was "white page"); §12.4 the first secondary line in lists is `--text-body`, `--text-muted` is for captions; §12.9 the logo in the shell (the client's wordmark as a maroon mask, recolouring approved 21 Oct 2026) and the bindi ending the owner's tab-level titles on phones. New tokens `--app-page`, `--logo`, `--logo-mask` and the role tones `--role-*` with their avatar tints (used by §12.6 avatars in a later slice) |
+| 1.6 | 21 Oct 2026 | UI redesign slice 1b, interaction layer (`docs/ui-redesign-plan.md` 5a): §12.6 `Button` roles and their six states (rest, hover, pressed, focus, pending, disabled with a reason), §12.8 the motion tokens, the inline pending ring as the one looping motion, haptics and the Vibration choice in Me, §12.11 rule 6 raised inner edges on buttons, segments and chips |

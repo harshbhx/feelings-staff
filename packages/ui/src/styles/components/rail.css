@@ -42,13 +42,22 @@
     line-height: 1.25;
     text-decoration: none;
     transition:
-      background-color var(--dur-fast) var(--ease-out),
-      color var(--dur-fast) var(--ease-out);
+      background-color var(--dur-fast) var(--ease-soft),
+      color var(--dur-fast) var(--ease-soft),
+      scale var(--dur-fast) var(--ease-out);
   }
 
-  .fs-rail-item:hover {
-    background: var(--rail-hover-bg);
-    color: var(--text);
+  @media (hover: hover) {
+    .fs-rail-item:hover {
+      background: var(--rail-hover-bg);
+      color: var(--text);
+    }
+  }
+
+  .fs-rail-item:active {
+    scale: 0.98;
+    background: var(--rail-active-bg);
+    transition-duration: var(--dur-press);
   }
 
   .fs-rail-item:focus-visible {

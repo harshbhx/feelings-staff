@@ -13,7 +13,7 @@ import { Icon, type IconName } from './icons';
 export const focusRing =
   'focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent';
 
-const buttonBase = `inline-flex min-h-12 items-center justify-center gap-[0.55em] rounded-full border px-[1.4rem] py-3 text-base leading-[1.1] font-bold transition-[transform,background-color,border-color] duration-150 select-none active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100 disabled:cursor-not-allowed disabled:active:scale-100 ${focusRing}`;
+const buttonBase = `inline-flex min-h-12 items-center justify-center gap-[0.55em] rounded-full border px-[1.4rem] py-3 text-base leading-[1.1] font-bold transition-[transform,background-color,border-color] duration-(--dur-fast) select-none active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100 disabled:cursor-not-allowed disabled:active:scale-100 ${focusRing}`;
 
 const variants = {
   primary: 'border-transparent bg-accent text-white hover:bg-accent-hover disabled:bg-accent-hover',
