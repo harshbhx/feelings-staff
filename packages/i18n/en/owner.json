@@ -1062,6 +1062,18 @@
     "locked": "Finalised. Reopen payroll to make changes.",
     "legend": "Key",
     "summary": "This month, everyone",
+    "summaryShort": "Everyone this month:",
+    "viewLabel": "View",
+    "viewWeek": "Last 7 days",
+    "viewMonth": "Month grid",
+    "weekList": "Attendance, last 7 days",
+    "panel": {
+      "label": "Selected day",
+      "none": "None",
+      "source": "Source",
+      "note": "Note",
+      "fix": "Fix this day"
+    },
     "week": "Week of {{date}}",
     "openMonth": "Open the month",
     "dayLink": "{{name}}, {{date}}: {{status}}",
