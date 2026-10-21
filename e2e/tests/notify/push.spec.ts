@@ -1,100 +1,156 @@
-import type { BrowserContext } from '@playwright/test';
+import type { BrowserContext, Page } from '@playwright/test';
 import { expect, test } from '../../fixtures';
+
+/** The slice of the worker global scope the spec touches (the e2e project has no webworker lib). */
+interface WorkerScope {
+  registration: { showNotification: unknown };
+  navigator: unknown;
+  clients: {
+    matchAll(o: unknown): Promise<unknown[]>;
+    openWindow: unknown;
+  };
+  recorded: unknown[];
+}
 
 interface Shown {
   title: string;
-  body: string;
-  tag: string;
-  data: { url: string };
-}
-
-/** Notifications the service worker is showing, read inside the worker (a page read crashed the headless page). */
-async function shown(context: BrowserContext): Promise<Shown[]> {
-  const worker = context.serviceWorkers()[0];
-  if (!worker) return [];
-  try {
-    return await worker.evaluate(async () => {
-      const reg = (
-        self as unknown as {
-          registration: { getNotifications(): Promise<Shown[]> };
-        }
-      ).registration;
-      return (await reg.getNotifications()).map((n) => ({
-        title: n.title,
-        body: n.body,
-        tag: n.tag,
-        data: n.data,
-      }));
-    });
-  } catch {
-    // The worker restarts while it handles the push; the poll asks again.
-    return [];
-  }
+  body?: string;
+  tag?: string;
+  data: { url: string; e?: string };
 }
 
 /**
  * E2E-19 (PRD 14.4, 11.6): the service worker shows a push and a click opens the target.
+ *
  * Headless Chromium has no push service, so a real subscription cannot be made here (the server
  * half is covered by notifier.matrix.test.ts and notify.test.ts). This spec delivers a Declarative
- * Web Push payload straight to the installed service worker through the DevTools protocol and
- * checks what the WP-8 handlers show: the owner's N2 text, its target and the app badge data.
+ * Web Push payload straight to the installed service worker through the DevTools protocol.
+ *
+ * The Playwright image cannot display a real notification: as soon as the push handler calls the
+ * platform showNotification, the worker restarts and the page target crashes. So the spec records
+ * the call instead: inside the worker, `registration.showNotification` is replaced by a recorder
+ * that hands each call to the open page. Everything else (the push event, payload parsing, the
+ * handler, notificationclick and navigation) is the real code.
  */
-// Headless Chromium in the Playwright image restarts the service worker as soon as a push makes it
-// call showNotification (the page target crashes, and getNotifications() then returns nothing), so
-// the notification cannot be read back in CI. The handlers are covered by
-// app/src/pwa/sw/push-handlers.test.ts; run this spec in a headed browser to check the real display.
-test.describe('E2E-19 push in the service worker', () => {
-  test.fixme(true, 'headless Chromium cannot display a notification in the CI image');
 
-  test('E2E-19 a delivered push becomes a notification with the in-app target', async ({
+/** Replace showNotification and the badge calls in the worker; calls are kept in `self.recorded`. */
+async function recordNotifications(context: BrowserContext) {
+  const worker = context.serviceWorkers()[0];
+  if (!worker) throw new Error('no service worker');
+  await worker.evaluate(() => {
+    const sw = self as unknown as WorkerScope;
+    sw.recorded = [];
+    sw.registration.showNotification = async (title: string, options?: NotificationOptions) => {
+      sw.recorded.push({ title, body: options?.body, tag: options?.tag, data: options?.data });
+    };
+    const nav = sw.navigator as unknown as Record<string, unknown>;
+    nav.setAppBadge = async () => undefined;
+    nav.clearAppBadge = async () => undefined;
+  });
+}
+
+async function recorded(context: BrowserContext): Promise<Shown[]> {
+  try {
+    return (
+      (await context
+        .serviceWorkers()[0]
+        ?.evaluate(() => (self as unknown as { recorded: Shown[] }).recorded)) ?? []
+    );
+  } catch {
+    return [];
+  }
+}
+
+async function setup(page: Page, context: BrowserContext) {
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('ServiceWorker.enable');
+  const registrationId = new Promise<string>((resolve) => {
+    cdp.on('ServiceWorker.workerRegistrationUpdated', (e) => {
+      const r = e.registrations[0];
+      if (r) resolve(r.registrationId);
+    });
+  });
+  await page.goto('/signin?allowBrowser=1');
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+  });
+  await recordNotifications(context);
+  const origin = new URL(page.url()).origin;
+  const push = async (data: string) =>
+    cdp.send('ServiceWorker.deliverPushMessage', {
+      origin,
+      registrationId: await registrationId,
+      data,
+    });
+  return { origin, push };
+}
+
+test.describe('E2E-19 push in the service worker', () => {
+  test('E2E-19 a delivered push becomes a notification and its click opens the target', async ({
     page,
     context,
   }, info) => {
     test.skip(info.project.name !== 'staff-android', 'Chromium service worker path');
-    await context.grantPermissions(['notifications']);
-    const cdp = await context.newCDPSession(page);
-    await cdp.send('ServiceWorker.enable');
-    const registrationId = new Promise<string>((resolve) => {
-      cdp.on('ServiceWorker.workerRegistrationUpdated', (e) => {
-        const r = e.registrations[0];
-        if (r) resolve(r.registrationId);
-      });
-    });
-    await page.goto('/signin?allowBrowser=1');
-    await page.evaluate(async () => {
-      await navigator.serviceWorker.ready;
-    });
-    const origin = new URL(page.url()).origin;
-    const payload = {
-      web_push: 8030,
-      notification: {
-        title: 'Priya is 18 min late',
-        body: 'Checked in 10:28 at the salon.',
-        navigate: `${origin}/o/register/01K80VYGQP1PYC7SQGE0Y8BQDX/2026-10-19`,
-        lang: 'en-IN',
-      },
-      t: 'late_checkin',
-      e: '01K8WN0TQC11QKMBNWMGPP50NM',
-      topic: 'late-priya-20261019',
-      badge: 1,
-    };
-    await cdp.send('ServiceWorker.deliverPushMessage', {
-      origin,
-      registrationId: await registrationId,
-      data: JSON.stringify(payload),
-    });
+    const { origin, push } = await setup(page, context);
+    const path = '/o/register/01K80VYGQP1PYC7SQGE0Y8BQDX/2026-10-19';
+    await push(
+      JSON.stringify({
+        web_push: 8030,
+        notification: {
+          title: 'Priya is 18 min late',
+          body: 'Checked in 10:28 at the salon.',
+          navigate: `${origin}${path}`,
+          lang: 'en-IN',
+        },
+        t: 'late_checkin',
+        e: '01K8WN0TQC11QKMBNWMGPP50NM',
+        topic: 'late-priya-20261019',
+        badge: 1,
+      }),
+    );
     await expect
-      .poll(() => shown(context), { timeout: 15_000 })
+      .poll(() => recorded(context), { timeout: 15_000 })
       .toEqual([
         expect.objectContaining({
           title: 'Priya is 18 min late',
           body: 'Checked in 10:28 at the salon.',
           tag: 'late-priya-20261019',
-          data: expect.objectContaining({
-            url: '/o/register/01K80VYGQP1PYC7SQGE0Y8BQDX/2026-10-19',
-          }),
+          data: expect.objectContaining({ url: path, e: '01K8WN0TQC11QKMBNWMGPP50NM' }),
         }),
       ]);
+
+    // A click: run the real notificationclick handler with the recorded notification. Headless
+    // Chromium refuses to open or focus windows without a user gesture, so openWindow is recorded;
+    // the handler either navigates the open tab or opens a new window, and both must hit the target.
+    const urls: string[] = [];
+    page.on('framenavigated', (f) => {
+      if (f === page.mainFrame()) urls.push(new URL(f.url()).pathname);
+    });
+    const worker = context.serviceWorkers()[0];
+    const opened = await worker?.evaluate(
+      async (data) => {
+        const sw = self as unknown as WorkerScope;
+        const openedUrls: string[] = [];
+        sw.clients.openWindow = async (url: string | URL) => {
+          openedUrls.push(String(url));
+          return null;
+        };
+        const waits: Promise<unknown>[] = [];
+        const ev = Object.assign(new Event('notificationclick'), {
+          notification: { data, close() {} },
+          waitUntil: (p: Promise<unknown>) => waits.push(p),
+        });
+        self.dispatchEvent(ev);
+        await Promise.allSettled(waits);
+        return openedUrls;
+      },
+      (await recorded(context))[0]?.data,
+    );
+    await expect
+      .poll(() => (opened ?? []).map((u) => new URL(u).pathname).concat(urls), {
+        timeout: 15_000,
+      })
+      .toContain(path);
   });
 
   test('E2E-19 a push with no readable body still shows a notification', async ({
@@ -102,24 +158,10 @@ test.describe('E2E-19 push in the service worker', () => {
     context,
   }, info) => {
     test.skip(info.project.name !== 'staff-android', 'Chromium service worker path');
-    await context.grantPermissions(['notifications']);
-    const cdp = await context.newCDPSession(page);
-    await cdp.send('ServiceWorker.enable');
-    const registrationId = new Promise<string>((resolve) => {
-      cdp.on('ServiceWorker.workerRegistrationUpdated', (e) => {
-        const r = e.registrations[0];
-        if (r) resolve(r.registrationId);
-      });
-    });
-    await page.goto('/signin?allowBrowser=1');
-    await page.evaluate(async () => {
-      await navigator.serviceWorker.ready;
-    });
-    await cdp.send('ServiceWorker.deliverPushMessage', {
-      origin: new URL(page.url()).origin,
-      registrationId: await registrationId,
-      data: 'not json',
-    });
-    await expect.poll(async () => (await shown(context)).map((n) => n.title)).toEqual(['Feelings']);
+    const { push } = await setup(page, context);
+    await push('not json');
+    await expect
+      .poll(async () => (await recorded(context)).map((n) => n.title), { timeout: 15_000 })
+      .toEqual(['Feelings']);
   });
 });

@@ -91,7 +91,7 @@ Optional variable for the owner host ([owner access](owner-access.md)). Leave it
 | `ACCESS_AUD` | `a1b2...` (64 hex) | Audience tag of the Access application on the owner host. Not secret. **Setting it turns the Access check on** for the owner host (needs `OWNER_HOST`): every owner-host request must carry a valid `Cf-Access-Jwt-Assertion`, otherwise 403 with an empty body. Unset = check off. |
 | `ACCESS_ALLOWED_EMAILS` | `a@example.test,b@example.test` | Comma-separated e-mails allowed through Access, compared case-insensitively. Not secret. With `ACCESS_AUD` set, an empty list or a missing `ACCESS_TEAM_DOMAIN` makes every owner-host request answer 403. |
 
-Set the three Access variables together, after the Access application exists ([owner access](owner-access.md#cloudflare-access)), and only after `OWNER_HOST`. Rollback: unset `ACCESS_AUD`. They are plain variables, not secrets, so they need no rotation ([secrets runbook](runbooks/secrets.md#access-variables)).
+Set the three Access variables together, after the Access application exists ([owner access](owner-access.md#cloudflare-access)), and only after `OWNER_HOST`. Rollback: unset `ACCESS_AUD`. The ordered cutover steps are in the [owner cutover runbook](runbooks/owner-cutover.md). They are plain variables, not secrets, so they need no rotation ([secrets runbook](runbooks/secrets.md#access-variables)).
 
 ## 4. Email
 
