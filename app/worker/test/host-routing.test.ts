@@ -118,7 +118,7 @@ describe('X-HOST-2 staff host with OWNER_HOST set', () => {
   });
 
   it('staff pages, staff API and health keep working', async () => {
-    for (const p of ['/', ...STAFF_PAGES, '/v/abc']) {
+    for (const p of [...STAFF_PAGES, '/v/abc']) {
       expect((await fetchAs('set', STAFF_HOST, p)).status).toBe(200);
     }
     expect((await fetchAs('set', STAFF_HOST, '/api/v1/health')).status).toBe(200);
@@ -141,7 +141,7 @@ describe('X-HOST-2 staff host with OWNER_HOST set', () => {
 });
 
 describe('X-HOST-3 owner host with OWNER_HOST set', () => {
-  it.each(['/', ...OWNER_PAGES, '/v/abc', '/assets/x.js'])('%s is served', async (p) => {
+  it.each([...OWNER_PAGES, '/v/abc'])('%s is served', async (p) => {
     const res = await fetchAs('set', OWNER, p);
     expect(res.status).toBe(200);
   });

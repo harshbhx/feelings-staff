@@ -73,7 +73,7 @@ export function isStaffAppPath(path: string): boolean {
 }
 
 /** The only API paths the owner host answers (everything else is staff-only and answers 404). */
-const OWNER_HOST_API: readonly string[] = [
+const OWNER_HOST_API_EXACT: readonly string[] = [
   '/health',
   '/config',
   '/time',
@@ -83,13 +83,14 @@ const OWNER_HOST_API: readonly string[] = [
   '/me',
   '/me/notification-prefs',
   '/notifications',
+  '/notifications/read',
   '/push/subscribe',
-  '/verify',
-  '/__test',
 ];
+const OWNER_HOST_API_PREFIX: readonly string[] = ['/verify', '/__test'];
 
 export function isOwnerHostApiPath(path: string): boolean {
   if (isOwnerApiPath(path)) return true;
   if (/^\/payslips\/[^/]+\/pdf$/.test(path)) return true;
-  return OWNER_HOST_API.some((p) => prefix(path, p));
+  if (/^\/notifications\/[^/]+\/opened$/.test(path)) return true;
+  return OWNER_HOST_API_EXACT.includes(path) || OWNER_HOST_API_PREFIX.some((p) => prefix(path, p));
 }
