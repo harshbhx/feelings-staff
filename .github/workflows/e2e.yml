@@ -17,6 +17,18 @@ on:
         description: Only run tests matching this pattern
         required: false
         default: ''
+      hogs:
+        description: Busy-loop processes to start first, to rerun a timing flake on a slow runner
+        required: false
+        default: '0'
+      args:
+        description: Extra Playwright arguments (for example --repeat-each=5 --retries=0 --project=staff-android)
+        required: false
+        default: ''
+      split:
+        description: Also run the split-host pass (turn off to rerun a few specs quickly)
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -64,9 +76,22 @@ jobs:
         run: |
           for cfg in $(find app/dist -name wrangler.json -not -path '*/node_modules/*'); do cp app/.dev.vars "$(dirname "$cfg")/.dev.vars"; done
       - name: Playwright
-        run: pnpm --filter @fs/e2e exec playwright test ${{ github.event.inputs.grep && format('--grep "{0}"', github.event.inputs.grep) || '' }}
-      - name: Playwright (split hosts, OWNER_HOST set)
+        env:
+          HOGS: ${{ github.event.inputs.hogs || '0' }}
+        run: |
+          for _ in $(seq 1 "$HOGS"); do (while :; do :; done) & done
+          status=0
+          pnpm --filter @fs/e2e exec playwright test ${{ github.event.inputs.grep && format('--grep "{0}"', github.event.inputs.grep) || '' }} ${{ github.event.inputs.args }} || status=$?
+          kill $(jobs -p) 2>/dev/null || true
+          exit $status
+      # Playwright empties its output folder at the start of a run: keep this pass's traces.
+      - name: Keep the first pass results
         if: ${{ !cancelled() }}
+        run: |
+          mv e2e/test-results e2e/test-results-main 2>/dev/null || true
+          mv e2e/playwright-report e2e/playwright-report-main 2>/dev/null || true
+      - name: Playwright (split hosts, OWNER_HOST set)
+        if: ${{ !cancelled() && github.event.inputs.split != 'false' }}
         run: |
           for cfg in $(find app/dist -name wrangler.json -not -path '*/node_modules/*'); do
             printf '\nOWNER_HOST=owner.localhost:8787\n' >> "$(dirname "$cfg")/.dev.vars"
@@ -82,3 +107,5 @@ jobs:
           path: |
             e2e/playwright-report
             e2e/test-results
+            e2e/playwright-report-main
+            e2e/test-results-main
