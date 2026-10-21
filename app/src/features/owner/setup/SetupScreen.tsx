@@ -5,7 +5,7 @@
  * Every step can be skipped and finished later; nothing here is lost when she leaves.
  */
 import type { SetupStep } from '@fs/contracts';
-import { Button, Icon, List, ListRow, StatusChip, useToast } from '@fs/ui';
+import { Button, Card, Icon, List, ListRow, useToast } from '@fs/ui';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
@@ -23,15 +23,13 @@ import { SettingsForm } from '../settings/SettingsForm';
 import { ShiftsSection } from '../settings/ShiftsSection';
 import { sectionById } from '../settings/sections';
 import { useOwnerTitle } from '../shell/chrome';
-import { STEPS, setupProgress } from './setup-model';
+import { STEPS, setupLayout, setupProgress } from './setup-model';
 
 export function SetupScreen() {
   const [params] = useSearchParams();
   const step = params.get('step') as SetupStep | null;
   return step && STEPS.includes(step) ? <StepPage step={step} /> : <Checklist />;
 }
-
-const STATE_CHIP = { done: 'present', skipped: 'off', todo: 'waiting' } as const;
 
 function Checklist() {
   const { t } = useTranslation();
@@ -41,15 +39,17 @@ function Checklist() {
     <QueryView query={setup} skeleton={<RowsSkeleton rows={8} />}>
       {(view) => {
         const p = setupProgress(view.steps);
+        const layout = setupLayout(view.steps);
+        const title = (s: SetupStep) => t(`owner:setup.steps.${s}.title`);
+        const stepLink = (s: SetupStep) => `/o/setup?step=${s}`;
         return (
           <div className="grid max-w-(--container-narrow) grid-cols-[minmax(0,1fr)] gap-6">
-            <div className="grid gap-1">
+            <div className="grid gap-3">
               <p className="font-extrabold text-text text-xl tracking-display">
                 {view.complete ? t('owner:setup.ready') : t('owner:setup.lead')}
               </p>
-              <Meta>{t('owner:setup.progress', { done: p.handled, total: p.total })}</Meta>
               <div
-                className="mt-2 h-1.5 overflow-hidden rounded-full bg-bg-tint"
+                className="h-1.5 overflow-hidden rounded-full bg-bg-tint"
                 role="progressbar"
                 aria-valuemin={0}
                 aria-valuemax={p.total}
@@ -62,40 +62,18 @@ function Checklist() {
                 />
               </div>
             </div>
-            <List>
-              {STEPS.map((s, i) => {
-                const state = view.steps[s] ?? 'todo';
-                return (
-                  <ListRow
-                    key={s}
-                    asChild
-                    leading={
-                      <span className="grid size-10 place-items-center rounded-full bg-bg-tint font-bold text-maroon-800 tabular-nums">
-                        {state === 'done' ? <Icon name="check-circle" className="size-5" /> : i + 1}
-                      </span>
-                    }
-                    title={t(`owner:setup.steps.${s}.title`)}
-                    subtitle={t(`owner:setup.steps.${s}.hint`)}
-                    trailing={
-                      <StatusChip
-                        status={STATE_CHIP[state]}
-                        label={t(`owner:setup.state.${state}`)}
-                      />
-                    }
-                  >
-                    <Link to={`/o/setup?step=${s}`} />
-                  </ListRow>
-                );
-              })}
-            </List>
-            {p.next ? (
-              <div>
+            {layout.next ? (
+              <Card
+                tone="soft"
+                title={title(layout.next)}
+                description={t(`owner:setup.steps.${layout.next}.hint`)}
+              >
                 <Button asChild variant="primary" iconEnd="arrow-right">
-                  <Link to={`/o/setup?step=${p.next}`}>
-                    {t('owner:setup.continue', { step: t(`owner:setup.steps.${p.next}.title`) })}
+                  <Link to={stepLink(layout.next)}>
+                    {t('owner:setup.continue', { step: title(layout.next) })}
                   </Link>
                 </Button>
-              </div>
+              </Card>
             ) : (
               <div>
                 <Button asChild variant="primary" iconEnd="arrow-right">
@@ -103,6 +81,68 @@ function Checklist() {
                 </Button>
               </div>
             )}
+            {layout.open.length > 0 ? (
+              <section aria-labelledby="setup-open" className="grid gap-1">
+                <h2 id="setup-open" className="font-semibold text-sm text-text-muted tracking-name">
+                  {layout.open.some((s) => (view.steps[s] ?? 'todo') === 'todo')
+                    ? t('owner:setup.todoHeading')
+                    : t('owner:setup.skippedHeading')}
+                </h2>
+                <List>
+                  {layout.open.map((s) => (
+                    <ListRow
+                      key={s}
+                      asChild
+                      leading={
+                        <span className="grid size-10 place-items-center rounded-full bg-bg-tint font-bold text-maroon-800 tabular-nums">
+                          {STEPS.indexOf(s) + 1}
+                        </span>
+                      }
+                      title={title(s)}
+                      subtitle={t(`owner:setup.steps.${s}.hint`)}
+                      trailing={
+                        view.steps[s] === 'skipped' ? (
+                          <span className="font-semibold text-sm text-text-muted">
+                            {t('owner:setup.state.skipped')}
+                          </span>
+                        ) : undefined
+                      }
+                    >
+                      <Link to={stepLink(s)} />
+                    </ListRow>
+                  ))}
+                </List>
+              </section>
+            ) : null}
+            {layout.done.length > 0 ? (
+              <details className="group rounded-md border border-border bg-white">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 px-4 py-2 font-semibold text-sm text-text [&::-webkit-details-marker]:hidden">
+                  <Icon name="check-circle" className="size-5 text-[var(--status-present)]" />
+                  <span className="flex-1">
+                    {t('owner:setup.progress', { done: layout.done.length, total: layout.total })}
+                  </span>
+                  <Icon
+                    name="caret-down"
+                    className="size-5 text-text-muted transition-transform group-open:rotate-180"
+                  />
+                </summary>
+                <ul className="border-border border-t">
+                  {layout.done.map((s) => (
+                    <li key={s} className="border-border border-b last:border-b-0">
+                      <Link
+                        to={stepLink(s)}
+                        aria-label={t('owner:setup.doneStep', { step: title(s) })}
+                        className="flex min-h-11 items-center gap-3 px-4 py-2 text-sm text-text"
+                      >
+                        <Icon name="check" className="size-4 text-[var(--status-present)]" />
+                        <span className="flex-1">{title(s)}</span>
+                        <Icon name="caret-right" className="size-4 text-text-muted" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ) : null}
           </div>
         );
       }}
