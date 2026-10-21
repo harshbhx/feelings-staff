@@ -238,7 +238,7 @@ function Board({ board }: { board: TodayBoard }) {
       {/* PRD 4.18.3: the roll-call that is open or missed (N33), else one quiet line. */}
       <RollCallCard slot={board.rollCall} primary={board.actionsCount === 0} />
 
-      <div className="xl:sticky xl:top-16 xl:z-20 xl:-my-3 xl:bg-bg xl:py-3">
+      <div className="xl:sticky xl:top-16 xl:z-20 xl:-my-3 xl:bg-(--app-page) xl:py-3">
         <StatChipGroup
           legend={t('owner:today.counters.label')}
           legendHidden
