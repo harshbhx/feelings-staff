@@ -61,11 +61,17 @@ export function createHttpApiClient(opts: HttpClientOptions): ApiClient {
   const doFetch = opts.fetchImpl ?? fetch.bind(globalThis);
   const client: Record<string, unknown> = {};
 
+  // A route this build does not have (the owner-host passkey routes outside the owner build) is a 404.
+  const route = (key: EndpointKey) => {
+    const r = ROUTES[key];
+    if (!r) throw new ApiError({ code: 'NOT_FOUND', status: 404 });
+    return r;
+  };
   const url = (key: EndpointKey, input?: Input) =>
-    `${base}${API_BASE}${buildPath(ROUTES[key].p, input?.params)}${queryString(input?.query)}`;
+    `${base}${API_BASE}${buildPath(route(key).p, input?.params)}${queryString(input?.query)}`;
 
   for (const key of Object.keys(ROUTES) as EndpointKey[]) {
-    const def = ROUTES[key];
+    const def = route(key);
     client[key] = async (input: Input | undefined, callOpts: CallOptions = {}) => {
       const headers: Record<string, string> = {
         'X-FS-Client': opts.appVersion,

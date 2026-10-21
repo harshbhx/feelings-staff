@@ -4,6 +4,7 @@
  */
 import type { APIRequestContext, Page, TestInfo } from '@playwright/test';
 import { expect, test } from '../../fixtures';
+import { answerPresenceNotice, presenceNotice } from '../flows/helpers';
 
 interface FsPwaHooks {
   state(): { needRefresh: boolean; canPromptNow: boolean; upgradeRequired: boolean };
@@ -332,9 +333,8 @@ test.describe('offline', () => {
     await owner.approvePendingDevice(staff.id);
     const home = page.getByRole('heading', { level: 1, name: /Riya/ });
     // The first Today asks for the presence notice once (PRD 4.18.1): say OK, then the home shows.
-    const notice = page.getByRole('button', { name: 'OK, I understand' });
-    await expect(home.or(notice)).toBeVisible({ timeout: 30_000 });
-    if (await notice.isVisible()) await notice.click();
+    await expect(home.or(presenceNotice(page))).toBeVisible({ timeout: 30_000 });
+    await answerPresenceNotice(page);
     await expect(home).toBeVisible();
 
     // The shell gets this phone ready to check in offline while it is online (PRD 4.3.6).

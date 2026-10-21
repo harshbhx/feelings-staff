@@ -1,13 +1,13 @@
 /**
  * Split build, two hosts (docs/owner-access.md, ADR-19, slice 1b). Runs only with `E2E_SPLIT=1`, against
- * the preview Worker started with OWNER_HOST=owner.example.test:8787 (the e2e workflow does that
+ * the preview Worker started with OWNER_HOST=owner.localhost:8787 (the e2e workflow does that
  * in its own step). Both hosts are placeholders. API-level checks send a Host header to localhost; the
  * browser checks reach the hosts through Chromium's host resolver rule in playwright.config.ts.
  */
 import { type APIRequestContext, expect, test } from '@playwright/test';
 
 const STAFF = 'staff.example.test:8787';
-const OWNER = 'owner.example.test:8787';
+const OWNER = 'owner.localhost:8787';
 
 const get = (request: APIRequestContext, host: string, path: string) =>
   request.get(path, { headers: { Host: host }, maxRedirects: 0 });

@@ -7,6 +7,7 @@ import { IconButton, Logo } from '@fs/ui';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
+import { LOGO_MASK } from '../../../lib/brand';
 import { InboxBell } from '../../inbox';
 import { ShellBanners } from './ShellBanners';
 
@@ -38,7 +39,12 @@ export function ScreenHeader({ title, as = 'h1', back, dataAt }: ScreenHeaderPro
           />
         ) : null}
         {as === 'brand' ? (
-          <Logo name={t('common:app.shortName')} size="sm" className="staff-header__logo" />
+          <Logo
+            name={t('common:app.shortName')}
+            size="sm"
+            mask={LOGO_MASK}
+            className="staff-header__logo"
+          />
         ) : null}
         {as === 'h1' ? (
           <h1 className="staff-header__title">{title}</h1>

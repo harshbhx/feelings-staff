@@ -9,6 +9,7 @@ import { Avatar, Icon, List, ListRow, Logo } from '@fs/ui';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useMe } from '../../../api/hooks';
+import { LOGO_MASK } from '../../../lib/brand';
 import { Section } from '../components/layout';
 import { allowed, MORE, type NavItem } from '../shell/nav';
 
@@ -34,7 +35,7 @@ export function MoreScreen() {
         );
       })}
       <div className="grid gap-4 rounded-md border border-border bg-bg p-4 xl:hidden">
-        <Logo name={t('common:app.shortName')} />
+        <Logo name={t('common:app.shortName')} mask={LOGO_MASK} />
         {me.data ? (
           <div className="flex items-center gap-3">
             <Avatar name={me.data.user.name} size="sm" />

@@ -146,27 +146,40 @@ export async function onboardPhone(
     name: p.name.split(' ')[0] ?? p.name,
   });
   // The first Today asks for the presence notice once (PRD 4.18.1): say OK, then the home shows.
-  const notice = page.getByRole('button', { name: 'OK, I understand' });
-  // The notice sheet is lazy and can open after the checks below, covering Check in for the rest
-  // of the test. Answer it whenever it shows up.
-  await page.addLocatorHandler(notice, async () => {
-    await notice.click();
-  });
-  await expect(home.or(notice)).toBeVisible({ timeout: 30_000 });
-  // The home heading can show before the presence answer and the lazy notice sheet arrive: let
-  // both settle, then look for the notice again.
-  await page.waitForLoadState('networkidle');
-  if (await notice.isVisible()) await notice.click();
+  // While the notice is open the rest of the page is aria-hidden, so the home heading only shows
+  // once it is answered.
+  await expect(home.or(presenceNotice(page))).toBeVisible({ timeout: 30_000 });
+  await answerPresenceNotice(page);
   await expect(home).toBeVisible();
   return { id: staff.id };
 }
 
-/** The presence notice sheet ("When you are not at the salon") shows on Today until it is answered. */
-export async function dismissPresenceNotice(page: Page) {
-  await page.waitForLoadState('networkidle');
-  const notice = page.getByRole('button', { name: 'OK, I understand' });
-  if (await notice.isVisible()) await notice.click();
+/** The presence notice sheet ("When you are not at the salon"). */
+export function presenceNotice(page: Page) {
+  return page.getByRole('dialog', { name: 'When you are not at the salon' });
+}
+
+/**
+ * The one way the E2E suites answer the presence notice. The server decides whether it is due
+ * (`consentNeeded` on `/me/presence`), so there is nothing to race: when it is due the lazy sheet
+ * must show up and gets OK; when it is not, it must not be on the page. Either way the answer is
+ * then checked on the server. Call it on Today, after the home or the notice is on screen.
+ * Never use `addLocatorHandler` for this: the handler answers the sheet in the middle of another
+ * click and that click then waits for a button that is gone.
+ */
+export async function answerPresenceNotice(page: Page) {
+  const notice = presenceNotice(page);
+  const state = () =>
+    staffApi(page)<{ enabled: boolean; consentNeeded: boolean }>('GET', '/me/presence');
+  const due = (await state()).body.consentNeeded;
+  if (due) {
+    await expect(notice, 'the notice is due, so Today shows it').toBeVisible({ timeout: 30_000 });
+    await notice.getByRole('button', { name: 'OK, I understand' }).click();
+  }
   await expect(notice).toBeHidden();
+  await expect
+    .poll(async () => (await state()).body.consentNeeded, { message: 'the answer is stored' })
+    .toBe(false);
 }
 
 /** The staff phone calls the API with its own session. */
