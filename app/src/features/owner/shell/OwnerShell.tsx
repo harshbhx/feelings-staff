@@ -67,7 +67,7 @@ export function OwnerShell() {
         <ChromeProvider>
           <div
             style={SHELL_VARS}
-            className="min-h-dvh bg-(--app-page) [--owner-toast-offset:var(--tabbar-h)] xl:pl-(--owner-rail-w) xl:[--owner-toast-offset:0px]"
+            className="relative min-h-dvh bg-(--app-page) [--owner-toast-offset:var(--tabbar-h)] xl:pl-(--owner-rail-w) xl:[--owner-toast-offset:0px]"
           >
             <a
               href="#owner-main"
@@ -75,6 +75,12 @@ export function OwnerShell() {
             >
               <SkipLabel />
             </a>
+            {/* The rail's white column runs the page's full height under the fixed rail, so a long
+                page never shows the warm band beside the nav (and full-page captures match). */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-y-0 left-0 hidden w-(--owner-rail-w) border-border border-r bg-bg xl:block"
+            />
             <Rail count={count ?? 0} />
             <Header />
             <Banners />
