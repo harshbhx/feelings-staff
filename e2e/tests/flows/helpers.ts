@@ -151,6 +151,14 @@ export async function onboardPhone(
   return { id: staff.id };
 }
 
+/** The presence notice sheet ("When you are not at the salon") shows on Today until it is answered. */
+export async function dismissPresenceNotice(page: Page) {
+  await page.waitForLoadState('networkidle');
+  const notice = page.getByRole('button', { name: 'OK, I understand' });
+  if (await notice.isVisible()) await notice.click();
+  await expect(notice).toBeHidden();
+}
+
 /** The staff phone calls the API with its own session. */
 export function staffApi(page: Page) {
   return async function call<T>(

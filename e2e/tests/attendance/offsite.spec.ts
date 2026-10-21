@@ -19,6 +19,7 @@ import type {
 } from '@fs/contracts';
 import { expect, test } from '../../fixtures';
 import {
+  dismissPresenceNotice,
   enterPin,
   expectStep,
   ist,
@@ -89,6 +90,7 @@ test.describe('E2E-09 off-site duty from a Google Maps link', () => {
 
     // Her Today shows the duty; she is at the venue, not the salon.
     await page.reload();
+    await dismissPresenceNotice(page);
     await expect(page.getByText('Venue duty today')).toBeVisible();
     await expect(page.getByText(/Hotel Aram/).first()).toBeVisible();
     await context.grantPermissions(['geolocation']);
@@ -151,8 +153,11 @@ test.describe('E2E-10 an unplanned venue, opened for others', () => {
       await sheet.getByRole('button', { name: "I'm at a venue" }).click();
       await sheet.getByLabel('Where are you?').fill('Patel wedding');
       await sheet.getByRole('button', { name: /^Send to / }).click();
-      await expectStep(page, 'pin');
-      await enterPin(page, 'in', PIN);
+      // The PIN from the first try is kept; if the flow asks again, answer it.
+      await expectStep(page, 'pin', 'sent');
+      if ((await punchStep(page).getAttribute('data-punch-step')) === 'pin') {
+        await enterPin(page, 'in', PIN);
+      }
       await expectStep(page, 'sent');
 
       // Needs action shows it as a request to open the venue; the owner lets the second one in too.
@@ -171,6 +176,7 @@ test.describe('E2E-10 an unplanned venue, opened for others', () => {
 
       // The second one checks in on her own phone at the same place.
       await secondPhone.page.reload();
+      await dismissPresenceNotice(secondPhone.page);
       await expect(secondPhone.page.getByText('Venue duty today')).toBeVisible();
       await punch(secondPhone.page, 'in', PIN);
 
