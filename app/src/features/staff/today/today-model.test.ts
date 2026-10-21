@@ -110,7 +110,7 @@ describe('Today model (PRD 5.1, AC S-10)', () => {
   });
 
   it('the Not checked in banner counts minutes since the shift start, only once it has started', () => {
-    const m = buildTodayModel(view(), [], NOW);
+    const m = buildTodayModel(view('ready'), [], NOW);
     expect(m.status).toBe('not_in');
     const start = m.shiftStartTs ?? 0;
     expect(minutesLateToStart(m, start + 42 * 60_000)).toBe(42);
