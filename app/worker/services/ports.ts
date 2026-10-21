@@ -174,7 +174,7 @@ export interface Ctx {
   ipHmac: string | null;
   cf: IncomingRequestCfProperties | null;
   /** Verified Cloudflare Access e-mail on the owner host, when the Access gate is on. */
-  accessEmail?: string;
+  accessEmail?: string | undefined;
   waitUntil(p: Promise<unknown>): void;
   services: Services;
 }

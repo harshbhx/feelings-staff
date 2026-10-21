@@ -44,7 +44,11 @@ async function makePair(kid: string): Promise<Pair> {
     true,
     ['sign', 'verify'],
   )) as CryptoKeyPair;
-  return { kid, priv: kp.privateKey, pub: await crypto.subtle.exportKey('jwk', kp.publicKey) };
+  return {
+    kid,
+    priv: kp.privateKey,
+    pub: (await crypto.subtle.exportKey('jwk', kp.publicKey)) as JsonWebKey,
+  };
 }
 
 const now = () => Math.floor(Date.now() / 1000);
@@ -73,6 +77,7 @@ let other: Pair;
 let certsKeys: Pair[];
 let certsStatus = 200;
 let certsCalls = 0;
+let warn: ReturnType<typeof vi.spyOn>;
 
 beforeAll(async () => {
   pair = await makePair('kid-1');
@@ -93,7 +98,7 @@ beforeEach(() => {
       keys: certsKeys.map((k) => ({ ...k.pub, kid: k.kid, alg: 'RS256', use: 'sig' })),
     });
   });
-  vi.spyOn(console, 'warn').mockImplementation(() => {});
+  warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 });
 afterEach(() => {
   vi.restoreAllMocks();
@@ -300,7 +305,7 @@ describe('access gate is on', () => {
   it('logs no token or email when it denies', async () => {
     const token = await sign(pair, { ...goodClaims(), email: 'x@example.test' });
     await owner(ON, token);
-    const logged = vi.mocked(console.warn).mock.calls.flat().map(String).join(' ');
+    const logged = warn.mock.calls.flat().map(String).join(' ');
     expect(logged).toContain('access: denied');
     expect(logged).not.toContain(token);
     expect(logged).not.toContain('x@example.test');

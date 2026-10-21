@@ -8,6 +8,6 @@ export type AppEnv = {
     requestId: string;
     ctx: Ctx;
     /** Verified Cloudflare Access e-mail (lower case); set only when the Access gate ran and passed. */
-    accessEmail?: string;
+    accessEmail?: string | undefined;
   };
 };
