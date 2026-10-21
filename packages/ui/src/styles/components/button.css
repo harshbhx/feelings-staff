@@ -172,8 +172,9 @@
     flex: none;
     width: 1.2em;
     height: 1.2em;
-    border: 2px solid currentColor;
-    border-right-color: transparent;
+    /* A faint full circle with one strong arc, so a still frame never reads as a letter. */
+    border: 2px solid color-mix(in oklab, currentColor 28%, transparent);
+    border-top-color: currentColor;
     border-radius: 50%;
     scale: 0.8;
     animation: fs-spin var(--dur-spin) linear infinite;
@@ -231,8 +232,6 @@
 
     .fs-btn__ring {
       animation: none;
-      border-right-color: currentColor;
-      opacity: 0.55;
     }
   }
 
