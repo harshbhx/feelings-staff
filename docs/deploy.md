@@ -82,6 +82,12 @@ npx wrangler secret list
 
 Optional secrets, only if you use them: `RESEND_API_KEY` (when `EMAIL_PROVIDER=resend`) and the WhatsApp secrets (P1, not built). The variables `ENV`, `APP_ORIGIN`, `APP_VERSION`, `MIN_APP_VERSION`, `EMAIL_PROVIDER`, `EMAIL_FROM`, `VAPID_SUBJECT` and `OWNER_BOOTSTRAP_EMAIL` live in `app/wrangler.jsonc`. Rotation of each secret: [secrets runbook](runbooks/secrets.md).
 
+Optional variable for the owner host ([owner access](owner-access.md)). Leave it unset until the cutover step; unset means one host serves everything exactly as before.
+
+| Variable | Example | Meaning |
+|---|---|---|
+| `OWNER_HOST` | `owner.example.test` | Host name only, no scheme. When set, requests with this Host get the owner surface, every other host gets the staff surface (owner paths answer 404), the Origin check uses the answering host's own origin, and owner sign-in links use `https://<OWNER_HOST>`. Invite and join links keep `APP_ORIGIN`. Rollback: unset it. |
+
 ## 4. Email
 
 Owner sign-in links and codes, and the payroll and weekly digest emails, are sent by Cloudflare Email Service in production ([ADR-09](decisions/0009-email-through-cloudflare-email-service.md)). Preview (`EMAIL_PROVIDER=outbox`) never sends: messages go to the outbox. `feelingsbeautycare.in` is already enabled for Email Sending in the DualMind Labs Cloudflare account and its DNS records are live; do the steps below only for a different account.

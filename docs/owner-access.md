@@ -6,6 +6,8 @@ Contents: [What changes](#what-changes) · [The two hosts](#the-two-hosts) · [C
 
 ## What changes
 
+**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default) is built; slice 1b (split build) follows.
+
 | Today | After |
 |---|---|
 | Owner and staff share `staff.feelingsbeautycare.in`; `/auth/owner` is public | The owner app lives on a random first-level subdomain (the "owner host"). The staff host answers 404 on every owner route and its build has no owner code. |

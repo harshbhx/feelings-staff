@@ -19,6 +19,7 @@ import {
 import type { AppLang } from '@fs/i18n';
 import { json } from '../db';
 import { isNonProd } from '../env';
+import { originForPath } from '../lib/hosts';
 import { loadOrg } from '../lib/settings';
 import { ulid } from '../lib/ulid';
 import { weeklyDigest } from './digest';
@@ -100,8 +101,12 @@ export interface PayloadInput {
 }
 
 /** Declarative Web Push payload, at most 2 KB (the body is shortened until it fits). */
-export function buildPayload(env: { APP_ORIGIN: string }, i: PayloadInput): PushPayload {
-  const navigate = env.APP_ORIGIN ? new URL(i.url, env.APP_ORIGIN).toString() : i.url;
+export function buildPayload(
+  env: { APP_ORIGIN: string; OWNER_HOST?: string },
+  i: PayloadInput,
+): PushPayload {
+  const origin = originForPath(env, i.url);
+  const navigate = origin ? new URL(i.url, origin).toString() : i.url;
   const make = (body: string | null): PushPayload => ({
     web_push: 8030,
     notification: {
@@ -508,7 +513,7 @@ async function notifyRecipient(
         title: view.title,
         body: view.body,
         lines: await emailLines(ctx, e, t),
-        url: `${ctx.env.APP_ORIGIN}${view.url}`,
+        url: `${originForPath(ctx.env, view.url)}${view.url}`,
         footer: t(e.type === 'weekly_digest' ? 'email.digest.footer' : 'email.notice.footer'),
       });
       await ctx.services.email.send(ctx, msg);

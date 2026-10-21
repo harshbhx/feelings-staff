@@ -9,6 +9,14 @@ import { isNonProd } from './env';
 import { registerApi } from './lib/api';
 import type { AppEnv } from './lib/app-env';
 import { ApiException } from './lib/errors';
+import {
+  isOwnerApiPath,
+  isOwnerAppPath,
+  isOwnerHostApiPath,
+  isStaffAppPath,
+  STAFF_APP_PATHS,
+  surfaceOf,
+} from './lib/hosts';
 import { ulid } from './lib/ulid';
 import { context } from './middleware/context';
 import { errorResponse, onError } from './middleware/errors';
@@ -25,6 +33,28 @@ export function createApp(): Hono<AppEnv> {
     await next();
     c.res = withSecurityHeaders(c.res, requestId);
   });
+
+  // Host routing (ADR-19). A no-op while OWNER_HOST is unset. `/api/v1` is stripped for the checks.
+  app.use('*', async (c, next) => {
+    const url = new URL(c.req.url);
+    const surface = surfaceOf(c.env, url);
+    if (surface === 'combined') return next();
+    const isApi = url.pathname.startsWith('/api/');
+    const path = isApi ? url.pathname.replace(/^\/api(\/v1)?/, '') || '/' : url.pathname;
+    let hidden: boolean;
+    if (surface === 'staff') hidden = isApi ? isOwnerApiPath(path) : isOwnerAppPath(path);
+    else hidden = isApi ? !isOwnerHostApiPath(path) : isStaffAppPath(path);
+    if (!hidden) return next();
+    return isApi ? errorResponse(c, new ApiException('NOT_FOUND')) : c.text('Not found', 404);
+  });
+
+  // Pages that only exist on one host pass through the Worker (wrangler `run_worker_first`) so the
+  // rules above can hide them; the shell itself still comes from the asset layer.
+  const shell = [...STAFF_APP_PATHS.filter((p) => p !== '/q'), '/o', '/auth/owner'].flatMap((p) => [
+    p,
+    `${p}/*`,
+  ]);
+  for (const p of shell) app.get(p, (c) => c.env.ASSETS.fetch(c.req.raw));
 
   app.use('/api/*', guard);
   app.use('/api/*', context);

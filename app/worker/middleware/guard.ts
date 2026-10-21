@@ -7,6 +7,7 @@
 import type { MiddlewareHandler } from 'hono';
 import type { AppEnv } from '../lib/app-env';
 import { fail } from '../lib/errors';
+import { allowedOrigins } from '../lib/hosts';
 
 export function compareVersions(a: string, b: string): number {
   const pa = a.split(/[.+-]/).map((x) => Number.parseInt(x, 10) || 0);
@@ -30,8 +31,8 @@ export const guard: MiddlewareHandler<AppEnv> = async (c, next) => {
   const client = c.req.header('X-FS-Client');
   if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS') {
     const origin = c.req.header('Origin');
-    const self = new URL(c.req.url).origin;
-    if (!origin || origin !== self || !client) fail('CSRF');
+    const allowed = allowedOrigins(c.env, new URL(c.req.url));
+    if (!origin || !allowed.includes(origin) || !client) fail('CSRF');
   }
   if (client && c.env.MIN_APP_VERSION && compareVersions(client, c.env.MIN_APP_VERSION) < 0) {
     fail('UPGRADE_REQUIRED', undefined, { minAppVersion: c.env.MIN_APP_VERSION });

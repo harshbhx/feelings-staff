@@ -18,6 +18,7 @@ import {
   verifyDeviceSignature,
 } from '../../lib/crypto';
 import { fail } from '../../lib/errors';
+import { ownerOrigin } from '../../lib/hosts';
 import { loadOrg } from '../../lib/settings';
 import { ulid } from '../../lib/ulid';
 import { revokeSession } from '../../middleware/session';
@@ -509,7 +510,7 @@ export const handlers: Handlers = {
       const octx = withOrg(ctx, owner.org_id);
       const link = await createMagicLink(octx, email);
       const mail = magicEmail({
-        origin: ctx.env.APP_ORIGIN,
+        origin: ownerOrigin(ctx.env),
         name: owner.name,
         token: link.token,
         code: link.code,
