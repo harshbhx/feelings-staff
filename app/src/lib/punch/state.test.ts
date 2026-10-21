@@ -256,7 +256,7 @@ describe('punch flow: server answers (PRD 4.3.2, 4.3.5, 4.4)', () => {
     expect(s.intent.qrToken).toBe('ABCDEFGHJK');
   });
 
-  it("outside -> I'm at a venue resends with the place name", () => {
+  it("outside -> I'm at a venue resends with the place name as a request to the owner", () => {
     const out = failWith(apiError('OUTSIDE_FENCE', 422, { distanceM: null }));
     const s = punchReducer(out, {
       type: 'IM_AT_VENUE',
@@ -268,7 +268,7 @@ describe('punch flow: server answers (PRD 4.3.2, 4.3.5, 4.4)', () => {
     expect(s.intent).toMatchObject({
       placeName: 'Patel wedding',
       note: 'Bridal',
-      requestApproval: false,
+      requestApproval: true,
     });
   });
 

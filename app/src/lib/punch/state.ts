@@ -569,7 +569,13 @@ export function punchReducer(state: PunchFlowState, event: PunchEvent): PunchFlo
         {
           ...s,
           result: null,
-          intent: { ...s.intent, placeName: event.placeName, note: event.note },
+          // The server stores a venue punch as a request to the owner: both fields go together.
+          intent: {
+            ...s.intent,
+            requestApproval: true,
+            placeName: event.placeName,
+            note: event.note,
+          },
         },
         event.at,
       );
