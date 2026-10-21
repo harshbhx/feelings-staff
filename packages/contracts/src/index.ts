@@ -2,12 +2,13 @@
  * @fs/contracts, version 1 (`contracts-v1`). Shared by the Worker, the SPA, the engine and the tests.
  * Changes after the freeze go through a PR labelled `contract-change` (PRD 16.1).
  */
-export const CONTRACTS_VERSION = '1.2.0';
+export const CONTRACTS_VERSION = '1.3.0';
 
 export * from './api/auth';
 export * from './api/credits';
 export * from './api/notify';
 export * from './api/owner';
+export * from './api/owner-access';
 export * from './api/staff';
 export * from './api/views';
 export * from './client';

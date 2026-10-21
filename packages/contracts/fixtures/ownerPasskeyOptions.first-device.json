@@ -1,0 +1,12 @@
+{
+  "challengeId": "01M5995R80TDG76EV4EZPECGNR",
+  "expiresAt": 1792387020000,
+  "options": {
+    "challenge": "pJimjMc-sccNc4YVFVdWBtdof0qbh6lsHmot-wEK8Vw",
+    "timeout": 60000,
+    "rpId": "owner.example.test",
+    "allowCredentials": [],
+    "userVerification": "required"
+  },
+  "emailCode": true
+}

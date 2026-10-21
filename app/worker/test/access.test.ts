@@ -353,4 +353,40 @@ describe('JWKS cache', () => {
     expect((await owner(ON, await sign(pair))).status).toBe(200);
     expect(certsCalls).toBe(2);
   });
+
+  it('keeps using the cached key for up to 24 h when the refetch fails', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-21T10:00:00Z'));
+    expect((await owner(ON, await sign(pair))).status).toBe(200);
+    certsStatus = 500;
+    vi.setSystemTime(new Date('2026-10-21T12:00:00Z'));
+    expect((await owner(ON, await sign(pair))).status).toBe(200);
+    expect(certsCalls).toBe(2);
+    // within the minute after the failed refetch the stale key still works, without another fetch
+    expect((await owner(ON, await sign(pair))).status).toBe(200);
+    expect(certsCalls).toBe(2);
+    // a network error behaves the same
+    vi.setSystemTime(new Date('2026-10-21T20:00:00Z'));
+    vi.mocked(globalThis.fetch).mockRejectedValueOnce(new Error('boom'));
+    expect((await owner(ON, await sign(pair))).status).toBe(200);
+  });
+
+  it('denies once the cached keys are older than 24 h and the refetch fails', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-21T10:00:00Z'));
+    expect((await owner(ON, await sign(pair))).status).toBe(200);
+    certsStatus = 500;
+    vi.setSystemTime(new Date('2026-10-22T10:30:00Z'));
+    await expectDenied(await owner(ON, await sign(pair)));
+  });
+
+  it('denies an unknown kid when the refetch fails, while the cached kid still works', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-21T10:00:00Z'));
+    expect((await owner(ON, await sign(pair))).status).toBe(200);
+    certsStatus = 500;
+    vi.setSystemTime(new Date('2026-10-21T10:05:00Z'));
+    await expectDenied(await owner(ON, await sign(other)));
+    expect((await owner(ON, await sign(pair))).status).toBe(200);
+  });
 });
