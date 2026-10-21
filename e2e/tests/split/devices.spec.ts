@@ -57,7 +57,9 @@ test.describe('SPLIT-4 owner devices', () => {
     // The fingerprint answers by itself (virtual authenticator); then the owner PIN.
     const sheet = page.getByRole('dialog');
     await sheet.getByLabel('Owner PIN').fill(s.owner.pin ?? '');
-    await expect(page.getByText('Approved. Finish on the new device.')).toBeVisible();
+    await expect(
+      page.getByText('Approved. Finish on the new device.', { exact: true }),
+    ).toBeVisible();
     await expect(page.getByTestId('action-owner_device')).toHaveCount(0);
 
     // The new device notices, then makes its own passkey.
@@ -101,7 +103,9 @@ test.describe('SPLIT-4 owner devices', () => {
       .getByRole('dialog')
       .getByLabel('Owner PIN')
       .fill(s.owner.pin ?? '');
-    await expect(page.getByText('Declined. That device was not added.')).toBeVisible();
+    await expect(
+      page.getByText('Declined. That device was not added.', { exact: true }),
+    ).toBeVisible();
 
     await expect(
       laptop.page.getByText('This device was declined on your other phone.'),
