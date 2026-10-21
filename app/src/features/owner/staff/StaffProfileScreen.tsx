@@ -49,6 +49,7 @@ import { Meta, NoBreakParts, Section } from '../components/layout';
 import { ErrorCard, QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { Balance, useEstimateText } from '../credits/parts';
 import { clock, days, duration, longDate, money, shortDate } from '../lib/format';
+import { roleTone } from '../lib/people';
 import { phoneLabel } from '../lib/share';
 import { dayStatusMeta, leaveKey } from '../lib/status';
 import { useOwnerTitle } from '../shell/chrome';
@@ -119,7 +120,7 @@ function Profile({ staff }: { staff: StaffDetail }) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       <div className="flex items-center gap-4">
-        <Avatar name={staff.name} size="lg" />
+        <Avatar name={staff.name} size="lg" tone={roleTone(staff.designation)} />
         <div className="grid min-w-0">
           <p className="font-bold text-text">{staff.designation}</p>
           <Meta>

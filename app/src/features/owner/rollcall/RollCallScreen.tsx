@@ -6,12 +6,23 @@
  * same way and Done saves the edit until the day is locked. `/o/roll-call` lists today's slots.
  */
 import type { RollCallPerson, RollCallSlot, RollCallView } from '@fs/contracts';
-import { Avatar, Badge, Button, Icon, List, ListRow, StatusChip, useToast } from '@fs/ui';
+import {
+  Avatar,
+  type AvatarTone,
+  Badge,
+  Button,
+  Icon,
+  List,
+  ListRow,
+  StatusChip,
+  useToast,
+} from '@fs/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { useIsOwner, useRollCall, useRollCallDay, useRollCallSubmit } from '../api/presence';
+import { useRoleTones } from '../api/staff';
 import { Meta, NoBreakParts } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { clock } from '../lib/format';
@@ -176,6 +187,8 @@ function Marking({ view, slot }: { view: RollCallView; slot: RollCallSlot | null
     );
   };
 
+  // Role tones for the avatars (the roll-call data has no designation); owners only read the list.
+  const tones = useRoleTones(useIsOwner());
   const editing = slot?.status === 'done';
   const savedBy = slot?.submittedBy?.name.split(' ')[0];
 
@@ -204,6 +217,7 @@ function Marking({ view, slot }: { view: RollCallView; slot: RollCallSlot | null
               <PersonRow
                 key={p.userId}
                 person={p}
+                tone={tones.get(p.userId)}
                 mark={marks[p.userId] ?? 'here'}
                 onToggle={() => setMarks((m) => toggleMark(m, p.userId))}
               />
@@ -262,10 +276,12 @@ function hintText(h: RowHint, t: ReturnType<typeof useTranslation>['t']): string
  */
 function PersonRow({
   person,
+  tone,
   mark,
   onToggle,
 }: {
   person: RollCallPerson;
+  tone: AvatarTone | undefined;
   mark: Mark;
   onToggle: () => void;
 }) {
@@ -282,7 +298,7 @@ function PersonRow({
       >
         <input type="checkbox" className="sr-only" checked={notHere} onChange={onToggle} />
         <span className="fs-row__leading">
-          <Avatar name={person.name} />
+          <Avatar name={person.name} tone={tone} />
         </span>
         <span className="fs-row__text">
           <span className="fs-row__title">

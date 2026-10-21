@@ -52,6 +52,37 @@
     font-size: var(--text-lg);
   }
 
+  /* Role tones (PRD 12.6 as amended): initials in the tone on its tint, 4.5:1 or more (12.3). */
+  .fs-avatar[data-tone="makeup"] {
+    background: var(--role-makeup-bg);
+    color: var(--role-makeup);
+  }
+
+  .fs-avatar[data-tone="nails"] {
+    background: var(--role-nails-bg);
+    color: var(--role-nails);
+  }
+
+  .fs-avatar[data-tone="mehndi"] {
+    background: var(--role-mehndi-bg);
+    color: var(--role-mehndi);
+  }
+
+  .fs-avatar[data-tone="salon"] {
+    background: var(--role-salon-bg);
+    color: var(--role-salon);
+  }
+
+  .fs-avatar[data-tone="trainee"] {
+    background: var(--role-trainee-bg);
+    color: var(--role-trainee);
+  }
+
+  .fs-avatar[data-tone="neutral"] {
+    background: var(--role-neutral-bg);
+    color: var(--role-neutral);
+  }
+
   /* Skeleton: a slow breathe between two tints, 6 times at most, then still. No shimmer. */
   .fs-skeleton {
     position: relative;

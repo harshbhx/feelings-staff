@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { initials } from '../src/components/Avatar';
+import { Avatar, initials } from '../src/components/Avatar';
 import { Button, IconButton } from '../src/components/Button';
 import { Field, Input, PasswordInput } from '../src/components/Field';
 import { type DayStatus, STATUS_HAS_LETTER, StatusChip } from '../src/components/StatusChip';
@@ -94,5 +94,18 @@ describe('Avatar', () => {
     expect(initials('Priya Shah')).toBe('PS');
     expect(initials('  neha  ')).toBe('N');
     expect(initials('Kajal Ben Mehta')).toBe('KM');
+  });
+
+  it('PRD 12.6 as amended: the role tone is a data attribute, blush without one', () => {
+    const { container } = renderUi(
+      <>
+        <Avatar name="Sejal Makwana" tone="makeup" />
+        <Avatar name="Urmi" />
+      </>,
+    );
+    const [toned, plain] = container.querySelectorAll('.fs-avatar');
+    expect(toned?.getAttribute('data-tone')).toBe('makeup');
+    expect(toned?.hasAttribute('tone')).toBe(false);
+    expect(plain?.hasAttribute('data-tone')).toBe(false);
   });
 });

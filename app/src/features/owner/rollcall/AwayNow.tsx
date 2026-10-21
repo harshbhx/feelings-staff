@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useAwayNow, useIsOwner } from '../api/presence';
 import { NoBreakParts, Section, WRAP_ROW } from '../components/layout';
 import { clock } from '../lib/format';
+import { roleTone } from '../lib/people';
 import { EditAwaySheet } from './EditAwaySheet';
 
 export function AwayNowSection() {
@@ -32,7 +33,7 @@ export function AwayNowSection() {
             <ListRow
               key={a.id}
               className={WRAP_ROW}
-              leading={<Avatar name={a.user.name} />}
+              leading={<Avatar name={a.user.name} tone={roleTone(a.user.designation)} />}
               title={a.user.name}
               subtitle={
                 // The reason is words in the quiet line, not a second chip (Fix 2).

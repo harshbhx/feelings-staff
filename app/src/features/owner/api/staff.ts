@@ -3,8 +3,10 @@
  * re-send invite, reset PIN, edit (salary changes need step-up), exit, rehire, leave, devices.
  */
 import type { StaffCreate, StaffDetail, StaffPatch } from '@fs/contracts';
+import type { AvatarTone } from '@fs/ui';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApi } from '../../../api/provider';
+import { roleTone } from '../lib/people';
 import { filterStaff } from '../staff/staff-list-model';
 import { ownerKeys, type StaffStatusFilter } from './keys';
 import { ownerQuery, useOwnerMutation } from './query';
@@ -19,6 +21,24 @@ export function useStaffList(status: StaffStatusFilter = 'active', q = '') {
     placeholderData: (prev) => prev,
     select: (rows) => filterStaff(rows, status, query),
   });
+}
+
+const NO_TONES: ReadonlyMap<string, AvatarTone> = new Map();
+
+/**
+ * Role tones by person id, from the active staff list (shared cache with the Staff screen), for
+ * rows whose data carries no designation (Credits, Roll-call). Until it loads, avatars keep the blush.
+ */
+export function useRoleTones(enabled = true): ReadonlyMap<string, AvatarTone> {
+  const api = useApi();
+  const query = useQuery({
+    ...ownerQuery('ownerStaffList', ownerKeys.staffList('active', ''), () =>
+      api.ownerStaffList({ query: { status: 'active' } }),
+    ),
+    enabled,
+    select: (rows) => new Map(rows.map((r) => [r.id, roleTone(r.designation)])),
+  });
+  return query.data ?? NO_TONES;
 }
 
 export function useStaff(id: string) {
