@@ -6,7 +6,7 @@
  * English is the source of truth; Gujarati falls back to English key by key.
  *
  * Bundling (PRD 11.10, staff initial JS): only the English catalogs a staff phone needs before its
- * first paint are in the app shell (`STAFF_NAMESPACES`). The owner, door, payslip and presence copy and every
+ * first paint are in the app shell (`STAFF_NAMESPACES`). The owner, door, payslip, presence and notify copy and every
  * Gujarati catalog are separate chunks, loaded through a small i18next backend when an instance
  * asks for them (at creation, on `changeLanguage('gu')`, or with `i18n.loadNamespaces`).
  */
@@ -14,7 +14,6 @@ import i18next, { type BackendModule, type i18n as I18n, type ResourceKey } from
 import enAuth from '../en/auth.json';
 import enCommon from '../en/common.json';
 import enErrors from '../en/errors.json';
-import enNotify from '../en/notify.json';
 import enStaff from '../en/staff.json';
 import enUi from '../en/ui.json';
 
@@ -33,14 +32,16 @@ export const NAMESPACES = [
 export type Namespace = (typeof NAMESPACES)[number];
 export type AppLang = 'en' | 'gu';
 
-/** What the staff app needs from the start: shell, screens, errors, sign-in, inbox, kit labels. */
+/**
+ * What the staff app needs from the start: shell, screens, errors, sign-in, kit labels. The inbox
+ * copy (`notify`, 9 KB) loads with the inbox screen; the header bell's label is in `common`.
+ */
 export const STAFF_NAMESPACES = [
   'common',
   'staff',
   'errors',
   'ui',
   'auth',
-  'notify',
 ] as const satisfies readonly Namespace[];
 
 type Catalog = Exclude<ResourceKey, string>;
@@ -53,7 +54,6 @@ const bundledEn: Record<(typeof STAFF_NAMESPACES)[number], Catalog> = {
   errors: enErrors,
   ui: enUi,
   auth: enAuth,
-  notify: enNotify,
 };
 
 /**
@@ -70,6 +70,7 @@ const lazyCatalogs: Record<AppLang, Partial<Record<Namespace, Loader>>> = {
       ? {}
       : { owner: () => import('../en/owner.json') }),
     door: () => import('../en/door.json'),
+    notify: () => import('../en/notify.json'),
     payslip: () => import('../en/payslip.json'),
     presence: () => import('../en/presence.json'),
   },

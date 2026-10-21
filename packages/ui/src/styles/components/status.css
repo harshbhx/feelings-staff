@@ -53,9 +53,11 @@
     --fs-status-bg: var(--status-leave-bg);
   }
 
+  /* Its tint is the page colour, so a hairline keeps the chip's shape on the warm band. */
   .fs-status:is([data-status="off"], [data-status="holiday"]) {
     --fs-status-fg: var(--status-off);
     --fs-status-bg: var(--status-off-bg);
+    border-color: var(--border-strong);
   }
 
   /* Needs a look: ink text, the icon in sindoor. */

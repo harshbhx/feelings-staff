@@ -20,6 +20,8 @@ const LazyOwnerShell = lazy(() =>
 );
 
 const OWNER_NS = ['owner', 'payslip'] as const;
+// The panel also holds the inbox (/o/inbox), whose copy is not in the staff start catalogs.
+const OWNER_SHELL_NS = [...OWNER_NS, 'notify'] as const;
 const DOOR_NS = ['door'] as const;
 const KIT_NS = ['owner', 'payslip', 'door'] as const;
 
@@ -33,7 +35,7 @@ export const routes: RouteObject[] = [
     path: '/o',
     element: (
       <RequireRole roles={['owner', 'manager']} signIn="/auth/owner">
-        <WithNamespaces ns={OWNER_NS}>
+        <WithNamespaces ns={OWNER_SHELL_NS}>
           <Suspense fallback={null}>
             <LazyOwnerShell />
           </Suspense>

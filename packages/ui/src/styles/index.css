@@ -2,7 +2,7 @@
  * @fs/ui stylesheet (WP-2), imported once by app/src/main.tsx.
  *
  *   tokens.css      brand tokens, byte-for-byte copy (PRD 12.1); never edited
- *   app-tokens.css  status colours and app chrome (PRD 12.3)
+ *   app-tokens.css  status colours and app chrome (PRD 12.3), the brand layer (page, logo, role tones)
  *   intent-tokens.css  kit aliases (WP-10): intents, tab bar, rail, meter; no new values
  *   @theme below    the locked Tailwind v4 theme (docs/research/brand-and-stack.md 6.3): every
  *                   default scale cleared, brand values only, semantic names (bg-bg-soft,
@@ -36,6 +36,7 @@
 @import "./components/stat.css";
 @import "./components/card.css";
 @import "./components/rail.css";
+@import "./components/logo.css";
 @import "./components/shift.css";
 
 /* Scan the app and this package for class names (the Vite root is app/). */

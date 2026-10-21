@@ -2,11 +2,14 @@
  * More (PRD 5.2): on phones the fifth tab holds everything that is not a tab, grouped as Money,
  * People and days, Salon, each row with a one-line hint. Managers see only what they may open
  * (PRD 10.2). On desktop the rail already lists every item, so this page is just a fallback there.
+ * On phones the logo lives here (Today's header has it too): it closes the page with who is signed
+ * in, as the rail's foot does on desktop.
  */
-import { Icon, List, ListRow } from '@fs/ui';
+import { Avatar, Icon, List, ListRow, Logo } from '@fs/ui';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useMe } from '../../../api/hooks';
+import { LOGO_MASK } from '../../../lib/brand';
 import { Section } from '../components/layout';
 import { allowed, MORE, type NavItem } from '../shell/nav';
 
@@ -31,6 +34,18 @@ export function MoreScreen() {
           </Section>
         );
       })}
+      <div className="grid gap-4 rounded-md border border-border bg-bg p-4 xl:hidden">
+        <Logo name={t('common:app.shortName')} mask={LOGO_MASK} />
+        {me.data ? (
+          <div className="flex items-center gap-3">
+            <Avatar name={me.data.user.name} size="sm" />
+            <div className="min-w-0">
+              <p className="truncate font-bold text-sm text-text">{me.data.user.name}</p>
+              <p className="truncate text-sm text-text-body">{me.data.org.name}</p>
+            </div>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
