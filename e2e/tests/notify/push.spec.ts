@@ -108,25 +108,38 @@ test.describe('E2E-19 push in the service worker', () => {
         }),
       ]);
 
-    // A click: run the real notificationclick handler with the recorded notification.
+    // A click: run the real notificationclick handler with the recorded notification. Headless
+    // Chromium refuses to open or focus windows without a user gesture, so openWindow is recorded;
+    // the handler either navigates the open tab or opens a new window, and both must hit the target.
     const urls: string[] = [];
     page.on('framenavigated', (f) => {
       if (f === page.mainFrame()) urls.push(new URL(f.url()).pathname);
     });
     const worker = context.serviceWorkers()[0];
-    await worker?.evaluate(
+    const opened = await worker?.evaluate(
       async (data) => {
+        const sw = self as unknown as ServiceWorkerGlobalScope;
+        const openedUrls: string[] = [];
+        sw.clients.openWindow = async (url: string | URL) => {
+          openedUrls.push(String(url));
+          return null;
+        };
         const waits: Promise<unknown>[] = [];
         const ev = Object.assign(new Event('notificationclick'), {
           notification: { data, close() {} },
           waitUntil: (p: Promise<unknown>) => waits.push(p),
         });
         self.dispatchEvent(ev);
-        await Promise.all(waits);
+        await Promise.allSettled(waits);
+        return openedUrls;
       },
       (await recorded(context))[0]?.data,
     );
-    await expect.poll(() => urls, { timeout: 15_000 }).toContain(path);
+    await expect
+      .poll(() => (opened ?? []).map((u) => new URL(u).pathname).concat(urls), {
+        timeout: 15_000,
+      })
+      .toContain(path);
   });
 
   test('E2E-19 a push with no readable body still shows a notification', async ({
