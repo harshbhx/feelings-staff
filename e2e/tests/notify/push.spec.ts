@@ -22,33 +22,33 @@ interface Shown {
  * handler, notificationclick and navigation) is the real code.
  */
 
-/** Replace showNotification in the worker; every call is posted to the page's `recorded` list. */
-async function recordNotifications(page: Page, context: BrowserContext) {
-  await page.evaluate(() => {
-    const w = window as unknown as { recorded: unknown[] };
-    w.recorded = [];
-    navigator.serviceWorker.addEventListener('message', (e) => {
-      if (e.data?.type === 'e2e-shown') w.recorded.push(e.data.shown);
-    });
-  });
+/** Replace showNotification and the badge calls in the worker; calls are kept in `self.recorded`. */
+async function recordNotifications(context: BrowserContext) {
   const worker = context.serviceWorkers()[0];
   if (!worker) throw new Error('no service worker');
   await worker.evaluate(() => {
-    const sw = self as unknown as ServiceWorkerGlobalScope;
+    const sw = self as unknown as ServiceWorkerGlobalScope & { recorded: unknown[] };
+    sw.recorded = [];
     sw.registration.showNotification = async (title: string, options?: NotificationOptions) => {
-      const clients = await sw.clients.matchAll({ type: 'window', includeUncontrolled: true });
-      for (const c of clients) {
-        c.postMessage({
-          type: 'e2e-shown',
-          shown: { title, body: options?.body, tag: options?.tag, data: options?.data },
-        });
-      }
+      sw.recorded.push({ title, body: options?.body, tag: options?.tag, data: options?.data });
     };
+    const nav = sw.navigator as unknown as Record<string, unknown>;
+    nav.setAppBadge = async () => undefined;
+    nav.clearAppBadge = async () => undefined;
   });
 }
 
-const recorded = (page: Page) =>
-  page.evaluate(() => (window as unknown as { recorded: Shown[] }).recorded);
+async function recorded(context: BrowserContext): Promise<Shown[]> {
+  try {
+    return (
+      (await context
+        .serviceWorkers()[0]
+        ?.evaluate(() => (self as unknown as { recorded: Shown[] }).recorded)) ?? []
+    );
+  } catch {
+    return [];
+  }
+}
 
 async function setup(page: Page, context: BrowserContext) {
   const cdp = await context.newCDPSession(page);
@@ -63,7 +63,7 @@ async function setup(page: Page, context: BrowserContext) {
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
   });
-  await recordNotifications(page, context);
+  await recordNotifications(context);
   const origin = new URL(page.url()).origin;
   const push = async (data: string) =>
     cdp.send('ServiceWorker.deliverPushMessage', {
@@ -98,7 +98,7 @@ test.describe('E2E-19 push in the service worker', () => {
       }),
     );
     await expect
-      .poll(() => recorded(page), { timeout: 15_000 })
+      .poll(() => recorded(context), { timeout: 15_000 })
       .toEqual([
         expect.objectContaining({
           title: 'Priya is 18 min late',
@@ -124,7 +124,7 @@ test.describe('E2E-19 push in the service worker', () => {
         self.dispatchEvent(ev);
         await Promise.all(waits);
       },
-      (await recorded(page))[0]?.data,
+      (await recorded(context))[0]?.data,
     );
     await expect.poll(() => urls, { timeout: 15_000 }).toContain(path);
   });
@@ -137,7 +137,7 @@ test.describe('E2E-19 push in the service worker', () => {
     const { push } = await setup(page, context);
     await push('not json');
     await expect
-      .poll(async () => (await recorded(page)).map((n) => n.title), { timeout: 15_000 })
+      .poll(async () => (await recorded(context)).map((n) => n.title), { timeout: 15_000 })
       .toEqual(['Feelings']);
   });
 });
