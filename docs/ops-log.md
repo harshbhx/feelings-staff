@@ -29,6 +29,7 @@ Normal deploys from `main` do not need an entry: the `deploy` workflow run, its 
 
 | Date and time (IST) | By | Action | Why and who asked | Command or SQL | Audit row id | Result |
 |---|---|---|---|---|---|---|
+| 21 Oct 2026 12:25 | lead (Wrangler OAuth) | Production created and owner bootstrapped | Harsh asked for go-live on staff.feelingsbeautycare.in | `d1 create fbc-staff`, `r2 bucket create fbc-staff-media`, migrations 0001-0003, `wrangler deploy --secrets-file`, `POST /api/v1/setup` once | none (setup) | 201, org created, health ok on the custom domain |
 | | | | | | | |
 
 Copy the last row for each new entry. A longer incident can have a heading of its own under this table with the timeline, root cause, change made, pull request link, and who was told and when.
