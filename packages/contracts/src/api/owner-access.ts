@@ -62,7 +62,7 @@ export const PasskeyRequestOptions = z.object({
 export type PasskeyRequestOptions = z.infer<typeof PasskeyRequestOptions>;
 
 /** Credential ids are at most 1023 bytes (1364 base64url characters). */
-const CredentialId = Base64Url.min(16).max(1400);
+const CredentialId = Base64Url.min(16).max(1364);
 const ClientExtensionResults = z.record(z.string(), z.unknown());
 
 /** The browser's answer to `create()` (`RegistrationResponseJSON`). */

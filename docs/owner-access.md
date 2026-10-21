@@ -49,13 +49,13 @@ Keep working throughout: the current owner sign-in stays on until the cutover st
 
 ## Passkeys
 
-Library: `@simplewebauthn/server` (pinned) in the Worker. Relying party: id = the owner host, name "Feelings", origin = `https://<owner host>`. User verification `required` (fingerprint, Face ID or the device PIN), resident key `preferred`, attestation `none`, algorithms ES256 and RS256. Challenges are single-use, 5 minutes, stored in D1 with the session or request id.
+Library: `@simplewebauthn/server` (pinned) in the Worker. Relying party: id = the owner host, name "Feelings", origin = `https://<owner host>`. User verification `required` (fingerprint, Face ID or the device PIN), resident key `preferred`, attestation `none`, algorithms ES256 and RS256. Sign-in is usernameless (no allow list), so it needs a discoverable credential: the phone and laptop platform authenticators (iCloud Keychain, Google Password Manager, Windows Hello) always make one; a hardware security key that cannot store one would enrol but not sign in. On phones `preferred` and `required` behave the same; with `required` such a key would be refused at enrolment instead. Challenges are single-use, 5 minutes, stored in D1 with the session or request id.
 
 Flows:
 
 1. **First device (enrolment).** The owner is past the Access wall and has no passkey. The page offers "Email me a code". The existing magic link and 6-digit code are sent to the owner address (owner host link). After the code, the browser creates a passkey; the Worker stores it and marks the device approved and the owner as `passkey_enrolled`. From then on the email-code route refuses for that owner (`passkey_enrolled_at` set) except through a recovery code.
 2. **Sign in.** "Use your fingerprint" runs a WebAuthn assertion; the Worker verifies it (counter must increase, origin and rpId checked) and issues the owner session (host-only, 12 hours idle, 7 days absolute, bound to the credential id). The PIN is then asked for sensitive actions as today.
-3. **New device.** On the new device the owner taps "Add this device"; the Worker creates a device request with a short code shown on the new device ("Approve code 482-913 on your other phone"). The request appears as a card in Needs action on an approved device. Approving needs a passkey assertion on the approving device plus the owner PIN. On approval the Worker issues a single-use enrolment token (10 minutes) that lets the new device create its passkey. Requests expire after 15 minutes and can be declined.
+3. **New device.** On the new device the owner taps "Add this device"; the Worker creates a device request with a short code shown on the new device ("Approve code 482-913 on your other phone"). The request appears as a card in Needs action on an approved device. Approving needs a passkey assertion on the approving device plus the owner PIN. The new device gets a single-use enrolment token with its request and keeps it (it is never shown); the token works only after approval, for 10 minutes, and lets the new device create its passkey. Requests expire after 15 minutes and can be declined.
 4. **Device list.** Settings, Security: each approved device (name from the browser, platform, added, last used, "This device"), Remove (passkey plus PIN, audited). The last device cannot be removed. Removing a device revokes its sessions.
 5. **Recovery.** If every device is lost, only an admin can help: `scripts/owner-recovery.mjs` (run with Wrangler access to the production D1) issues a one-time code (shown once, stored hashed, valid 24 hours, single use, audited as `owner.recovery_issued`). On the owner host "I lost my phone" accepts the code, then the Access wall still applies, and the owner enrols a fresh first device, which removes the old passkeys.
 
@@ -69,11 +69,11 @@ New migration `0004_owner_access.sql`:
 - `owner_device_requests` (`id`, `org_id`, `user_id`, `code`, `device_name`, `status` pending/approved/declined/expired, `approved_by_credential`, `enrol_token_hash`, `expires_at`, `created_at`).
 - `owner_recovery_codes` (`id`, `org_id`, `user_id`, `code_hash`, `issued_by`, `expires_at`, `used_at`).
 - `users.passkey_enrolled_at` (nullable).
-- Audit actions: `owner.passkey_enrolled`, `owner.device_requested`, `owner.device_approved`, `owner.device_declined`, `owner.device_removed`, `owner.recovery_issued`, `owner.recovery_used`, `owner.signin_passkey`.
+- Audit actions: `owner.passkey_enrolled`, `owner.device_requested`, `owner.device_approved`, `owner.device_declined`, `owner.device_removed`, `owner.device_renamed`, `owner.recovery_issued`, `owner.recovery_used`, `owner.signin_passkey`. The read routes (options, status, lists) write none.
 
 ## API
 
-The contract (slice 3) is in the endpoint table, schemas in `packages/contracts/src/api/owner-access.ts`; the rows, how they fit together and the error codes are in the [API reference](api.md#owner-access-passkeys-devices-recovery). Every route answers only on the owner host (404 on the staff host and while `OWNER_HOST` is unset) and has a rate limit and an audit row.
+The contract (slice 3) is in the endpoint table, schemas in `packages/contracts/src/api/owner-access.ts`; the rows, how they fit together and the error codes are in the [API reference](api.md#owner-access-passkeys-devices-recovery). Every route answers only on the owner host: 404 on the staff host, and 404 while `OWNER_HOST` is unset once the passkey core (slice 4) is built (until then a route without a handler answers 501 there). The challenge routes are rate limited, and every route that changes something writes an audit row (see [Data model](#data-model)).
 
 | Endpoint | Route | Notes |
 |---|---|---|

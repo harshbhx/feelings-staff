@@ -35,7 +35,7 @@ export const OWNER_ACCESS_ROUTES = {
 } as const satisfies Partial<Record<EndpointKey, ClientRoute>>;
 
 /** Every route this build calls. Outside the owner build the owner-access keys are absent. */
-export const ROUTES = {
+export const ROUTES: Readonly<Partial<Record<EndpointKey, ClientRoute>>> = {
   health: { m: 'GET', p: '/health' },
   config: { m: 'GET', p: '/config' },
   time: { m: 'GET', p: '/time' },
@@ -202,4 +202,4 @@ export const ROUTES = {
   testCron: { m: 'POST', p: '/__test/cron' },
   testOutbox: { m: 'GET', p: '/__test/outbox' },
   ...(OWNER_ONLY ? OWNER_ACCESS_ROUTES : {}),
-} as Readonly<Record<EndpointKey, ClientRoute>>;
+};
