@@ -69,7 +69,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           for cfg in $(find app/dist -name wrangler.json -not -path '*/node_modules/*'); do
-            printf '\nOWNER_HOST=owner.example.test:8787\n' >> "$(dirname "$cfg")/.dev.vars"
+            printf '\nOWNER_HOST=owner.localhost:8787\n' >> "$(dirname "$cfg")/.dev.vars"
           done
           E2E_SPLIT=1 pnpm --filter @fs/e2e exec playwright test
       - name: Upload report, traces and screenshots

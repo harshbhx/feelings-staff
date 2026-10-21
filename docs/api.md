@@ -305,7 +305,7 @@ The credits routes are owner only; managers get 403 on all of them. Roll-call an
 
 ### Owner access: passkeys, devices, recovery
 
-Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host: built are the passkey options and verify, the first-device enrolment (without `enrolToken`), the device list and rename; device requests, Remove, recovery and enrolment with a token come in the next slices. The schemas are in `packages/contracts/src/api/owner-access.ts`.
+Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host: built are the passkey options and verify, enrolment (the first device, and another device with the `enrolToken` of an approved device request), device requests (create, poll, list, decide), the device list and rename; Remove and recovery come in the next slices. The schemas are in `packages/contracts/src/api/owner-access.ts`.
 
 | Method | Path | Who may call | Step-up | Idempotent | Request | Response | Summary |
 |---|---|---|---|---|---|---|---|
@@ -337,8 +337,10 @@ Errors these routes use (no new codes):
 | `NONCE_INVALID` (409) | The challenge is unknown, used, expired (5 min) or was issued for another purpose or session. Get a new one. |
 | `SIGNATURE_INVALID` (401) | The passkey answer does not verify: signature, origin, relying-party id, user verification flag, counter, or an unknown or removed credential. |
 | `FORBIDDEN` (403), `details.reason: "passkey_enrolled"` | The email-code sign-in on the owner host for an owner who has a passkey. |
-| `RULE_VIOLATION` (422), `details.reason` | `already_enrolled` (first-device enrolment for an owner with a passkey), `last_device` (removing the only device). |
-| `LINK_EXPIRED` (410) | An enrolment token or device request that expired, was declined or was used; a recovery code that expired or was used. |
+| `RULE_VIOLATION` (422), `details.reason` | `already_enrolled` (first-device enrolment for an owner with a passkey), `no_device` (a device request while no owner has a passkey to approve it), `last_device` (removing the only device). |
+| `FORBIDDEN` (403), `details.reason: "passkey_session"` | A confirm challenge, the request list or a decision from a session that did not sign in with a passkey. |
+| `NOT_FOUND` (404) | Polling a request with a token that is not its own (wrong or another request's). |
+| `LINK_EXPIRED` (410) | An enrolment token or device request that expired (15 minutes pending, 10 minutes after approval), was declined, was not approved yet or was used; a recovery code that expired or was used. Polling a used token answers it too; a declined or expired request polls as `status: "declined"` or `"expired"`. |
 | `ALREADY_DECIDED` (409) | Deciding a device request that is no longer pending. |
 | `CODE_WRONG` (401) | A recovery code that does not match. |
 

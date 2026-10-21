@@ -1,7 +1,8 @@
 /**
  * Owner sign-in on the owner host (docs/owner-access.md, ui-redesign-plan 5b): "Use your fingerprint"
  * (or "Use Face ID") runs a passkey assertion; "Email me a code" shows only while an owner of the
- * salon has no passkey yet (the first device); "Lost your phone?" explains the recovery code. The
+ * salon has no passkey yet (the first device); "Add this device" asks a phone that has a passkey to
+ * approve this one; "Lost your phone?" explains the recovery code. The
  * email-code route is the old screen, and a successful code leads to the first-device enrolment.
  * Owner build only.
  */
@@ -169,6 +170,10 @@ export function OwnerPasskeySignInScreen() {
             {t('owner:access.signIn.emailCode')}
           </Button>
         ) : null}
+        {/* A phone without a passkey yet asks one that has it (docs/owner-access.md flow 3). */}
+        <Button variant="ghost" block onClick={() => navigate('/auth/owner/add')}>
+          {t('owner:access.signIn.addDevice')}
+        </Button>
         <div className="mt-2 text-center">
           <button
             type="button"
