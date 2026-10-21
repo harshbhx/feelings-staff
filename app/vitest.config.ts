@@ -36,6 +36,13 @@ export default defineConfig({
               compatibilityFlags: ['nodejs_compat'],
               d1Databases: ['DB'],
               r2Buckets: ['MEDIA'],
+              // Same limits as wrangler.jsonc; only active for a request with X-FS-Test-RateLimit: on.
+              ratelimits: {
+                RL_IP: { namespace_id: '4101', simple: { limit: 300, period: 60 } },
+                RL_SESSION: { namespace_id: '4102', simple: { limit: 120, period: 60 } },
+                RL_PUNCH: { namespace_id: '4103', simple: { limit: 6, period: 60 } },
+                RL_DOOR: { namespace_id: '4104', simple: { limit: 12, period: 60 } },
+              },
               bindings: {
                 ENV: 'local',
                 APP_ORIGIN: 'https://staff.test',

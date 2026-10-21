@@ -6,7 +6,7 @@ Contents: [What changes](#what-changes) · [The two hosts](#the-two-hosts) · [C
 
 ## What changes
 
-**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default), slice 1b (split build, below), slice 2 (Access JWT verification, `app/worker/middleware/access.ts`) and slice 3 (the endpoint contract, [API](#api)) are built. Nothing changes in production until `OWNER_HOST` is set, and the Access check stays off until `ACCESS_AUD` is set as well.
+**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default), slice 1b (split build, below), slice 2 (Access JWT verification, `app/worker/middleware/access.ts`) and slice 3 (the endpoint contract, [API](#api)) are built. Slice 7 part A, the forgotten owner PIN (flow 6: self-service reset and `scripts/owner-recovery.mjs --clear-pin`, [runbook](runbooks/owner-recovery.md)), is built and works on the staff host today. Nothing changes in production until `OWNER_HOST` is set, and the Access check stays off until `ACCESS_AUD` is set as well.
 
 | Today | After |
 |---|---|
@@ -63,6 +63,7 @@ Flows:
    - **Self-service:** Settings, Security, "Forgot your PIN?" asks for a fresh sign-in (the email code before cutover; a passkey assertion after it) and then lets the owner set a new PIN without the old one, within 15 minutes of that sign-in, the same window as the first PIN. It resets `pin_failures` and `pin_locked_until`, revokes the owner's other sessions, sends a "Your PIN was changed" email to the owner address, and writes the audit row `owner.pin_reset`. Rate limited like every PIN route.
    - **Admin:** `scripts/owner-recovery.mjs --clear-pin` clears the owner PIN (audited as `owner.pin_cleared_by_admin`), so the next sign-in goes through the first-PIN flow. Documented in `docs/runbooks/owner-recovery.md` next to the recovery code.
    - Tests: reset refused without a fresh sign-in, refused after 15 minutes, works once inside the window, old PIN stops working, other sessions revoked, audit row and email written. The PRD 4.1.7 table gets a "Owner PIN forgotten" row and the owner guide a short section.
+   - **Built (slice 7 part A).** The window lives on the session row, `sessions.pin_reset_until` (migration `0005_session_pin_reset.sql`, like `step_up_until`): the email-code and magic-link sign-ins set it to the session's `created_at` + 15 minutes, a password sign-in never does, and any PIN set or change in that session clears it. `PUT /owner/security/pin` without `currentPin` uses it, and `SecurityView.pinResetUntil` tells the Security screen when to show the new-PIN form. The passkey sign-in (slice 4) opens it the same way (`openPinResetWindow` in `app/worker/services/pin-reset.ts`).
 
 Edge cases written down: browsers without WebAuthn (show a plain "this browser cannot use a passkey; use Chrome or Safari"), platform authenticators that sync passkeys between a person's devices (allowed; the approved-device list shows the credential, not a physical phone), clock skew, counters that stay 0 (synced passkeys; the counter check is skipped when both stored and received are 0), and a rate limit on every WebAuthn route.
 
@@ -113,7 +114,7 @@ Each is one small PR into `main` with tests, `ci` and `e2e` green; production on
 | 4 | **Passkey core**: migration 0004, options and verify with `@simplewebauthn/server`, first-device enrolment through the email code, passkey sign-in and session, tests with a software authenticator (generated credentials). | |
 | 5 | **Device approval**: request, approval card, assertion plus PIN, enrolment token, expiry and decline, tests for every state and for replays. | |
 | 6 | **Security screen**: device list and remove, last-device guard, session revocation. | |
-| 7 | **Recovery**: `scripts/owner-recovery.mjs`, redeem route and screen, audit rows, runbook `docs/runbooks/owner-recovery.md`, and the forgotten owner PIN reset (flow 6 under Passkeys). | The PIN reset does not depend on the owner host and can ship before cutover. |
+| 7 | **Recovery**: `scripts/owner-recovery.mjs`, redeem route and screen, audit rows, runbook `docs/runbooks/owner-recovery.md`, and the forgotten owner PIN reset (flow 6 under Passkeys). | The PIN reset does not depend on the owner host and can ship before cutover. Part A (PIN reset, `--clear-pin`, runbook) is built; part B (recovery codes, `--issue-code`, redeem route and screen) needs slice 4. |
 | 8 | **Cutover**: add the owner host custom domain and the Access application, set the variables, verify on two devices, then close the old routes on the staff host, switch off `workers.dev`, update the owner guide, `docs/deploy.md`, the secrets runbook and the ops log. | Manual verification by Harsh and Urmi before the old path is closed. |
 
 ## Cutover and rollback

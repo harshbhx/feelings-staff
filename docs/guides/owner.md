@@ -397,7 +397,18 @@ In **Settings**, **Security**:
 - **Password and PIN.** Set a password (at least 10 characters, and not a common one) and a 6-digit **owner PIN**. The password and PIN let you sign in when email is slow, and the PIN is what the app asks for before important actions. The first time you set the PIN, do it within 15 minutes of signing in.
 - **Active sessions.** See where you are signed in. **Sign out others** ends every other session. Use it if you lose a phone or laptop.
 - If the PIN is locked after wrong tries, sign in with an email link to unlock it.
+- **Forgot your PIN?** See [below](#forgot-your-owner-pin).
 - Keep your email account safe. It is the key to the owner account.
+
+### Forgot your owner PIN
+
+1. **Settings**, **Security**, under **Owner PIN** tap **Forgot your PIN?**, then **Sign in with an email code**.
+2. Type your email and the 6-digit code from the email (or open the link). Your password does not count for this.
+3. You are back on **Security**. Type a new 6-digit PIN twice and tap **Set new PIN**. You have 15 minutes from the sign-in, and one go; after that, sign in again.
+
+The old PIN stops working at once. Every other phone and computer signed in as you is signed out, and you get an email, "Your Feelings Staff owner PIN was changed". If you get that email and it was not you, sign in with an email code straight away, set a new PIN, and make sure nobody else can open your email.
+
+If this does not work, ask Harsh: he can clear the PIN so you set a new one at your next sign-in ([owner recovery runbook](../runbooks/owner-recovery.md)).
 
 ## Notifications you get
 

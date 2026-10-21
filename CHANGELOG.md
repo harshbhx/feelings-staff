@@ -12,6 +12,8 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ### Added
 
+- Forgotten owner PIN: **Settings, Security, Forgot your PIN?** sends the owner through the email-code sign-in and back to Security, where she can set a new PIN without the old one for 15 minutes, once. A password sign-in never opens this. The reset clears wrong tries and the lock, signs out her other devices, emails "Your Feelings Staff owner PIN was changed" and is audited (`owner.pin_reset`). Migration `0005_session_pin_reset.sql` adds `sessions.pin_reset_until`. `PUT /owner/security/pin` without the current PIN now answers `RULE_VIOLATION` (`recent_sign_in_required`) instead of `VALIDATION` when no reset window is open.
+- `scripts/owner-recovery.mjs --clear-pin`: an admin clears the owner PIN (audited as `owner.pin_cleared_by_admin`, every owner session signed out) so the next sign-in sets a first PIN. Dry run unless `--yes`, never prints secrets. [Owner recovery runbook](docs/runbooks/owner-recovery.md).
 - E2E-19 now runs: it checks that a push makes the service worker show the right notification and that a click opens the right page.
 - Owner cutover runbook (`docs/runbooks/owner-cutover.md`): the ordered checklist for the owner host and Cloudflare Access, with placeholders instead of real values and the one-line rollback.
 - Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.

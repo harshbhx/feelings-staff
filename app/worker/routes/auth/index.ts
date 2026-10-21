@@ -53,6 +53,12 @@ import {
   recordPinFailure,
   verifyPinOrThrow,
 } from '../../services/pin';
+import {
+  closePinResetWindowStmt,
+  openPinResetWindow,
+  pinResetUntil,
+  sendPinChangedEmail,
+} from '../../services/pin-reset';
 import type { Ctx } from '../../services/ports';
 import { revokeUserSessionsStmt, startUserSession } from '../../services/session';
 import { STEP_UP_MS } from '../../services/stepup';
@@ -171,6 +177,7 @@ async function securityView(ctx: Ctx) {
     email: u.email ?? '',
     passwordSet: u.password_hash !== null,
     pinSet: u.pin_hash !== null,
+    pinResetUntil: await pinResetUntil(ctx, u),
     sessions: sessions.map((s) => ({
       id: s.token_hash.slice(0, 12),
       current: s.token_hash === current,
@@ -564,7 +571,14 @@ export const handlers: Handlers = {
         actorId: owner.id,
       }),
     ]);
-    await startUserSession(octx, c, { id: owner.id, orgId: owner.org_id, role: 'owner' }, null);
+    const started = await startUserSession(
+      octx,
+      c,
+      { id: owner.id, orgId: owner.org_id, role: 'owner' },
+      null,
+    );
+    // A fresh email sign-in opens the forgotten-PIN window for 15 minutes (services/pin-reset.ts).
+    await openPinResetWindow(octx, started.tokenHash);
     return buildMe(octx, owner.id, { deviceId: null, stepUpUntil: null });
   },
 
@@ -592,6 +606,7 @@ export const handlers: Handlers = {
       actorType: 'user',
       actorId: owner.id,
     });
+    // Never opens the forgotten-PIN window: a password alone must not replace the PIN.
     await startUserSession(octx, c, { id: owner.id, orgId: owner.org_id, role: 'owner' }, null);
     return buildMe(octx, owner.id, { deviceId: null, stepUpUntil: null });
   },
@@ -817,12 +832,18 @@ export const handlers: Handlers = {
     const u = await ownerCredentials(ctx);
     const session = ctx.session;
     if (!session) fail('UNAUTHENTICATED');
+    // Forgotten PIN: no current PIN, allowed only inside the window the server derives from this
+    // session (fresh email sign-in, 15 minutes, once; docs/owner-access.md, Passkeys flow 6).
+    let reset = false;
     if (u.pin_hash) {
-      if (!body.currentPin)
-        fail('VALIDATION', 'Enter your current PIN.', {
-          issues: [{ path: 'currentPin', message: 'Required', code: 'custom' }],
-        });
-      await verifyPinOrThrow(ctx, u, body.currentPin);
+      if (body.currentPin) await verifyPinOrThrow(ctx, u, body.currentPin);
+      else if ((await pinResetUntil(ctx, u)) !== null) reset = true;
+      else
+        fail(
+          'RULE_VIOLATION',
+          'Enter your current PIN. Forgot it? Sign in again with a code from your email, then set a new one.',
+          { reason: 'recent_sign_in_required' },
+        );
     } else if (ctx.now() - session.createdAt > FIRST_PIN_WINDOW_MS) {
       fail('RULE_VIOLATION', 'For your safety, sign in again, then set your PIN.', {
         reason: 'recent_sign_in_required',
@@ -850,13 +871,19 @@ export const handlers: Handlers = {
         'id = ?',
         u.id,
       ),
+      // Any PIN write closes this session's reset window (one reset per sign-in); a reset also
+      // signs out every other session of the owner (this one stays).
+      closePinResetWindowStmt(ctx, session.tokenHash),
+      ...(reset ? [revokeUserSessionsStmt(ctx, u.id, session.tokenHash)] : []),
       ctx.services.audit.stmt(ctx, {
         category: 'security',
-        action: u.pin_hash ? 'owner.pin_change' : 'owner.pin_set',
+        action: reset ? 'owner.pin_reset' : u.pin_hash ? 'owner.pin_change' : 'owner.pin_set',
         entity: 'user',
         entityId: u.id,
+        ...(reset ? { after: { otherSessionsRevoked: true } } : {}),
       }),
     ]);
+    if (reset) await sendPinChangedEmail(ctx, u);
     return securityView(ctx);
   },
 

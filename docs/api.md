@@ -282,7 +282,7 @@ Organisation settings, the first-run checklist, the owner's own security, the au
 | PUT | `/owner/managers` | owner | yes | no | body `ManagerUpsert` | `ManagerView` | Grant manager rights (P1) |
 | DELETE | `/owner/managers/:id` | owner | yes | no | path `IdParams` | no body (204) | Remove manager rights (P1) |
 
-Forgotten owner PIN ([owner access](owner-access.md#passkeys), flow 6): `PUT /owner/security/pin` without `currentPin` while a PIN exists sets a new one only while `SecurityView.pinResetUntil` is in the future. The server opens that window for 15 minutes after an email-code or magic-link sign-in (a password sign-in never opens it), once per sign-in; otherwise it answers `RULE_VIOLATION` with `reason: recent_sign_in_required`.
+Forgotten owner PIN ([owner access](owner-access.md#passkeys), flow 6): `PUT /owner/security/pin` without `currentPin` while a PIN exists sets a new one only while `SecurityView.pinResetUntil` is in the future. The server opens that window for 15 minutes after an email-code or magic-link sign-in (a password sign-in never opens it), once per sign-in; otherwise it answers `RULE_VIOLATION` with `reason: recent_sign_in_required`. A reset clears the PIN failures and lock, revokes the owner's other sessions, emails "Your Feelings Staff owner PIN was changed" to the owner address and writes the audit row `owner.pin_reset`; any PIN set or change closes the window for that session. The admin path is `scripts/owner-recovery.mjs --clear-pin` ([owner recovery runbook](runbooks/owner-recovery.md)).
 
 ### Owner: Time credits and presence
 

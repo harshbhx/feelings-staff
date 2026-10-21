@@ -1,6 +1,6 @@
 # Data model
 
-One D1 (SQLite) database per environment, plus one private R2 bucket. This page says what each table is for, the rules every table follows, how long data is kept and where files live. The schema itself is in [`migrations/0001_init.sql`](../migrations/0001_init.sql) (copied from PRD 8.2), [`migrations/0002_platform.sql`](../migrations/0002_platform.sql) and [`migrations/0003_time_credits_presence.sql`](../migrations/0003_time_credits_presence.sql) (WP-9). When this page and a migration disagree, the migration wins; fix the page.
+One D1 (SQLite) database per environment, plus one private R2 bucket. This page says what each table is for, the rules every table follows, how long data is kept and where files live. The schema itself is in [`migrations/0001_init.sql`](../migrations/0001_init.sql) (copied from PRD 8.2), [`migrations/0002_platform.sql`](../migrations/0002_platform.sql) [`migrations/0003_time_credits_presence.sql`](../migrations/0003_time_credits_presence.sql) (WP-9) and [`migrations/0005_session_pin_reset.sql`](../migrations/0005_session_pin_reset.sql) (forgotten owner PIN). When this page and a migration disagree, the migration wins; fix the page.
 
 Contents: [Conventions](#conventions) · [Tables](#tables) · [Platform tables (0002)](#platform-tables-0002_platformsql) · [Time credits and presence (0003)](#time-credits-and-presence-tables-0003_time_credits_presencesql) · [Retention](#retention) · [R2 layout](#r2-layout) · [Migrations](#migrations)
 
@@ -36,7 +36,7 @@ Grouped as in PRD 8.2.
 |---|---|
 | `invites` | Join codes and PIN-reset codes. Only an HMAC of the code is stored. Single use, expires in 48 hours, counts failed tries. |
 | `devices` | A phone's public key (JWK and RFC 7638 thumbprint), label, platform and status (`pending`, `approved`, `rejected`, `revoked`). One approved device per person. |
-| `sessions` | Server side of the `fs_session` cookie: SHA-256 of the token, user, device, expiry, `step_up_until`, kind (`user` or `door`). |
+| `sessions` | Server side of the `fs_session` cookie: SHA-256 of the token, user, device, expiry, `step_up_until`, kind (`user` or `door`). `pin_reset_until` (0005): until then an owner session may set a new owner PIN without the old one; set only by an email-code or magic-link sign-in (`created_at` + 15 min), cleared by any PIN change in the session ([owner recovery](runbooks/owner-recovery.md)). |
 | `challenges` | Single-use nonces: login challenges and punch nonces (5 minutes) and offline nonces (24 hours). |
 | `magic_links` | Owner sign-in links and 6-digit codes (15 minutes, single use, limited tries). |
 
@@ -202,4 +202,4 @@ Object metadata: `content-type`, `x-org-id`, `x-sha256`. Owners get selfie thumb
 - Files live in `migrations/` as `NNNN_name.sql` and are applied with `wrangler d1 migrations apply`. `app/wrangler.jsonc` points both databases at `../migrations`.
 - Locally and in CI the E2E run applies them to a local database. For the shared preview database, the `preview` workflow runs `wrangler d1 migrations apply fbc-staff-preview --remote -c wrangler.preview-migrations.jsonc`. In production, the `deploy` workflow exports the database first and then applies them ([deploy guide](deploy.md), [backup runbook](runbooks/backup-restore.md)).
 - A bad migration is fixed forward with a new file. D1 Time Travel (30 days) is the safety net for the data.
-- Current files: `0001_init.sql` (the PRD 8.2 schema), `0002_platform.sql` (idempotency keys and the preview outbox) and `0003_time_credits_presence.sql` (time credits and presence, WP-9).
+- Current files: `0001_init.sql` (the PRD 8.2 schema), `0002_platform.sql` (idempotency keys and the preview outbox) `0003_time_credits_presence.sql` (time credits and presence, WP-9) and `0005_session_pin_reset.sql` (`sessions.pin_reset_until`, the forgotten owner PIN window; numbered after the owner access `0004`, which it does not need).
