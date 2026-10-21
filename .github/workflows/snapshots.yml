@@ -17,6 +17,10 @@ on:
         description: Commit the baselines to the branch
         type: boolean
         default: false
+      all:
+        description: Rewrite every baseline the run takes, not only those over the diff threshold (a page-wide colour shift or a small header change can stay under it)
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -51,7 +55,7 @@ jobs:
       - run: |
           for cfg in $(find app/dist -name wrangler.json -not -path '*/node_modules/*'); do cp app/.dev.vars "$(dirname "$cfg")/.dev.vars"; done
       - name: Update baselines
-        run: pnpm --filter @fs/e2e exec playwright test --update-snapshots ${{ inputs.grep && format('--grep "{0}"', inputs.grep) || '' }}
+        run: pnpm --filter @fs/e2e exec playwright test --update-snapshots${{ inputs.all && '=all' || '' }} ${{ inputs.grep && format('--grep "{0}"', inputs.grep) || '' }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
