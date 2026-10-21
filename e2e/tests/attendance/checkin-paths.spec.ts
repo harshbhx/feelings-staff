@@ -74,7 +74,20 @@ test.describe('E2E-05 the edge of the fence', () => {
     const board = await owner.ok<TodayBoard>('GET', '/owner/today');
     const row = board.in.find((r) => r.user.id === me.id);
     expect(row, 'the Today board lists her as in').toBeTruthy();
-    expect(row?.flagged).toBe(true);
+    const seen = await owner.ok<OwnerDayDetail>('GET', `/owner/days/${me.id}/${DATE}`);
+    expect(
+      row?.flagged,
+      JSON.stringify(
+        seen.punches.map((p) => ({
+          status: p.status,
+          fence: p.fenceResult,
+          dist: p.distanceM,
+          acc: p.accuracyM,
+          score: p.riskScore,
+          reasons: p.riskReasons,
+        })),
+      ),
+    ).toBe(true);
 
     const waiting = await owner.ok<ActionsView>('GET', '/owner/actions?type=flagged_punch');
     const item = waiting.items.find((i) => i.type === 'flagged_punch' && i.user.id === me.id);
@@ -175,14 +188,17 @@ test.describe('E2E-06 proof with the door code', () => {
     await setGeo('outside');
     const me = await onboardPhone(page, owner, person(3));
 
-    expect(await startPunch(page, 'in')).toBe('problem');
+    // The distance is checked by the server, after the PIN.
+    expect(await startPunch(page, 'in')).toBe('pin');
+    await enterPin(page, 'in', PIN);
+    await expectStep(page, 'problem');
     const sheet = page.getByRole('dialog');
     await expect(sheet.getByText(/from the salon/)).toBeVisible();
     await expect(sheet.getByRole('button', { name: 'Scan door code' })).toBeVisible();
 
     const door = await owner.ok<DoorCode>('GET', '/owner/door-code');
     await typeDoorCode(page, door.token);
-    // The code proves the place; the PIN is still asked for.
+    // The code proves the place; the PIN is asked for again if the flow needs it.
     await expectStep(page, 'pin', 'result');
     if ((await punchStep(page).getAttribute('data-punch-step')) === 'pin') {
       await enterPin(page, 'in', PIN);

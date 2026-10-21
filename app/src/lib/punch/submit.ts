@@ -118,8 +118,10 @@ async function submitPunch(
   signer: PunchSigner,
 ): Promise<PunchEvent> {
   const s = input.state;
-  const pin = s.needs.pin && !s.intent.requestApproval ? input.pin : null;
-  if (s.needs.pin && !s.intent.requestApproval && pin === null) return { type: 'PIN_NEEDED' };
+  // The PIN pad is shown for an approval request too ("This will go to Urmi"), and the server asks
+  // for the PIN on every punch: send what was typed. Only a locked PIN skips it (needs.pin off).
+  const pin = s.needs.pin ? input.pin : null;
+  if (s.needs.pin && pin === null) return { type: 'PIN_NEEDED' };
   const selfie = s.selfie.photo?.blob ?? null;
   if (!deps.isOnline()) return queueOffline(deps, input, signer, pin, selfie);
 
