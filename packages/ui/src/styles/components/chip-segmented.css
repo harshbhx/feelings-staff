@@ -40,16 +40,26 @@
   .fs-chip-group__items[data-layout="segmented"] .fs-chip__input:checked + .fs-chip__face {
     border-color: transparent;
     background: var(--bg);
-    box-shadow: 0 0 0 1px var(--border-strong);
+    box-shadow:
+      0 0 0 1px var(--border-strong),
+      var(--raised-soft);
     color: var(--text);
     font-weight: var(--weight-strong);
   }
 
   .fs-chip-group__items[data-layout="segmented"]
-    .fs-chip:hover:not([data-disabled])
+    .fs-chip:is(:hover, :active):not([data-disabled])
     .fs-chip__input:not(:checked)
     + .fs-chip__face {
     border-color: transparent;
+    background: transparent;
     color: var(--text);
+  }
+
+  .fs-chip-group__items[data-layout="segmented"]
+    .fs-chip:active:not([data-disabled])
+    .fs-chip__input:not(:checked)
+    + .fs-chip__face {
+    background: var(--bg-tint);
   }
 }

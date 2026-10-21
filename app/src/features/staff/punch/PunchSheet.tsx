@@ -11,7 +11,6 @@ import {
   Bindi,
   Button,
   Field,
-  hapticTick,
   Icon,
   type IconName,
   Input,
@@ -32,6 +31,7 @@ import {
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
+import { success as hapticSuccess, tick as hapticTick } from '../../../lib/haptics';
 import { applyUpdate, setUpdateBlocker } from '../../../pwa/register';
 import { useOwnerName, useStaffMe } from '../api';
 import { FixItGuide, type FixItTopic } from '../fixit/FixItGuide';
@@ -582,9 +582,12 @@ function Success({
   const { t } = useTranslation();
   const owner = useOwnerName();
   const fmt = useFmt();
+  // The hero moment (docs/ui-redesign-plan.md 5a): one tick for in, two for out.
   useEffect(() => {
-    if (!frozen) hapticTick();
-  }, [frozen]);
+    if (frozen) return;
+    if (kind === 'out') hapticSuccess();
+    else hapticTick();
+  }, [frozen, kind]);
   const time = fmt.clock(result.punch.effectiveTs);
   const headline =
     kind === 'out'

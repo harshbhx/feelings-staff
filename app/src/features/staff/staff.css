@@ -145,8 +145,16 @@
     height: 2rem;
   }
 
+  /* The hero moment (docs/ui-redesign-plan.md 5a): the disc lands with the bindi's spring, then
+     the headline and the place rise in after it, once. CSS only; the flow is unchanged. */
   .staff-success-check[data-land] {
-    animation: staff-check-in var(--dur-enter) var(--ease-soft) both;
+    animation: staff-check-in var(--dur-hero) var(--ease-spring) both;
+  }
+
+  .staff-success-check[data-land] ~ *,
+  [data-success]:has(.staff-success-check[data-land]) > p {
+    animation: fs-enter var(--dur-base) var(--ease-out) both;
+    animation-delay: var(--dur-fast);
   }
 
   @keyframes staff-check-in {
@@ -159,6 +167,11 @@
   @media (prefers-reduced-motion: reduce) {
     .staff-success-check[data-land] {
       animation: none;
+    }
+
+    .staff-success-check[data-land] ~ *,
+    [data-success]:has(.staff-success-check[data-land]) > p {
+      animation: fs-fade-in var(--dur-reduced) var(--ease-out) both;
     }
   }
 

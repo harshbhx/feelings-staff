@@ -3,7 +3,8 @@
  *
  * The combined build (OWNER_HOST unset) keeps the email-code screen at `/auth/owner`. The owner build
  * (docs/owner-access.md) signs in with a passkey there; `/auth/owner/email` is the email code for the
- * first device and `/auth/owner/enrol` makes this phone the key. The tables are built in functions so
+ * first device, `/auth/owner/enrol` makes this phone the key and `/auth/owner/add` asks an approved
+ * phone to let this device in ("Add this device"). The tables are built in functions so
  * `OWNER_ONLY` folds the passkey screens (and their chunks) out of every other build.
  */
 import { lazy, Suspense } from 'react';
@@ -37,6 +38,9 @@ function passkeyRoutes(): RouteObject[] {
   const Enrol = lazy(() =>
     import('./screens/owner-enrol').then((m) => ({ default: m.OwnerEnrolScreen })),
   );
+  const AddDevice = lazy(() =>
+    import('./screens/owner-add-device').then((m) => ({ default: m.OwnerAddDeviceScreen })),
+  );
   return [
     {
       path: '/auth/owner',
@@ -51,6 +55,14 @@ function passkeyRoutes(): RouteObject[] {
       element: (
         <Suspense fallback={null}>
           <FirstDeviceEmail />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/auth/owner/add',
+      element: (
+        <Suspense fallback={null}>
+          <AddDevice />
         </Suspense>
       ),
     },

@@ -7,6 +7,9 @@
     "show": "Show password",
     "hide": "Hide password"
   },
+  "button": {
+    "stillTrying": "Still trying"
+  },
   "sheet": {
     "close": "Close"
   },

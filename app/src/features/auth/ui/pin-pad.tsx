@@ -129,7 +129,7 @@ export function PinPad({
               data-key={key}
               onPointerDown={(e) => e.preventDefault()}
               onClick={() => set(pressKey(value, key, length.max))}
-              className="flex h-16 touch-manipulation items-center justify-center rounded-md border border-border bg-bg text-xl font-extrabold text-text tabular-nums transition-[transform,background-color] duration-100 select-none hover:bg-bg-soft active:scale-[0.97] active:bg-bg-tint disabled:opacity-60 motion-reduce:transition-none motion-reduce:active:scale-100"
+              className="flex h-16 touch-manipulation items-center justify-center rounded-md border border-border bg-bg text-xl font-extrabold text-text tabular-nums transition-[transform,background-color] duration-(--dur-press) select-none hover:bg-bg-soft active:scale-[0.97] active:bg-bg-tint disabled:opacity-60 motion-reduce:transition-none motion-reduce:active:scale-100"
             >
               {key === 'delete' ? (
                 <Icon name="backspace" className="size-6" label={t('auth:pin.delete')} />

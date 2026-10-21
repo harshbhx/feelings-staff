@@ -39,6 +39,7 @@ export default defineConfig({
     ...(surface === 'combined' ? {} : { outDir: `dist/client/${SPLIT_FOLDER[surface]}` }),
   },
   server: { port: 5173 },
-  // `.example.test` are the placeholder hosts of the split-host e2e run (e2e/tests/split).
-  preview: { port: 8787, allowedHosts: ['.example.test'] },
+  // Placeholder hosts of the split-host e2e run (e2e/tests/split): `staff.example.test` and
+  // `owner.localhost` (a secure context over http, for passkeys).
+  preview: { port: 8787, allowedHosts: ['.example.test', '.localhost'] },
 });

@@ -262,6 +262,7 @@ The **Me** tab has:
 
 - **Language:** a switch for English or Gujarati. Gujarati is not ready yet, so every screen stays in English for now.
 - **Notifications:** on or off, and a help text if they are off.
+- **Vibration** (Android): a short buzz when you check in or out. Turn it off here; it is also off when the phone is set to reduce motion. iPhones do not vibrate for web apps.
 - **This phone:** the name of your phone and the day Urmi approved it.
 - **My data:** what we keep about you: your check-ins and whether each was inside, near the edge or outside, any selfies still kept (with the date each is deleted), and what you agreed to. You can **Ask for a correction**, and see Urmi's contact for any complaint.
 - **Privacy notice:** the full text.

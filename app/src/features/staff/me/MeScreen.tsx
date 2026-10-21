@@ -5,10 +5,12 @@
 import { formatIndianPhone } from '@fs/contracts';
 import type { AppLang } from '@fs/i18n';
 import { applyDocumentLang } from '@fs/i18n/fonts';
-import { Avatar, Badge, Button, Card, List, ListRow, RadioGroup, useToast } from '@fs/ui';
+import { Avatar, Badge, Button, Card, List, ListRow, RadioGroup, Switch, useToast } from '@fs/ui';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { saveLang } from '../../../app/i18n';
+import { VIBRATE_KEY } from '../../../lib/haptics';
 import { usePush } from '../../../pwa/push';
 import { useQueue } from '../../../pwa/queue';
 import { useLanguageSave, useOwnerName, useSignOut, useStaffMe } from '../api';
@@ -133,6 +135,8 @@ export function MeScreen() {
           )}
         </Card>
 
+        <VibrationCard />
+
         {me.device ? (
           <Card title={t('staff:me.phoneSection')}>
             <p className="font-semibold text-text">{me.device.label}</p>
@@ -166,5 +170,37 @@ export function MeScreen() {
         </p>
       </main>
     </>
+  );
+}
+
+/** Haptics on this phone (app/src/lib/haptics.ts reads the same key). Hidden where there are none. */
+function VibrationCard() {
+  const { t } = useTranslation();
+  const [on, setOn] = useState(() => {
+    try {
+      return localStorage.getItem(VIBRATE_KEY) !== 'off';
+    } catch {
+      return true;
+    }
+  });
+  if (typeof navigator.vibrate !== 'function') return null;
+  const change = (next: boolean) => {
+    setOn(next);
+    try {
+      if (next) localStorage.removeItem(VIBRATE_KEY);
+      else localStorage.setItem(VIBRATE_KEY, 'off');
+    } catch {
+      // storage blocked: the choice lasts until the app closes
+    }
+  };
+  return (
+    <Card title={t('staff:me.vibration')}>
+      <Switch
+        label={on ? t('staff:me.vibrationOn') : t('staff:me.vibrationOff')}
+        description={t('staff:me.vibrationHint')}
+        checked={on}
+        onCheckedChange={change}
+      />
+    </Card>
   );
 }

@@ -49,8 +49,24 @@
     letter-spacing: -0.015em;
   }
 
+  /* The close X is neutral (5a): a hairline circle with an ink X, never red; the sindoor ring is
+     only the keyboard focus ring. */
   .fs-sheet__close {
-    margin-right: -0.625rem;
+    margin-right: -0.25rem;
+    border-color: var(--border-strong);
+    color: var(--text);
+  }
+
+  @media (hover: hover) {
+    .fs-sheet__close:hover:not(:disabled) {
+      border-color: var(--border-control);
+      background: var(--bg-soft);
+    }
+  }
+
+  /* The sheet takes focus when it opens; it is not a control, so it shows no ring. */
+  .fs-sheet:focus-visible {
+    outline: none;
   }
 
   .fs-sheet__desc {
@@ -119,11 +135,11 @@
   /* Tier 1: no slide. The sheet just fades in. */
   @media (prefers-reduced-motion: reduce) {
     .fs-sheet[data-state="open"] {
-      animation: fs-fade-in 160ms ease-out;
+      animation: fs-fade-in var(--dur-reduced) var(--ease-out);
     }
 
     .fs-sheet[data-state="closed"] {
-      animation: fs-fade-out 120ms ease-out forwards;
+      animation: fs-fade-out var(--dur-fast) var(--ease-out) forwards;
     }
   }
 }
