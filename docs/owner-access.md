@@ -6,7 +6,7 @@ Contents: [What changes](#what-changes) · [The two hosts](#the-two-hosts) · [C
 
 ## What changes
 
-**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default) and slice 1b (split build, below) are built, and slice 2 (Access JWT verification, `app/worker/middleware/access.ts`) is built. Nothing changes in production until `OWNER_HOST` is set, and the Access check stays off until `ACCESS_AUD` is set as well.
+**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default), slice 1b (split build, below), slice 2 (Access JWT verification, `app/worker/middleware/access.ts`) and slice 3 (the endpoint contract, [API](#api)) are built. Nothing changes in production until `OWNER_HOST` is set, and the Access check stays off until `ACCESS_AUD` is set as well.
 
 | Today | After |
 |---|---|
@@ -44,21 +44,25 @@ Keep working throughout: the current owner sign-in stays on until the cutover st
 
 - A self-hosted application on the owner host, policy "owners": allow `urmi@feelingsbeautycare.in` and `creharsh@gmail.com`, identity provider One-time PIN, session duration 7 days. (Google sign-in can be added as a second provider later, no code change.)
 - The Worker verifies `Cf-Access-Jwt-Assertion` on every owner-host request: RS256 signature against `https://<team>.cloudflareaccess.com/cdn-cgi/access/certs`, `aud` equal to the application's audience tag, `exp`, `iss`, and the e-mail claim in an allow-list variable. Variables: `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Until they are set the check is off (so builds and previews work); once `ACCESS_AUD` is set it is mandatory and a missing or bad token answers 403 with no detail.
-- Implementation (`app/worker/middleware/access.ts`, first middleware in `index.ts`, so the owner shell, assets and API are all behind it): runs only when the request is for the owner surface and `ACCESS_AUD` is non-empty. It reads the `Cf-Access-Jwt-Assertion` header only (never the cookie), accepts RS256 only, picks the key by `kid` from the JWKS (cached one hour; an unknown `kid` forces one refetch, at most one fetch of the certs URL per minute), and checks `aud` (string or array), `iss` (`https://<team domain>`), `exp`, `nbf` and `iat` (60 s skew) and the `email` claim against `ACCESS_ALLOWED_EMAILS` (trimmed, case-insensitive). It fails closed: `ACCESS_AUD` set with the team domain or the allow-list empty, a certs fetch failure, or any bad token answers 403 with an empty body. The reason goes to `console.warn` without the token or the e-mail. On success the e-mail is on the Hono context (`accessEmail`) and on `Ctx.accessEmail` for later slices. Tests: `app/worker/test/access.test.ts` (locally signed tokens, stubbed certs URL).
+- Implementation (`app/worker/middleware/access.ts`, first middleware in `index.ts`, so the owner shell, assets and API are all behind it): runs only when the request is for the owner surface and `ACCESS_AUD` is non-empty. It reads the `Cf-Access-Jwt-Assertion` header only (never the cookie), accepts RS256 only, picks the key by `kid` from the JWKS (cached one hour; an unknown `kid` forces one refetch, at most one fetch of the certs URL per minute; if a refresh fails, keys already cached keep working for up to 24 hours, an uncached `kid` is refused), and checks `aud` (string or array), `iss` (`https://<team domain>`), `exp`, `nbf` and `iat` (60 s skew) and the `email` claim against `ACCESS_ALLOWED_EMAILS` (trimmed, case-insensitive). It fails closed: `ACCESS_AUD` set with the team domain or the allow-list empty, a certs fetch failure, or any bad token answers 403 with an empty body. The reason goes to `console.warn` without the token or the e-mail. On success the e-mail is on the Hono context (`accessEmail`) and on `Ctx.accessEmail` for later slices. Tests: `app/worker/test/access.test.ts` (locally signed tokens, stubbed certs URL).
 - The Access email is only a gate. Identity inside the app is the passkey. A person who passes Access but has no approved device sees only the enrolment screens.
 - Zero Trust must be enabled on the account first (free plan: up to 50 users). Exact steps for Harsh are [below](#what-harsh-does-in-cloudflare).
 
 ## Passkeys
 
-Library: `@simplewebauthn/server` (pinned) in the Worker. Relying party: id = the owner host, name "Feelings", origin = `https://<owner host>`. User verification `required` (fingerprint, Face ID or the device PIN), resident key `preferred`, attestation `none`, algorithms ES256 and RS256. Challenges are single-use, 5 minutes, stored in D1 with the session or request id.
+Library: `@simplewebauthn/server` (pinned) in the Worker. Relying party: id = the owner host, name "Feelings", origin = `https://<owner host>`. User verification `required` (fingerprint, Face ID or the device PIN), resident key `preferred`, attestation `none`, algorithms ES256 and RS256. Sign-in is usernameless (no allow list), so it needs a discoverable credential: the phone and laptop platform authenticators (iCloud Keychain, Google Password Manager, Windows Hello) always make one; a hardware security key that cannot store one would enrol but not sign in. On phones `preferred` and `required` behave the same; with `required` such a key would be refused at enrolment instead. Challenges are single-use, 5 minutes, stored in D1 with the session or request id.
 
 Flows:
 
 1. **First device (enrolment).** The owner is past the Access wall and has no passkey. The page offers "Email me a code". The existing magic link and 6-digit code are sent to the owner address (owner host link). After the code, the browser creates a passkey; the Worker stores it and marks the device approved and the owner as `passkey_enrolled`. From then on the email-code route refuses for that owner (`passkey_enrolled_at` set) except through a recovery code.
 2. **Sign in.** "Use your fingerprint" runs a WebAuthn assertion; the Worker verifies it (counter must increase, origin and rpId checked) and issues the owner session (host-only, 12 hours idle, 7 days absolute, bound to the credential id). The PIN is then asked for sensitive actions as today.
-3. **New device.** On the new device the owner taps "Add this device"; the Worker creates a device request with a short code shown on the new device ("Approve code 482-913 on your other phone"). The request appears as a card in Needs action on an approved device. Approving needs a passkey assertion on the approving device plus the owner PIN. On approval the Worker issues a single-use enrolment token (10 minutes) that lets the new device create its passkey. Requests expire after 15 minutes and can be declined.
+3. **New device.** On the new device the owner taps "Add this device"; the Worker creates a device request with a short code shown on the new device ("Approve code 482-913 on your other phone"). The request appears as a card in Needs action on an approved device. Approving needs a passkey assertion on the approving device plus the owner PIN. The new device gets a single-use enrolment token with its request and keeps it (it is never shown); the token works only after approval, for 10 minutes, and lets the new device create its passkey. Requests expire after 15 minutes and can be declined.
 4. **Device list.** Settings, Security: each approved device (name from the browser, platform, added, last used, "This device"), Remove (passkey plus PIN, audited). The last device cannot be removed. Removing a device revokes its sessions.
 5. **Recovery.** If every device is lost, only an admin can help: `scripts/owner-recovery.mjs` (run with Wrangler access to the production D1) issues a one-time code (shown once, stored hashed, valid 24 hours, single use, audited as `owner.recovery_issued`). On the owner host "I lost my phone" accepts the code, then the Access wall still applies, and the owner enrols a fresh first device, which removes the old passkeys.
+6. **Forgotten owner PIN.** Gap found on 21 Oct 2026: today `PUT /owner/security/pin` (`ownerSetPin`) needs the current PIN once one exists, and PRD 4.1.7 only covers a *locked* PIN (unlocked by a magic-link sign-in), so an owner who forgets the PIN has no way back except an admin editing D1. Slice 7 closes it:
+   - **Self-service:** Settings, Security, "Forgot your PIN?" asks for a fresh sign-in (the email code before cutover; a passkey assertion after it) and then lets the owner set a new PIN without the old one, within 15 minutes of that sign-in, the same window as the first PIN. It resets `pin_failures` and `pin_locked_until`, revokes the owner's other sessions, sends a "Your PIN was changed" email to the owner address, and writes the audit row `owner.pin_reset`. Rate limited like every PIN route.
+   - **Admin:** `scripts/owner-recovery.mjs --clear-pin` clears the owner PIN (audited as `owner.pin_cleared_by_admin`), so the next sign-in goes through the first-PIN flow. Documented in `docs/runbooks/owner-recovery.md` next to the recovery code.
+   - Tests: reset refused without a fresh sign-in, refused after 15 minutes, works once inside the window, old PIN stops working, other sessions revoked, audit row and email written. The PRD 4.1.7 table gets a "Owner PIN forgotten" row and the owner guide a short section.
 
 Edge cases written down: browsers without WebAuthn (show a plain "this browser cannot use a passkey; use Chrome or Safari"), platform authenticators that sync passkeys between a person's devices (allowed; the approved-device list shows the credential, not a physical phone), clock skew, counters that stay 0 (synced passkeys; the counter check is skipped when both stored and received are 0), and a rate limit on every WebAuthn route.
 
@@ -70,11 +74,28 @@ New migration `0004_owner_access.sql`:
 - `owner_device_requests` (`id`, `org_id`, `user_id`, `code`, `device_name`, `status` pending/approved/declined/expired, `approved_by_credential`, `enrol_token_hash`, `expires_at`, `created_at`).
 - `owner_recovery_codes` (`id`, `org_id`, `user_id`, `code_hash`, `issued_by`, `expires_at`, `used_at`).
 - `users.passkey_enrolled_at` (nullable).
-- Audit actions: `owner.passkey_enrolled`, `owner.device_requested`, `owner.device_approved`, `owner.device_declined`, `owner.device_removed`, `owner.recovery_issued`, `owner.recovery_used`, `owner.signin_passkey`.
+- Audit actions: `owner.passkey_enrolled`, `owner.device_requested`, `owner.device_approved`, `owner.device_declined`, `owner.device_removed`, `owner.device_renamed`, `owner.recovery_issued`, `owner.recovery_used`, `owner.signin_passkey`. The read routes (options, status, lists) write none.
 
 ## API
 
-Contract change (separate `contract-change` PR before the feature PRs): owner-host endpoints `ownerPasskeyOptions`, `ownerPasskeyVerify`, `ownerEnrolOptions`, `ownerEnrolVerify`, `ownerDeviceRequestCreate`, `ownerDeviceRequestList`, `ownerDeviceRequestDecide` (passkey assertion plus PIN step-up), `ownerDeviceList`, `ownerDeviceRemove`, `ownerRecoveryRedeem`, each with a zod schema, a rate limit and an audit row. The old `ownerMagic`, `ownerVerify` and `ownerPassword` stay until the cutover, then answer 404 on the staff host and are restricted on the owner host to "first device" and "recovery" only.
+The contract (slice 3) is in the endpoint table, schemas in `packages/contracts/src/api/owner-access.ts`; the rows, how they fit together and the error codes are in the [API reference](api.md#owner-access-passkeys-devices-recovery). Every route answers only on the owner host: 404 on the staff host, and 404 while `OWNER_HOST` is unset once the passkey core (slice 4) is built (until then a route without a handler answers 501 there). The challenge routes are rate limited, and every route that changes something writes an audit row (see [Data model](#data-model)).
+
+| Endpoint | Route | Notes |
+|---|---|---|
+| `ownerPasskeyOptions` | `POST /auth/owner/passkey/options` | `purpose` `signin` (usernameless) or `confirm` (the session's own credential, for approve and remove); also says whether "Email me a code" is still offered |
+| `ownerPasskeyVerify` | `POST /auth/owner/passkey/verify` | Starts the owner session bound to the credential |
+| `ownerEnrolOptions` | `POST /auth/owner/enrol/options` | First device (owner session after the email code, no passkey yet) or an enrolment token |
+| `ownerEnrolVerify` | `POST /auth/owner/enrol/verify` | Stores the passkey, sets `passkey_enrolled_at`, starts a session bound to it |
+| `ownerDeviceRequestCreate` | `POST /auth/owner/device-requests` | New device: 6-digit code, 15 minutes, and an enrolment token it keeps |
+| `ownerDeviceRequestStatus` | `POST /auth/owner/device-requests/:id/status` | The new device polls its request (added to the plan: the new device has no session) |
+| `ownerDeviceRequestList` | `GET /owner/device-requests` | Approval cards in Needs action |
+| `ownerDeviceRequestDecide` | `POST /owner/device-requests/:id/decide` | Approve (passkey assertion on this device plus PIN step-up) or decline |
+| `ownerDeviceList` | `GET /owner/security/devices` | Settings, Security |
+| `ownerDeviceRename` | `PATCH /owner/security/devices/:id` | The prefilled name on the enrolment success screen (added to the plan) |
+| `ownerDeviceRemove` | `POST /owner/security/devices/:id/remove` | Passkey assertion plus PIN step-up; never the last device |
+| `ownerRecoveryRedeem` | `POST /auth/owner/recovery` | Recovery code to an enrolment token for a fresh first device |
+
+The old `ownerMagic`, `ownerVerify` and `ownerPassword` stay until the cutover, then answer 404 on the staff host and are restricted on the owner host to "first device" and "recovery" only.
 
 ## Screens
 
@@ -92,12 +113,12 @@ Each is one small PR into `main` with tests, `ci` and `e2e` green; production on
 | 4 | **Passkey core**: migration 0004, options and verify with `@simplewebauthn/server`, first-device enrolment through the email code, passkey sign-in and session, tests with a software authenticator (generated credentials). | |
 | 5 | **Device approval**: request, approval card, assertion plus PIN, enrolment token, expiry and decline, tests for every state and for replays. | |
 | 6 | **Security screen**: device list and remove, last-device guard, session revocation. | |
-| 7 | **Recovery**: `scripts/owner-recovery.mjs`, redeem route and screen, audit rows, runbook `docs/runbooks/owner-recovery.md`. | |
+| 7 | **Recovery**: `scripts/owner-recovery.mjs`, redeem route and screen, audit rows, runbook `docs/runbooks/owner-recovery.md`, and the forgotten owner PIN reset (flow 6 under Passkeys). | The PIN reset does not depend on the owner host and can ship before cutover. |
 | 8 | **Cutover**: add the owner host custom domain and the Access application, set the variables, verify on two devices, then close the old routes on the staff host, switch off `workers.dev`, update the owner guide, `docs/deploy.md`, the secrets runbook and the ops log. | Manual verification by Harsh and Urmi before the old path is closed. |
 
 ## Cutover and rollback
 
-Order: ship slices 1 to 7 with everything off, create the owner host and the Access application, set `OWNER_HOST`, `ACCESS_*`, sign in on the owner host and enrol a passkey on two devices, ask Urmi to do the same, only then close the old owner routes on the staff host. Rollback is a one-line change: unset `OWNER_HOST` and the old owner routes answer again; the passkey tables stay. Recovery codes are tested once before the old path is closed.
+Order: ship slices 1 to 7 with everything off, create the owner host and the Access application, set `OWNER_HOST`, `ACCESS_*`, sign in on the owner host and enrol a passkey on two devices, ask Urmi to do the same, only then close the old owner routes on the staff host. Rollback is a one-line change: unset `OWNER_HOST` and the old owner routes answer again; the passkey tables stay. Recovery codes are tested once before the old path is closed. The ordered checklist is the [owner cutover runbook](runbooks/owner-cutover.md).
 
 ## What Harsh does in Cloudflare
 

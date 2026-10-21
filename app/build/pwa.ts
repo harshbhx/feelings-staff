@@ -238,7 +238,7 @@ export function pwa(): PluginOption[] {
     injectManifest: {
       // Classic script: registered without `type: 'module'`.
       rollupFormat: 'iife',
-      globPatterns: ['**/*.{html,js,css,woff2,png,svg,webmanifest}'],
+      globPatterns: ['**/*.{html,js,css,woff2,png,svg,webp,webmanifest}'],
       // Splash images are only read by iOS at install; screenshots only by install UIs.
       globIgnores: ['**/node_modules/**', '.vite/**', 'icons/splash-*.png', 'screens/**'],
       maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,

@@ -1,0 +1,12 @@
+{
+  "devices": [
+    {
+      "id": "01M51HZK80QB75BAEXYQHS65P2",
+      "deviceName": "Urmi's iPhone",
+      "platform": "ios",
+      "createdAt": 1792127520000,
+      "lastUsedAt": 1792386720000,
+      "current": true
+    }
+  ]
+}
