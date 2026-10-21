@@ -2945,8 +2945,9 @@ Battery and data: the roll-call and Step out cost the staff phone nothing. A for
  *
  *   page   the app page is the website's warm band (--rose-50); cards, sheets, the header glass, the
  *          tab bar and the rail stay white, so content sits on white with a hairline.
- *   logo   the wordmark colour. Until the client confirms the recoloured wordmark, the Logo component
- *          typesets the name with the bindi; --logo-mask is where the wordmark image goes later.
+ *   logo   the wordmark colour. The app passes the wordmark file to Logo's `mask` prop (recolouring
+ *          approved 21 Oct 2026); without one, Logo typesets the name with the bindi. --logo-mask is
+ *          set per element from that prop.
  *   role   people colour: each staff role maps to one of the five service tones (bridal, nails,
  *          mehndi, salon, academy), helpers and receptionists to ink. `-bg` is the avatar tint,
  *          color-mix(in oklab, <tone> 12%, white), written out so contrast checkers read it.
