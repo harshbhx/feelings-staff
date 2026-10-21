@@ -183,3 +183,14 @@ export function defaultSelection(view: RegisterView, today: string): Selection |
   }
   return { userId: first.user.id, date };
 }
+
+/**
+ * The seven days the phone list shows: the last seven ending today (or the month's last day when
+ * the month is over; from the 1st the window starts at the 1st and runs forward).
+ */
+export function recentDates(view: RegisterView, today: string): string[] {
+  const past = view.dates.filter((d) => d <= today).length;
+  const end = Math.max(1, Math.min(past, view.dates.length));
+  const start = Math.max(0, Math.min(end - 7, view.dates.length - 7));
+  return view.dates.slice(start, start + 7);
+}

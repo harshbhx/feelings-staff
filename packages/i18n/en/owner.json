@@ -1058,9 +1058,9 @@
     "summary": "This month, everyone",
     "summaryShort": "Everyone this month:",
     "viewLabel": "View",
-    "viewWeek": "This week",
+    "viewWeek": "Last 7 days",
     "viewMonth": "Month grid",
-    "weekList": "Attendance this week, week of {{date}}",
+    "weekList": "Attendance, last 7 days",
     "panel": {
       "label": "Selected day",
       "none": "None",

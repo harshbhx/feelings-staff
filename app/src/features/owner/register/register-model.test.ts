@@ -9,6 +9,7 @@ import {
   lateText,
   monthNav,
   monthTotals,
+  recentDates,
   shortName,
   stripIndexFor,
   TOTAL_COLUMNS,
@@ -123,5 +124,14 @@ describe('Register cells and selection (redesign slice 7)', () => {
     expect(r).toBeTruthy();
     const empty = { ...view, rows: [] } as RegisterView;
     expect(defaultSelection(empty, '2026-10-19')).toBeNull();
+  });
+
+  it('the phone list shows the seven days ending today', () => {
+    const d = recentDates(view, '2026-10-19');
+    expect(d).toHaveLength(7);
+    expect(d[6]).toBe('2026-10-19');
+    expect(d[0]).toBe('2026-10-13');
+    expect(recentDates(view, '2026-10-03')[0]).toBe('2026-10-01');
+    expect(recentDates(view, '2026-11-30').at(-1)).toBe(view.dates.at(-1));
   });
 });

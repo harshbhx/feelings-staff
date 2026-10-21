@@ -135,7 +135,7 @@ One list for everything that waits for your decision. Newest first, grouped by k
 
 ## The register
 
-**Register** shows who was in, day by day. On a phone you see one row per person with this week as seven cells; tap a name for that person's month, or switch to "Month grid" for the whole table (one row per person, one column per day). A cell shows a letter, or the minutes when someone was late (`+28`, or `+1h` for an hour or more): P present, H half day, A absent, L leave, WO week off, HO holiday. The key (button at the top right) explains every colour and symbol. On the right of the table: totals for present, half, absent, leave, late minutes, overtime hours and unpaid days. On a wide screen the table sits beside a panel for the day you pick, opening on today and the first person who needs a look; "Fix this day" opens the full day.
+**Register** shows who was in, day by day. On a phone you see one row per person with the last seven days as cells; tap a name for that person's month, or switch to "Month grid" for the whole table (one row per person, one column per day). A cell shows a letter, or the minutes when someone was late (`+28`, or `+1h` for an hour or more): P present, H half day, A absent, L leave, WO week off, HO holiday. The key (button at the top right) explains every colour and symbol. On the right of the table: totals for present, half, absent, leave, late minutes, overtime hours and unpaid days. On a wide screen the table sits beside a panel for the day you pick, opening on today and the first person who needs a look; "Fix this day" opens the full day.
 
 <!-- screenshot: owner-register -->
 

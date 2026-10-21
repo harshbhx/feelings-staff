@@ -133,6 +133,30 @@ test.describe('owner visual', () => {
     });
   }
 
+  test('OWN-V register: the Month grid toggle keeps the table on a phone, axe clean', async ({
+    page,
+    checkA11y,
+  }, info) => {
+    test.skip(info.project.name !== 'owner-phone', 'the toggle is a phone control');
+    await openOwner(page, '/o/register');
+    await expect(shown(page, 'Priya Solanki')).toBeVisible();
+    await page.locator('#owner-main').getByText('Month grid', { exact: true }).click();
+    await expect(page.locator('#owner-main table')).toBeVisible();
+    await noCrash(page);
+    await expect(page).toHaveScreenshot('owner-register-month.png', { fullPage: true });
+    await checkA11y();
+  });
+
+  test('OWN-V register: the key opens from its button, axe clean', async ({ page, checkA11y }) => {
+    await openOwner(page, '/o/register');
+    await expect(shown(page, 'Priya Solanki')).toBeVisible();
+    await page.locator('#owner-main').getByRole('button', { name: 'Key' }).click();
+    await expect(page.getByRole('dialog').getByText('At a venue')).toBeVisible();
+    await noCrash(page);
+    await expect(page).toHaveScreenshot('owner-register-key.png');
+    await checkA11y();
+  });
+
   test('OWN-V today: holiday says the salon is closed', async ({ page, checkA11y }) => {
     await openOwner(page, '/o/today', ['ownerToday:holiday']);
     await expect(shown(page, 'Salon closed today (Dussehra).')).toBeVisible();

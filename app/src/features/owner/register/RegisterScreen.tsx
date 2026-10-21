@@ -46,9 +46,9 @@ import {
   monthNav,
   monthTotals,
   type RegisterRow,
+  recentDates,
   type Selection,
   shortName,
-  stripIndexFor,
   TOTAL_COLUMNS,
   type TotalColumn,
   totalValue,
@@ -228,10 +228,7 @@ function WeekList({ view, today }: { view: RegisterView; today: string }) {
   const { t } = useTranslation();
   const cellText = useCellText();
   const [params, setParams] = useSearchParams();
-  const strips = view.rows.map((row) => weekStrips(view, row));
-  const first = strips[0];
-  const idx = first ? stripIndexFor(first, today) : 0;
-  const head = first?.[idx];
+  const dates = recentDates(view, today);
   const openPerson = (id: string) => {
     const next = new URLSearchParams(params);
     next.set('user', id);
@@ -239,26 +236,21 @@ function WeekList({ view, today }: { view: RegisterView; today: string }) {
   };
   return (
     <section
-      aria-label={t('owner:register.weekList', { date: head ? dayLabel(head.start) : '' })}
+      aria-label={t('owner:register.weekList')}
       className="rounded-md border border-border bg-bg"
     >
       <div className="grid grid-cols-7 px-3 pt-2 pb-1" aria-hidden="true">
-        {(head?.days ?? []).map((d, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: seven fixed weekday slots
-          <span key={i} className="grid text-center text-text-muted text-xs leading-tight">
-            {d ? (
-              <>
-                <span className={d.date === today ? 'font-bold text-text' : 'font-semibold'}>
-                  {Number(d.date.slice(8))}
-                </span>
-                <span>{dayLabel(d.date).slice(0, 2)}</span>
-              </>
-            ) : null}
+        {dates.map((d) => (
+          <span key={d} className="grid text-center text-text-muted text-xs leading-tight">
+            <span className={d === today ? 'font-bold text-text' : 'font-semibold'}>
+              {Number(d.slice(8))}
+            </span>
+            <span>{dayLabel(d).slice(0, 2)}</span>
           </span>
         ))}
       </div>
       <ul>
-        {view.rows.map((row, r) => (
+        {view.rows.map((row) => (
           <li key={row.user.id} className="border-border border-t px-3 py-1">
             <button
               type="button"
@@ -272,30 +264,31 @@ function WeekList({ view, today }: { view: RegisterView; today: string }) {
               <span className="sr-only">{t('owner:register.openMonth')}</span>
             </button>
             <ol className="grid grid-cols-7">
-              {(strips[r]?.[idx]?.days ?? []).map((d, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: seven fixed weekday slots
-                <li key={i} className="grid place-items-center">
-                  {d?.meta ? (
-                    <Link
-                      to={`/o/register/${row.user.id}/${d.date}`}
-                      className="relative grid h-11 w-full place-items-center rounded-sm"
-                    >
-                      <span className="relative">
-                        <CellMark c={d} size="week" />
-                        <Dot c={d} />
+              {dates.map((date) => {
+                const cell = row.cells[view.dates.indexOf(date)];
+                const d = cell ? cellModel(date, cell) : null;
+                return (
+                  <li key={date} className="grid place-items-center">
+                    {d?.meta ? (
+                      <Link
+                        to={`/o/register/${row.user.id}/${date}`}
+                        className="relative grid h-11 w-full place-items-center rounded-sm"
+                      >
+                        <span className="relative">
+                          <CellMark c={d} size="week" />
+                          <Dot c={d} />
+                        </span>
+                        <span className="sr-only">{cellText(row.user.name, d)}</span>
+                      </Link>
+                    ) : (
+                      <span className="grid h-11 w-full place-items-center">
+                        <span className="size-9 rounded-sm border border-border border-dashed" />
+                        {d ? <span className="sr-only">{cellText(row.user.name, d)}</span> : null}
                       </span>
-                      <span className="sr-only">{cellText(row.user.name, d)}</span>
-                    </Link>
-                  ) : d ? (
-                    <span className="grid h-11 w-full place-items-center">
-                      <span className="size-9 rounded-sm border border-border border-dashed" />
-                      <span className="sr-only">{cellText(row.user.name, d)}</span>
-                    </span>
-                  ) : (
-                    <span className="h-11" aria-hidden="true" />
-                  )}
-                </li>
-              ))}
+                    )}
+                  </li>
+                );
+              })}
             </ol>
           </li>
         ))}
@@ -672,7 +665,7 @@ function MonthSummary({ view }: { view: RegisterView }) {
     t(`owner:register.line.${c}`, { n: c === 'otHours' ? totals[c].toFixed(1) : days(totals[c]) });
   return (
     <p className="text-sm text-text-body">
-      <span className="font-semibold text-text">{t('owner:register.summaryShort')}</span>{' '}
+      <span className="sr-only">{t('owner:register.summaryShort')} </span>
       {(['present', 'half', 'absent', 'leave'] as const)
         .filter((c) => totals[c] > 0)
         .map(part)
