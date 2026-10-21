@@ -37,8 +37,9 @@ test.describe('SPLIT-1 the staff host serves no owner shell', () => {
       expect(asset.status(), file).toBe(200);
       if (file.endsWith('.js')) {
         const code = await asset.text();
-        expect(code).not.toContain('OwnerShell');
-        expect(code).not.toContain('auth/owner');
+        // Booleans, so a failure does not dump a whole bundle into the log.
+        expect(code.includes('OwnerShell'), `${file} has OwnerShell`).toBe(false);
+        expect(code.includes('features/owner'), `${file} has an owner source path`).toBe(false);
       }
     }
   });
