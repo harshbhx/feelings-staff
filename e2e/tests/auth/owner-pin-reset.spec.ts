@@ -19,7 +19,7 @@ test.describe('owner forgotten PIN', () => {
   }) => {
     const s = await reset('basic-salon');
     const headers = { 'X-FS-Client': '0.1.0', Origin: 'http://localhost:8787' };
-    const password = (pin: string | undefined) =>
+    const password = (pin: string | null) =>
       request.post('/api/v1/auth/owner/password', {
         headers,
         data: { email: s.owner.email, password: s.owner.password, pin },
