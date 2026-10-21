@@ -18,3 +18,20 @@ export function setupProgress(steps: Partial<Record<SetupStep, SetupStepState>>)
   const next = STEPS.find((s) => (steps[s] ?? 'todo') === 'todo') ?? null;
   return { handled, total: STEPS.length, next };
 }
+
+/**
+ * How the checklist is laid out: the next step to do leads, the other open steps follow, and the
+ * finished ones fold into one line. A skipped step stays open (it can still be finished) but is
+ * never the lead, so a finished setup has no step competing with "Go to Today".
+ */
+export function setupLayout(steps: Partial<Record<SetupStep, SetupStepState>>) {
+  const state = (s: SetupStep): SetupStepState => steps[s] ?? 'todo';
+  const next = STEPS.find((s) => state(s) === 'todo') ?? null;
+  return {
+    next,
+    /** Steps still to do after the lead, then skipped ones, in checklist order. */
+    open: STEPS.filter((s) => s !== next && state(s) !== 'done'),
+    done: STEPS.filter((s) => state(s) === 'done'),
+    total: STEPS.length,
+  };
+}

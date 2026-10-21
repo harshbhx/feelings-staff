@@ -283,12 +283,22 @@ export const SECTIONS: readonly SectionDef[] = [
   { id: 'credits', icon: 'hourglass', fields: CREDITS },
   { id: 'leave', icon: 'airplane-tilt', fields: LEAVE },
   { id: 'notifications', icon: 'bell', fields: NOTIFICATIONS },
-  { id: 'presence', icon: 'check-circle' },
+  { id: 'presence', icon: 'calendar-check' },
   { id: 'people', icon: 'users' },
   { id: 'privacy', icon: 'lock', fields: PRIVACY },
   { id: 'security', icon: 'fingerprint' },
-  { id: 'app', icon: 'gear', fields: APP },
+  { id: 'app', icon: 'phone', fields: APP },
   { id: 'audit', icon: 'chart-bar' },
+];
+
+export type GroupId = 'salon' | 'peoplePay' | 'attendance' | 'account';
+
+/** The four headings of the Settings index (redesign plan, Fix 5); every section sits in exactly one. */
+export const SECTION_GROUPS: readonly { id: GroupId; sections: readonly SectionId[] }[] = [
+  { id: 'salon', sections: ['salon', 'location', 'shifts', 'holidays'] },
+  { id: 'peoplePay', sections: ['people', 'pay', 'credits', 'leave'] },
+  { id: 'attendance', sections: ['attendance', 'presence', 'notifications'] },
+  { id: 'account', sections: ['privacy', 'security', 'app', 'audit'] },
 ];
 
 export function sectionById(id: string | undefined): SectionDef | undefined {

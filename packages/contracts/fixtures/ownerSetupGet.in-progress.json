@@ -1,0 +1,13 @@
+{
+  "steps": {
+    "salon": "done",
+    "location": "done",
+    "shifts": "done",
+    "holidays": "todo",
+    "pay_rules": "todo",
+    "selfie": "skipped",
+    "first_staff": "todo",
+    "install": "todo"
+  },
+  "complete": false
+}

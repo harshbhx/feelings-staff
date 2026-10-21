@@ -560,6 +560,12 @@
     "saved": "Saved.",
     "needsPin": "Saving this asks for your owner PIN.",
     "undo": "Undo changes",
+    "groups": {
+      "salon": "The salon",
+      "peoplePay": "People and pay",
+      "attendance": "Attendance",
+      "account": "Account and safety"
+    },
     "sections": {
       "salon": {
         "title": "Salon",
@@ -1348,6 +1354,9 @@
     "progress": "{{done}} of {{total}} done",
     "continue": "Next: {{step}}",
     "toToday": "Go to Today",
+    "todoHeading": "Still to do",
+    "skippedHeading": "Skipped for now",
+    "doneStep": "Done: {{step}}",
     "skip": "Skip for now",
     "state": {
       "done": "Done",
