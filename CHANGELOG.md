@@ -12,6 +12,7 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ### Added
 
+- Owner cutover runbook (`docs/runbooks/owner-cutover.md`): the ordered checklist for the owner host and Cloudflare Access, with placeholders instead of real values and the one-line rollback.
 - Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
@@ -83,6 +84,10 @@ Also merged since (all with `ci` and `e2e` green on main):
 - Stale lazy chunks after a redeploy: a phone with an old app shell now asks the server first and, if a file is missing, drops its saved copy and reloads once by itself: https://github.com/harshbhx/feelings-staff/pull/74.
 - Docs: email per environment and how to verify a sending domain: https://github.com/harshbhx/feelings-staff/pull/75.
 - Review follow-ups: presence, requests, Me and icons on the staff side https://github.com/harshbhx/feelings-staff/pull/76; presence, roll-call, escalation and seed in the Worker https://github.com/harshbhx/feelings-staff/pull/77; roll-call, presence settings and credits on the owner side https://github.com/harshbhx/feelings-staff/pull/78.
+
+### Fixed
+
+- Owner-host Access check: if the signing keys cannot be refreshed after their 1 hour cache (Cloudflare certs error), the cached keys keep working for up to 24 hours instead of locking the owner out. An unknown key id with a failed refresh is still refused.
 
 ### Changed
 
