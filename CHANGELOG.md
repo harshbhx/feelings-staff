@@ -6,11 +6,15 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ## [Unreleased]
 
+### Changed
+
+- Register on a phone is a person-first list: one row per person with the last seven days as 36 px cells and the full name on one line; a "Month grid" toggle keeps the table (96 px name column, 40 px cells). Late days show the minutes (`+28`, `+1h`) on the late tint and cells drop the icon. On desktop the Register has a panel for the selected day (status, punches, source, note, Fix this day), the summary is one line and the key opens from a popover.
+
 ### Added
 
 - The app now wears the salon's brand: the page is the website's warm blush band with white cards, the salon's logo leads the owner's Today header on phones, tops the desktop rail and leads the staff Today header (with the date next to the bell), and the owner's More screen closes with the logo and who is signed in. Owner tab-level titles end with the bindi on phones. List lines under a name are darker for contrast. The logo is the typeset name with the bindi until the client confirms the recoloured wordmark.
 - Design tokens for the redesign: `--app-page`, `--logo`, `--logo-mask`, and role tones `--role-*` with avatar tints that keep initials at 4.5:1 or more; a `Logo` component in `@fs/ui` and kit specimens for both.
-
+- Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
 Docs for Time credits and presence (WP-9):
@@ -85,7 +89,7 @@ Also merged since (all with `ci` and `e2e` green on main):
 ### Changed
 
 - The inbox copy (`notify` catalog) now loads with the inbox screen instead of with the staff app, which takes about 2 KB off the staff phone's first download; the header bell's label moved to `common`.
-
+- Settings groups its sections under four headings (The salon, People and pay, Attendance, Account and safety). Setup leads with the next step as one card and folds finished steps into one line such as "7 of 8 done"; the "Done" pills are gone.
 - The Content Security Policy no longer sends `upgrade-insecure-requests`. Every source is `'self'`, HSTS already forces HTTPS, and WebKit applies the directive to `http://localhost`, which broke the iPhone project of the CI run.
 - `CONTRIBUTING.md` now covers docs rules, labels and the PR template.
 - `docs/PRD.md` is at version 1.3 (see Appendix C). 1.2 added Time credits and presence checks; 1.3 restores the legal overtime guardrail: the Time credits setting **Pay legal overtime at 2×** is on by default, so approved overtime beyond 9 h a day or 48 h a week counts twice in the ledger and is worth 2× when it is settled or netted against late and early minutes (PRD 7.17.7).

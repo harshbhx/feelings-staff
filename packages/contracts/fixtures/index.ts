@@ -138,6 +138,7 @@ import ownerSetPassword from './ownerSetPassword.json';
 import ownerSetPin from './ownerSetPin.json';
 import ownerSettingsGet from './ownerSettingsGet.json';
 import ownerSettingsPatch from './ownerSettingsPatch.json';
+import ownerSetupGet_inProgress from './ownerSetupGet.in-progress.json';
 import ownerSetupGet from './ownerSetupGet.json';
 import ownerSetupStep from './ownerSetupStep.json';
 import ownerShiftTemplateCreate from './ownerShiftTemplateCreate.json';
@@ -373,6 +374,9 @@ export const variants: Partial<Record<EndpointKey, Record<string, unknown>>> = {
   notificationsList: {
     empty: notificationsList_empty,
     owner: notificationsList_owner,
+  },
+  ownerSetupGet: {
+    'in-progress': ownerSetupGet_inProgress,
   },
   ownerToday: {
     'before-first-shift': ownerToday_beforeFirstShift,

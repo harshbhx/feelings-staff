@@ -60,6 +60,7 @@ export const context: MiddlewareHandler<AppEnv> = async (c, next) => {
     ip,
     ipHmac,
     cf: (c.req.raw as Request & { cf?: IncomingRequestCfProperties }).cf ?? null,
+    accessEmail: c.get('accessEmail'),
     waitUntil: (p) => c.executionCtx.waitUntil(p),
     services,
   };
