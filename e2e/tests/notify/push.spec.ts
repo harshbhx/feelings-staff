@@ -1,6 +1,17 @@
 import type { BrowserContext, Page } from '@playwright/test';
 import { expect, test } from '../../fixtures';
 
+/** The slice of the worker global scope the spec touches (the e2e project has no webworker lib). */
+interface WorkerScope {
+  registration: { showNotification: unknown };
+  navigator: unknown;
+  clients: {
+    matchAll(o: unknown): Promise<unknown[]>;
+    openWindow: unknown;
+  };
+  recorded: unknown[];
+}
+
 interface Shown {
   title: string;
   body?: string;
@@ -27,7 +38,7 @@ async function recordNotifications(context: BrowserContext) {
   const worker = context.serviceWorkers()[0];
   if (!worker) throw new Error('no service worker');
   await worker.evaluate(() => {
-    const sw = self as unknown as ServiceWorkerGlobalScope & { recorded: unknown[] };
+    const sw = self as unknown as WorkerScope;
     sw.recorded = [];
     sw.registration.showNotification = async (title: string, options?: NotificationOptions) => {
       sw.recorded.push({ title, body: options?.body, tag: options?.tag, data: options?.data });
@@ -118,7 +129,7 @@ test.describe('E2E-19 push in the service worker', () => {
     const worker = context.serviceWorkers()[0];
     const opened = await worker?.evaluate(
       async (data) => {
-        const sw = self as unknown as ServiceWorkerGlobalScope;
+        const sw = self as unknown as WorkerScope;
         const openedUrls: string[] = [];
         sw.clients.openWindow = async (url: string | URL) => {
           openedUrls.push(String(url));
