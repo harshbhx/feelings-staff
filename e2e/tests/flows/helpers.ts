@@ -94,7 +94,12 @@ export async function joinOnPhone(page: Page, phone: string, code: string, pin: 
   if ((await codeField.inputValue()) === '') await codeField.fill(code);
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'I understand' }).click();
-  await page.getByRole('textbox', { name: 'New PIN' }).fill(pin);
+  // A salon that asks for a selfie with every check-in asks for consent first.
+  const agree = page.getByRole('button', { name: 'I agree' });
+  const newPin = page.getByRole('textbox', { name: 'New PIN' });
+  await expect(agree.or(newPin)).toBeVisible({ timeout: 20_000 });
+  if (await agree.isVisible()) await agree.click();
+  await newPin.fill(pin);
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('textbox', { name: 'Your PIN again' }).fill(pin);
   await page.getByRole('button', { name: 'Set up this phone' }).click();
