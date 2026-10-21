@@ -18,7 +18,7 @@
     {
       "binding": "DB",
       "database_name": "fbc-staff",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "146c99ea-73cb-44dc-9fcb-b2ee53cfe687",
       "migrations_dir": "../migrations"
     }
   ],
@@ -36,6 +36,7 @@
     { "name": "RL_PUNCH", "namespace_id": "4103", "simple": { "limit": 6, "period": 60 } },
     { "name": "RL_DOOR", "namespace_id": "4104", "simple": { "limit": 12, "period": 60 } }
   ],
+  "routes": [{ "pattern": "staff.feelingsbeautycare.in", "custom_domain": true }],
   "triggers": { "crons": ["*/5 * * * *", "30 21 * * *"] },
   "vars": {
     "ENV": "production",
@@ -44,7 +45,7 @@
     "MIN_APP_VERSION": "0.1.0",
     "EMAIL_PROVIDER": "cloudflare",
     "EMAIL_FROM": "Feelings Staff <staff@feelingsbeautycare.in>",
-    "VAPID_PUBLIC_KEY": "",
+    "VAPID_PUBLIC_KEY": "BNrERk7JtIzXyetiP_54bSWvTDcDVpx7lIXg72AIu09Ikl3LvqwwTcSKdBQCI7utuGjfIug7JM5GSYSmNxmMJLU",
     "VAPID_SUBJECT": "mailto:staff@feelingsbeautycare.in",
     "OWNER_BOOTSTRAP_EMAIL": "urmi@feelingsbeautycare.in"
   },

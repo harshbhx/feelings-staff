@@ -68,7 +68,7 @@ Open one pull request that changes:
 | `app/wrangler.jsonc` | `vars.OWNER_BOOTSTRAP_EMAIL` | Urmi's email |
 | `app/wrangler.jsonc` | `vars.VAPID_PUBLIC_KEY` | filled in at step 5 |
 
-The production id is `00000000-0000-0000-0000-000000000000` until you replace it. The preview ids in the repo are already filled in; replace them with the new ones if the previews should live on the salon's account. While it is in place, deploys fail on purpose, so nothing goes live half set up. Only the address in `OWNER_BOOTSTRAP_EMAIL` can ask for the first sign-in link.
+For a fresh fork the production id is `00000000-0000-0000-0000-000000000000` until you replace it (the salon's own production database already exists and is in the file). The preview ids in the repo are already filled in; replace them with the new ones if the previews should live on the salon's account. While it is in place, deploys fail on purpose, so nothing goes live half set up. Only the address in `OWNER_BOOTSTRAP_EMAIL` can ask for the first sign-in link.
 
 Do not merge this pull request until step 5 is done, so you can add the VAPID public key to the same change.
 

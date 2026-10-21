@@ -32,7 +32,7 @@ Each `d1 create` prints a `database_id`. Put them into the config in one PR (con
 | `app/wrangler.jsonc` | `previews.d1_databases[0].database_id` | the `fbc-staff-preview` id |
 | `app/wrangler.preview-migrations.jsonc` | `d1_databases[0].database_id` | the `fbc-staff-preview` id |
 
-The placeholders today are `00000000-0000-0000-0000-000000000000` (production; the preview ids are already set). While they are in place, deploys and previews fail on purpose.
+Production was created on 21 Oct 2026 (D1 `fbc-staff`, R2 `fbc-staff-media`, custom domain `staff.feelingsbeautycare.in`); its ids are in `app/wrangler.jsonc`. An all-zero id makes deploys fail on purpose, which is the state of a fresh fork.
 
 The R2 buckets stay private. Do not add a public URL or a custom domain to them. Lifecycle rules (selfies 30 days, exports 7 days, backups 90 days) are created by `scripts/r2-lifecycle.ts`. Once the API token from step 2 exists, run `gh workflow run r2-lifecycle -f mode=apply`, then `-f mode=check`. The workflow also checks every Monday. More in the [retention runbook](runbooks/retention-purge.md).
 
