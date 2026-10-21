@@ -65,27 +65,26 @@ export function PinResetForm({ until }: { until: number }) {
       ? t('owner:security.pinMismatch')
       : null;
 
-  function submit(e: FormEvent) {
+  // mutateAsync, not mutate callbacks: on success the new SecurityView closes the window, so this
+  // form unmounts before a mutate() callback could run.
+  async function submit(e: FormEvent) {
     e.preventDefault();
     setTried(true);
     if (problem) return;
-    setPin.mutate(
-      { pin },
-      {
-        onSuccess: () => toast({ title: t('owner:security.pinResetDone') }),
-        onError: (err) => {
-          if (isStepUpCancelled(err)) return;
-          toast({ title: errorText(err), tone: 'error' });
-          // The window may have closed (15 minutes, or used): show what the server says now.
-          void qc.invalidateQueries({ queryKey: ownerKeys.security() });
-        },
-      },
-    );
+    try {
+      await setPin.mutateAsync({ pin });
+      toast({ title: t('owner:security.pinResetDone') });
+    } catch (err) {
+      if (isStepUpCancelled(err)) return;
+      toast({ title: errorText(err), tone: 'error' });
+      // The window may have closed (15 minutes, or used): show what the server says now.
+      void qc.invalidateQueries({ queryKey: ownerKeys.security() });
+    }
   }
 
   return (
     <Section title={t('owner:security.pin')}>
-      <form noValidate onSubmit={submit} className="grid gap-4">
+      <form noValidate onSubmit={(e) => void submit(e)} className="grid gap-4">
         <Meta>{t('owner:security.pinResetWhat', { time: clock(until) })}</Meta>
         <div className="grid gap-4 sm:max-w-md sm:grid-cols-2">
           <Field label={t('owner:security.newPin')} error={tried && problem ? problem : undefined}>
