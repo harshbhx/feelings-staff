@@ -4,6 +4,7 @@
  * multipart (mp), binary (b) and success status (s). routes.gen.test.ts checks it against the table.
  */
 import type { EndpointKey, HttpMethod } from '@fs/contracts';
+import { OWNER_ONLY } from '../lib/surface';
 
 export interface ClientRoute {
   readonly m: HttpMethod;
@@ -14,7 +15,27 @@ export interface ClientRoute {
   readonly s?: 200 | 201 | 202 | 204;
 }
 
-export const ROUTES: Readonly<Record<EndpointKey, ClientRoute>> = {
+/**
+ * Owner-host passkey routes (ADR-19). Only the owner build has them: everywhere else they answer
+ * 404, so the staff and combined builds leave the rows out (the bundler drops this table there).
+ */
+export const OWNER_ACCESS_ROUTES = {
+  ownerPasskeyOptions: { m: 'POST', p: '/auth/owner/passkey/options' },
+  ownerPasskeyVerify: { m: 'POST', p: '/auth/owner/passkey/verify' },
+  ownerEnrolOptions: { m: 'POST', p: '/auth/owner/enrol/options' },
+  ownerEnrolVerify: { m: 'POST', p: '/auth/owner/enrol/verify', s: 201 },
+  ownerDeviceRequestCreate: { m: 'POST', p: '/auth/owner/device-requests', s: 201 },
+  ownerDeviceRequestStatus: { m: 'POST', p: '/auth/owner/device-requests/:id/status' },
+  ownerDeviceRequestList: { m: 'GET', p: '/owner/device-requests' },
+  ownerDeviceRequestDecide: { m: 'POST', p: '/owner/device-requests/:id/decide' },
+  ownerDeviceList: { m: 'GET', p: '/owner/security/devices' },
+  ownerDeviceRename: { m: 'PATCH', p: '/owner/security/devices/:id' },
+  ownerDeviceRemove: { m: 'POST', p: '/owner/security/devices/:id/remove' },
+  ownerRecoveryRedeem: { m: 'POST', p: '/auth/owner/recovery' },
+} as const satisfies Partial<Record<EndpointKey, ClientRoute>>;
+
+/** Every route this build calls. Outside the owner build the owner-access keys are absent. */
+export const ROUTES = {
   health: { m: 'GET', p: '/health' },
   config: { m: 'GET', p: '/config' },
   time: { m: 'GET', p: '/time' },
@@ -172,18 +193,6 @@ export const ROUTES: Readonly<Record<EndpointKey, ClientRoute>> = {
   ownerManagersList: { m: 'GET', p: '/owner/managers' },
   ownerManagerUpsert: { m: 'PUT', p: '/owner/managers' },
   ownerManagerRemove: { m: 'DELETE', p: '/owner/managers/:id', s: 204 },
-  ownerPasskeyOptions: { m: 'POST', p: '/auth/owner/passkey/options' },
-  ownerPasskeyVerify: { m: 'POST', p: '/auth/owner/passkey/verify' },
-  ownerEnrolOptions: { m: 'POST', p: '/auth/owner/enrol/options' },
-  ownerEnrolVerify: { m: 'POST', p: '/auth/owner/enrol/verify', s: 201 },
-  ownerDeviceRequestCreate: { m: 'POST', p: '/auth/owner/device-requests', s: 201 },
-  ownerDeviceRequestStatus: { m: 'POST', p: '/auth/owner/device-requests/:id/status' },
-  ownerDeviceRequestList: { m: 'GET', p: '/owner/device-requests' },
-  ownerDeviceRequestDecide: { m: 'POST', p: '/owner/device-requests/:id/decide' },
-  ownerDeviceList: { m: 'GET', p: '/owner/security/devices' },
-  ownerDeviceRename: { m: 'PATCH', p: '/owner/security/devices/:id' },
-  ownerDeviceRemove: { m: 'POST', p: '/owner/security/devices/:id/remove' },
-  ownerRecoveryRedeem: { m: 'POST', p: '/auth/owner/recovery' },
   doorPair: { m: 'POST', p: '/door/pair' },
   doorStatus: { m: 'GET', p: '/door/status' },
   doorSecret: { m: 'GET', p: '/door/secret' },
@@ -192,4 +201,5 @@ export const ROUTES: Readonly<Record<EndpointKey, ClientRoute>> = {
   testClock: { m: 'POST', p: '/__test/clock' },
   testCron: { m: 'POST', p: '/__test/cron' },
   testOutbox: { m: 'GET', p: '/__test/outbox' },
-};
+  ...(OWNER_ONLY ? OWNER_ACCESS_ROUTES : {}),
+} as Readonly<Record<EndpointKey, ClientRoute>>;
