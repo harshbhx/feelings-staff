@@ -51,7 +51,15 @@ const BUTTONS: readonly {
   { variant: 'danger', role: 'Destructive, armed', label: 'Remove phone', icon: 'x-circle' },
 ];
 
-function Cell({ label, force, children }: { label: string; force?: Forced; children: ReactNode }) {
+function Cell({
+  label,
+  force,
+  children,
+}: {
+  label: string;
+  force?: Forced | undefined;
+  children: ReactNode;
+}) {
   return (
     <div className="grid content-start justify-items-start gap-2" data-kit-force={force}>
       <p className="text-xs font-semibold text-text-muted">{label}</p>
