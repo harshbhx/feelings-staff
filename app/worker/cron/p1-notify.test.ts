@@ -261,6 +261,9 @@ describe('O-21 payroll emails N24 and N25 (PRD 6)', () => {
     expect(email.sent).toHaveLength(1);
     expect(email.sent[0]?.subject).toBe('October payroll is ready to check');
     expect(email.sent[0]?.text).toContain('3 things need a look first.');
+    // No Settings screen has an email switch yet, so the footer must not point there.
+    expect(email.sent[0]?.text).toContain('switched on for your account.');
+    expect(email.sent[0]?.text).not.toContain('Settings');
     expect(email.sent[0]?.text).toContain('/o/payroll/RUN1');
   });
 

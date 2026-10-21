@@ -33,6 +33,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { meQueryKey } from '../../api/hooks';
 import { useApi } from '../../api/provider';
+import { STAFF_ONLY } from '../../lib/surface';
 import { describeAuthError, type ErrorCopy } from './lib/errors';
 import { useErrorText, useOwnerNames } from './lib/hooks';
 import { OWNER_PIN } from './lib/inputs';
@@ -188,6 +189,11 @@ function StepUpSheet({
   };
 
   const noPin = error?.action === 'noOwnerPin';
+  const submitButton = (
+    <Button type="submit" variant="primary" disabled={busy} icon="lock">
+      {busy ? t('auth:stepUp.checking') : t('auth:stepUp.submit')}
+    </Button>
+  );
 
   return (
     <Sheet open={open} onCancel={cancel} labelledBy={titleId} describedBy={leadId}>
@@ -221,14 +227,14 @@ function StepUpSheet({
           <ErrorFromCopy copy={error} text={text} />
         </div>
         <div className="mt-6 flex flex-col gap-3">
-          {noPin ? (
+          {STAFF_ONLY ? (
+            submitButton
+          ) : noPin ? (
             <ButtonLink to="/o/settings/security" variant="primary" onClick={cancel}>
               {t('auth:stepUp.openSettings')}
             </ButtonLink>
           ) : (
-            <Button type="submit" variant="primary" disabled={busy} icon="lock">
-              {busy ? t('auth:stepUp.checking') : t('auth:stepUp.submit')}
-            </Button>
+            submitButton
           )}
           <Button onClick={cancel}>{t('auth:stepUp.cancel')}</Button>
         </div>
