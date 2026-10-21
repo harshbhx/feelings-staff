@@ -5,7 +5,12 @@
  */
 import { type CDPSession, expect, type Page, test } from '@playwright/test';
 
-export const OWNER = 'owner.example.test:8787';
+/**
+ * The owner host of the split run. A `*.localhost` name: Chromium resolves it to loopback and treats it
+ * as a secure context over plain http, which WebAuthn needs (an `--unsafely-treat-insecure-origin-as-
+ * secure` flag for another name did not take effect in the CI image).
+ */
+export const OWNER = 'owner.localhost:8787';
 
 /** A platform authenticator with user verification that says yes without a prompt. */
 export async function virtualAuthenticator(page: Page): Promise<CDPSession> {

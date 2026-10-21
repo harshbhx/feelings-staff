@@ -14,8 +14,10 @@ const PORT = 8787;
  * Split-host run (docs/owner-access.md): the same preview Worker with OWNER_HOST set, so the staff and
  * owner hosts are served from their own build folders. `E2E_SPLIT=1` runs only the `split-hosts`
  * project; the default run keeps OWNER_HOST unset (the combined build, as in production today). The
- * ci workflow sets OWNER_HOST=owner.example.test:8787 for that run; the hosts are placeholders (see
- * tests/split). Chromium maps `*.example.test` to loopback; API calls send a Host header.
+ * ci workflow sets OWNER_HOST=owner.localhost:8787 for that run; the hosts are placeholders (see
+ * tests/split). Chromium maps `*.example.test` to loopback (the staff host) and resolves `*.localhost`
+ * by itself; the owner host is a `*.localhost` name because that is a secure context over plain http,
+ * which passkeys need. API calls send a Host header.
  */
 const SPLIT = process.env.E2E_SPLIT === '1';
 const ANDROID_UA =
@@ -51,13 +53,7 @@ export default defineConfig({
           use: {
             browserName: 'chromium',
             viewport: { width: 390, height: 844 },
-            launchOptions: {
-              args: [
-                '--host-resolver-rules=MAP *.example.test localhost',
-                // The preview owner host is plain http; passkeys need a secure context (tests/split/passkey).
-                '--unsafely-treat-insecure-origin-as-secure=http://owner.example.test:8787',
-              ],
-            },
+            launchOptions: { args: ['--host-resolver-rules=MAP *.example.test localhost'] },
           },
         },
       ]
