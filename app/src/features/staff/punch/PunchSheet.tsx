@@ -39,6 +39,7 @@ import { useFmt } from '../lib/format';
 import { telLink } from '../lib/links';
 import { ScanPanel } from '../scan/ScanPanel';
 import type { PunchConfirm } from '../today/today-model';
+import { formatDistance } from './distance';
 import { usePunchSheetFlow } from './flow';
 import type {
   PlaceFix,
@@ -363,6 +364,7 @@ function FlowView({ a }: { a: StepArgs }) {
 
 function PlaceLine({ place }: { place: PlaceFix }) {
   const { t } = useTranslation();
+  const fmt = useFmt();
   const text =
     place.type === 'venue' && place.name
       ? t('staff:punch.gotVenue', { place: place.name })
@@ -376,7 +378,7 @@ function PlaceLine({ place }: { place: PlaceFix }) {
         {text}
         {place.distanceM !== null ? (
           <span className="block text-sm font-normal text-text-muted">
-            {t('staff:punch.distance', { distance: Math.round(place.distanceM) })}
+            {t('staff:punch.distance', { distance: formatDistance(place.distanceM, fmt.lang) })}
           </span>
         ) : null}
       </span>
@@ -593,7 +595,7 @@ function Success({
   const where = venue
     ? t('staff:punch.successVenue', { place: venue })
     : distance !== null
-      ? t('staff:punch.successSalon', { distance: Math.round(distance) })
+      ? t('staff:punch.successSalon', { distance: formatDistance(distance, fmt.lang) })
       : t('staff:punch.successSalonNoDistance');
   return (
     <div className="flex flex-col items-start gap-3 py-2" data-success="">
@@ -750,7 +752,7 @@ function ProblemStep({ a, p }: { a: StepArgs; p: PunchProblem }) {
     case 'outside':
       message =
         p.distanceM !== null
-          ? t('staff:punch.problem.outside', { distance: Math.round(p.distanceM) })
+          ? t('staff:punch.problem.outside', { distance: formatDistance(p.distanceM, fmt.lang) })
           : t('staff:punch.problem.outsideNoDistance');
       options = [
         scan(true),
