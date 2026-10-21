@@ -254,9 +254,11 @@ describe('forgotten owner PIN: admin --clear-pin (scripts/owner-recovery.mjs)', 
     expect((await call('GET', '/me', { cookie: before })).status).toBe(401);
     expect(await auditActions(s.ownerId)).toContain('owner.pin_cleared_by_admin');
     const audit = await testEnv.DB.prepare(
-      "SELECT actor_type, reason FROM audit_log WHERE action = 'owner.pin_cleared_by_admin' ORDER BY id LIMIT 1",
-    ).first<{ actor_type: string; reason: string }>();
-    expect(audit).toEqual({ actor_type: 'system', reason: "Owner's PIN forgotten" });
+      "SELECT actor_type, reason FROM audit_log WHERE action = 'owner.pin_cleared_by_admin'",
+    ).all<{ actor_type: string; reason: string }>();
+    // Two runs (same millisecond, so no order): one row each, actor `system`, with the reason.
+    expect(audit.results.map((r) => r.reason).sort()).toEqual(["Owner's PIN forgotten", 'again']);
+    expect(audit.results.every((r) => r.actor_type === 'system')).toBe(true);
 
     // The password alone cannot sign in without a PIN.
     const password = await call('POST', '/auth/owner/password', {
