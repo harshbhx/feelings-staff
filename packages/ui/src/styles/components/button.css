@@ -6,8 +6,9 @@
     align-items: center;
     justify-content: center;
     gap: 0.55em;
+    --fs-btn-px: 1.4rem;
     min-height: 3rem;
-    padding: 0.75rem 1.4rem;
+    padding: 0.75rem var(--fs-btn-px);
     border: 1px solid transparent;
     border-radius: var(--radius-pill);
     background: transparent;
@@ -23,10 +24,10 @@
     -webkit-user-select: none;
     touch-action: manipulation;
     transition:
-      background-color var(--dur-fast) var(--ease-out),
-      border-color var(--dur-fast) var(--ease-out),
-      color var(--dur-fast) var(--ease-out),
-      box-shadow var(--dur-base) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-soft),
+      border-color var(--dur-fast) var(--ease-soft),
+      color var(--dur-fast) var(--ease-soft),
+      text-decoration-color var(--dur-fast) var(--ease-soft),
       transform var(--dur-fast) var(--ease-out);
   }
 
@@ -36,20 +37,18 @@
     flex: none;
   }
 
-  .fs-btn:active:not(:disabled, [aria-disabled="true"]) {
-    transform: scale(0.98);
-  }
-
   /* The hero: 56 px and a step up in type (the 1.2em icon grows with it). */
   .fs-btn[data-size="lg"] {
+    --fs-btn-px: 1.6rem;
     min-height: 3.5rem;
-    padding: 0.9rem 1.6rem;
+    padding: 0.9rem var(--fs-btn-px);
     font-size: var(--text-lg);
   }
 
   .fs-btn[data-size="sm"] {
+    --fs-btn-px: 1.05rem;
     min-height: 2.5rem;
-    padding: 0.55rem 1.05rem;
+    padding: 0.55rem var(--fs-btn-px);
     font-size: var(--text-sm);
   }
 
@@ -64,51 +63,149 @@
     width: 100%;
   }
 
+  /* Primary: solid sindoor, raised edges, white label. Hover lifts the tone, press sinks it. */
   .fs-btn[data-variant="primary"] {
     background: var(--accent);
     color: var(--on-accent);
+    box-shadow: var(--raised);
   }
 
-  .fs-btn[data-variant="primary"]:hover:not(:disabled) {
+  /* Secondary: a cream pill with a hairline and soft raised edges, never an outline on white. */
+  .fs-btn[data-variant="secondary"] {
+    background: var(--bg-soft);
+    border-color: var(--border-strong);
+    color: var(--text);
+    box-shadow: var(--raised-soft);
+  }
+
+  /* Tertiary (ghost): a text button; the underline comes with hover and focus. */
+  .fs-btn:is([data-variant="ghost"], [data-variant="tertiary"]) {
+    --fs-btn-px: 0.75rem;
+    padding-inline: var(--fs-btn-px);
+    color: var(--text);
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+  }
+
+  /* Destructive at rest: the secondary pill with a red label and icon. Never the default focus. */
+  .fs-btn[data-variant="danger-secondary"] {
+    background: var(--bg-soft);
+    border-color: var(--border-strong);
+    color: var(--status-absent);
+    box-shadow: var(--raised-soft);
+  }
+
+  /* Destructive, armed (the last step of a confirm sheet): solid red, still one tap. */
+  .fs-btn[data-variant="danger"] {
+    background: var(--status-absent);
+    color: var(--on-accent);
+    box-shadow: var(--raised);
+  }
+
+  @media (hover: hover) {
+    .fs-btn[data-variant="primary"]:hover:not(:disabled, [aria-disabled="true"]) {
+      background: color-mix(in oklab, var(--red-600) 80%, var(--red-400));
+    }
+
+    .fs-btn:is([data-variant="secondary"], [data-variant="danger-secondary"]):hover:not(
+        :disabled,
+        [aria-disabled="true"]
+      ) {
+      background: var(--bg);
+      border-color: var(--border-control);
+    }
+
+    .fs-btn:is([data-variant="ghost"], [data-variant="tertiary"]):hover:not(
+        :disabled,
+        [aria-disabled="true"]
+      ) {
+      text-decoration-color: currentColor;
+    }
+
+    .fs-btn[data-variant="danger"]:hover:not(:disabled, [aria-disabled="true"]) {
+      background: var(--accent);
+    }
+  }
+
+  .fs-btn:is([data-variant="ghost"], [data-variant="tertiary"]):focus-visible {
+    text-decoration-color: currentColor;
+  }
+
+  /* Pressed: scale 0.97, the tone steps down 6 percent, the raised edges go. 80 ms in, 140 ms out. */
+  .fs-btn:active:not(:disabled, [aria-disabled="true"]) {
+    transform: scale(0.97);
+    box-shadow: none;
+    transition-duration: var(--dur-press);
+  }
+
+  .fs-btn[data-variant="primary"]:active:not(:disabled, [aria-disabled="true"]) {
     background: var(--accent-hover);
   }
 
-  .fs-btn[data-variant="secondary"] {
-    background: var(--bg);
-    border-color: var(--border-strong);
-    color: var(--text);
+  .fs-btn:is([data-variant="secondary"], [data-variant="danger-secondary"]):active:not(
+    :disabled,
+    [aria-disabled="true"]
+  ) {
+    background: color-mix(in oklab, var(--bg-soft) 94%, var(--ink-900));
   }
 
-  .fs-btn[data-variant="secondary"]:hover:not(:disabled) {
-    border-color: var(--text);
+  .fs-btn:is([data-variant="ghost"], [data-variant="tertiary"]):active:not(
+    :disabled,
+    [aria-disabled="true"]
+  ) {
+    background: var(--bg-tint);
   }
 
-  .fs-btn[data-variant="ghost"]:hover:not(:disabled) {
-    background: var(--bg-soft);
-  }
-
-  /* Destructive: never a second red fill. Secondary pill with absent-red text; confirm first. */
-  .fs-btn[data-variant="danger-secondary"] {
-    background: var(--bg);
-    border-color: var(--border-strong);
-    color: var(--status-absent);
-  }
-
-  .fs-btn[data-variant="danger-secondary"]:hover:not(:disabled) {
-    border-color: var(--status-absent);
+  .fs-btn[data-variant="danger"]:active:not(:disabled, [aria-disabled="true"]) {
+    background: var(--maroon-800);
   }
 
   .fs-btn[aria-busy="true"] {
     cursor: progress;
   }
 
-  /* Disabled reads as inert, not as a faded red action. */
-  .fs-btn:disabled {
-    background: var(--bg-soft);
-    border-color: var(--border);
+  /* Pending (5a): the ring takes the leading icon's place; with no icon the padding gives up the
+     ring's room, so the width never jumps. */
+  .fs-btn__ring {
+    flex: none;
+    width: 1.2em;
+    height: 1.2em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    scale: 0.8;
+    animation: fs-spin var(--dur-spin) linear infinite;
+  }
+
+  .fs-btn[aria-busy="true"]:not([data-icon]) {
+    padding-inline: max(0px, calc(var(--fs-btn-px) - 0.875em));
+  }
+
+  /* Disabled (5a): a quieter tone, never faded text; the label keeps 3:1 or more. A disabled
+     primary says why in a line under it (disabledReason). */
+  .fs-btn:is(:disabled, [aria-disabled="true"]:not([aria-busy="true"])) {
+    background: var(--bg-tint);
+    border-color: transparent;
     color: var(--text-muted);
     box-shadow: none;
     cursor: not-allowed;
+  }
+
+  .fs-btn:is([data-variant="ghost"], [data-variant="tertiary"]):is(
+    :disabled,
+    [aria-disabled="true"]:not([aria-busy="true"])
+  ) {
+    background: transparent;
+  }
+
+  .fs-btn__reason {
+    display: block;
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--text-body);
   }
 
   /* On the maroon band (door screen header), primary turns white with red text. */
@@ -127,19 +224,15 @@
     outline-color: var(--white);
   }
 
-  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-    .fs-btn:hover:not(:disabled, [aria-disabled="true"]) {
-      transform: translateY(-1px);
-    }
-
-    .fs-btn[data-variant="primary"]:hover:not(:disabled, [aria-disabled="true"]) {
-      box-shadow: var(--shadow-accent);
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .fs-btn:active:not(:disabled, [aria-disabled="true"]) {
       transform: none;
+    }
+
+    .fs-btn__ring {
+      animation: none;
+      border-right-color: currentColor;
+      opacity: 0.55;
     }
   }
 
@@ -159,8 +252,8 @@
     cursor: pointer;
     touch-action: manipulation;
     transition:
-      background-color var(--dur-fast) var(--ease-out),
-      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-soft),
+      border-color var(--dur-fast) var(--ease-soft),
       transform var(--dur-fast) var(--ease-out);
   }
 
@@ -174,22 +267,27 @@
     background: var(--bg);
   }
 
-  .fs-icon-btn:hover:not(:disabled) {
-    background: var(--bg-soft);
-  }
+  @media (hover: hover) {
+    .fs-icon-btn:hover:not(:disabled) {
+      background: var(--bg-tint);
+    }
 
-  .fs-icon-btn[data-variant="outline"]:hover:not(:disabled) {
-    border-color: var(--text);
-    background: var(--bg);
+    .fs-icon-btn[data-variant="outline"]:hover:not(:disabled) {
+      border-color: var(--text);
+      background: var(--bg);
+    }
   }
 
   .fs-icon-btn:active:not(:disabled) {
-    transform: scale(0.92);
+    background: var(--bg-tint);
+    transform: scale(0.94);
+    transition-duration: var(--dur-press);
   }
 
+  /* Disabled: the icon in the control-outline ink (3.3:1), not a faded whole. */
   .fs-icon-btn:disabled {
-    color: var(--text-muted);
-    opacity: 0.45;
+    border-color: var(--border);
+    color: var(--border-control);
     cursor: not-allowed;
   }
 

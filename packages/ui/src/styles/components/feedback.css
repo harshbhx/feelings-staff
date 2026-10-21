@@ -69,7 +69,7 @@
     border-radius: inherit;
     background: var(--border);
     opacity: 0;
-    animation: fs-breathe 1.6s ease-in-out 6 alternate;
+    animation: fs-breathe var(--dur-breathe) ease-in-out 6 alternate;
   }
 
   .fs-skeleton[data-shape="block"] {

@@ -41,7 +41,7 @@ export function Sheet({
         e.preventDefault();
         onCancel();
       }}
-      className="mx-0 mt-auto mb-0 max-h-[92dvh] w-full max-w-full overflow-y-auto rounded-t-lg border border-border bg-bg p-0 text-text-body shadow-md transition-[translate,opacity] duration-220 ease-out backdrop:bg-[var(--scrim-soft)] starting:translate-y-6 starting:opacity-0 motion-reduce:transition-none md:m-auto md:max-w-[26rem] md:rounded-lg"
+      className="mx-0 mt-auto mb-0 max-h-[92dvh] w-full max-w-full overflow-y-auto rounded-t-lg border border-border bg-bg p-0 text-text-body shadow-md transition-[translate,opacity] duration-(--dur-base) ease-out backdrop:bg-[var(--scrim-soft)] starting:translate-y-6 starting:opacity-0 motion-reduce:transition-none md:m-auto md:max-w-[26rem] md:rounded-lg"
     >
       <div className="px-5 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:px-8 md:pt-8 md:pb-8">
         <div

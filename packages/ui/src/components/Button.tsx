@@ -1,9 +1,30 @@
 import { Slot } from 'radix-ui';
-import type { ComponentProps, MouseEvent, ReactNode } from 'react';
+import {
+  type ComponentProps,
+  type MouseEvent,
+  type ReactNode,
+  useEffect,
+  useId,
+  useState,
+} from 'react';
+import { useTranslation } from 'react-i18next';
 import { Icon, type IconName } from '../icons/Icon';
 import { cx } from '../lib/cx';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger-secondary';
+/**
+ * Roles (docs/ui-redesign-plan.md 5a): `primary` the one sindoor action of the view; `secondary` a
+ * cream pill for common alternatives; `tertiary` (alias `ghost`) a text button for low-stakes
+ * actions; `danger-secondary` a destructive action at rest (red label); `danger` the armed last
+ * step of a confirm sheet (solid red). Every role has rest, hover, pressed, focus, pending and
+ * disabled states in button.css.
+ */
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'ghost'
+  | 'danger-secondary'
+  | 'danger';
 /** `lg` (56 px) is the staff Today hero: the one Check in / Check out (WP-10). */
 export type ButtonSize = 'lg' | 'md' | 'sm';
 
@@ -19,9 +40,19 @@ export interface ButtonProps extends ComponentProps<'button'> {
   iconEnd?: IconName | undefined;
   /** Full width (stacked buttons on phones). */
   block?: boolean | undefined;
-  /** Submitting: the label changes (`loadingLabel`, e.g. "Checking in…") and presses are ignored. */
+  /**
+   * Pending: a 16 px ring takes the leading icon's place, `aria-busy`, presses are ignored and the
+   * width holds. The label stays (or becomes `loadingLabel`, e.g. "Checking in…"); after 8 s with no
+   * answer it reads "Still trying".
+   */
   loading?: boolean | undefined;
   loadingLabel?: ReactNode;
+  /**
+   * Why it cannot be pressed yet ("Check in opens at 09:00"): a line under the button, read with it.
+   * The button stays focusable (`aria-disabled`, not `disabled`) so touch and screen readers reach
+   * the reason. A primary action is never disabled without one.
+   */
+  disabledReason?: ReactNode;
   /** Render the child element (a link) with the button's look instead of a `<button>`. */
   asChild?: boolean | undefined;
 }
@@ -34,6 +65,7 @@ export function Button({
   block,
   loading = false,
   loadingLabel,
+  disabledReason,
   asChild = false,
   className,
   children,
@@ -41,32 +73,64 @@ export function Button({
   onClick,
   ...rest
 }: ButtonProps) {
+  const { t } = useTranslation();
+  const reasonId = useId();
+  const slow = useSlow(loading);
   const Comp = asChild ? Slot.Root : 'button';
-  const label = loading && loadingLabel !== undefined ? loadingLabel : children;
+  const blocked = loading || !!disabledReason;
+  const label = slow
+    ? t('ui:button.stillTrying')
+    : loading && loadingLabel !== undefined
+      ? loadingLabel
+      : children;
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    if (loading) {
+    if (blocked) {
       e.preventDefault();
       return;
     }
     onClick?.(e);
   };
-  return (
+  const button = (
     <Comp
       type={asChild ? undefined : (type ?? 'button')}
       className={cx('fs-btn', className)}
       data-variant={variant}
       data-size={size}
       data-block={block ? '' : undefined}
+      data-icon={icon ? '' : undefined}
       aria-busy={loading || undefined}
-      aria-disabled={loading || undefined}
+      aria-disabled={blocked || undefined}
+      aria-describedby={disabledReason ? reasonId : undefined}
       onClick={handleClick}
       {...rest}
     >
-      {icon ? <Icon name={icon} /> : null}
+      {loading ? <span className="fs-btn__ring" aria-hidden="true" /> : null}
+      {icon && !loading ? <Icon name={icon} /> : null}
       {asChild ? <Slot.Slottable>{children}</Slot.Slottable> : label}
       {iconEnd ? <Icon name={iconEnd} /> : null}
     </Comp>
   );
+  if (!disabledReason) return button;
+  return (
+    <>
+      {button}
+      <span id={reasonId} className="fs-btn__reason">
+        {disabledReason}
+      </span>
+    </>
+  );
+}
+
+/** True once a pending press has had no answer for 8 s (the "Still trying" label). */
+function useSlow(loading: boolean): boolean {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    setSlow(false);
+    if (!loading) return;
+    const id = setTimeout(() => setSlow(true), 8000);
+    return () => clearTimeout(id);
+  }, [loading]);
+  return loading && slow;
 }
 
 export interface IconButtonProps extends Omit<ComponentProps<'button'>, 'children' | 'aria-label'> {

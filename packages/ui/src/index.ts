@@ -120,4 +120,4 @@ export {
 } from './components/Toast';
 export { ICON_NAMES, Icon, type IconName, type IconProps } from './icons/Icon';
 export { cx } from './lib/cx';
-export { hapticTick, prefersReducedMotion } from './lib/motion';
+export { prefersReducedMotion } from './lib/motion';

@@ -5,9 +5,10 @@
  */
 import type { AwayReason } from '@fs/contracts';
 import { isApiError } from '@fs/contracts';
-import { Button, ChipGroup, Field, hapticTick, Sheet, Textarea, useToast } from '@fs/ui';
+import { Button, ChipGroup, Field, Sheet, Textarea, useToast } from '@fs/ui';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { tick as hapticTick } from '../../../lib/haptics';
 import { useOwnerName } from '../api';
 import { STEP_OUT_REASONS } from './presence-model';
 import { newPresenceKey, useStepOut } from './sheet-api';

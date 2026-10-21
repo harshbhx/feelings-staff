@@ -1,4 +1,41 @@
 /*
+ * Motion tokens (docs/ui-redesign-plan.md 5a). The one place for durations and easings: components
+ * and app CSS use these variables, never a literal (scripts/check-ui.mjs enforces it).
+ *
+ *   --dur-press   80 ms   press in
+ *   --dur-fast   140 ms   hover, toggles, chips, press out, toast fade   (brand, tokens.css)
+ *   --dur-base   220 ms   sheets, screen enter, ripple                   (brand, tokens.css)
+ *   --dur-reduced 160 ms  the reduced-motion fade that replaces an enter or a slide
+ *   --dur-hero   520 ms   the check-in success moment only
+ *   --dur-spin   720 ms   one turn of a control's pending ring
+ *   --ease-out            entering and pressing out                      (brand, tokens.css)
+ *   --ease-soft           colour and state changes                       (brand, tokens.css)
+ *   --ease-spring         the bindi landing
+ *
+ * --ease-out and --ease-soft keep the brand's curves from tokens.css (the website's motion.css);
+ * the plan's table lists near-identical curves, and the brand copy is never edited.
+ */
+:root {
+  --dur-press: 80ms;
+  --dur-reduced: 160ms;
+  --dur-hero: 520ms;
+  --dur-breathe: 1.6s; /* a skeleton's breath, at most six times */
+  --dur-spin: 720ms; /* one turn of the pending ring, the one looping motion (inline, while pending) */
+  --ease-spring: cubic-bezier(0.34, 1.5, 0.5, 1);
+
+  /* Raised controls: a 1 px lighter top edge and a 1 px darker bottom edge, inside the shape. */
+  --edge-hi: rgb(255 255 255 / 0.2);
+  --edge-lo: rgb(30 18 20 / 0.22);
+  --edge-hi-soft: rgb(255 255 255 / 0.9);
+  --edge-lo-soft: rgb(30 18 20 / 0.08);
+  --raised: inset 0 1px 0 var(--edge-hi), inset 0 -1px 0 var(--edge-lo);
+  --raised-soft: inset 0 1px 0 var(--edge-hi-soft), inset 0 -1px 0 var(--edge-lo-soft);
+
+  /* A row held down: the tint one step darker. */
+  --row-press-bg: color-mix(in oklab, var(--bg-tint) 94%, var(--ink-900));
+}
+
+/*
  * Motion (PRD 12.8): small, never large or looping. Opacity and transform only.
  *
  * Allowed: sheet slide-up 220ms, toast fade 140ms, press scale 0.97-0.98, screen enter
@@ -9,6 +46,12 @@
  *   2. softened - enters become a 160ms fade with no movement
  *   3. kept     - colour and focus changes
  */
+
+@keyframes fs-spin {
+  to {
+    rotate: 1turn;
+  }
+}
 
 @keyframes fs-fade-in {
   from {
@@ -60,26 +103,25 @@
     animation: fs-enter var(--dur-base) var(--ease-soft) both;
   }
 
-  /* Tappable cards and chips dip while held, on touch screens. */
-  @media (hover: none) {
-    [data-press] {
-      transition: scale var(--dur-fast) var(--ease-out);
-    }
+  /* Tappable cards and chips dip while held: 80 ms in, 140 ms out (docs/ui-redesign-plan.md 5a). */
+  [data-press] {
+    transition: scale var(--dur-fast) var(--ease-out);
+  }
 
-    [data-press]:active:not([data-disabled]) {
-      scale: 0.97;
-    }
+  [data-press]:active:not([data-disabled]) {
+    scale: 0.98;
+    transition-duration: var(--dur-press);
   }
 
   /* The bindi lands once (success moment only). */
   .fs-bindi[data-land] {
-    animation: fs-bindi-in 520ms cubic-bezier(0.34, 1.5, 0.5, 1) both;
+    animation: fs-bindi-in var(--dur-hero) var(--ease-spring) both;
   }
 
   @media (prefers-reduced-motion: reduce) {
     /* Tier 2: enters become a short fade. */
     .fs-enter {
-      animation: fs-fade-in 160ms ease-out both;
+      animation: fs-fade-in var(--dur-reduced) var(--ease-out) both;
     }
 
     /* Tier 1: no spring, no press scale, no lifts. */
@@ -92,5 +134,19 @@
       scale: none;
       transition: none;
     }
+  }
+}
+
+/* Tier 1 everywhere (outside the layers, so it wins over every component and utility without
+   !important): nothing slides, lifts or scales; colour, opacity and focus changes stay. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    transition-property: color, background-color, border-color, outline-color, opacity;
+  }
+
+  :active {
+    scale: none;
   }
 }
