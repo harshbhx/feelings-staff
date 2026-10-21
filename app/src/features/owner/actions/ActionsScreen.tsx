@@ -1,14 +1,17 @@
 /**
  * Needs action (PRD 4.12, 5.2, O-04): one queue, grouped by type, with filter chips and counts.
  * Select several items of one type to approve them together (never devices). The only sindoor
- * button on this screen is "Approve selected"; per-item actions are outline buttons.
+ * button on this screen is "Approve selected"; per-item actions are outline buttons. On the owner host
+ * new owner devices waiting for approval come first, in the same card style (docs/owner-access.md).
  */
-import type { ActionItem, ActionsView, ActionType } from '@fs/contracts';
+import type { ActionItem, ActionsView, ActionType, OwnerDeviceRequestView } from '@fs/contracts';
 import { Button, Card, ChipGroup, useToast } from '@fs/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { OWNER_ONLY } from '../../../lib/surface';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { useActions, useBulkApprove } from '../api/attendance';
+import { useDeviceRequests } from '../api/owner-access';
 import { CHIPS_WRAP, useNow } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { ActionCard } from './ActionCard';
@@ -20,17 +23,22 @@ import {
   openActionCount,
   toggleSelected,
 } from './actions-model';
+import { DeviceRequestsCard } from './DeviceRequestCard';
+
+const NO_DEVICES: readonly OwnerDeviceRequestView[] = [];
 
 export function ActionsScreen() {
   const query = useActions();
+  // Owner devices waiting for approval: owner build only (the route exists only on the owner host).
+  const devices = useDeviceRequests().data?.requests ?? NO_DEVICES;
   return (
     <QueryView
       query={query}
       skeleton={<RowsSkeleton rows={6} />}
-      isEmpty={(v) => v.items.length === 0}
+      isEmpty={(v) => v.items.length === 0 && devices.length === 0}
       empty={<AllClear />}
     >
-      {(view) => <Queue view={view} />}
+      {(view) => <Queue view={view} devices={devices} />}
     </QueryView>
   );
 }
@@ -45,7 +53,13 @@ interface Selection {
   ids: Set<string>;
 }
 
-function Queue({ view }: { view: ActionsView }) {
+function Queue({
+  view,
+  devices,
+}: {
+  view: ActionsView;
+  devices: readonly OwnerDeviceRequestView[];
+}) {
   const { t } = useTranslation();
   const toast = useToast();
   const errorText = useErrorText();
@@ -111,6 +125,9 @@ function Queue({ view }: { view: ActionsView }) {
       ) : null}
 
       <div className="grid gap-5 xl:grid-cols-2 xl:items-start xl:gap-6">
+        {OWNER_ONLY && devices.length > 0 && filter === null ? (
+          <DeviceRequestsCard requests={devices} now={now} />
+        ) : null}
         {groups.map((g) => (
           <Card
             key={g.type}

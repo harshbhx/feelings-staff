@@ -1,0 +1,60 @@
+/**
+ * Owner passkeys on the owner host (docs/owner-access.md, slice 4). Runs only in the `split-hosts`
+ * project (E2E_SPLIT=1, OWNER_HOST=owner.localhost:8787). Chromium's virtual authenticator (the CDP
+ * WebAuthn domain) stands in for the fingerprint; the preview owner host is plain http, and a
+ * `*.localhost` name is a secure context by default, so passkeys work there. Screenshots of the
+ * three screens are attached to the report.
+ */
+import { expect, test } from '../../fixtures';
+import { OWNER, shot, virtualAuthenticator } from './owner-kit';
+
+test.describe('SPLIT-3 owner passkeys', () => {
+  test('SPLIT-3.1 first device after the email code, then sign-in with the fingerprint', async ({
+    page,
+    reset,
+    outbox,
+  }) => {
+    const s = await reset('basic-salon');
+    await virtualAuthenticator(page);
+
+    await page.goto(`http://${OWNER}/auth/owner`);
+    await expect(page.getByRole('heading', { name: /Welcome back/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Use your fingerprint' })).toBeVisible();
+    await shot(page, 'owner-sign-in-first-device');
+    await page.getByRole('button', { name: 'Email me a code' }).click();
+
+    await expect(page).toHaveURL(/\/auth\/owner\/email/);
+    await page.getByLabel('Email').fill(s.owner.email);
+    await page.getByRole('button', { name: 'Send me a sign-in link' }).click();
+    let code = '';
+    await expect
+      .poll(async () => {
+        const mail = (await outbox()).find((o) => o.channel === 'email' && o.to === s.owner.email);
+        const text = (mail?.payload as { text?: string } | undefined)?.text ?? '';
+        code = text.match(/\b(\d{6})\b/)?.[1] ?? '';
+        return code;
+      })
+      .toMatch(/^\d{6}$/);
+    await page.getByLabel('6-digit code').fill(code);
+
+    await expect(page).toHaveURL(/\/auth\/owner\/enrol/);
+    await expect(page.getByRole('heading', { name: 'Make this phone your key' })).toBeVisible();
+    await shot(page, 'owner-enrol');
+    await page.getByRole('button', { name: 'Make this phone your key' }).click();
+    await expect(page.getByRole('heading', { name: 'This phone is your key' })).toBeVisible();
+    await expect(page.getByLabel('Name of this phone')).toHaveValue(/'s computer$/);
+    await shot(page, 'owner-enrol-done');
+    await page.getByLabel('Name of this phone').fill('Front desk laptop');
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await expect(page).toHaveURL(/\/o\/today/);
+
+    // Next visit: no email code any more; the fingerprint signs in.
+    await page.context().clearCookies();
+    await page.goto(`http://${OWNER}/auth/owner`);
+    await expect(page.getByRole('button', { name: 'Use your fingerprint' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Email me a code' })).toHaveCount(0);
+    await shot(page, 'owner-sign-in');
+    await page.getByRole('button', { name: 'Use your fingerprint' }).click();
+    await expect(page).toHaveURL(/\/o\/today/);
+  });
+});

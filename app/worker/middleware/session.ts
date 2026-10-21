@@ -1,6 +1,10 @@
 /**
  * Session cookie (PRD 9.1): `fs_session`, 32 random bytes, HttpOnly, Secure, SameSite=Strict.
  * D1 stores only SHA-256(token). Staff sessions slide for 30 days, owner/manager 14, door 365.
+ * With OWNER_HOST set (docs/owner-access.md), an owner session started with a passkey is bound to that
+ * credential: 12 hours idle, 7 days at most, and it ends when the credential is removed. On the owner
+ * host an owner with a passkey has no other kind of session. While OWNER_HOST is unset none of this
+ * runs and the queries are the ones from before.
  * Owner: WP-1 (loading). WP-3 calls issueSession/revokeSession from its auth routes.
  */
 import { Permission, type Role, toBase64Url } from '@fs/contracts';
@@ -11,6 +15,7 @@ import { json } from '../db';
 import type { AppEnv } from '../lib/app-env';
 import { randomToken, sha256 } from '../lib/crypto';
 import { fail } from '../lib/errors';
+import { ownerHost, surfaceOf } from '../lib/hosts';
 import type { Ctx, SessionInfo, SessionUser } from '../services/ports';
 
 export const SESSION_COOKIE = 'fs_session';
@@ -22,6 +27,12 @@ export const SESSION_TTL_MS = {
   door: 365 * DAY,
 } as const;
 const SLIDE_AFTER_MS = 60 * 60_000;
+/** Owner sessions bound to a passkey (owner host only). */
+export const PASSKEY_SESSION = {
+  idleMs: 12 * 60 * 60_000,
+  maxMs: 7 * DAY,
+  slideAfterMs: 10 * 60_000,
+} as const;
 
 export async function hashToken(token: string): Promise<string> {
   return toBase64Url(await sha256(token));
@@ -44,6 +55,29 @@ interface SessionRow {
   phone_e164: string | null;
   email: string | null;
   permissions_json: string | null;
+  /** Only selected while OWNER_HOST is set. */
+  passkey_id?: string | null;
+  passkey_enrolled_at?: number | null;
+  passkey_row?: string | null;
+  passkey_removed_at?: number | null;
+}
+
+/** Extra columns and join for passkey-bound sessions, read only while OWNER_HOST is set. */
+const PASSKEY_SELECT =
+  ', s.passkey_id, u.passkey_enrolled_at, p.id AS passkey_row, p.removed_at AS passkey_removed_at';
+const PASSKEY_JOIN = ' LEFT JOIN owner_passkeys p ON p.id = s.passkey_id';
+
+/**
+ * Passkey rules for a session row (OWNER_HOST set): a bound session ends with its credential and after
+ * 7 days; on the owner host an owner who has a passkey only counts with a bound session (an older
+ * email-code session cookie replayed there does not pass).
+ */
+function passkeySessionOk(row: SessionRow, now: number, onOwnerHost: boolean): boolean {
+  if (row.passkey_id) {
+    if (!row.passkey_row || row.passkey_removed_at != null) return false;
+    return row.created_at + PASSKEY_SESSION.maxMs > now;
+  }
+  return !(onOwnerHost && row.role === 'owner' && row.passkey_enrolled_at != null);
 }
 
 export interface LoadedSession {
@@ -60,12 +94,13 @@ export async function loadSession(
   const token = getCookie(c, SESSION_COOKIE);
   if (!token || token.length < 32 || token.length > 64) return null;
   const tokenHash = await hashToken(token);
+  const passkeys = ownerHost(c.env) !== '';
   let row: SessionRow | null;
   try {
     row = await sys.first<SessionRow>(
       `SELECT s.token_hash, s.org_id, s.kind, s.user_id, s.device_id, s.created_at, s.last_seen_at, s.expires_at,
-            s.step_up_until, u.role, u.name, u.status, u.lang, u.phone_e164, u.email, u.permissions_json
-       FROM sessions s LEFT JOIN users u ON u.id = s.user_id
+            s.step_up_until, u.role, u.name, u.status, u.lang, u.phone_e164, u.email, u.permissions_json${passkeys ? PASSKEY_SELECT : ''}
+       FROM sessions s LEFT JOIN users u ON u.id = s.user_id${passkeys ? PASSKEY_JOIN : ''}
       WHERE s.token_hash = ?1 AND s.revoked_at IS NULL`,
       tokenHash,
     );
@@ -78,6 +113,11 @@ export async function loadSession(
     clearSessionCookie(c);
     return null;
   }
+  const passkeyId = passkeys ? (row.passkey_id ?? null) : null;
+  if (passkeys && !passkeySessionOk(row, now, surfaceOf(c.env, new URL(c.req.url)) === 'owner')) {
+    clearSessionCookie(c);
+    return null;
+  }
   const session: SessionInfo = {
     tokenHash,
     kind: row.kind,
@@ -87,6 +127,7 @@ export async function loadSession(
     createdAt: row.created_at,
     expiresAt: row.expires_at,
     stepUpUntil: row.step_up_until,
+    ...(passkeys ? { passkeyId } : {}),
   };
   let user: SessionUser | null = null;
   if (row.kind === 'user') {
@@ -118,14 +159,18 @@ export async function loadSession(
       permissions,
     };
   }
-  if (now - row.last_seen_at > SLIDE_AFTER_MS) {
+  const slideAfter = passkeyId ? PASSKEY_SESSION.slideAfterMs : SLIDE_AFTER_MS;
+  if (now - row.last_seen_at > slideAfter) {
     const ttl = row.kind === 'door' ? SESSION_TTL_MS.door : SESSION_TTL_MS[user?.role ?? 'staff'];
+    const expiresAt = passkeyId
+      ? Math.min(now + PASSKEY_SESSION.idleMs, row.created_at + PASSKEY_SESSION.maxMs)
+      : now + ttl;
     c.executionCtx.waitUntil(
       sys
         .run(
           'UPDATE sessions SET last_seen_at = ?1, expires_at = ?2 WHERE token_hash = ?3',
           now,
-          now + ttl,
+          expiresAt,
           tokenHash,
         )
         .catch(() => undefined),
@@ -151,30 +196,54 @@ export async function issueSession(
     userId: string | null;
     deviceId: string | null;
     role?: Role;
+    /** Owner passkey this session signs in with (owner host only): 12 h idle, 7 days at most. */
+    passkeyId?: string;
   },
 ): Promise<string> {
   const token = randomToken(32);
   const tokenHash = await hashToken(token);
   const now = ctx.now();
-  const ttl = opts.kind === 'door' ? SESSION_TTL_MS.door : SESSION_TTL_MS[opts.role ?? 'staff'];
-  await ctx.sys.run(
-    `INSERT INTO sessions (token_hash, org_id, kind, user_id, device_id, created_at, last_seen_at, expires_at, ip_hmac)
-     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?6, ?7, ?8)`,
-    tokenHash,
-    opts.orgId,
-    opts.kind,
-    opts.userId,
-    opts.deviceId,
-    now,
-    now + ttl,
-    ctx.ipHmac,
-  );
+  const ttl = opts.passkeyId
+    ? PASSKEY_SESSION.idleMs
+    : opts.kind === 'door'
+      ? SESSION_TTL_MS.door
+      : SESSION_TTL_MS[opts.role ?? 'staff'];
+  if (opts.passkeyId) {
+    await ctx.sys.run(
+      `INSERT INTO sessions (token_hash, org_id, kind, user_id, device_id, created_at, last_seen_at, expires_at, ip_hmac, passkey_id)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?6, ?7, ?8, ?9)`,
+      tokenHash,
+      opts.orgId,
+      opts.kind,
+      opts.userId,
+      opts.deviceId,
+      now,
+      now + ttl,
+      ctx.ipHmac,
+      opts.passkeyId,
+    );
+  } else {
+    await ctx.sys.run(
+      `INSERT INTO sessions (token_hash, org_id, kind, user_id, device_id, created_at, last_seen_at, expires_at, ip_hmac)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?6, ?7, ?8)`,
+      tokenHash,
+      opts.orgId,
+      opts.kind,
+      opts.userId,
+      opts.deviceId,
+      now,
+      now + ttl,
+      ctx.ipHmac,
+    );
+  }
+  // A passkey session's cookie lasts as long as the session can; the server enforces the idle limit.
+  const cookieMs = opts.passkeyId ? PASSKEY_SESSION.maxMs : ttl;
   setCookie(c, SESSION_COOKIE, token, {
     httpOnly: true,
     secure: cookieSecure(c),
     sameSite: 'Strict',
     path: '/',
-    maxAge: Math.floor(ttl / 1000),
+    maxAge: Math.floor(cookieMs / 1000),
   });
   return tokenHash;
 }

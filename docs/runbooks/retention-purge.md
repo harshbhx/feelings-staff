@@ -17,6 +17,9 @@ Two kinds of data: things we keep only briefly (location, selfies, sessions) and
 | Audit log `change` and `export` rows | 5 years | Deleted | Monthly |
 | Audit log `security` and `access` rows | 1 year | Deleted | Nightly |
 | Sessions, challenges, magic links | Until expiry plus 7 days | Deleted | Nightly |
+| Owner passkey challenges | Until expiry plus 7 days | Deleted | Nightly |
+| Owner device requests, owner recovery codes | Until expiry plus 30 days | Deleted | Nightly |
+| Removed owner passkeys | 1 year after removal | Deleted | Nightly |
 | Notifications | 180 days | Deleted | Nightly |
 | Push subscriptions | Until the push service says 404 or 410, the device is revoked, or the person leaves | Deleted at once | On the event |
 | Devices | Until revoked plus 30 days | Deleted; the id stays in audit references | Nightly |

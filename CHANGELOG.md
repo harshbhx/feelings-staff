@@ -11,17 +11,34 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 - Staff Month: a late day shows its minutes (+28, or +1h from an hour) on the late tint instead of the P, like the register; the key now lists Late.
 - Staff Today: the greeting and shift sit on a warm blush band under the logo; once the shift has started and you have not checked in, a henna banner says "Not checked in. Shift started at 10:00, 42 min ago." (before the shift the calm chip stays). Payslips: the latest month is a hero card with the take-home in large type and "Not marked paid yet" or the paid date; older months are rows under "Earlier months".
 - Register on a phone is a person-first list: one row per person with the last seven days as 36 px cells and the full name on one line; a "Month grid" toggle keeps the table (96 px name column, 40 px cells). Late days show the minutes (`+28`, `+1h`) on the late tint and cells drop the icon. On desktop the Register has a panel for the selected day (status, punches, source, note, Fix this day), the summary is one line and the key opens from a popover.
+- E2E: one shared way to answer the presence notice, driven by the server's `consentNeeded` instead of a locator handler that raced the explicit click (the cause of the E2E-07, E2E-09, E2E-10 and E2E-11 timeouts and the two-dialog failures). On Today the notice now waits for the Check in or Step out sheet to leave the page before it opens, so two dialogs are never on screen together. Manual `e2e` runs can add load (`hogs`) and extra Playwright arguments (`args`), and keep the first pass traces.
 
 ### Added
 
 - Every control now answers a press the same way: a pressed state within 80 ms, a ring inside the button while it waits (the label and width stay, "Still trying" after 8 s, a second press does nothing), and a disabled main button says why. Buttons have distinct looks per role (solid sindoor, cream secondary, text tertiary, red-labelled destructive), the sheet's close X is neutral, and chips, rows, tabs, the rail and switches have hover, pressed and focus states. Reduced motion turns off every slide and scale.
 - A short vibration on check-in (one tick) and check-out (two ticks) on Android, with a Vibration switch in Me; never with reduced motion.
 - For developers: `useAction` (pending, double-press safe, optimistic only when asked, Cancel, "slow" after 8 s), `app/src/lib/haptics.ts`, motion tokens in `motion.css`, a Control states section on the kit page with forced-state baselines (INT-01 to INT-06), and check-ui rules for transitions and literal durations.
-
-- The app now wears the salon's brand: the page is the website's warm blush band with white cards, the salon's logo leads the owner's Today header on phones, tops the desktop rail and leads the staff Today header (with the date next to the bell), and the owner's More screen closes with the logo and who is signed in. Owner tab-level titles end with the bindi on phones. List lines under a name are darker for contrast. The logo is the typeset name with the bindi until the client confirms the recoloured wordmark.
+- The app now wears the salon's brand: the page is the website's warm blush band with white cards, the salon's logo leads the owner's Today header on phones, tops the desktop rail and leads the staff Today header (with the date next to the bell), and the owner's More screen closes with the logo and who is signed in. Owner tab-level titles end with the bindi on phones. List lines under a name are darker for contrast. The logo is the salon's own wordmark in maroon (a 9 KB image, kept for offline use).
 - Design tokens for the redesign: `--app-page`, `--logo`, `--logo-mask`, and role tones `--role-*` with avatar tints that keep initials at 4.5:1 or more; a `Logo` component in `@fs/ui` and kit specimens for both.
+- E2E-19 now runs: it checks that a push makes the service worker show the right notification and that a click opens the right page.
+- Owner cutover runbook (`docs/runbooks/owner-cutover.md`): the ordered checklist for the owner host and Cloudflare Access, with placeholders instead of real values and the one-line rollback.
 - Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
+
+Owner access, device approval (slice 5, off until `OWNER_HOST` is set):
+
+- "Add this device" on the owner sign-in page: the new device shows a 6-digit code ("482 913") with "Expires in 14 minutes" and waits. On a phone that already has a passkey the request is a card in Needs action (device, when, city, the code to compare): Approve asks for the fingerprint on that phone, then the owner PIN; Decline asks for the PIN. The new device then makes its own passkey within 10 minutes and is signed in. Requests expire after 15 minutes; a declined or expired one can ask again.
+- The enrolment token is single use and stored only hashed; approve and decline are audited (`owner.device_requested`, `owner.device_approved`, `owner.device_declined`), and the audit log has labels for the owner passkey actions. 5 requests per IP and 20 per salon in 15 minutes.
+
+Owner access, passkey core (slice 4, off until `OWNER_HOST` is set):
+
+- On the owner host the owner signs in with a passkey ("Use your fingerprint", or "Use Face ID" on an iPhone). The first device is enrolled after the existing email code ("Make this phone your key"), with a name for the phone. From then on that owner gets no email code and no password sign-in on the owner host. A passkey session lasts 12 hours idle and 7 days at most and ends when the passkey is removed.
+- Migration `0004_owner_access.sql`: owner passkeys, device requests, recovery codes and single-use passkey challenges, `users.passkey_enrolled_at`, `sessions.passkey_id`. The nightly purge covers the new tables.
+- `@simplewebauthn/server` 13.3.3 in the Worker (user verification required, attestation none, ES256 and RS256, counter check, 20 challenges per IP per 15 minutes). While `OWNER_HOST` is unset the passkey routes answer 404 and sign-in is unchanged.
+
+Owner access, contracts (`contracts-v1.3`, [owner access](docs/owner-access.md#api)):
+
+- 12 owner-host endpoints for passkeys: sign-in and confirm challenges, first-device enrolment, device requests with a 6-digit code (create, poll, list, approve or decline), the device list (rename, remove) and recovery. WebAuthn JSON schemas, fixtures with UI-state variants. Nothing is built behind them yet: they answer 501 (404 on the staff host when `OWNER_HOST` is set).
 
 Docs for Time credits and presence (WP-9):
 
@@ -91,6 +108,10 @@ Also merged since (all with `ci` and `e2e` green on main):
 - Stale lazy chunks after a redeploy: a phone with an old app shell now asks the server first and, if a file is missing, drops its saved copy and reloads once by itself: https://github.com/harshbhx/feelings-staff/pull/74.
 - Docs: email per environment and how to verify a sending domain: https://github.com/harshbhx/feelings-staff/pull/75.
 - Review follow-ups: presence, requests, Me and icons on the staff side https://github.com/harshbhx/feelings-staff/pull/76; presence, roll-call, escalation and seed in the Worker https://github.com/harshbhx/feelings-staff/pull/77; roll-call, presence settings and credits on the owner side https://github.com/harshbhx/feelings-staff/pull/78.
+
+### Fixed
+
+- Owner-host Access check: if the signing keys cannot be refreshed after their 1 hour cache (Cloudflare certs error), the cached keys keep working for up to 24 hours instead of locking the owner out. An unknown key id with a failed refresh is still refused.
 
 ### Changed
 
