@@ -16,6 +16,7 @@ import { surfaceOf } from '../lib/hosts';
 
 const SKEW_S = 60;
 const JWKS_TTL_MS = 60 * 60 * 1000;
+const JWKS_STALE_MAX_MS = 24 * 60 * 60 * 1000;
 const REFETCH_MIN_MS = 60 * 1000;
 const FETCH_TIMEOUT_MS = 5000;
 
@@ -101,30 +102,30 @@ async function fetchJwks(domain: string): Promise<Jwks | null> {
 }
 
 /**
- * The verification key for `kid`. The cache lives one hour; an unknown `kid` forces one refetch,
- * and the certs URL is contacted at most once per minute however many bad tokens arrive.
+ * The verification key for `kid`. The cache is fresh for one hour; an unknown `kid` forces one
+ * refetch, and the certs URL is contacted at most once per minute however many bad tokens arrive.
+ * When a refetch fails (network error or non-200), a key already cached is still used for up to
+ * 24 hours, so a Cloudflare certs hiccup does not lock the owner out. A `kid` that is not cached
+ * is never allowed on a failed fetch.
  */
 async function keyFor(domain: string, kid: string): Promise<CryptoKey | null> {
   const now = Date.now();
-  const fresh = cache && cache.domain === domain && now - cache.fetchedAt < JWKS_TTL_MS;
-  if (fresh) {
-    const hit = cache?.keys.get(kid);
-    if (hit) return hit;
-  }
-  const sameDomain = lastAttemptDomain === domain;
-  if (sameDomain && now - lastAttemptAt < REFETCH_MIN_MS) {
-    if (inflight) {
-      const j = await inflight;
-      return j?.keys.get(kid) ?? null;
-    }
-    return null;
+  const cached = cache && cache.domain === domain ? cache : null;
+  const age = cached ? now - cached.fetchedAt : Number.POSITIVE_INFINITY;
+  const hit = cached?.keys.get(kid);
+  if (hit && age < JWKS_TTL_MS) return hit;
+  const stale = hit && age < JWKS_STALE_MAX_MS ? hit : null;
+
+  if (lastAttemptDomain === domain && now - lastAttemptAt < REFETCH_MIN_MS) {
+    if (inflight) return (await inflight)?.keys.get(kid) ?? stale;
+    return stale;
   }
   lastAttemptAt = now;
   lastAttemptDomain = domain;
   inflight = fetchJwks(domain);
   const jwks = await inflight;
   inflight = null;
-  if (!jwks) return null;
+  if (!jwks) return stale;
   cache = jwks;
   return jwks.keys.get(kid) ?? null;
 }

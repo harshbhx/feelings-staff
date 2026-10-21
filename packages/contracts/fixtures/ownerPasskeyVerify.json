@@ -1,0 +1,46 @@
+{
+  "user": {
+    "id": "01K894PPK418TJT35A8CDEANDV",
+    "name": "Urmi Mengar",
+    "role": "owner",
+    "status": "active",
+    "phone": null,
+    "email": "urmi@feelingsbeautycare.in",
+    "lang": "en",
+    "designation": null,
+    "joinDate": "2024-10-14"
+  },
+  "org": {
+    "id": "01K88WMW5DRXRGE3RMW4NF61X1",
+    "name": "Feelings Beauty Care",
+    "ownerDisplayName": "Urmi",
+    "contactPhone": "+918000661578",
+    "timezone": "Asia/Kolkata"
+  },
+  "device": null,
+  "permissions": [
+    "approve_attendance",
+    "approve_leave",
+    "approve_overtime",
+    "offsite",
+    "roster",
+    "door",
+    "payroll",
+    "staff",
+    "exports"
+  ],
+  "flags": {
+    "selfieRequired": false,
+    "selfieOnCheckOut": false,
+    "strongMode": false,
+    "breakPunches": false,
+    "pinEveryPunch": true,
+    "showPayslips": true,
+    "consentsNeeded": [],
+    "ownerPinSet": true,
+    "ownerPasswordSet": true,
+    "setupIncomplete": false,
+    "stepUpUntil": null,
+    "storageTip": false
+  }
+}
