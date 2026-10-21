@@ -173,6 +173,8 @@ export interface Ctx {
   /** HMAC(IP_HMAC_KEY, ip), computed once per request; safe to store. */
   ipHmac: string | null;
   cf: IncomingRequestCfProperties | null;
+  /** Verified Cloudflare Access e-mail on the owner host, when the Access gate is on. */
+  accessEmail?: string;
   waitUntil(p: Promise<unknown>): void;
   services: Services;
 }

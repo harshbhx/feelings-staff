@@ -8,6 +8,7 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ### Added
 
+- Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
 Docs for Time credits and presence (WP-9):

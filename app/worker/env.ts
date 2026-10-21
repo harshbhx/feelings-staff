@@ -16,6 +16,12 @@ export interface Env {
   APP_ORIGIN: string;
   /** Owner host name (no scheme). Unset = one host serves everything (today's behaviour). */
   OWNER_HOST?: string;
+  /** Cloudflare Access team domain ("team.cloudflareaccess.com", scheme optional). Not secret. */
+  ACCESS_TEAM_DOMAIN?: string;
+  /** Access application audience tag. Unset = the owner-host Access check is off. Not secret. */
+  ACCESS_AUD?: string;
+  /** Comma-separated e-mails allowed through Access (case-insensitive). Not secret. */
+  ACCESS_ALLOWED_EMAILS?: string;
   APP_VERSION: string;
   MIN_APP_VERSION: string;
   EMAIL_PROVIDER: 'cloudflare' | 'resend' | 'outbox';
