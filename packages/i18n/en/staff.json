@@ -227,7 +227,7 @@
       "location_denied": "Location is off for this app.",
       "location_timeout": "We couldn't find your location. Step near a window or the door and try again.",
       "location_approximate": "Your phone is sharing only an approximate location. Turn on Precise location for this app.",
-      "outside": "You're about {{distance}} from the salon.",
+      "outside": "You're {{distance}} from the salon. Come closer to check in.",
       "outsideNoDistance": "You're outside the salon.",
       "camera_denied": "Camera is off for this app.",
       "camera_failed": "We couldn't open the camera.",

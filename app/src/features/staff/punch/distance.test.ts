@@ -34,3 +34,12 @@ describe('formatDistance', () => {
     expect(formatDistance(1234, 'gu')).toMatch(/^1\.2\s/);
   });
 });
+
+describe('staff copy', () => {
+  it('never states the allowed check-in radius', async () => {
+    const staff = (await import('../../../../../packages/i18n/en/staff.json')).default;
+    const errors = (await import('../../../../../packages/i18n/en/errors.json')).default;
+    const text = JSON.stringify([staff, errors]).toLowerCase();
+    expect(text).not.toMatch(/radius|geofence|works within|allowed distance/);
+  });
+});
