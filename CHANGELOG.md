@@ -17,6 +17,11 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 - Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
+Owner access, device approval (slice 5, off until `OWNER_HOST` is set):
+
+- "Add this device" on the owner sign-in page: the new device shows a 6-digit code ("482 913") with "Expires in 14 minutes" and waits. On a phone that already has a passkey the request is a card in Needs action (device, when, city, the code to compare): Approve asks for the fingerprint on that phone, then the owner PIN; Decline asks for the PIN. The new device then makes its own passkey within 10 minutes and is signed in. Requests expire after 15 minutes; a declined or expired one can ask again.
+- The enrolment token is single use and stored only hashed; approve and decline are audited (`owner.device_requested`, `owner.device_approved`, `owner.device_declined`), and the audit log has labels for the owner passkey actions. 5 requests per IP and 20 per salon in 15 minutes.
+
 Owner access, passkey core (slice 4, off until `OWNER_HOST` is set):
 
 - On the owner host the owner signs in with a passkey ("Use your fingerprint", or "Use Face ID" on an iPhone). The first device is enrolled after the existing email code ("Make this phone your key"), with a name for the phone. From then on that owner gets no email code and no password sign-in on the owner host. A passkey session lasts 12 hours idle and 7 days at most and ends when the passkey is removed.

@@ -5,30 +5,8 @@
  * project treats that origin as secure (playwright.config.ts). Screenshots of the three screens are
  * attached to the report.
  */
-import type { CDPSession, Page } from '@playwright/test';
 import { expect, test } from '../../fixtures';
-
-const OWNER = 'owner.example.test:8787';
-
-async function virtualAuthenticator(page: Page): Promise<CDPSession> {
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send('WebAuthn.enable');
-  await cdp.send('WebAuthn.addVirtualAuthenticator', {
-    options: {
-      protocol: 'ctap2',
-      transport: 'internal',
-      hasResidentKey: true,
-      hasUserVerification: true,
-      isUserVerified: true,
-      automaticPresenceSimulation: true,
-    },
-  });
-  return cdp;
-}
-
-async function shot(page: Page, name: string): Promise<void> {
-  await test.info().attach(name, { body: await page.screenshot(), contentType: 'image/png' });
-}
+import { OWNER, shot, virtualAuthenticator } from './owner-kit';
 
 test.describe('SPLIT-3 owner passkeys', () => {
   test('SPLIT-3.1 first device after the email code, then sign-in with the fingerprint', async ({

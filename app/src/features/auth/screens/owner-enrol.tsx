@@ -1,7 +1,9 @@
 /**
- * First-device enrolment on the owner host (docs/owner-access.md, ui-redesign-plan 5b): after the
- * email code, "Make this phone your key" creates the passkey; the success step shows the name of the
- * phone, prefilled ("Urmi's iPhone"), which the owner may change before going on. Owner build only.
+ * Enrolment on the owner host (docs/owner-access.md, ui-redesign-plan 5b): "Make this phone your key"
+ * creates the passkey, after the email code on the first device, or with the enrolment token of a
+ * device request that another phone approved ("Add this device", `enrolToken`). The success step shows
+ * the name of the phone, prefilled ("Urmi's iPhone"), which the owner may change before going on.
+ * Owner build only.
  */
 import {
   isApiError,
@@ -11,7 +13,7 @@ import {
 } from '@fs/contracts';
 import { Banner, Bindi, Button, Field, Input } from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { meQueryKey, useMe } from '../../../api/hooks';
@@ -39,7 +41,7 @@ function firstName(name: string): string {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
-export function OwnerEnrolScreen() {
+export function OwnerEnrolScreen({ enrolToken }: { enrolToken?: string } = {}) {
   const { t } = useTranslation();
   const api = useApi();
   const navigate = useNavigate();
@@ -55,31 +57,46 @@ export function OwnerEnrolScreen() {
   const [nameError, setNameError] = useState<string | null>(null);
   const [enrolled, setEnrolled] = useState(false);
   const loading = useRef(false);
+  const titleId = useId();
 
-  const owner = me.data?.user.name ?? '';
-  const defaultName = t(DEVICE_NAME[platform], { name: firstName(owner) });
+  // A new device has no session yet: the name comes with the options (the owner who approved it).
+  const nameFor = (o: OwnerEnrolOptions | null) =>
+    t(DEVICE_NAME[platform], {
+      name: firstName(me.data?.user.name ?? o?.options.user.displayName ?? ''),
+    });
 
   const load = useCallback(async (): Promise<OwnerEnrolOptions | null> => {
     if (loading.current) return null;
     loading.current = true;
     try {
-      const next = await api.ownerEnrolOptions({ body: {} });
+      const next = await api.ownerEnrolOptions({ body: enrolToken ? { enrolToken } : {} });
       setChallenge(next);
       return next;
     } catch (e) {
       // An owner who already has a passkey adds devices another way: go to the panel.
-      if (isApiError(e, 'RULE_VIOLATION') && e.details?.reason === 'already_enrolled')
+      if (
+        !enrolToken &&
+        isApiError(e, 'RULE_VIOLATION') &&
+        e.details?.reason === 'already_enrolled'
+      )
         setEnrolled(true);
+      else if (isApiError(e, 'LINK_EXPIRED'))
+        setNotice({ tone: 'error', key: 'owner:access.enrol.tokenGone' });
       else setNotice({ tone: 'error', key: 'owner:access.enrol.loadFailed' });
       return null;
     } finally {
       loading.current = false;
     }
-  }, [api]);
+  }, [api, enrolToken]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Approved on the other phone: this is a new screen, start screen readers at its heading.
+  useEffect(() => {
+    if (enrolToken) document.getElementById(titleId)?.focus();
+  }, [enrolToken, titleId]);
 
   // A new step is a new screen: start screen readers at its heading.
   const doneTitle = useRef<HTMLHeadingElement | null>(null);
@@ -116,7 +133,13 @@ export function OwnerEnrolScreen() {
     }
     try {
       const result = await api.ownerEnrolVerify({
-        body: { challengeId: current.challengeId, credential, deviceName: defaultName, platform },
+        body: {
+          challengeId: current.challengeId,
+          credential,
+          deviceName: nameFor(current),
+          platform,
+          ...(enrolToken ? { enrolToken } : {}),
+        },
       });
       queryClient.setQueryData(meQueryKey, result.me);
       setName(result.device.deviceName);
@@ -129,7 +152,9 @@ export function OwnerEnrolScreen() {
       setNotice(
         isApiError(e, 'NONCE_INVALID')
           ? { tone: 'quiet', key: 'owner:access.enrol.tooSlow' }
-          : { tone: 'error', key: 'owner:access.enrol.failed' },
+          : isApiError(e, 'LINK_EXPIRED')
+            ? { tone: 'error', key: 'owner:access.enrol.tokenGone' }
+            : { tone: 'error', key: 'owner:access.enrol.failed' },
       );
       void load();
     }
@@ -213,8 +238,10 @@ export function OwnerEnrolScreen() {
   return (
     <AuthScreen busy={busy}>
       <Stepper step={2} total={3} />
-      <Title>{t('owner:access.enrol.title')}</Title>
-      <Lead>{t('owner:access.enrol.lead')}</Lead>
+      <Title id={titleId}>{t('owner:access.enrol.title')}</Title>
+      <Lead>
+        {enrolToken ? t('owner:access.enrol.approvedLead') : t('owner:access.enrol.lead')}
+      </Lead>
       {!supported ? (
         <div className="mt-6">
           <Banner icon="warning-circle" tone="plain">
@@ -240,6 +267,11 @@ export function OwnerEnrolScreen() {
         >
           {t('owner:access.enrol.start')}
         </Button>
+        {enrolToken && notice?.key === 'owner:access.enrol.tokenGone' ? (
+          <Button variant="ghost" block onClick={() => navigate('/auth/owner', { replace: true })}>
+            {t('owner:access.add.backToSignIn')}
+          </Button>
+        ) : null}
       </div>
     </AuthScreen>
   );
