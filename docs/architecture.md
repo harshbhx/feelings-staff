@@ -46,10 +46,11 @@ Static files are served from assets. `/api/*`, `/v/*`, `/q/*`, `/__kit`, `/asset
 What the Worker does on every `/api/*` request, in order:
 
 1. Assign a request id and, on the way out, add the security headers (`app/worker/middleware/headers.ts`).
-2. `guard`: CSRF (`Origin` and `X-FS-Client`), minimum app version, per-IP rate limit.
-3. `context`: load the session and user, pick the organisation, build the org-scoped database (`OrgDb`), the services and the per-session rate limit.
-4. The endpoint registered by `registerApi` ([ADR-15](decisions/0015-endpoint-table-drives-server-and-client.md)): access check, input parsing, step-up, idempotency, handler, response check.
-5. Errors anywhere are turned into the standard error body ([API reference](api.md#error-shape-and-codes)).
+2. On the owner host only, and only when `OWNER_HOST` and `ACCESS_AUD` are set: verify the Cloudflare Access token (`app/worker/middleware/access.ts`); anything wrong answers 403 with an empty body ([owner access](owner-access.md#cloudflare-access)). This runs for every owner-host request, not only `/api/*`.
+3. `guard`: CSRF (`Origin` and `X-FS-Client`), minimum app version, per-IP rate limit.
+4. `context`: load the session and user, pick the organisation, build the org-scoped database (`OrgDb`), the services and the per-session rate limit.
+5. The endpoint registered by `registerApi` ([ADR-15](decisions/0015-endpoint-table-drives-server-and-client.md)): access check, input parsing, step-up, idempotency, handler, response check.
+6. Errors anywhere are turned into the standard error body ([API reference](api.md#error-shape-and-codes)).
 
 ## A check-in, end to end
 

@@ -133,6 +133,10 @@ Used once to create the organisation and owner ([deploy guide, step 7](../deploy
 
 The `e2e` and `snapshots` workflows create their own token on every run, so only the shared preview needs this value. Rotate with `--preview` as above. Do not set `E2E_TOKEN` in production: the test routes answer 404 there whatever the token.
 
+### Access variables
+
+`ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` and `ACCESS_ALLOWED_EMAILS` are plain Worker variables, not secrets: the audience tag and team domain are visible to anyone who can open the Access application, and a token is still needed to get in. Nothing to rotate on a schedule. Set them together with `OWNER_HOST` at the owner-access cutover ([deploy](../deploy.md#3-worker-secrets), [owner access](../owner-access.md#cloudflare-access)). Changing the allow-list takes effect at once; unsetting `ACCESS_AUD` switches the owner-host Access check off. Record changes in the [ops log](../ops-log.md).
+
 ## After any rotation
 
 1. `curl -fsS https://staff.feelingsbeautycare.in/api/v1/health` answers `ok`.
