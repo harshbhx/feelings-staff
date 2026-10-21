@@ -61,7 +61,7 @@ export async function ownerSession(request: APIRequestContext, creds: OwnerCreds
 /** Add a person, return the id and join code. */
 export async function addStaff(
   owner: OwnerApi,
-  p: { name: string; phone: string; joinDate: string },
+  p: { name: string; phone: string; joinDate: string; selfieRequired?: boolean },
 ): Promise<{ id: string; code: string }> {
   const templates = await owner.ok<{ id: string; name: string }[]>('GET', '/owner/shift-templates');
   const full = templates.find((t) => t.name === 'Full day') ?? templates[0];
@@ -79,7 +79,7 @@ export async function addStaff(
       defaultTemplateId: full?.id,
       weekOffDow: null,
       lang: 'en',
-      selfieRequired: false,
+      selfieRequired: p.selfieRequired ?? false,
       adultConfirmed: true,
     },
   );
@@ -131,7 +131,7 @@ export async function approvePhone(owner: OwnerApi, staffId: string) {
 export async function onboardPhone(
   page: Page,
   owner: OwnerApi,
-  p: { name: string; phone: string; pin: string; joinDate: string },
+  p: { name: string; phone: string; pin: string; joinDate: string; selfieRequired?: boolean },
 ): Promise<{ id: string }> {
   const staff = await addStaff(owner, p);
   await joinOnPhone(page, p.phone, staff.code, p.pin);
@@ -207,6 +207,77 @@ export async function punch(page: Page, kind: 'in' | 'out', pin: string) {
       .toBeHidden({ timeout: 20_000 })
       .catch(() => page.keyboard.press('Escape'));
   await expect(sheet).toBeHidden({ timeout: 10_000 });
+}
+
+export type PunchStep =
+  | 'pin'
+  | 'problem'
+  | 'result'
+  | 'sent'
+  | 'camera'
+  | 'scanning'
+  | 'confirm'
+  | 'queued';
+const DECISION_STEPS = /^(pin|problem|result|sent|camera|scanning|confirm|queued)$/;
+
+/** The sheet's `data-punch-step` marker: the step the check-in flow is showing right now. */
+export function punchStep(page: Page) {
+  return page.getByRole('dialog').locator('[data-punch-step]');
+}
+
+/**
+ * Tap Check in or Check out and wait for the first screen that needs a person: the PIN pad, a
+ * problem with its options, a camera, or an end state. The location explainer is answered on the
+ * way. Returns the step reached so a spec can branch on it.
+ */
+export async function startPunch(page: Page, kind: 'in' | 'out'): Promise<PunchStep> {
+  await page
+    .getByRole('button', { name: kind === 'in' ? 'Check in' : 'Check out', exact: true })
+    .click();
+  const sheet = page.getByRole('dialog');
+  const allow = sheet.getByRole('button', { name: 'Allow location' });
+  let step = '';
+  await expect
+    .poll(
+      async () => {
+        step =
+          (await punchStep(page)
+            .getAttribute('data-punch-step')
+            .catch(() => null)) ?? '';
+        if (step === 'permission') await allow.click().catch(() => undefined);
+        return step;
+      },
+      { timeout: 60_000, intervals: [250, 500, 1000] },
+    )
+    .toMatch(DECISION_STEPS);
+  return step as PunchStep;
+}
+
+/** Type the PIN on the open pad (it may send by itself once complete). */
+export async function enterPin(page: Page, kind: 'in' | 'out', pin: string) {
+  const sheet = page.getByRole('dialog');
+  await sheet.getByRole('textbox', { name: 'Enter your PIN' }).fill(pin);
+  await sheet
+    .getByRole('button', { name: kind === 'in' ? 'Check in' : 'Check out', exact: true })
+    .click({ timeout: 2_000 })
+    .catch((err: unknown) => {
+      if (!(err instanceof errors.TimeoutError)) throw err;
+    });
+}
+
+/** Wait until the check-in flow reaches one of these steps. */
+export async function expectStep(page: Page, ...steps: PunchStep[]) {
+  await expect
+    .poll(
+      async () =>
+        (await punchStep(page)
+          .getAttribute('data-punch-step')
+          .catch(() => null)) ?? '',
+      {
+        timeout: 45_000,
+      },
+    )
+    .toMatch(new RegExp(`^(${steps.join('|')})$`));
 }
 
 /** IST wall time on a date as epoch ms. */
