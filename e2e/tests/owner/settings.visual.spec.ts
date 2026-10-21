@@ -35,6 +35,19 @@ test.describe('owner settings visual', () => {
     });
   }
 
+  test('OWN-S setup-in-progress: the next step leads with one button, finished steps fold (O-02)', async ({
+    page,
+    checkA11y,
+  }) => {
+    await openOwner(page, '/o/setup', ['ownerSetupGet:in-progress']);
+    await expect(shown(page, 'Holidays')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Next: Holidays' })).toBeVisible();
+    await expect(page.getByText('3 of 8 done')).toBeVisible();
+    await noCrash(page);
+    await expect(page).toHaveScreenshot('owner-setup-in-progress.png', { fullPage: true });
+    await checkA11y();
+  });
+
   test('OWN-S settings: a change shows its new meaning before saving (O-16.1)', async ({
     page,
   }) => {
