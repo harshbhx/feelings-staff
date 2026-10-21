@@ -8,6 +8,8 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ### Added
 
+- E2E-19 now runs: it checks that a push makes the service worker show the right notification and that a click opens the right page.
+
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
 Docs for Time credits and presence (WP-9):
