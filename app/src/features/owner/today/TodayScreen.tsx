@@ -248,8 +248,9 @@ function Board({ board }: { board: TodayBoard }) {
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-3 xl:grid-cols-[minmax(0,58fr)_minmax(0,42fr)] xl:items-start xl:gap-x-10">
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 xl:gap-8">
-        <div className="grid grid-cols-[minmax(0,1fr)] gap-3">
+      {/* Tight on phones so the first person sits above 420 px (Fix 3). */}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-2 xl:gap-8">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-2 xl:gap-3">
           {hero}
           {/* PRD 4.18.3: the roll-call that is open or missed (N33), else one quiet line. */}
           <RollCallCard slot={board.rollCall} primary={board.actionsCount === 0} />
