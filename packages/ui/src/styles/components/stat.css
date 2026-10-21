@@ -176,8 +176,7 @@
     pointer-events: none;
     transition:
       border-color var(--dur-fast) var(--ease-out),
-      background-color var(--dur-fast) var(--ease-out),
-      box-shadow var(--dur-fast) var(--ease-out);
+      background-color var(--dur-fast) var(--ease-out);
   }
 
   .fs-stat__disc {

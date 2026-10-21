@@ -30,20 +30,37 @@
   }
 
   .fs-row[data-interactive] {
+    --fs-row-fill: transparent;
     position: relative;
     cursor: pointer;
-    transition: background-color var(--dur-fast) var(--ease-out);
-  }
-
-  /* The hover tint bleeds into the gutter so the row text stays aligned with the page. */
-  .fs-row[data-interactive]:hover {
-    background: var(--row-hover-bg);
+    background: var(--fs-row-fill);
+    /* The fill bleeds into the gutter so the row text stays aligned with the page. */
     box-shadow:
-      calc(var(--space-3) * -1) 0 0 var(--row-hover-bg),
-      var(--space-3) 0 0 var(--row-hover-bg);
+      calc(var(--space-3) * -1) 0 0 var(--fs-row-fill),
+      var(--space-3) 0 0 var(--fs-row-fill);
+    transition:
+      background-color var(--dur-fast) var(--ease-soft),
+      scale var(--dur-fast) var(--ease-out);
   }
 
+  @media (hover: hover) {
+    .fs-row[data-interactive]:hover {
+      --fs-row-fill: var(--row-hover-bg);
+    }
+  }
+
+  /* Pressed (5a): the fill steps down and the row dips to 0.98, 80 ms in. */
+  .fs-row[data-interactive]:active {
+    --fs-row-fill: var(--row-press-bg);
+    scale: 0.98;
+    transition-duration: var(--dur-press);
+  }
+
+  /* The ring wraps the whole row, gutter included, and never moves. */
   .fs-row[data-interactive]:focus-visible {
+    border-radius: var(--radius-sm);
+    box-shadow: none;
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 

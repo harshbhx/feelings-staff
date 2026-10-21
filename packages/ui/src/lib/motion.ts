@@ -6,13 +6,4 @@ export function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-/**
- * One 8 ms haptic tick on Android (PRD 12.8), for the success moment. Never with reduced motion;
- * a no-op where vibration is not supported (iOS Safari, desktop).
- */
-export function hapticTick(): void {
-  if (prefersReducedMotion()) return;
-  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-    navigator.vibrate(8);
-  }
-}
+// Haptics live in the app (app/src/lib/haptics.ts): tick, success and warn, with the Vibration choice.

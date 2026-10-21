@@ -385,12 +385,13 @@ describe('PK-2 first device: the email code, then "Make this phone your key"', (
     const again = await req('/auth/owner/enrol/options', { body: {}, cookie });
     expect(again.status).toBe(422);
     expect(again.reason).toBe('already_enrolled');
-    // Another device comes through a device request (slice 5), not built yet.
+    // Another device comes through a device request (owner-devices.test.ts); an unknown token does not.
     const token = await req('/auth/owner/enrol/options', {
       body: { enrolToken: 'A'.repeat(43) },
       cookie,
     });
-    expect(token.status).toBe(501);
+    expect(token.status).toBe(410);
+    expect(token.code).toBe('LINK_EXPIRED');
   });
 });
 

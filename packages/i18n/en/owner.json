@@ -1720,6 +1720,12 @@
       "notification_prefs_update": "Alert settings changed",
       "org_setup": "Salon set up",
       "org_update": "Salon details changed",
+      "owner_device_approved": "Owner device approved",
+      "owner_device_declined": "Owner device declined",
+      "owner_device_renamed": "Owner device renamed",
+      "owner_device_requested": "Owner device asked to be added",
+      "owner_passkey_enrolled": "Passkey added",
+      "owner_signin_passkey": "Owner signed in with a passkey",
       "payroll_adjustment_add": "Added to a payslip",
       "payroll_adjustment_delete": "Removed from a payslip",
       "payroll_advance_recovery": "Advance recovery changed",
@@ -2093,7 +2099,8 @@
       "loadFailed": "We couldn't get ready to sign you in. Check your internet and reload.",
       "emailCode": "Email me a code",
       "lostPhone": "Lost your phone?",
-      "lostPhoneHelp": "Ask Harsh for a one-time recovery code. With it you set up a new phone as your key."
+      "lostPhoneHelp": "Ask Harsh for a one-time recovery code. With it you set up a new phone as your key.",
+      "addDevice": "Add this device"
     },
     "enrol": {
       "title": "Make this phone your key",
@@ -2111,7 +2118,50 @@
       "nameHint": "So you can tell your phones apart in Settings, Security.",
       "nameInvalid": "Give this phone a name of up to 80 characters.",
       "continue": "Continue",
-      "saving": "Saving…"
+      "saving": "Saving…",
+      "approvedLead": "Your other phone said yes. Make this device your key in the next 10 minutes.",
+      "tokenGone": "This approval has run out. Ask again from this device."
+    },
+    "add": {
+      "title": "Add this device",
+      "lead": "On a phone that already signs you in, open Needs action and approve this code.",
+      "codeLabel": "Your code",
+      "asking": "Getting a code…",
+      "expiresIn_one": "Expires in {{count}} minute",
+      "expiresIn_other": "Expires in {{count}} minutes",
+      "expiresSoon": "Expires in less than a minute",
+      "cancel": "Cancel",
+      "backToSignIn": "Back to sign-in",
+      "again": "Ask again",
+      "declined": "This device was declined on your other phone.",
+      "expired": "The code ran out of time.",
+      "noDevice": "No phone signs you in with a passkey yet. Go back and use \"Email me a code\" on the first one.",
+      "rateLimited": "Too many tries. Wait 15 minutes and try again.",
+      "failed": "We couldn't get a code. Check your internet and try again.",
+      "label": {
+        "ios": "iPhone",
+        "android": "Android phone",
+        "desktop": "Computer",
+        "other": "Phone or tablet"
+      }
+    },
+    "approve": {
+      "group": "New owner devices",
+      "title": "{{name}} wants to sign in as you",
+      "from": "from {{city}}",
+      "compare": "Approve only if the new device shows this code:",
+      "expiresIn_one": "Expires in {{count}} minute",
+      "expiresIn_other": "Expires in {{count}} minutes",
+      "expiresSoon": "Expires in less than a minute",
+      "hint": "You confirm with your fingerprint, then your owner PIN.",
+      "approve": "Approve",
+      "decline": "Decline",
+      "waiting": "Waiting for your fingerprint…",
+      "approved": "Approved. Finish on the new device.",
+      "declined": "Declined. That device was not added.",
+      "cancelled": "Nothing happened. Try again.",
+      "expired": "This request ran out of time. Ask again on the new device.",
+      "failed": "That fingerprint didn't work. Try again."
     },
     "deviceName": {
       "ios": "{{name}}'s iPhone",

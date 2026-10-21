@@ -42,6 +42,7 @@ import {
   useToast,
 } from '@fs/ui';
 import { type ReactNode, useEffect, useState } from 'react';
+import { ControlStates } from './ControlStates';
 
 const STATUSES: DayStatus[] = [
   'present',
@@ -933,6 +934,17 @@ export function KitPage() {
         </header>
         <Foundations />
         <Buttons />
+        <ControlStates
+          section={(children) => (
+            <Section
+              id="control-states"
+              title="Control states"
+              intro="Every role in rest, hover, pressed, focus, pending and disabled. Hover is pointer only; pressed dips 0.97 (rows and chips 0.98) in 80 ms; pending keeps the label and the width; disabled says why."
+            >
+              {children}
+            </Section>
+          )}
+        />
         <Fields />
         <Chips />
         <Statuses />

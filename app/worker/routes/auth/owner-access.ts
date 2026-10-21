@@ -1,14 +1,21 @@
 /**
- * Owner access on the owner host (ADR-19, docs/owner-access.md, slice 4): passkey sign-in, the first
- * device's enrolment after the email code, and the device list. Every handler answers NOT_FOUND off
- * the owner host (the host routing already does so; this is the second line). Device requests (slice 5),
- * Remove (slice 6) and recovery (slice 7) are not built yet and answer 501.
+ * Owner access on the owner host (ADR-19, docs/owner-access.md): passkey sign-in, enrolment (the first
+ * device after the email code, slice 4; another device with the enrolment token of an approved device
+ * request, slice 5), and the device list. Device requests are in owner-device-requests.ts. Every
+ * handler answers NOT_FOUND off the owner host (the host routing already does so; this is the second
+ * line). Remove (slice 6) and recovery (slice 7) are not built yet and answer 501.
  * Owner: WP-3.
  */
 import type { Handlers } from '../../lib/api';
 import { fail } from '../../lib/errors';
 import { ulid } from '../../lib/ulid';
 import { buildMe, requireOrg } from '../../services/auth';
+import {
+  type DeviceRequestRow,
+  ENROL_WINDOW_MS,
+  enrolOpen,
+  requestByToken,
+} from '../../services/owner-devices';
 import {
   assertChallengeBudget,
   assertionOptions,
@@ -26,8 +33,9 @@ import {
 } from '../../services/passkey';
 import type { Ctx } from '../../services/ports';
 import { startUserSession } from '../../services/session';
+import { deviceRequestHandlers } from './owner-device-requests';
 
-const NOT_YET = 'Adding a device this way is not ready yet.';
+const TOKEN_GONE = 'This request has run out. Ask again on this phone.';
 
 interface OwnerRow {
   id: string;
@@ -57,6 +65,26 @@ async function firstDeviceOwner(ctx: Ctx): Promise<{ owner: OwnerRow; sessionHas
   return { owner, sessionHash: session.tokenHash };
 }
 
+/**
+ * Another device: the enrolment token of a device request that an approved device approved, inside
+ * its 10 minutes and not used yet. The passkey goes to the owner who approved it. Unknown, pending,
+ * declined, expired and used tokens all answer LINK_EXPIRED.
+ */
+async function tokenEnrolment(
+  ctx: Ctx,
+  token: string,
+): Promise<{ owner: OwnerRow; request: DeviceRequestRow }> {
+  const request = await requestByToken(ctx, token);
+  if (!request?.user_id || !enrolOpen(request, ctx.now())) fail('LINK_EXPIRED', TOKEN_GONE);
+  const owner = await ctx.db.first<OwnerRow>(
+    `SELECT id, name, email, passkey_enrolled_at FROM users
+      WHERE org_id = ?org AND id = ? AND role = 'owner' AND status = 'active'`,
+    request.user_id,
+  );
+  if (!owner) fail('LINK_EXPIRED', TOKEN_GONE);
+  return { owner, request };
+}
+
 /** True while an active owner of the salon has no passkey: the sign-in page still offers the email code. */
 async function emailCodeOffered(ctx: Ctx): Promise<boolean> {
   const row = await ctx.db.first<{ n: number }>(
@@ -67,6 +95,8 @@ async function emailCodeOffered(ctx: Ctx): Promise<boolean> {
 }
 
 export const ownerAccessHandlers: Handlers = {
+  ...deviceRequestHandlers,
+
   // ---- Sign in, and the challenge that confirms a device action ---------------------------------
 
   async ownerPasskeyOptions({ body }, ctx, c) {
@@ -147,20 +177,29 @@ export const ownerAccessHandlers: Handlers = {
     return buildMe(ctx, stored.user_id, { deviceId: null, stepUpUntil: null });
   },
 
-  // ---- First device: after the email code, this phone becomes the key -----------------------------
+  // ---- Enrolment: the first device after the email code, or a device approved on another ------------
 
   async ownerEnrolOptions({ body }, ctx, c) {
     const rp = ownerRelyingParty(c);
     requireOrg(ctx);
-    if (body.enrolToken !== undefined) fail('NOT_IMPLEMENTED', NOT_YET);
-    const { owner, sessionHash } = await firstDeviceOwner(ctx);
+    let owner: OwnerRow;
+    let bind: { sessionHash: string } | { requestId: string };
+    if (body.enrolToken !== undefined) {
+      const t = await tokenEnrolment(ctx, body.enrolToken);
+      owner = t.owner;
+      bind = { requestId: t.request.id };
+    } else {
+      const f = await firstDeviceOwner(ctx);
+      owner = f.owner;
+      bind = { sessionHash: f.sessionHash };
+    }
     await assertChallengeBudget(ctx);
     const options = await registrationOptions(rp, owner, await livePasskeys(ctx, owner.id));
     const { challengeId, expiresAt } = await storeChallenge(ctx, {
       purpose: 'enrol',
       challenge: options.challenge,
       userId: owner.id,
-      sessionHash,
+      ...bind,
     });
     return { challengeId, expiresAt, options };
   },
@@ -168,11 +207,18 @@ export const ownerAccessHandlers: Handlers = {
   async ownerEnrolVerify({ body }, ctx, c) {
     const rp = ownerRelyingParty(c);
     const orgId = requireOrg(ctx);
-    if (body.enrolToken !== undefined) fail('NOT_IMPLEMENTED', NOT_YET);
-    const { owner, sessionHash } = await firstDeviceOwner(ctx);
+    let owner: OwnerRow;
+    let request: DeviceRequestRow | null = null;
+    let sessionHash: string | null = null;
+    if (body.enrolToken !== undefined)
+      ({ owner, request } = await tokenEnrolment(ctx, body.enrolToken));
+    else ({ owner, sessionHash } = await firstDeviceOwner(ctx));
     const challenge = await claimChallenge(ctx, body.challengeId, 'enrol');
-    // The challenge belongs to this owner and this session (not one handed out to another sign-in).
-    if (challenge.user_id !== owner.id || challenge.session_hash !== sessionHash)
+    // The challenge belongs to this owner and this session or request (not one handed out elsewhere).
+    const bound = request
+      ? challenge.request_id === request.id
+      : challenge.session_hash === sessionHash;
+    if (challenge.user_id !== owner.id || !bound)
       fail('NONCE_INVALID', 'That took too long. Try again.');
     const reg = await verifyRegistration(ctx, rp, challenge.challenge, body.credential);
     const taken = await ctx.db.first<{ id: string }>(
@@ -182,6 +228,17 @@ export const ownerAccessHandlers: Handlers = {
     if (taken) fail('DUPLICATE', 'This passkey is already saved.');
 
     const now = ctx.now();
+    if (request) {
+      // The token works once: one conditional UPDATE, so two passkeys cannot come from one approval.
+      const claimed = await ctx.db.run(
+        `UPDATE owner_device_requests SET used_at = ?
+          WHERE org_id = ?org AND id = ? AND status = 'approved' AND used_at IS NULL AND decided_at > ?`,
+        now,
+        request.id,
+        now - ENROL_WINDOW_MS,
+      );
+      if (claimed.meta.changes !== 1) fail('LINK_EXPIRED', TOKEN_GONE);
+    }
     const passkeyId = ulid(now);
     const row: PasskeyRow = {
       id: passkeyId,
@@ -195,38 +252,46 @@ export const ownerAccessHandlers: Handlers = {
       created_at: now,
       last_used_at: now,
     };
-    await ctx.db.batch([
-      ctx.db.insert('owner_passkeys', { ...row }),
-      ctx.db.stmt(
-        `UPDATE users SET passkey_enrolled_at = COALESCE(passkey_enrolled_at, ?), updated_at = ?
-          WHERE org_id = ?org AND id = ?`,
-        now,
-        now,
-        owner.id,
-      ),
-      // From now on only passkey sessions count for this owner: end the email-code ones.
-      ctx.db.stmt(
-        `UPDATE sessions SET revoked_at = ? WHERE org_id = ?org AND user_id = ? AND revoked_at IS NULL
-            AND passkey_id IS NULL`,
-        now,
-        owner.id,
-      ),
-      ctx.services.audit.stmt(ctx, {
-        category: 'security',
-        action: 'owner.passkey_enrolled',
-        entity: 'owner_passkey',
-        entityId: passkeyId,
-        after: {
-          deviceName: row.device_name,
-          platform: row.platform,
-          via: 'email_code',
-          deviceType: reg.deviceType,
-          backedUp: reg.backedUp,
-        },
-      }),
-    ]);
+    const audit = ctx.services.audit.stmt(ctx, {
+      category: 'security',
+      action: 'owner.passkey_enrolled',
+      entity: 'owner_passkey',
+      entityId: passkeyId,
+      after: {
+        deviceName: row.device_name,
+        platform: row.platform,
+        via: request ? 'device_request' : 'email_code',
+        ...(request ? { requestId: request.id } : {}),
+        deviceType: reg.deviceType,
+        backedUp: reg.backedUp,
+      },
+      ...(request ? { actorType: 'user' as const, actorId: owner.id } : {}),
+    });
+    if (request) {
+      // Another device of an owner who already has a passkey: nothing else changes.
+      await ctx.db.batch([ctx.db.insert('owner_passkeys', { ...row }), audit]);
+    } else {
+      await ctx.db.batch([
+        ctx.db.insert('owner_passkeys', { ...row }),
+        ctx.db.stmt(
+          `UPDATE users SET passkey_enrolled_at = COALESCE(passkey_enrolled_at, ?), updated_at = ?
+            WHERE org_id = ?org AND id = ?`,
+          now,
+          now,
+          owner.id,
+        ),
+        // From now on only passkey sessions count for this owner: end the email-code ones.
+        ctx.db.stmt(
+          `UPDATE sessions SET revoked_at = ? WHERE org_id = ?org AND user_id = ? AND revoked_at IS NULL
+              AND passkey_id IS NULL`,
+          now,
+          owner.id,
+        ),
+        audit,
+      ]);
+    }
     // Sign-in codes already sent to this owner stop working too.
-    if (owner.email)
+    if (!request && owner.email)
       await ctx.sys.run(
         'UPDATE magic_links SET used_at = ?1 WHERE email = ?2 AND used_at IS NULL',
         now,

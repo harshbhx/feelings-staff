@@ -9,7 +9,6 @@ import {
   Bindi,
   Button,
   type DayStatus,
-  hapticTick,
   Icon,
   type IconName,
   List,
@@ -25,6 +24,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 import { mockChoice, useApi } from '../../../api/provider';
+import { tick as hapticTick } from '../../../lib/haptics';
 import { useQueue } from '../../../pwa/queue';
 import { staffKeys, useOwnerName, useStaffMe, useToday } from '../api';
 import { type Fmt, useFmt } from '../lib/format';

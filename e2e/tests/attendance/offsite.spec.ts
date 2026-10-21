@@ -19,7 +19,7 @@ import type {
 } from '@fs/contracts';
 import { expect, test } from '../../fixtures';
 import {
-  dismissPresenceNotice,
+  answerPresenceNotice,
   enterPin,
   expectStep,
   ist,
@@ -91,7 +91,7 @@ test.describe('E2E-09 off-site duty from a Google Maps link', () => {
 
     // Her Today shows the duty; she is at the venue, not the salon.
     await page.reload();
-    await dismissPresenceNotice(page);
+    await answerPresenceNotice(page);
     await expect(page.getByText('Venue duty today')).toBeVisible();
     await expect(page.getByText(/Hotel Aram/).first()).toBeVisible();
     await context.grantPermissions(['geolocation']);
@@ -179,7 +179,7 @@ test.describe('E2E-10 an unplanned venue, opened for others', () => {
 
       // The second one checks in on her own phone at the same place.
       await secondPhone.page.reload();
-      await dismissPresenceNotice(secondPhone.page);
+      await answerPresenceNotice(secondPhone.page);
       await expect(secondPhone.page.getByText('Venue duty today')).toBeVisible();
       await punch(secondPhone.page, 'in', PIN);
 

@@ -71,7 +71,9 @@ test.describe('kit', () => {
         'button:not(.fs-pinpad__key[data-kind="delete"]:disabled), a[href], input, textarea';
       for (const el of Array.from(document.querySelectorAll<HTMLElement>(`main ${sel}`))) {
         const target =
-          el.closest('.fs-chip, .fs-input-wrap, .fs-pinpad__display') ?? (el as Element);
+          // A switch's row is its target: the label toggles it too.
+          el.closest('.fs-chip, .fs-input-wrap, .fs-pinpad__display, .fs-switch-row') ??
+          (el as Element);
         const r = target.getBoundingClientRect();
         // Small buttons extend their target with ::after (2px above and below).
         const extra = el.matches('.fs-btn[data-size="sm"]') ? 4 : 0;
