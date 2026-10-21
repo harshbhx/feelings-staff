@@ -77,7 +77,7 @@ export function TodayScreen() {
 
   return (
     <>
-      <ScreenHeader as="quiet" title={fmt.weekday(now)} dataAt={today.dataUpdatedAt || undefined} />
+      <ScreenHeader as="brand" title={fmt.weekday(now)} dataAt={today.dataUpdatedAt || undefined} />
       <main id="main" className="staff-main">
         {today.data ? (
           <TodayBody view={today.data} model={buildTodayModel(today.data, queued, now)} now={now} />

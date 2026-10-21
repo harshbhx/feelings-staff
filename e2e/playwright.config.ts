@@ -51,7 +51,13 @@ export default defineConfig({
           use: {
             browserName: 'chromium',
             viewport: { width: 390, height: 844 },
-            launchOptions: { args: ['--host-resolver-rules=MAP *.example.test localhost'] },
+            launchOptions: {
+              args: [
+                '--host-resolver-rules=MAP *.example.test localhost',
+                // The preview owner host is plain http; passkeys need a secure context (tests/split/passkey).
+                '--unsafely-treat-insecure-origin-as-secure=http://owner.example.test:8787',
+              ],
+            },
           },
         },
       ]

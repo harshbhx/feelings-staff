@@ -6,7 +6,7 @@ Contents: [What changes](#what-changes) · [The two hosts](#the-two-hosts) · [C
 
 ## What changes
 
-**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default), slice 1b (split build, below), slice 2 (Access JWT verification, `app/worker/middleware/access.ts`) and slice 3 (the endpoint contract, [API](#api)) are built. Slice 7 part A, the forgotten owner PIN (flow 6: self-service reset and `scripts/owner-recovery.mjs --clear-pin`, [runbook](runbooks/owner-recovery.md)), is built and works on the staff host today. Nothing changes in production until `OWNER_HOST` is set, and the Access check stays off until `ACCESS_AUD` is set as well.
+**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default), slice 1b (split build, below), slice 2 (Access JWT verification, `app/worker/middleware/access.ts`), slice 3 (the endpoint contract, [API](#api)) and slice 4 (passkey core: migration 0004, first-device enrolment, passkey sign-in, the owner-host sign-in and enrolment screens) are built. Slice 7 part A, the forgotten owner PIN (flow 6: self-service reset and `scripts/owner-recovery.mjs --clear-pin`, [runbook](runbooks/owner-recovery.md)), is built and works on the staff host today. Nothing changes in production until `OWNER_HOST` is set: while it is unset the passkey routes answer 404, and the Access check stays off until `ACCESS_AUD` is set as well.
 
 | Today | After |
 |---|---|
@@ -63,23 +63,26 @@ Flows:
    - **Self-service:** Settings, Security, "Forgot your PIN?" asks for a fresh sign-in (the email code before cutover; a passkey assertion after it) and then lets the owner set a new PIN without the old one, within 15 minutes of that sign-in, the same window as the first PIN. It resets `pin_failures` and `pin_locked_until`, revokes the owner's other sessions, sends a "Your PIN was changed" email to the owner address, and writes the audit row `owner.pin_reset`. Rate limited like every PIN route.
    - **Admin:** `scripts/owner-recovery.mjs --clear-pin` clears the owner PIN (audited as `owner.pin_cleared_by_admin`), so the next sign-in goes through the first-PIN flow. Documented in `docs/runbooks/owner-recovery.md` next to the recovery code.
    - Tests: reset refused without a fresh sign-in, refused after 15 minutes, works once inside the window, old PIN stops working, other sessions revoked, audit row and email written. The PRD 4.1.7 table gets a "Owner PIN forgotten" row and the owner guide a short section.
-   - **Built (slice 7 part A).** The window lives on the session row, `sessions.pin_reset_until` (migration `0005_session_pin_reset.sql`, like `step_up_until`): the email-code and magic-link sign-ins set it to the session's `created_at` + 15 minutes, a password sign-in never does, and any PIN set or change in that session clears it. `PUT /owner/security/pin` without `currentPin` uses it, and `SecurityView.pinResetUntil` tells the Security screen when to show the new-PIN form. The passkey sign-in (slice 4) opens it the same way (`openPinResetWindow` in `app/worker/services/pin-reset.ts`).
+   - **Built (slice 7 part A).** The window lives on the session row, `sessions.pin_reset_until` (migration `0005_session_pin_reset.sql`, like `step_up_until`): the email-code and magic-link sign-ins set it to the session's `created_at` + 15 minutes, a password sign-in never does, and any PIN set or change in that session clears it. `PUT /owner/security/pin` without `currentPin` uses it, and `SecurityView.pinResetUntil` tells the Security screen when to show the new-PIN form. The passkey sign-in and the first-device enrolment (slice 4) open it the same way (`openPinResetWindow` in `app/worker/services/pin-reset.ts`), so the reset keeps working on the owner host after the cutover, where the email code is refused.
+
+How slice 4 builds it: the RP id is `OWNER_HOST` without its port and the origin is `https://<OWNER_HOST>` (`http` only when `APP_ORIGIN` is `http`, as in the e2e preview). Sign-in is usernameless (no allow list), so it relies on the resident key. A passkey session is a normal `fs_session` cookie (host-only) with `sessions.passkey_id` set: 12 hours idle, 7 days at most, and it ends when its credential is removed. On the owner host an owner with a passkey has no other session: an email-code session cookie is refused there, and `ownerMagic` sends nothing (still 202), `ownerVerify` and `ownerPassword` answer `FORBIDDEN` with `details.reason: "passkey_enrolled"`. The first enrolment also ends the owner's email-code sessions and unused codes. The browser side is a few lines over `navigator.credentials` (`app/src/features/auth/lib/passkey.ts`), owner build only.
 
 Edge cases written down: browsers without WebAuthn (show a plain "this browser cannot use a passkey; use Chrome or Safari"), platform authenticators that sync passkeys between a person's devices (allowed; the approved-device list shows the credential, not a physical phone), clock skew, counters that stay 0 (synced passkeys; the counter check is skipped when both stored and received are 0), and a rate limit on every WebAuthn route.
 
 ## Data model
 
-New migration `0004_owner_access.sql`:
+Migration [`0004_owner_access.sql`](../migrations/0004_owner_access.sql) (details in the [data model](data-model.md#owner-access-tables-0004_owner_accesssql)):
 
 - `owner_passkeys` (`id`, `org_id`, `user_id`, `credential_id` unique, `public_key`, `sign_count`, `transports`, `device_name`, `platform`, `created_at`, `last_used_at`, `removed_at`, `removed_by`).
-- `owner_device_requests` (`id`, `org_id`, `user_id`, `code`, `device_name`, `status` pending/approved/declined/expired, `approved_by_credential`, `enrol_token_hash`, `expires_at`, `created_at`).
-- `owner_recovery_codes` (`id`, `org_id`, `user_id`, `code_hash`, `issued_by`, `expires_at`, `used_at`).
-- `users.passkey_enrolled_at` (nullable).
+- `owner_device_requests` (`id`, `org_id`, `user_id`, `code`, `device_name`, `platform`, `city`, `status` pending/approved/declined/expired, `approved_by_credential`, `enrol_token_hash`, `ip_hmac`, `expires_at`, `decided_at`, `used_at`, `created_at`). `platform`, `city`, `decided_at` (start of the 10-minute enrolment window) and `used_at` were added to the plan for the approval card and the token's single use.
+- `owner_recovery_codes` (`id`, `org_id`, `user_id`, `code_hash`, `issued_by`, `expires_at`, `used_at`, `created_at`).
+- `owner_passkey_challenges` (single use, 5 minutes): `purpose` (`signin`, `confirm`, `enrol`), `challenge`, and for `enrol` and `confirm` the user, the session and (for `confirm`) the one credential it accepts.
+- `users.passkey_enrolled_at` (nullable) and `sessions.passkey_id` (the credential an owner session signed in with).
 - Audit actions: `owner.passkey_enrolled`, `owner.device_requested`, `owner.device_approved`, `owner.device_declined`, `owner.device_removed`, `owner.device_renamed`, `owner.recovery_issued`, `owner.recovery_used`, `owner.signin_passkey`. The read routes (options, status, lists) write none.
 
 ## API
 
-The contract (slice 3) is in the endpoint table, schemas in `packages/contracts/src/api/owner-access.ts`; the rows, how they fit together and the error codes are in the [API reference](api.md#owner-access-passkeys-devices-recovery). Every route answers only on the owner host: 404 on the staff host, and 404 while `OWNER_HOST` is unset once the passkey core (slice 4) is built (until then a route without a handler answers 501 there). The challenge routes are rate limited, and every route that changes something writes an audit row (see [Data model](#data-model)).
+The contract (slice 3) is in the endpoint table, schemas in `packages/contracts/src/api/owner-access.ts`; the rows, how they fit together and the error codes are in the [API reference](api.md#owner-access-passkeys-devices-recovery). Every route answers only on the owner host: 404 on the staff host and, since slice 4, 404 on every host while `OWNER_HOST` is unset. The challenge routes are rate limited, and every route that changes something writes an audit row (see [Data model](#data-model)).
 
 | Endpoint | Route | Notes |
 |---|---|---|

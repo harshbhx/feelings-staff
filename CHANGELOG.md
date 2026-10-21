@@ -14,10 +14,18 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 - Forgotten owner PIN: **Settings, Security, Forgot your PIN?** sends the owner through the email-code sign-in and back to Security, where she can set a new PIN without the old one for 15 minutes, once. A password sign-in never opens this. The reset clears wrong tries and the lock, signs out her other devices, emails "Your Feelings Staff owner PIN was changed" and is audited (`owner.pin_reset`). Migration `0005_session_pin_reset.sql` adds `sessions.pin_reset_until`. `PUT /owner/security/pin` without the current PIN now answers `RULE_VIOLATION` (`recent_sign_in_required`) instead of `VALIDATION` when no reset window is open.
 - `scripts/owner-recovery.mjs --clear-pin`: an admin clears the owner PIN (audited as `owner.pin_cleared_by_admin`, every owner session signed out) so the next sign-in sets a first PIN. Dry run unless `--yes`, never prints secrets. [Owner recovery runbook](docs/runbooks/owner-recovery.md).
+- The app now wears the salon's brand: the page is the website's warm blush band with white cards, the salon's logo leads the owner's Today header on phones, tops the desktop rail and leads the staff Today header (with the date next to the bell), and the owner's More screen closes with the logo and who is signed in. Owner tab-level titles end with the bindi on phones. List lines under a name are darker for contrast. The logo is the salon's own wordmark in maroon (a 9 KB image, kept for offline use).
+- Design tokens for the redesign: `--app-page`, `--logo`, `--logo-mask`, and role tones `--role-*` with avatar tints that keep initials at 4.5:1 or more; a `Logo` component in `@fs/ui` and kit specimens for both.
 - E2E-19 now runs: it checks that a push makes the service worker show the right notification and that a click opens the right page.
 - Owner cutover runbook (`docs/runbooks/owner-cutover.md`): the ordered checklist for the owner host and Cloudflare Access, with placeholders instead of real values and the one-line rollback.
 - Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
+
+Owner access, passkey core (slice 4, off until `OWNER_HOST` is set):
+
+- On the owner host the owner signs in with a passkey ("Use your fingerprint", or "Use Face ID" on an iPhone). The first device is enrolled after the existing email code ("Make this phone your key"), with a name for the phone. From then on that owner gets no email code and no password sign-in on the owner host. A passkey session lasts 12 hours idle and 7 days at most and ends when the passkey is removed.
+- Migration `0004_owner_access.sql`: owner passkeys, device requests, recovery codes and single-use passkey challenges, `users.passkey_enrolled_at`, `sessions.passkey_id`. The nightly purge covers the new tables.
+- `@simplewebauthn/server` 13.3.3 in the Worker (user verification required, attestation none, ES256 and RS256, counter check, 20 challenges per IP per 15 minutes). While `OWNER_HOST` is unset the passkey routes answer 404 and sign-in is unchanged.
 
 Owner PIN reset, contracts (`contracts-v1.4`):
 
@@ -102,6 +110,7 @@ Also merged since (all with `ci` and `e2e` green on main):
 
 ### Changed
 
+- The inbox copy (`notify` catalog) now loads with the inbox screen instead of with the staff app, which takes about 2 KB off the staff phone's first download; the header bell's label moved to `common`.
 - Settings groups its sections under four headings (The salon, People and pay, Attendance, Account and safety). Setup leads with the next step as one card and folds finished steps into one line such as "7 of 8 done"; the "Done" pills are gone.
 - The Content Security Policy no longer sends `upgrade-insecure-requests`. Every source is `'self'`, HSTS already forces HTTPS, and WebKit applies the directive to `http://localhost`, which broke the iPhone project of the CI run.
 - `CONTRIBUTING.md` now covers docs rules, labels and the PR template.

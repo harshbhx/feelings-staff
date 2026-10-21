@@ -2085,5 +2085,49 @@
     "slip": {
       "line": "Change it in Settle credits."
     }
+  },
+  "access": {
+    "signIn": {
+      "titleNamed": "Welcome back, {{name}}",
+      "title": "Welcome back",
+      "lead": "Sign in with the fingerprint, face or screen lock of this phone.",
+      "fingerprint": "Use your fingerprint",
+      "faceId": "Use Face ID",
+      "waiting": "Waiting for your phone…",
+      "cancelled": "Nothing happened. Try again.",
+      "tooSlow": "That took too long. Try again.",
+      "failed": "That didn't work. Try again, or use the phone you set up first.",
+      "rateLimited": "Too many tries. Wait 15 minutes and try again.",
+      "generic": "We couldn't sign you in. Try again in a moment.",
+      "loadFailed": "We couldn't get ready to sign you in. Check your internet and reload.",
+      "emailCode": "Email me a code",
+      "lostPhone": "Lost your phone?",
+      "lostPhoneHelp": "Ask Harsh for a one-time recovery code. With it you set up a new phone as your key."
+    },
+    "enrol": {
+      "title": "Make this phone your key",
+      "lead": "From now on you sign in with this phone's fingerprint, face or screen lock instead of an email code.",
+      "start": "Make this phone your key",
+      "waiting": "Waiting for your phone…",
+      "cancelled": "Nothing happened. Try again.",
+      "tooSlow": "That took too long. Try again.",
+      "failed": "We couldn't save the key. Try again.",
+      "exists": "This phone already has a key for this account. Sign in with your fingerprint instead.",
+      "loadFailed": "We couldn't get ready. Check your internet and reload.",
+      "doneTitle": "This phone is your key",
+      "doneLead": "Next time, sign in with your fingerprint.",
+      "nameLabel": "Name of this phone",
+      "nameHint": "So you can tell your phones apart in Settings, Security.",
+      "nameInvalid": "Give this phone a name of up to 80 characters.",
+      "continue": "Continue",
+      "saving": "Saving…"
+    },
+    "deviceName": {
+      "ios": "{{name}}'s iPhone",
+      "android": "{{name}}'s phone",
+      "desktop": "{{name}}'s computer",
+      "other": "{{name}}'s device"
+    },
+    "unsupported": "This browser can't use a passkey. Open this page in Chrome or Safari."
   }
 }

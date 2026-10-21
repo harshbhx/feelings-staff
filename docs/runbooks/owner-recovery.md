@@ -18,7 +18,7 @@ This needs no one else and works on the staff host today (before the owner host 
    - she gets an email, "Your Feelings Staff owner PIN was changed";
    - the audit log gets `owner.pin_reset` ("Owner PIN reset after a new sign-in").
 
-If 15 minutes pass, or she already used the window, the server refuses ("Enter your current PIN. Forgot it? Sign in again with a code from your email, then set a new one.") and she starts again at step 1. The server decides from the session alone (`sessions.pin_reset_until`, set only by an email sign-in), never from anything the browser sends. If the email does not arrive, see [the owner cannot sign in](troubleshooting.md#the-owner-cannot-sign-in).
+If 15 minutes pass, or she already used the window, the server refuses ("Enter your current PIN. Forgot it? Sign in again with a code from your email, then set a new one.") and she starts again at step 1. The server decides from the session alone (`sessions.pin_reset_until`, set only by an email-code or magic-link sign-in, or on the owner host a passkey sign-in), never from anything the browser sends. On the owner host after the cutover, **Forgot your PIN?** asks for the fingerprint or Face ID instead of an email code. If the email does not arrive, see [the owner cannot sign in](troubleshooting.md#the-owner-cannot-sign-in).
 
 ## Forgotten owner PIN: the admin clears it
 

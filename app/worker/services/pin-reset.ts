@@ -1,10 +1,11 @@
 /**
  * Forgotten owner PIN (docs/owner-access.md, Passkeys flow 6; PRD 4.1.7). Owner: WP-3.
  *
- * A fresh sign-in by email (the 6-digit code or the magic link; later a passkey) lets the owner set a
- * new PIN without the old one for 15 minutes, once. The window lives on the session row
- * (`sessions.pin_reset_until`, like `step_up_until`): the sign-in route opens it from the session's
- * own `created_at`, and any PIN set or change in that session closes it. The client never opens it.
+ * A fresh sign-in (the 6-digit code or the magic link; on the owner host a passkey sign-in or the
+ * first-device enrolment) lets the owner set a new PIN without the old one for 15 minutes, once.
+ * The window lives on the session row (`sessions.pin_reset_until`, like `step_up_until`): the
+ * sign-in route opens it from the session's own `created_at`, and any PIN set or change in that
+ * session closes it. The client never opens it.
  * A password sign-in never opens it, or the password alone would replace the PIN. Staff PINs are
  * not touched here.
  */
@@ -16,8 +17,8 @@ import type { Ctx } from './ports';
 export const PIN_RESET_WINDOW_MS = 15 * 60_000;
 
 /**
- * Open the window on a session that just signed in by email (or, later, a passkey). Call it right
- * after the session is issued; never after a password sign-in.
+ * Open the window on a session that just signed in by email or with a passkey. Call it right after
+ * the session is issued; never after a password sign-in.
  */
 export async function openPinResetWindow(ctx: Ctx, tokenHash: string): Promise<void> {
   await ctx.db.run(

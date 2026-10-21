@@ -319,7 +319,7 @@ Needs action → "New phone for Priya · Redmi Note 12 · Chrome · joined 2 min
 | Link expired or used | "This link has expired. Send a new one." |
 | Email not arriving | After 60 s the screen offers "Use password instead" (if set) and "Resend" (3 per 15 min). |
 | Owner PIN locked | Same rules as staff PIN; unlock by magic link sign-in. |
-| Owner PIN forgotten | Settings → Security → **Forgot your PIN?** → sign in again with the email code or link (a password sign-in does not count) → within 15 minutes of that sign-in, once, set a new PIN without the old one. The server decides from the session (`sessions.pin_reset_until`). The reset clears failures and the lock, signs out every other session, emails "Your PIN was changed" to the owner address and is audited as `owner.pin_reset`. If that fails, an admin runs `scripts/owner-recovery.mjs --clear-pin` (audited as `owner.pin_cleared_by_admin`) and the next sign-in sets a first PIN ([owner recovery runbook](runbooks/owner-recovery.md)). |
+| Owner PIN forgotten | Settings → Security → **Forgot your PIN?** → sign in again with the email code or link (on the owner host: a passkey; a password sign-in does not count) → within 15 minutes of that sign-in, once, set a new PIN without the old one. The server decides from the session (`sessions.pin_reset_until`). The reset clears failures and the lock, signs out every other session, emails "Your PIN was changed" to the owner address and is audited as `owner.pin_reset`. If that fails, an admin runs `scripts/owner-recovery.mjs --clear-pin` (audited as `owner.pin_cleared_by_admin`) and the next sign-in sets a first PIN ([owner recovery runbook](runbooks/owner-recovery.md)). |
 
 ### 4.2 Install the PWA
 
@@ -2907,7 +2907,7 @@ Battery and data: the roll-call and Step out cost the staff phone nothing. A for
 
 ### 12.2 Colour rules
 
-- White page, blush (`--bg-soft`, `--bg-tint`) for grouped surfaces, maroon only for one deep element per screen at most (the owner's payroll summary band, the door screen header), sindoor for actions.
+- The page is the warm band, `--app-page` (= `--bg-soft`, `--rose-50`); cards, sheets, the header glass, the tab bar and the owner's rail stay white with a hairline. Blush (`--bg-soft`, `--bg-tint`) for grouped surfaces, maroon only for one deep element per screen at most (the owner's payroll summary band, the door screen header), sindoor for actions. *Amended 21 Oct 2026 (UI redesign slice 1, `docs/ui-redesign-plan.md`): this was "white page". On white everywhere the app read as a generic admin tool; the website keeps white as its base and leans on the blush bands, and the app now does the same with white cards on the band. App only; the website is unchanged.*
 - **One red (sindoor) button per view.** Secondary actions are white pills with a `--border-strong` outline. Destructive actions are secondary pills with `--status-absent` text and a confirm step, never a second red fill.
 - 3–5 red placements per screen at most (the button, the bindi, focus, one emphasis word).
 - No gold, no gradients, no glows, no blur orbs, no grain. Depth from white space, hairlines (`--border`) and the two brand shadows, used sparingly (sheets and the sticky action bar only).
@@ -2940,9 +2940,43 @@ Battery and data: the roll-call and Step out cost the staff phone nothing. A for
   --app-bar-h: 4.75rem;   /* bottom action bar, + env(safe-area-inset-bottom) */
   --tabbar-h: 4rem;
 }
+
+/*
+ * Brand layer (UI redesign slice 1, docs/ui-redesign-plan.md section 4; PRD 12.2 and 12.6 as amended).
+ *
+ *   page   the app page is the website's warm band (--rose-50); cards, sheets, the header glass, the
+ *          tab bar and the rail stay white, so content sits on white with a hairline.
+ *   logo   the wordmark colour. The app passes the wordmark file to Logo's `mask` prop (recolouring
+ *          approved 21 Oct 2026); without one, Logo typesets the name with the bindi. --logo-mask is
+ *          set per element from that prop.
+ *   role   people colour: each staff role maps to one of the five service tones (bridal, nails,
+ *          mehndi, salon, academy), helpers and receptionists to ink. `-bg` is the avatar tint,
+ *          color-mix(in oklab, <tone> 12%, white), written out so contrast checkers read it.
+ *          Initials in `--role-x` on `--role-x-bg` (700, 13-17 px, normal text), WCAG 2.2:
+ *            makeup 5.76:1, nails 5.00:1, mehndi 5.78:1, salon 4.99:1, trainee 8.59:1, neutral 4.62:1.
+ *          Salon is the coral tone deepened 10% toward --maroon-900 in oklab: coral itself is only
+ *          4.38:1 on its tint (5.14:1 on white). The tints are 12% so the disc still reads on the page.
+ */
+:root {
+  --app-page: var(--bg-soft);
+  --bg-glass-soft: rgb(255 247 246 / 0.94); /* --rose-50 at the header glass's 94% */
+
+  --logo: var(--maroon-800);
+  --logo-mask: none;
+
+  --role-makeup: var(--tone-bridal);   --role-makeup-bg: #fae5e3;
+  --role-nails: var(--tone-nails);     --role-nails-bg: #fbe6ea;
+  --role-mehndi: var(--tone-mehndi);   --role-mehndi-bg: #f5e7e3;
+  --role-salon: #b33b2a;               --role-salon-bg: #fbe9e5;
+  --role-trainee: var(--tone-academy); --role-trainee-bg: #efe3e8;
+  --role-neutral: var(--ink-500);      --role-neutral-bg: #eeebec;
+
+  /* A row's hover fill: the page is already --bg-soft, so the fill steps up to the tint. */
+  --row-hover-bg: var(--bg-tint);
+}
 ```
 
-All pairs were checked against WCAG 2.2 (contrast on the tint, normal text). Chips always combine colour, icon and a word or letter. One exception (redesign amendment, 21 Oct 2026): Register and Month day cells of 40 px or smaller show colour plus a letter, or late minutes (`+28`, `+1h` from 60 minutes, on `--status-late-bg`), without the icon, because an icon does not fit and the number says more than the clock did. The icon, the word and the full chip stay in the key, the day panel, the day screen and every list. If Urmi rejects the green, present becomes `--ink-900` with a filled `check-circle` (Q1 default keeps the green).
+All pairs were checked against WCAG 2.2 (contrast on the tint, normal text). The second `:root` block is the brand layer added by the UI redesign (21 Oct 2026, see 12.2, 12.4 and 12.9): the warm page, the logo colour and mask, and the role tones with their avatar tints, each initials-on-tint pair at 4.5:1 or more. Chips always combine colour, icon and a word or letter. One exception (redesign amendment, 21 Oct 2026): Register and Month day cells of 40 px or smaller show colour plus a letter, or late minutes (`+28`, `+1h` from 60 minutes, on `--status-late-bg`), without the icon, because an icon does not fit and the number says more than the clock did. The icon, the word and the full chip stay in the key, the day panel, the day screen and every list. If Urmi rejects the green, present becomes `--ink-900` with a filled `check-circle` (Q1 default keeps the green).
 
 ### 12.4 Typography in the app
 
@@ -2952,7 +2986,8 @@ All pairs were checked against WCAG 2.2 (contrast on the tint, normal text). Chi
 | Big time on Today and the success screen | `--text-3xl` (40–72 px), clamped to 56 px max on phones | 800, `tabular-nums` | "10:02" |
 | Section heading (h2) | `--text-lg` 20 px | 700 | |
 | Body | `--text-base` 17 px, leading 1.65 | 400 | |
-| Secondary text, captions | `--text-sm` 15 px, `--text-muted` | 400–600 | |
+| Secondary text (the first line under a name or title in a list) | `--text-sm` 15 px, `--text-body` | 400–600 | Amended 21 Oct 2026: `--text-muted` at 15 px next to 17 px ink read too faint |
+| Captions (a second muted line, hints, timestamps) | `--text-sm` 15 px, `--text-muted` | 400–600 | |
 | Labels, chips, table headers | `--text-xs` 13 px | 700 (chips), 600 (labels) | Nothing smaller than 13 px |
 | Money and times in tables | `--text-sm` | 600, `tabular-nums` | Right-aligned money |
 
@@ -3009,7 +3044,9 @@ Phosphor regular only. Set used: `sign-in`, `sign-out`, `clock`, `check-circle`,
 
 ### 12.9 The bindi signature
 
-The bindi is the brand's mark and appears in exactly these places: the app icon and favicon; the full stop on the Today greeting ("Good morning, Priya●"); the active tab marker; the success moment (it lands, once); the map pin; the PIN pad's filled dots; the owner's left-rail active marker. The sindoor brush line appears at most once in the whole app, under the first greeting of the day, and may be cut entirely if it competes with the check-in button.
+The bindi is the brand's mark and appears in exactly these places: the app icon and favicon; the full stop on the Today greeting ("Good morning, Priya●"); the active tab marker; the success moment (it lands, once); the map pin; the PIN pad's filled dots; the owner's left-rail active marker; the full stop of the logo while it is typeset, and of the owner's tab-level screen titles on phones (12.4 allows it).
+
+The logo in the shell (amended 21 Oct 2026, UI redesign slice 1) is not a bindi use but is recorded here: it leads the owner's phone header on Today (the title stays the screen's h1 for assistive tech), tops the desktop rail, leads the staff Today header (the date moves before the bell) and closes the owner's More screen on phones. Recolouring the client's wordmark was approved on 21 Oct 2026: `Logo` draws it as a CSS mask in `--logo` (`--maroon-800`) through its `mask` prop, the website's technique, from `public/brand/logo-mask.webp` (the client's `logo.webp` reduced to its alpha channel, 512 by 146, about 9 KB; an image, not JS, so the staff entry budget is untouched, and precached by the service worker). An SVG from the client would replace it. Without a mask, `Logo` still sets the salon's name in Plus Jakarta Sans 800 in `--logo` with the bindi (the kit page shows that mode). The sindoor brush line appears at most once in the whole app, under the first greeting of the day, and may be cut entirely if it competes with the check-in button.
 
 ### 12.10 Voice
 
@@ -3664,7 +3701,7 @@ These keep Harsh's defaults but change a detail because the research showed a ha
 | Q19 | Will a CA confirm the payroll defaults (2× OT, 50% cap reading, no fines)? | Ship with the defaults and a settings disclaimer; first month in parallel with paper |
 | Q20 | Do staff work venue duties before 06:00 or after 21:00, and do they agree to it? | Flag night hours and ask each affected person for a one-time consent tick |
 | Q21 | Are any staff or trainees under 18? | Not enrolled in v1 |
-| Q22 | Is recolouring the logo (maroon wordmark) approved, and is there a vector logo? | Use the bindi icon and the masked maroon wordmark; ask for an SVG |
+| Q22 | Is recolouring the logo (maroon wordmark) approved, and is there a vector logo? | Answered 21 Oct 2026: recolouring approved, the shell draws the masked maroon wordmark; still ask for an SVG |
 | Q23 | Domain: `staff.` or `team.feelingsbeautycare.in`? | `staff.feelingsbeautycare.in` |
 | Q24 | Should payslips be visible to staff in the app? | Yes, after you finalise |
 | Q25 | (Harsh) How do we detect time away? | **Answered 19 Oct, 15:22 UTC**: manager roll-call two or three times a shift as the primary method (default 12:00, 15:00, 18:00; owner taps only the exceptions); staff Step out / I'm back as the fallback; an optional silent foreground check as a hint only. No Wi-Fi box, no hardware, no push-and-tap. Native geofence stays a P2 option |
@@ -3702,4 +3739,5 @@ The two research files in `research/` carry the full citations (Code on Wages 20
 | 1.2 | 19 Oct 2026 | Time credits and presence checks (requested by Harsh after a client discussion). Time credits (§4.19, §4.19.5, §7.17, §7.15 examples 13–15): owner-only minute ledger of late, early, away and approved-overtime minutes, balance with carry-over, a ₹ estimate at 1×, owner settlement at payroll inside the 50% cap, a payslip line, a Credits screen, ledger CSV, default on for this salon, with over-break shown but not credited and no 2× logic (Harsh: hours never exceed 9 h/day or 48 h/week). Everything is editable (§4.19.5): roll-call times and marks, away intervals, step-outs, credit entries with a reason, settlements before finalise, each audit-logged old → new. Presence (§4.18, §7.18, §11.12): manager roll-call two or three times a shift as the primary method, staff Step out / I'm back as the fallback, an optional silent foreground check as a hint only; native geofence left as P2. Data model `0003_time_credits_presence.sql` (§8.2.1), API (§9.4), notifications N32–N36, privacy (§10.2, §10.6), tests (§14), build plan WP-9 (§16), risks and Q25–Q31 answered by Harsh on 19 Oct (§17) |
 | 1.3 | 19 Oct 2026 | `attendance_days.total_min` added to §8.2.1 (the legal band's `t_d`); §7.17.9 payslip wording for a plus settlement. Examples 14 and 15 use the month's own `r_day` (December 31 days: the −100 settlement is ₹71.68; November for Priya: ₹500 a day), as §7.17.4 says. Legal overtime guardrail restored (Harsh): Time credits setting **Pay legal overtime at 2×**, default on. Approved overtime beyond 9 h a day or 48 h a week (`legal_d`, per day within the ISO week) adds an `ot_legal` entry, so those minutes count twice and are worth 2× in the estimate, netting and settlement; notice `legal_ot_2x` when on, shortfall warning `legal_ot_shortfall` when off (§7.17.7). Updated §4.13.3, §4.19, §7.1, §7.6, §7.15 examples 13 and 14 (balances +170 and −85), §7.16 (`legalOtBand`), §7.17.2, §7.17.6, §7.17.9, §8.2.1 (`ot_legal` kind, `legalOt2x` setting), §14, §17 (F10, risks, Q30) |
 | 1.4 | 21 Oct 2026 | Redesign amendments 2 and 5 (Register slice, `docs/ui-redesign-plan.md` section 4): §12.3 and §12.11 rule 12, day cells of 40 px or smaller may show colour plus a letter or late minutes without the icon; §12.5 and §12.6 `RegisterGrid`, Register two-column layout with a day panel on desktop, a person-first week list on phones, the key in a popover |
-| 1.5 | 21 Oct 2026 | §4.1.7 "Owner PIN forgotten" row: self-service reset after a fresh email sign-in (15 minutes, once; a password sign-in never counts), other sessions signed out, a "Your PIN was changed" email, audit `owner.pin_reset`; admin `scripts/owner-recovery.mjs --clear-pin` (`owner.pin_cleared_by_admin`). Session column `pin_reset_until` (`0005_session_pin_reset.sql`) |
+| 1.5 | 21 Oct 2026 | UI redesign slice 1, brand layer (`docs/ui-redesign-plan.md` sections 3 and 4): §12.2 the app page is the warm band `--app-page` with white cards (was "white page"); §12.4 the first secondary line in lists is `--text-body`, `--text-muted` is for captions; §12.9 the logo in the shell (the client's wordmark as a maroon mask, recolouring approved 21 Oct 2026) and the bindi ending the owner's tab-level titles on phones. New tokens `--app-page`, `--logo`, `--logo-mask` and the role tones `--role-*` with their avatar tints (used by §12.6 avatars in a later slice) |
+| 1.6 | 21 Oct 2026 | §4.1.7 "Owner PIN forgotten" row: self-service reset after a fresh email sign-in (15 minutes, once; a password sign-in never counts), other sessions signed out, a "Your PIN was changed" email, audit `owner.pin_reset`; admin `scripts/owner-recovery.mjs --clear-pin` (`owner.pin_cleared_by_admin`). Session column `pin_reset_until` (`0005_session_pin_reset.sql`) |
