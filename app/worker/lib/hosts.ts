@@ -46,6 +46,23 @@ export function isOwnerApiPath(path: string): boolean {
   return prefix(path, '/owner') || path.startsWith('/auth/owner');
 }
 
+/**
+ * API paths (after /api/v1) of owner access: passkeys, devices, recovery (ADR-19). They exist only on
+ * the owner host, so while OWNER_HOST is unset they answer 404 like the staff host does.
+ */
+const OWNER_ACCESS_API_PREFIX: readonly string[] = [
+  '/auth/owner/passkey',
+  '/auth/owner/enrol',
+  '/auth/owner/device-requests',
+  '/auth/owner/recovery',
+  '/owner/device-requests',
+  '/owner/security/devices',
+];
+
+export function isOwnerAccessApiPath(path: string): boolean {
+  return OWNER_ACCESS_API_PREFIX.some((p) => prefix(path, p));
+}
+
 /** Public origin for an in-app path: owner paths use the owner host, everything else the staff host. */
 export function originForPath(env: HostEnv, path: string): string {
   return isOwnerAppPath(path) ? ownerOrigin(env) : env.APP_ORIGIN;

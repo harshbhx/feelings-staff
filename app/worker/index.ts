@@ -10,6 +10,7 @@ import { registerApi } from './lib/api';
 import type { AppEnv } from './lib/app-env';
 import { ApiException } from './lib/errors';
 import {
+  isOwnerAccessApiPath,
   isOwnerApiPath,
   isOwnerAppPath,
   isOwnerHostApiPath,
@@ -35,15 +36,21 @@ export function createApp(): Hono<AppEnv> {
     c.res = withSecurityHeaders(c.res, requestId);
   });
 
-  // Host routing (ADR-19). A no-op while OWNER_HOST is unset. `/api/v1` is stripped for the checks.
+  // Host routing (ADR-19). While OWNER_HOST is unset only the owner-access API (passkeys, devices,
+  // recovery) answers 404; everything else passes. `/api/v1` is stripped for the checks.
   app.use('*', async (c, next) => {
     const url = new URL(c.req.url);
     const surface = surfaceOf(c.env, url);
     // The split build folders are never served under their own name (nothing there in the combined build).
     if (isSplitFolderPath(url.pathname)) return c.text('Not found', 404);
-    if (surface === 'combined') return next();
     const isApi = url.pathname.startsWith('/api/');
     const path = isApi ? url.pathname.replace(/^\/api(\/v1)?/, '') || '/' : url.pathname;
+    if (surface === 'combined') {
+      // Owner access (passkeys, devices, recovery) lives on the owner host only.
+      if (isApi && isOwnerAccessApiPath(path))
+        return errorResponse(c, new ApiException('NOT_FOUND'));
+      return next();
+    }
     let hidden: boolean;
     if (surface === 'staff') hidden = isApi ? isOwnerApiPath(path) : isOwnerAppPath(path);
     else hidden = isApi ? !isOwnerHostApiPath(path) : isStaffAppPath(path);

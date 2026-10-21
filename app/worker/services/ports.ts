@@ -31,6 +31,8 @@ export interface SessionInfo {
   createdAt: number;
   expiresAt: number;
   stepUpUntil: number | null;
+  /** Owner passkey the session signed in with (read only while OWNER_HOST is set). */
+  passkeyId?: string | null;
 }
 
 export interface SessionUser {
