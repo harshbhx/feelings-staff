@@ -18,7 +18,7 @@ Contents: [Conventions](#conventions) · [Endpoints](#endpoints) · [Error shape
 
 ### Sign-in, cookie and roles
 
-- A session is the cookie `fs_session` (`HttpOnly; Secure; SameSite=Strict; Path=/`). It holds a random token; the database keeps only its SHA-256. Staff sessions slide for 30 days, owner and manager sessions for 14, door sessions for 365.
+- A session is the cookie `fs_session` (`HttpOnly; Secure; SameSite=Strict; Path=/`). It holds a random token; the database keeps only its SHA-256. Staff sessions slide for 30 days, owner and manager sessions for 14, door sessions for 365. On the owner host ([owner access](owner-access.md)) an owner session started with a passkey is bound to that credential: 12 hours idle, 7 days at most, and it ends when the credential is removed; an owner who has a passkey has no other kind of session there.
 - The **Who may call** column uses these words:
 
 | Word | Meaning |
@@ -305,7 +305,7 @@ The credits routes are owner only; managers get 403 on all of them. Roll-call an
 
 ### Owner access: passkeys, devices, recovery
 
-Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host. The schemas are in `packages/contracts/src/api/owner-access.ts`.
+Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host: built are the passkey options and verify, the first-device enrolment (without `enrolToken`), the device list and rename; device requests, Remove, recovery and enrolment with a token come in the next slices. The schemas are in `packages/contracts/src/api/owner-access.ts`.
 
 | Method | Path | Who may call | Step-up | Idempotent | Request | Response | Summary |
 |---|---|---|---|---|---|---|---|

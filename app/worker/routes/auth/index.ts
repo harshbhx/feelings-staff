@@ -45,6 +45,7 @@ import {
   type InviteLookup,
   inviteState,
 } from '../../services/invite';
+import { passkeyRequired } from '../../services/passkey';
 import {
   assertNotLocked,
   failForPin,
@@ -57,9 +58,17 @@ import type { Ctx } from '../../services/ports';
 import { revokeUserSessionsStmt, startUserSession } from '../../services/session';
 import { STEP_UP_MS } from '../../services/stepup';
 import { passwordProblem } from './common-passwords';
+import { ownerAccessHandlers } from './owner-access';
 import { setup } from './setup';
 
 const CHALLENGE_TTL_MS = 5 * 60_000;
+
+/** The owner host after a passkey exists: the email code and the password no longer sign in. */
+function failPasskeyRequired(): never {
+  return fail('FORBIDDEN', 'Use your fingerprint or Face ID to sign in.', {
+    reason: 'passkey_enrolled',
+  });
+}
 const FIRST_PIN_WINDOW_MS = 15 * 60_000;
 
 function phoneOrFail(input: string): string {
@@ -206,6 +215,7 @@ function currentMe(ctx: Ctx) {
 
 export const handlers: Handlers = {
   setup,
+  ...ownerAccessHandlers,
 
   // ---- Invite page and join (PRD 4.1.3, 4.1.4) ----------------------------------------------------
 
@@ -503,9 +513,14 @@ export const handlers: Handlers = {
 
   // ---- Owner sign-in (PRD 4.1.7) -------------------------------------------------------------------
 
-  async ownerMagic({ body }, ctx) {
+  async ownerMagic({ body }, ctx, c) {
     const email = normaliseEmail(body.email);
     const owner = await findOwnerByEmail(ctx, email);
+    // On the owner host an owner with a passkey gets no email code (still 202: no account enumeration).
+    if (owner && (await passkeyRequired(withOrg(ctx, owner.org_id), c, owner.id))) {
+      console.info(JSON.stringify({ msg: 'auth.magic_refused_passkey', requestId: ctx.requestId }));
+      return undefined;
+    }
     if (owner && (await magicLinkAllowed(ctx, email))) {
       const octx = withOrg(ctx, owner.org_id);
       const link = await createMagicLink(octx, email);
@@ -545,6 +560,7 @@ export const handlers: Handlers = {
     const owner = await findOwnerByEmail(ctx, email);
     if (!owner) fail('LINK_EXPIRED', 'This link has expired. Send a new one.');
     const octx = withOrg(ctx, owner.org_id);
+    if (await passkeyRequired(octx, c, owner.id)) failPasskeyRequired();
     const now = ctx.now();
     await octx.db.batch([
       // A magic-link sign-in also lifts an owner PIN lock (PRD 4.1.7).
@@ -583,6 +599,7 @@ export const handlers: Handlers = {
     }
     if (!owner.pin_hash) fail('PIN_WRONG', OWNER_NO_MATCH);
     await verifyPinOrThrow(octx, owner, body.pin);
+    if (await passkeyRequired(octx, c, owner.id)) failPasskeyRequired();
     await octx.services.audit.log(octx, {
       category: 'security',
       action: 'auth.owner_login',
