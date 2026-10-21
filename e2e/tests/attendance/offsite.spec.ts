@@ -97,7 +97,9 @@ test.describe('E2E-09 off-site duty from a Google Maps link', () => {
 
     const today = await staffApi(page)<TodayView>('GET', '/me/today');
     const mine = today.body.punches.find((p) => p.kind === 'in');
-    expect(mine?.status).toBe('accepted');
+    // Counted at once, not waiting for the owner (a runner's network may add a flag).
+    expect(mine?.status).toMatch(/^(accepted|flagged)$/);
+    expect(mine?.fenceResult).toBe('pass');
     expect(mine?.offsiteDutyId).toBe(duty.id);
     expect(mine?.siteName).toBe('Hotel Aram');
     const board = await owner.ok<TodayBoard>('GET', '/owner/today');
@@ -141,7 +143,10 @@ test.describe('E2E-10 an unplanned venue, opened for others', () => {
       // The first one is at a wedding, away from the salon: she says where she is.
       await context.grantPermissions(['geolocation']);
       await context.setGeolocation(VENUE);
-      expect(await startPunch(page, 'in')).toBe('problem');
+      // The distance is checked by the server, after the PIN.
+      expect(await startPunch(page, 'in')).toBe('pin');
+      await enterPin(page, 'in', PIN);
+      await expectStep(page, 'problem');
       const sheet = page.getByRole('dialog');
       await sheet.getByRole('button', { name: "I'm at a venue" }).click();
       await sheet.getByLabel('Where are you?').fill('Patel wedding');
@@ -171,7 +176,8 @@ test.describe('E2E-10 an unplanned venue, opened for others', () => {
 
       const theirs = await staffApi(secondPhone.page)<TodayView>('GET', '/me/today');
       const punchTwo = theirs.body.punches.find((p) => p.kind === 'in');
-      expect(punchTwo?.status).toBe('accepted');
+      expect(punchTwo?.status).toMatch(/^(accepted|flagged)$/);
+      expect(punchTwo?.fenceResult).toBe('pass');
       expect(punchTwo?.siteName).toBe('Patel wedding');
       const board = await owner.ok<TodayBoard>('GET', '/owner/today');
       expect(board.in.find((r) => r.user.id === first.id)?.place).toBe('venue');
