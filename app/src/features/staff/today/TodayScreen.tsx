@@ -39,6 +39,7 @@ import {
   buildTodayModel,
   firstName,
   greetingPart,
+  minutesLateToStart,
   type QueuedPunchBrief,
   type TodayModel,
 } from './today-model';
@@ -179,6 +180,7 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
 
   const kind = frozen?.kind ?? (model.primary === 'check_out' ? 'out' : 'in');
   const chip = statusChip(model, t);
+  const sinceStart = minutesLateToStart(model, now);
   const name = firstName(me.user.name);
   const part = greetingPart(now);
   const greeting =
@@ -190,8 +192,8 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-xl">
+      <div className="staff-band flex flex-col gap-1">
+        <h1 className="staff-band__greeting">
           {greeting}
           <Bindi />
         </h1>
@@ -202,10 +204,22 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
         <h2 id="today-status" className="sr-only">
           {t('staff:today.hoursLabel')}
         </h2>
-        <div>
-          <StatusChip status={chip.status} label={chip.label} />
-        </div>
-        <StatusBlock view={view} model={model} fmt={fmt} />
+        {sinceStart !== null && model.shiftStartTs !== null ? (
+          <p className="staff-late-banner">
+            <Icon name="clock" className="mt-0.5 size-5 shrink-0" />
+            <span>
+              {t('staff:today.lateBanner', {
+                time: fmt.clock(model.shiftStartTs),
+                ago: fmt.duration(sinceStart),
+              })}
+            </span>
+          </p>
+        ) : (
+          <div>
+            <StatusChip status={chip.status} label={chip.label} />
+          </div>
+        )}
+        <StatusBlock view={view} model={model} fmt={fmt} lateBanner={sinceStart !== null} />
       </section>
 
       {pres.card ? (
@@ -354,7 +368,7 @@ function ShiftLine({ view }: { view: TodayView }) {
   const text = view.schedule.templateName
     ? t('staff:today.shift', { name: view.schedule.templateName, times })
     : t('staff:today.shiftNoName', { times });
-  return <p className="tabular text-text-muted">{text}</p>;
+  return <p className="tabular text-sm">{text}</p>;
 }
 
 type TFn = ReturnType<typeof useTranslation>['t'];
@@ -387,7 +401,17 @@ function statusChip(model: TodayModel, t: TFn): { status: DayStatus; label: stri
   }
 }
 
-function StatusBlock({ view, model, fmt }: { view: TodayView; model: TodayModel; fmt: Fmt }) {
+function StatusBlock({
+  view,
+  model,
+  fmt,
+  lateBanner,
+}: {
+  view: TodayView;
+  model: TodayModel;
+  fmt: Fmt;
+  lateBanner: boolean;
+}) {
   const { t } = useTranslation();
   const owner = useOwnerName();
   const now = useNow();
@@ -473,7 +497,7 @@ function StatusBlock({ view, model, fmt }: { view: TodayView; model: TodayModel;
         <p className="staff-bignum">
           <time dateTime={new Date(now).toISOString()}>{fmt.clock(now)}</time>
         </p>
-        {model.shiftStartTs !== null ? (
+        {model.shiftStartTs !== null && !lateBanner ? (
           <p>
             {started
               ? t('staff:today.startedAt', { time: fmt.clock(model.shiftStartTs) })

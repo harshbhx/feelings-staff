@@ -1,7 +1,13 @@
 import { TodayView } from '@fs/contracts';
 import { fixtures, variants } from '@fs/contracts/fixtures';
 import { describe, expect, it } from 'vitest';
-import { buildTodayModel, firstName, greetingPart, liveWorkedMinutes } from './today-model';
+import {
+  buildTodayModel,
+  firstName,
+  greetingPart,
+  liveWorkedMinutes,
+  minutesLateToStart,
+} from './today-model';
 
 const NOW = Date.parse('2026-10-19T10:42:00+05:30');
 const view = (name?: string) => TodayView.parse(name ? variants.meToday?.[name] : fixtures.meToday);
@@ -101,5 +107,14 @@ describe('Today model (PRD 5.1, AC S-10)', () => {
     expect(greetingPart(Date.parse('2026-10-19T13:00:00+05:30'))).toBe('afternoon');
     expect(greetingPart(Date.parse('2026-10-19T19:00:00+05:30'))).toBe('evening');
     expect(firstName('Priya Solanki')).toBe('Priya');
+  });
+
+  it('the Not checked in banner counts minutes since the shift start, only once it has started', () => {
+    const m = buildTodayModel(view(), [], NOW);
+    expect(m.status).toBe('not_in');
+    const start = m.shiftStartTs ?? 0;
+    expect(minutesLateToStart(m, start + 42 * 60_000)).toBe(42);
+    expect(minutesLateToStart(m, start - 60_000)).toBeNull();
+    expect(minutesLateToStart(buildTodayModel(view('checked-in'), [], NOW), NOW)).toBeNull();
   });
 });
