@@ -21,15 +21,15 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 - Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
+Owner PIN reset, contracts (`contracts-v1.4`):
+
+- `SecurityView.pinResetUntil`: until when the signed-in owner may set a new PIN without the old one (15 minutes after an email-code or magic-link sign-in, once per sign-in). Optional, so a server without the reset still matches. Fixture variant `ownerSecurityGet.pin-reset`.
+
 Owner access, passkey core (slice 4, off until `OWNER_HOST` is set):
 
 - On the owner host the owner signs in with a passkey ("Use your fingerprint", or "Use Face ID" on an iPhone). The first device is enrolled after the existing email code ("Make this phone your key"), with a name for the phone. From then on that owner gets no email code and no password sign-in on the owner host. A passkey session lasts 12 hours idle and 7 days at most and ends when the passkey is removed.
 - Migration `0004_owner_access.sql`: owner passkeys, device requests, recovery codes and single-use passkey challenges, `users.passkey_enrolled_at`, `sessions.passkey_id`. The nightly purge covers the new tables.
 - `@simplewebauthn/server` 13.3.3 in the Worker (user verification required, attestation none, ES256 and RS256, counter check, 20 challenges per IP per 15 minutes). While `OWNER_HOST` is unset the passkey routes answer 404 and sign-in is unchanged.
-
-Owner PIN reset, contracts (`contracts-v1.4`):
-
-- `SecurityView.pinResetUntil`: until when the signed-in owner may set a new PIN without the old one (15 minutes after an email-code or magic-link sign-in, once per sign-in). Optional, so a server without the reset still matches. Fixture variant `ownerSecurityGet.pin-reset`.
 
 Owner access, contracts (`contracts-v1.3`, [owner access](docs/owner-access.md#api)):
 
