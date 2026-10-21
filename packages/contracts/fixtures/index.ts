@@ -86,6 +86,17 @@ import ownerCredits from './ownerCredits.json';
 import ownerDay from './ownerDay.json';
 import ownerDayOverride from './ownerDayOverride.json';
 import ownerDeviceDecide from './ownerDeviceDecide.json';
+import ownerDeviceList from './ownerDeviceList.json';
+import ownerDeviceList_oneDevice from './ownerDeviceList.one-device.json';
+import ownerDeviceRemove from './ownerDeviceRemove.json';
+import ownerDeviceRename from './ownerDeviceRename.json';
+import ownerDeviceRequestCreate from './ownerDeviceRequestCreate.json';
+import ownerDeviceRequestDecide from './ownerDeviceRequestDecide.json';
+import ownerDeviceRequestList_empty from './ownerDeviceRequestList.empty.json';
+import ownerDeviceRequestList from './ownerDeviceRequestList.json';
+import ownerDeviceRequestStatus_approved from './ownerDeviceRequestStatus.approved.json';
+import ownerDeviceRequestStatus_declined from './ownerDeviceRequestStatus.declined.json';
+import ownerDeviceRequestStatus from './ownerDeviceRequestStatus.json';
 import ownerDeviceRevoke from './ownerDeviceRevoke.json';
 import ownerDoorCode from './ownerDoorCode.json';
 import ownerDoorDeviceCreate from './ownerDoorDeviceCreate.json';
@@ -95,6 +106,8 @@ import ownerDutiesList from './ownerDutiesList.json';
 import ownerDutyCreate from './ownerDutyCreate.json';
 import ownerDutyGet from './ownerDutyGet.json';
 import ownerDutyPatch from './ownerDutyPatch.json';
+import ownerEnrolOptions from './ownerEnrolOptions.json';
+import ownerEnrolVerify from './ownerEnrolVerify.json';
 import ownerExportCreate from './ownerExportCreate.json';
 import ownerExportGet from './ownerExportGet.json';
 import ownerExportsList from './ownerExportsList.json';
@@ -107,6 +120,9 @@ import ownerManagerUpsert from './ownerManagerUpsert.json';
 import ownerMapsResolve from './ownerMapsResolve.json';
 import ownerOffsiteDecide from './ownerOffsiteDecide.json';
 import ownerOvertimeDecide from './ownerOvertimeDecide.json';
+import ownerPasskeyOptions_firstDevice from './ownerPasskeyOptions.first-device.json';
+import ownerPasskeyOptions from './ownerPasskeyOptions.json';
+import ownerPasskeyVerify from './ownerPasskeyVerify.json';
 import ownerPassword from './ownerPassword.json';
 import ownerPayrollCreate from './ownerPayrollCreate.json';
 import ownerPayrollCreditSet from './ownerPayrollCreditSet.json';
@@ -124,6 +140,7 @@ import ownerPayslipMarkPaid from './ownerPayslipMarkPaid.json';
 import ownerPayslipPreview from './ownerPayslipPreview.json';
 import ownerPresenceDay from './ownerPresenceDay.json';
 import ownerPunchReview from './ownerPunchReview.json';
+import ownerRecoveryRedeem from './ownerRecoveryRedeem.json';
 import ownerRegister from './ownerRegister.json';
 import ownerRegularisationDecide from './ownerRegularisationDecide.json';
 import ownerRollCallGet_empty from './ownerRollCallGet.empty.json';
@@ -327,6 +344,18 @@ export const fixtures: Partial<Record<EndpointKey, unknown>> = {
   ownerAudit,
   ownerManagersList,
   ownerManagerUpsert,
+  ownerPasskeyOptions,
+  ownerPasskeyVerify,
+  ownerEnrolOptions,
+  ownerEnrolVerify,
+  ownerDeviceRequestCreate,
+  ownerDeviceRequestStatus,
+  ownerDeviceRequestList,
+  ownerDeviceRequestDecide,
+  ownerDeviceList,
+  ownerDeviceRename,
+  ownerDeviceRemove,
+  ownerRecoveryRedeem,
   doorPair,
   doorSecret,
   doorStatus,
@@ -390,6 +419,19 @@ export const variants: Partial<Record<EndpointKey, Record<string, unknown>>> = {
   ownerRollCallGet: {
     open: ownerRollCallGet_open,
     empty: ownerRollCallGet_empty,
+  },
+  ownerPasskeyOptions: {
+    'first-device': ownerPasskeyOptions_firstDevice,
+  },
+  ownerDeviceRequestStatus: {
+    approved: ownerDeviceRequestStatus_approved,
+    declined: ownerDeviceRequestStatus_declined,
+  },
+  ownerDeviceRequestList: {
+    empty: ownerDeviceRequestList_empty,
+  },
+  ownerDeviceList: {
+    'one-device': ownerDeviceList_oneDevice,
   },
   ownerPayrollGet: {
     finalised: ownerPayrollGet_finalised,

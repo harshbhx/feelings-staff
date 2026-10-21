@@ -58,6 +58,10 @@ describe('fixtures', () => {
       mePayslips: ['empty'],
       notificationsList: ['empty'],
       me: ['owner', 'staff-pending-device'],
+      ownerPasskeyOptions: ['first-device'],
+      ownerDeviceRequestStatus: ['approved', 'declined'],
+      ownerDeviceRequestList: ['empty'],
+      ownerDeviceList: ['one-device'],
     };
     for (const [key, names] of Object.entries(need)) {
       for (const name of names) {

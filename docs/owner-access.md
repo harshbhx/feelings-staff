@@ -6,7 +6,7 @@ Contents: [What changes](#what-changes) · [The two hosts](#the-two-hosts) · [C
 
 ## What changes
 
-**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default) and slice 1b (split build, below) are built. Nothing changes in production until `OWNER_HOST` is set.
+**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default), slice 1b (split build, below) and slice 3 (the endpoint contract, [API](#api)) are built. Nothing changes in production until `OWNER_HOST` is set.
 
 | Today | After |
 |---|---|
@@ -73,7 +73,24 @@ New migration `0004_owner_access.sql`:
 
 ## API
 
-Contract change (separate `contract-change` PR before the feature PRs): owner-host endpoints `ownerPasskeyOptions`, `ownerPasskeyVerify`, `ownerEnrolOptions`, `ownerEnrolVerify`, `ownerDeviceRequestCreate`, `ownerDeviceRequestList`, `ownerDeviceRequestDecide` (passkey assertion plus PIN step-up), `ownerDeviceList`, `ownerDeviceRemove`, `ownerRecoveryRedeem`, each with a zod schema, a rate limit and an audit row. The old `ownerMagic`, `ownerVerify` and `ownerPassword` stay until the cutover, then answer 404 on the staff host and are restricted on the owner host to "first device" and "recovery" only.
+The contract (slice 3) is in the endpoint table, schemas in `packages/contracts/src/api/owner-access.ts`; the rows, how they fit together and the error codes are in the [API reference](api.md#owner-access-passkeys-devices-recovery). Every route answers only on the owner host (404 on the staff host and while `OWNER_HOST` is unset) and has a rate limit and an audit row.
+
+| Endpoint | Route | Notes |
+|---|---|---|
+| `ownerPasskeyOptions` | `POST /auth/owner/passkey/options` | `purpose` `signin` (usernameless) or `confirm` (the session's own credential, for approve and remove); also says whether "Email me a code" is still offered |
+| `ownerPasskeyVerify` | `POST /auth/owner/passkey/verify` | Starts the owner session bound to the credential |
+| `ownerEnrolOptions` | `POST /auth/owner/enrol/options` | First device (owner session after the email code, no passkey yet) or an enrolment token |
+| `ownerEnrolVerify` | `POST /auth/owner/enrol/verify` | Stores the passkey, sets `passkey_enrolled_at`, starts a session bound to it |
+| `ownerDeviceRequestCreate` | `POST /auth/owner/device-requests` | New device: 6-digit code, 15 minutes, and an enrolment token it keeps |
+| `ownerDeviceRequestStatus` | `POST /auth/owner/device-requests/:id/status` | The new device polls its request (added to the plan: the new device has no session) |
+| `ownerDeviceRequestList` | `GET /owner/device-requests` | Approval cards in Needs action |
+| `ownerDeviceRequestDecide` | `POST /owner/device-requests/:id/decide` | Approve (passkey assertion on this device plus PIN step-up) or decline |
+| `ownerDeviceList` | `GET /owner/security/devices` | Settings, Security |
+| `ownerDeviceRename` | `PATCH /owner/security/devices/:id` | The prefilled name on the enrolment success screen (added to the plan) |
+| `ownerDeviceRemove` | `POST /owner/security/devices/:id/remove` | Passkey assertion plus PIN step-up; never the last device |
+| `ownerRecoveryRedeem` | `POST /auth/owner/recovery` | Recovery code to an enrolment token for a fresh first device |
+
+The old `ownerMagic`, `ownerVerify` and `ownerPassword` stay until the cutover, then answer 404 on the staff host and are restricted on the owner host to "first device" and "recovery" only.
 
 ## Screens
 
