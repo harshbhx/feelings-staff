@@ -1,4 +1,4 @@
-/** Header bell with the unread count (PRD 5, S-15). Owner: WP-8. Kept tiny: it is in every shell header, so the initial bundle; the screen is `./screen`, a lazy chunk. */
+/** Header bell with the unread count (PRD 5, S-15). Owner: WP-8. Kept tiny: it is in every shell header, so the initial bundle; the screen is `./screen`, a lazy chunk. Its label is `common` copy, so the `notify` catalog loads only with the inbox screen. */
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
 import { STAFF_ONLY } from '../../lib/surface';
@@ -6,7 +6,7 @@ import { useRefetchOnPush, useUnreadCount } from './hooks';
 
 /** Header bell with the unread count. Shells render it; the route depends on the area (/o or staff). */
 export function InboxBell() {
-  const { t } = useTranslation('notify');
+  const { t } = useTranslation();
   const { pathname } = useLocation();
   const count = useUnreadCount();
   useRefetchOnPush();
@@ -15,7 +15,7 @@ export function InboxBell() {
     : pathname === '/o' || pathname.startsWith('/o/')
       ? '/o/inbox'
       : '/inbox';
-  const label = count > 0 ? t('inbox.bellUnread', { count }) : t('inbox.bell');
+  const label = count > 0 ? t('common:inbox.bellUnread', { count }) : t('common:inbox.bell');
   return (
     <Link
       to={to}

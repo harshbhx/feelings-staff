@@ -37,10 +37,10 @@
 
   /* The hover tint bleeds into the gutter so the row text stays aligned with the page. */
   .fs-row[data-interactive]:hover {
-    background: var(--bg-soft);
+    background: var(--row-hover-bg);
     box-shadow:
-      calc(var(--space-3) * -1) 0 0 var(--bg-soft),
-      var(--space-3) 0 0 var(--bg-soft);
+      calc(var(--space-3) * -1) 0 0 var(--row-hover-bg),
+      var(--space-3) 0 0 var(--row-hover-bg);
   }
 
   .fs-row[data-interactive]:focus-visible {
@@ -74,10 +74,11 @@
     overflow-wrap: anywhere;
   }
 
+  /* The first secondary line is body ink (PRD 12.4 as amended); --text-muted is for captions. */
   .fs-row__subtitle {
     font-size: var(--text-sm);
     line-height: 1.45;
-    color: var(--text-muted);
+    color: var(--text-body);
   }
 
   .fs-row__meta {

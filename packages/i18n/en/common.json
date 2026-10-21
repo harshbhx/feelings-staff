@@ -35,5 +35,10 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "range": "{{from}}–{{to}}"
+  },
+  "inbox": {
+    "bell": "Inbox",
+    "bellUnread_one": "Inbox, {{count}} unread",
+    "bellUnread_other": "Inbox, {{count}} unread"
   }
 }

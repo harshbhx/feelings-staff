@@ -63,6 +63,7 @@ export {
   type TimeFieldProps,
 } from './components/FormattedInputs';
 export { List, type ListProps, ListRow, type ListRowProps } from './components/ListRow';
+export { Logo, type LogoProps } from './components/Logo';
 export { PinPad, type PinPadProps } from './components/PinPad';
 export { Popover, type PopoverProps, Tooltip, type TooltipProps } from './components/Popover';
 export {
