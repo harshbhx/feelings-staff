@@ -65,6 +65,13 @@ jobs:
           for cfg in $(find app/dist -name wrangler.json -not -path '*/node_modules/*'); do cp app/.dev.vars "$(dirname "$cfg")/.dev.vars"; done
       - name: Playwright
         run: pnpm --filter @fs/e2e exec playwright test ${{ github.event.inputs.grep && format('--grep "{0}"', github.event.inputs.grep) || '' }}
+      - name: Playwright (split hosts, OWNER_HOST set)
+        if: ${{ !cancelled() }}
+        run: |
+          for cfg in $(find app/dist -name wrangler.json -not -path '*/node_modules/*'); do
+            printf '\nOWNER_HOST=owner.example.test:8787\n' >> "$(dirname "$cfg")/.dev.vars"
+          done
+          E2E_SPLIT=1 pnpm --filter @fs/e2e exec playwright test
       - name: Upload report, traces and screenshots
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4

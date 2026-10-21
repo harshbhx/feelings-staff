@@ -3,9 +3,10 @@
  * routes.tsx and never edit this file (PRD 16.1 rule 2).
  */
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter, Navigate, Outlet, type RouteObject } from 'react-router';
+import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 import { RequireRole } from './app/guards';
 import { WithNamespaces } from './app/i18n';
+import { withNamespaces } from './app/with-namespaces-route';
 import { authRoutes } from './features/auth/routes';
 import { doorRoutes } from './features/door/routes';
 import { kitRoutes } from './features/kit/routes';
@@ -21,18 +22,6 @@ const LazyOwnerShell = lazy(() =>
 const OWNER_NS = ['owner', 'payslip'] as const;
 const DOOR_NS = ['door'] as const;
 const KIT_NS = ['owner', 'payslip', 'door'] as const;
-
-/** A path-less layout route that loads the copy an area needs before it renders. */
-function withNamespaces(ns: Parameters<typeof WithNamespaces>[0]['ns'], children: RouteObject[]) {
-  return {
-    element: (
-      <WithNamespaces ns={ns}>
-        <Outlet />
-      </WithNamespaces>
-    ),
-    children,
-  } satisfies RouteObject;
-}
 
 export const routes: RouteObject[] = [
   ...authRoutes,

@@ -6,6 +6,7 @@
  */
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { STAFF_ONLY } from '../../../lib/surface';
 import { actsInstalled } from '../lib/flags';
 import { Lead, TextLink, Title } from './bits';
 import { InstallGuide } from './install-guide';
@@ -25,7 +26,13 @@ export function StaffAppOnly({
     ? `${window.location.origin}/join/${code}`
     : `${window.location.origin}${window.location.pathname}`;
   return (
-    <AuthScreen footer={<TextLink to="/auth/owner">{t('auth:common.ownerSignIn')}</TextLink>}>
+    <AuthScreen
+      footer={
+        STAFF_ONLY ? undefined : (
+          <TextLink to="/auth/owner">{t('auth:common.ownerSignIn')}</TextLink>
+        )
+      }
+    >
       <Title>{t('auth:browserTab.title')}</Title>
       <Lead>{t('auth:browserTab.lead')}</Lead>
       <InstallGuide code={code} link={link} />

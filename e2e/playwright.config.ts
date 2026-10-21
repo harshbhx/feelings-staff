@@ -9,6 +9,15 @@ import { defineConfig } from '@playwright/test';
 const FAKE_CAMERA = fileURLToPath(new URL('./assets/face.y4m', import.meta.url));
 
 const PORT = 8787;
+
+/**
+ * Split-host run (docs/owner-access.md): the same preview Worker with OWNER_HOST set, so the staff and
+ * owner hosts are served from their own build folders. `E2E_SPLIT=1` runs only the `split-hosts`
+ * project; the default run keeps OWNER_HOST unset (the combined build, as in production today). The
+ * ci workflow sets OWNER_HOST=owner.example.test:8787 for that run; the hosts are placeholders (see
+ * tests/split). Chromium maps `*.example.test` to loopback; API calls send a Host header.
+ */
+const SPLIT = process.env.E2E_SPLIT === '1';
 const ANDROID_UA =
   'Mozilla/5.0 (Linux; Android 14; Redmi Note 12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
 const IOS_UA =
@@ -16,6 +25,7 @@ const IOS_UA =
 
 export default defineConfig({
   testDir: './tests',
+  ...(SPLIT ? {} : { testIgnore: /split\// }),
   fullyParallel: false,
   workers: 1,
   forbidOnly: !!process.env.CI,
@@ -33,52 +43,64 @@ export default defineConfig({
     locale: 'en-IN',
     timezoneId: 'Asia/Kolkata',
   },
-  projects: [
-    {
-      name: 'staff-android',
-      use: {
-        browserName: 'chromium',
-        viewport: { width: 390, height: 844 },
-        deviceScaleFactor: 2,
-        isMobile: true,
-        hasTouch: true,
-        userAgent: ANDROID_UA,
-        launchOptions: {
-          args: [
-            '--use-fake-ui-for-media-stream',
-            '--use-fake-device-for-media-stream',
-            `--use-file-for-fake-video-capture=${FAKE_CAMERA}`,
-          ],
+  projects: SPLIT
+    ? [
+        {
+          name: 'split-hosts',
+          testMatch: /split\/.*\.spec\.ts/,
+          use: {
+            browserName: 'chromium',
+            viewport: { width: 390, height: 844 },
+            launchOptions: { args: ['--host-resolver-rules=MAP *.example.test localhost'] },
+          },
         },
-      },
-    },
-    {
-      name: 'staff-ios',
-      use: {
-        browserName: 'webkit',
-        viewport: { width: 390, height: 844 },
-        deviceScaleFactor: 2,
-        isMobile: true,
-        hasTouch: true,
-        userAgent: IOS_UA,
-      },
-    },
-    {
-      name: 'owner-desktop',
-      use: { browserName: 'chromium', viewport: { width: 1280, height: 800 } },
-    },
-    {
-      name: 'owner-phone',
-      use: {
-        browserName: 'chromium',
-        viewport: { width: 390, height: 844 },
-        deviceScaleFactor: 2,
-        isMobile: true,
-        hasTouch: true,
-        userAgent: ANDROID_UA,
-      },
-    },
-  ],
+      ]
+    : [
+        {
+          name: 'staff-android',
+          use: {
+            browserName: 'chromium',
+            viewport: { width: 390, height: 844 },
+            deviceScaleFactor: 2,
+            isMobile: true,
+            hasTouch: true,
+            userAgent: ANDROID_UA,
+            launchOptions: {
+              args: [
+                '--use-fake-ui-for-media-stream',
+                '--use-fake-device-for-media-stream',
+                `--use-file-for-fake-video-capture=${FAKE_CAMERA}`,
+              ],
+            },
+          },
+        },
+        {
+          name: 'staff-ios',
+          use: {
+            browserName: 'webkit',
+            viewport: { width: 390, height: 844 },
+            deviceScaleFactor: 2,
+            isMobile: true,
+            hasTouch: true,
+            userAgent: IOS_UA,
+          },
+        },
+        {
+          name: 'owner-desktop',
+          use: { browserName: 'chromium', viewport: { width: 1280, height: 800 } },
+        },
+        {
+          name: 'owner-phone',
+          use: {
+            browserName: 'chromium',
+            viewport: { width: 390, height: 844 },
+            deviceScaleFactor: 2,
+            isMobile: true,
+            hasTouch: true,
+            userAgent: ANDROID_UA,
+          },
+        },
+      ],
   webServer: {
     command: 'pnpm --filter @fs/app exec vite preview --port 8787 --strictPort',
     cwd: '..',

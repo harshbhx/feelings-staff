@@ -56,10 +56,19 @@ const bundledEn: Record<(typeof STAFF_NAMESPACES)[number], Catalog> = {
   notify: enNotify,
 };
 
+/**
+ * `__FS_SURFACE__` is set by the app's vite.config.ts. In the staff-only build (split host build,
+ * docs/owner-access.md) the owner catalogs are left out so no owner copy reaches the staff output.
+ * Where it is not defined (tests, Worker tests) the full set is used.
+ */
+declare const __FS_SURFACE__: string | undefined;
+
 /** Separate chunks, fetched on demand. */
 const lazyCatalogs: Record<AppLang, Partial<Record<Namespace, Loader>>> = {
   en: {
-    owner: () => import('../en/owner.json'),
+    ...(typeof __FS_SURFACE__ === 'string' && __FS_SURFACE__ === 'staff'
+      ? {}
+      : { owner: () => import('../en/owner.json') }),
     door: () => import('../en/door.json'),
     payslip: () => import('../en/payslip.json'),
     presence: () => import('../en/presence.json'),
@@ -67,7 +76,9 @@ const lazyCatalogs: Record<AppLang, Partial<Record<Namespace, Loader>>> = {
   gu: {
     common: () => import('../gu/common.json'),
     staff: () => import('../gu/staff.json'),
-    owner: () => import('../gu/owner.json'),
+    ...(typeof __FS_SURFACE__ === 'string' && __FS_SURFACE__ === 'staff'
+      ? {}
+      : { owner: () => import('../gu/owner.json') }),
     errors: () => import('../gu/errors.json'),
     notify: () => import('../gu/notify.json'),
     payslip: () => import('../gu/payslip.json'),

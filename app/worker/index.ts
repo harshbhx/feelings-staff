@@ -17,6 +17,7 @@ import {
   STAFF_APP_PATHS,
   surfaceOf,
 } from './lib/hosts';
+import { isSplitFolderPath, serveSplitAsset } from './lib/split-assets';
 import { ulid } from './lib/ulid';
 import { context } from './middleware/context';
 import { errorResponse, onError } from './middleware/errors';
@@ -38,6 +39,8 @@ export function createApp(): Hono<AppEnv> {
   app.use('*', async (c, next) => {
     const url = new URL(c.req.url);
     const surface = surfaceOf(c.env, url);
+    // The split build folders are never served under their own name (nothing there in the combined build).
+    if (isSplitFolderPath(url.pathname)) return c.text('Not found', 404);
     if (surface === 'combined') return next();
     const isApi = url.pathname.startsWith('/api/');
     const path = isApi ? url.pathname.replace(/^\/api(\/v1)?/, '') || '/' : url.pathname;
@@ -47,6 +50,21 @@ export function createApp(): Hono<AppEnv> {
     if (!hidden) return next();
     return isApi ? errorResponse(c, new ApiException('NOT_FOUND')) : c.text('Not found', 404);
   });
+
+  // Split build (OWNER_HOST set): the shell and every static file come from the folder of the host
+  // that answers, so the staff host never serves an owner file. API and door-QR routes stay below.
+  app.use('*', async (c, next) => {
+    const url = new URL(c.req.url);
+    const surface = surfaceOf(c.env, url);
+    const isRead = c.req.method === 'GET' || c.req.method === 'HEAD';
+    const own = !url.pathname.startsWith('/api/') && !/^\/q(\/|$)/.test(url.pathname);
+    if (surface === 'combined' || !isRead || !own) return next();
+    return serveSplitAsset(c.env.ASSETS, c.req.raw, surface);
+  });
+
+  // Entry files that reach the Worker (wrangler `run_worker_first`) in the combined build.
+  for (const p of ['/', '/index.html', '/sw.js', '/manifest.webmanifest'])
+    app.get(p, (c) => c.env.ASSETS.fetch(c.req.raw));
 
   // Pages that only exist on one host pass through the Worker (wrangler `run_worker_first`) so the
   // rules above can hide them; the shell itself still comes from the asset layer.
