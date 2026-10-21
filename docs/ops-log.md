@@ -30,6 +30,7 @@ Normal deploys from `main` do not need an entry: the `deploy` workflow run, its 
 | Date and time (IST) | By | Action | Why and who asked | Command or SQL | Audit row id | Result |
 |---|---|---|---|---|---|---|
 | 21 Oct 2026 12:25 | lead (Wrangler OAuth) | Production created and owner bootstrapped | Harsh asked for go-live on staff.feelingsbeautycare.in | `d1 create fbc-staff`, `r2 bucket create fbc-staff-media`, migrations 0001-0003, `wrangler deploy --secrets-file`, `POST /api/v1/setup` once | none (setup) | 201, org created, health ok on the custom domain |
+| 21 Oct 2026 23:37 | lead (Wrangler OAuth) | Production redeployed from main c58d2d3 | Ship merged work (E2E-08..10 fixes, owner access slices 1b and 2 switched off, redesign slices 7 and 8) | `wrangler deploy -c dist/feelings_staff/wrangler.json --secrets-file` from the app-dist artifact of ci run 39646663505 (e2e 39646663455 green); no new migrations | none | health commit c58d2d3; /, /signin, /auth/owner, /o/today, /today, manifest, sw 200; missing asset and /_s, /_o 404; magic 202 |
 | | | | | | | |
 
 Copy the last row for each new entry. A longer incident can have a heading of its own under this table with the timeline, root cause, change made, pull request link, and who was told and when.
