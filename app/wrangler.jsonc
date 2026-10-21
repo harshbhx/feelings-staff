@@ -12,7 +12,41 @@
   "assets": {
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*", "/v/*", "/q/*", "/__kit", "/assets/*"]
+    "run_worker_first": [
+      "/api/*",
+      "/v/*",
+      "/q/*",
+      "/__kit",
+      "/assets/*",
+      "/o",
+      "/o/*",
+      "/auth/owner",
+      "/auth/owner/*",
+      "/door",
+      "/door/*",
+      "/join",
+      "/join/*",
+      "/waiting",
+      "/waiting/*",
+      "/signin",
+      "/signin/*",
+      "/month",
+      "/month/*",
+      "/day",
+      "/day/*",
+      "/requests",
+      "/requests/*",
+      "/payslips",
+      "/payslips/*",
+      "/inbox",
+      "/inbox/*",
+      "/me",
+      "/me/*",
+      "/scan",
+      "/scan/*",
+      "/fix",
+      "/fix/*"
+    ]
   },
   "d1_databases": [
     {

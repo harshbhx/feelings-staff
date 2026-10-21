@@ -14,6 +14,8 @@ export interface Env {
   // Variables
   ENV: 'production' | 'preview' | 'local';
   APP_ORIGIN: string;
+  /** Owner host name (no scheme). Unset = one host serves everything (today's behaviour). */
+  OWNER_HOST?: string;
   APP_VERSION: string;
   MIN_APP_VERSION: string;
   EMAIL_PROVIDER: 'cloudflare' | 'resend' | 'outbox';
