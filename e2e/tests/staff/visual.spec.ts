@@ -194,8 +194,9 @@ test.describe('staff screens', () => {
           'button:not([disabled]), a[href]:not(p a), input:not([type="hidden"]), [role="tab"], [role="radio"]';
         for (const el of Array.from(document.querySelectorAll<HTMLElement>(sel))) {
           const target =
-            el.closest('.fs-chip, .fs-input-wrap, .fs-pinpad__display, .fs-choice') ??
-            (el as Element);
+            el.closest(
+              '.fs-chip, .fs-input-wrap, .fs-pinpad__display, .fs-choice, .fs-switch-row',
+            ) ?? (el as Element);
           const r = target.getBoundingClientRect();
           if (r.width <= 1 || r.height <= 1) continue; // hidden or visually hidden
           const extra = el.matches('.fs-btn[data-size="sm"]') ? 4 : 0;

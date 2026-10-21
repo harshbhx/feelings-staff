@@ -12,6 +12,9 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ### Added
 
+- Every control now answers a press the same way: a pressed state within 80 ms, a ring inside the button while it waits (the label and width stay, "Still trying" after 8 s, a second press does nothing), and a disabled main button says why. Buttons have distinct looks per role (solid sindoor, cream secondary, text tertiary, red-labelled destructive), the sheet's close X is neutral, and chips, rows, tabs, the rail and switches have hover, pressed and focus states. Reduced motion turns off every slide and scale.
+- A short vibration on check-in (one tick) and check-out (two ticks) on Android, with a Vibration switch in Me; never with reduced motion.
+- For developers: `useAction` (pending, double-press safe, optimistic only when asked, Cancel, "slow" after 8 s), `app/src/lib/haptics.ts`, motion tokens in `motion.css`, a Control states section on the kit page with forced-state baselines (INT-01 to INT-06), and check-ui rules for transitions and literal durations.
 - The app now wears the salon's brand: the page is the website's warm blush band with white cards, the salon's logo leads the owner's Today header on phones, tops the desktop rail and leads the staff Today header (with the date next to the bell), and the owner's More screen closes with the logo and who is signed in. Owner tab-level titles end with the bindi on phones. List lines under a name are darker for contrast. The logo is the salon's own wordmark in maroon (a 9 KB image, kept for offline use).
 - Design tokens for the redesign: `--app-page`, `--logo`, `--logo-mask`, and role tones `--role-*` with avatar tints that keep initials at 4.5:1 or more; a `Logo` component in `@fs/ui` and kit specimens for both.
 - E2E-19 now runs: it checks that a push makes the service worker show the right notification and that a click opens the right page.
