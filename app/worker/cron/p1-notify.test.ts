@@ -208,6 +208,8 @@ describe('O-21 weekly digest N30 (PRD 6)', () => {
     expect(mail?.text).toContain('Absent days: 1');
     expect(mail?.text).toContain('Overtime approved: 1 h 30 m');
     expect(mail?.text).toContain('Waiting for your decision: 0');
+    expect(mail?.text).toContain('You get this every Monday.');
+    expect(mail?.text).not.toContain('Settings');
     const rows = await testEnv.DB.prepare(
       "SELECT user_id, push_status, email_status FROM notifications WHERE type = 'weekly_digest'",
     ).all<{ user_id: string; push_status: string; email_status: string }>();

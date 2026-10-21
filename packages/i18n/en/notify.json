@@ -226,7 +226,7 @@
       "button": "Sign in to Feelings Staff"
     },
     "digest": {
-      "footer": "You get this every Monday. Turn it off in Settings.",
+      "footer": "You get this every Monday.",
       "late": "Late arrivals: {{count}}",
       "absent": "Absent days: {{count}}",
       "overtime": "Overtime approved: {{time}}",
