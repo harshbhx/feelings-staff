@@ -3,6 +3,7 @@ import { type AppLang, createI18n, NAMESPACES, type Namespace, STAFF_NAMESPACES 
 import type { i18n as I18n } from 'i18next';
 import { type ReactNode, useEffect, useState } from 'react';
 import { I18nextProvider, useTranslation } from 'react-i18next';
+import { STAFF_ONLY } from '../lib/surface';
 
 const LANG_KEY = 'fs.lang';
 
@@ -27,7 +28,8 @@ export function saveLang(lang: AppLang): void {
  * separate chunks that `WithNamespaces` loads when one of those areas opens.
  */
 function startNamespaces(path: string): readonly Namespace[] {
-  return /^\/(o|auth\/owner|door|v|__kit)(\/|$)/.test(path) ? NAMESPACES : STAFF_NAMESPACES;
+  const own = STAFF_ONLY ? /^\/(door|v)(\/|$)/ : /^\/(o|auth\/owner|door|v|__kit)(\/|$)/;
+  return own.test(path) ? NAMESPACES : STAFF_NAMESPACES;
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {

@@ -11,6 +11,7 @@
 import type { ApiClient, EndpointKey } from '@fs/contracts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createContext, type ReactNode, useContext, useState } from 'react';
+import { STAFF_ONLY } from '../lib/surface';
 import { createHttpApiClient } from './http-client';
 
 const ApiContext = createContext<ApiClient | null>(null);
@@ -64,8 +65,11 @@ function lazyMockClient(choice: MockChoice): ApiClient {
 }
 
 export function createAppClient(): ApiClient {
-  const mock = mockChoice();
-  if (mock) return lazyMockClient(mock);
+  // The staff build (split host) has no mock mode: the fixtures hold owner data and are dev/CI only.
+  if (!STAFF_ONLY) {
+    const mock = mockChoice();
+    if (mock) return lazyMockClient(mock);
+  }
   return createHttpApiClient({
     appVersion: APP_VERSION,
     onUpgradeRequired: () => window.dispatchEvent(new CustomEvent('fs:upgrade-required')),

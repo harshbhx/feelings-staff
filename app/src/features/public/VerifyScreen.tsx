@@ -43,7 +43,7 @@ export function VerifyScreen() {
   else if (query.isError)
     body = (
       <div role="alert" className="grid gap-3" data-testid="verify-error">
-        <p className="text-text-body">{t('owner:errors.network')}</p>
+        <p className="text-text-body">{t('payslip:verifyPage.network')}</p>
         <div>
           <Button
             variant="secondary"
@@ -51,14 +51,14 @@ export function VerifyScreen() {
             icon="arrows-clockwise"
             onClick={() => void query.refetch()}
           >
-            {t('owner:common.retry')}
+            {t('payslip:verifyPage.retry')}
           </Button>
         </div>
       </div>
     );
   else
     body = (
-      <SkeletonGroup label={t('owner:common.loading')} className="grid gap-3">
+      <SkeletonGroup label={t('payslip:verifyPage.loading')} className="grid gap-3">
         <Skeleton shape="pill" width="5rem" height="1.75rem" />
         <Skeleton width="70%" />
         <Skeleton width="55%" />
@@ -74,12 +74,12 @@ export function VerifyScreen() {
           <Bindi size="heading" />
         </p>
         <h1 className="font-extrabold text-2xl text-text tracking-display">
-          {t('owner:verify.title')}
+          {t('payslip:verifyPage.title')}
         </h1>
         <section className="grid gap-5 rounded-md border border-border p-5" aria-live="polite">
           {body}
         </section>
-        <p className="text-sm text-text-muted">{t('owner:verify.footer')}</p>
+        <p className="text-sm text-text-muted">{t('payslip:verifyPage.footer')}</p>
       </main>
     </div>
   );
@@ -90,9 +90,9 @@ function Invalid() {
   return (
     <div className="grid gap-2" data-testid="verify-invalid">
       <div>
-        <StatusChip status="absent" label={t('owner:verify.invalid')} />
+        <StatusChip status="absent" label={t('payslip:verifyPage.invalid')} />
       </div>
-      <p className="text-text-body">{t('owner:verify.invalidLine')}</p>
+      <p className="text-text-body">{t('payslip:verifyPage.invalidLine')}</p>
     </div>
   );
 }
@@ -100,25 +100,25 @@ function Invalid() {
 function Result({ v }: { v: PayslipVerify }) {
   const { t } = useTranslation();
   const rows: [string, ReactNode][] = [
-    [t('owner:verify.name'), v.staffName],
-    [t('owner:verify.month'), v.month ? monthLabel(v.month) : null],
-    [t('owner:verify.net'), v.netPaise !== null ? money(v.netPaise) : null],
-    [t('owner:verify.revision'), v.revision],
+    [t('payslip:verifyPage.name'), v.staffName],
+    [t('payslip:verifyPage.month'), v.month ? monthLabel(v.month) : null],
+    [t('payslip:verifyPage.net'), v.netPaise !== null ? money(v.netPaise) : null],
+    [t('payslip:verifyPage.revision'), v.revision],
   ];
   return (
     <div className="grid gap-4" data-testid="verify-result">
       <div className="grid gap-2">
         <div>
           {v.superseded ? (
-            <StatusChip status="flag" label={t('owner:verify.superseded')} />
+            <StatusChip status="flag" label={t('payslip:verifyPage.superseded')} />
           ) : (
-            <StatusChip status="present" label={t('owner:verify.valid')} />
+            <StatusChip status="present" label={t('payslip:verifyPage.valid')} />
           )}
         </div>
         <p className="text-text-body">
           {v.superseded
-            ? t('owner:verify.supersededLine')
-            : t('owner:verify.validLine', { org: v.orgName ?? '' })}
+            ? t('payslip:verifyPage.supersededLine')
+            : t('payslip:verifyPage.validLine', { org: v.orgName ?? '' })}
         </p>
       </div>
       <dl className="grid border-border border-t">

@@ -64,5 +64,22 @@
     "otherDeductions": "Other deductions",
     "paidOn": "Paid on",
     "total": "Total"
+  },
+  "verifyPage": {
+    "title": "Payslip check",
+    "valid": "Valid",
+    "validLine": "This payslip was issued by {{org}}.",
+    "name": "Staff",
+    "month": "Month",
+    "net": "Net pay",
+    "revision": "Revision",
+    "superseded": "Replaced by a newer revision",
+    "supersededLine": "This payslip was replaced. Ask for the latest one.",
+    "invalid": "This payslip link isn't valid.",
+    "invalidLine": "Check the link, or ask the salon for a new payslip.",
+    "footer": "Checked with Feelings Staff.",
+    "network": "We couldn't reach the server. Check your internet and try again.",
+    "retry": "Try again",
+    "loading": "Loading"
   }
 }

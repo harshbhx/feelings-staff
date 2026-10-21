@@ -1,6 +1,7 @@
 /** Header bell with the unread count (PRD 5, S-15). Owner: WP-8. Kept tiny: it is in every shell header, so the initial bundle; the screen is `./screen`, a lazy chunk. */
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
+import { STAFF_ONLY } from '../../lib/surface';
 import { useRefetchOnPush, useUnreadCount } from './hooks';
 
 /** Header bell with the unread count. Shells render it; the route depends on the area (/o or staff). */
@@ -9,7 +10,11 @@ export function InboxBell() {
   const { pathname } = useLocation();
   const count = useUnreadCount();
   useRefetchOnPush();
-  const to = pathname === '/o' || pathname.startsWith('/o/') ? '/o/inbox' : '/inbox';
+  const to = STAFF_ONLY
+    ? '/inbox'
+    : pathname === '/o' || pathname.startsWith('/o/')
+      ? '/o/inbox'
+      : '/inbox';
   const label = count > 0 ? t('inbox.bellUnread', { count }) : t('inbox.bell');
   return (
     <Link
