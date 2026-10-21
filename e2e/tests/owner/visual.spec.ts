@@ -140,7 +140,7 @@ test.describe('owner visual', () => {
     test.skip(info.project.name !== 'owner-phone', 'the toggle is a phone control');
     await openOwner(page, '/o/register');
     await expect(shown(page, 'Priya Solanki')).toBeVisible();
-    await page.locator('#owner-main').getByText('Month grid', { exact: true }).click();
+    await page.locator('#owner-main').getByRole('radio', { name: 'Month grid' }).check();
     await expect(page.locator('#owner-main table')).toBeVisible();
     await noCrash(page);
     await expect(page).toHaveScreenshot('owner-register-month.png', { fullPage: true });
