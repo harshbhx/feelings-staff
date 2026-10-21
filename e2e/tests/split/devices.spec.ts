@@ -4,29 +4,15 @@
  * context with its own virtual authenticator. Screenshots of the code screen and the approval card are
  * attached to the report.
  */
-import type { Browser, BrowserContext, Page } from '@playwright/test';
 import { expect, test } from '../../fixtures';
-import { enrolFirstDevice, OWNER, shot, virtualAuthenticator } from './owner-kit';
-
-/** The new device: a separate browser (no cookies, its own authenticator) on "Add this device". */
-async function newDevice(browser: Browser): Promise<{ context: BrowserContext; page: Page }> {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  const page = await context.newPage();
-  await virtualAuthenticator(page);
-  await page.goto(`http://${OWNER}/auth/owner`);
-  await page.getByRole('button', { name: 'Add this device' }).click();
-  await expect(page).toHaveURL(/\/auth\/owner\/add/);
-  return { context, page };
-}
-
-/** The code the new device shows ("482 913" on screen). */
-async function codeOn(page: Page): Promise<string> {
-  const card = page.getByTestId('device-code');
-  await expect(card).toContainText(/\d{3} \d{3}/);
-  const m = (await card.textContent())?.match(/(\d{3}) (\d{3})/);
-  if (!m) throw new Error('no code on the new device');
-  return `${m[1]} ${m[2]}`;
-}
+import {
+  codeOn,
+  enrolFirstDevice,
+  newDevice,
+  OWNER,
+  shot,
+  virtualAuthenticator,
+} from './owner-kit';
 
 test.describe('SPLIT-4 owner devices', () => {
   test('SPLIT-4.1 a new device asks, the phone approves with fingerprint and PIN, the new device enrols', async ({

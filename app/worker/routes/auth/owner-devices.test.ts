@@ -3,7 +3,8 @@
  * device, the approval card on an approved device (fingerprint on that device plus the owner PIN), the
  * single-use enrolment token, expiry and decline, and the replays: token reuse, an expired or declined
  * request, a wrong token ("code"), and an answer from a removed credential. The browser side is the
- * software authenticator in test/webauthn.ts.
+ * software authenticator in test/webauthn.ts. SD-1 (slice 6): the device list and Remove in Settings,
+ * Security (flow 4): fingerprint plus PIN, never the last device, the removed device signed out.
  */
 import type {
   Me,
@@ -614,5 +615,188 @@ describe('DA-3 the new device creates its passkey with the token', () => {
     // Neither token was used up by the refused try.
     expect((await requestRow(request.id))?.used_at).toBeNull();
     expect((await requestRow(other.body.id))?.used_at).toBeNull();
+  });
+});
+
+describe('SD-1 Settings, Security: the device list and Remove (slice 6)', () => {
+  /** The phone, and a laptop approved and enrolled a minute later; both have a passkey session. */
+  async function twoDevices() {
+    const { first, request } = await approvedRequest();
+    now += MIN;
+    const auth = await authenticator();
+    const r = await enrolWithToken(request.enrolToken, auth);
+    expect(r.status).toBe(201);
+    if (!r.cookie) throw new Error('no laptop session');
+    return { phone: first, laptop: { auth, cookie: r.cookie, device: r.body.device } };
+  }
+
+  function remove(
+    id: string,
+    cookie: string,
+    answer: { challengeId: string; credential: unknown },
+  ) {
+    return req<OwnerDeviceList>(`/owner/security/devices/${id}/remove`, { body: answer, cookie });
+  }
+
+  it('SD-1.1 every approved device: name, platform, added, last used, "This device"', async () => {
+    const { phone, laptop } = await twoDevices();
+    const list = await req<OwnerDeviceList>('/owner/security/devices', { cookie: phone.cookie });
+    expect(list.status).toBe(200);
+    expect(list.body.devices).toEqual([
+      {
+        id: phone.device.id,
+        deviceName: "Urmi's iPhone",
+        platform: 'ios',
+        createdAt: START,
+        lastUsedAt: START,
+        current: true,
+      },
+      {
+        id: laptop.device.id,
+        deviceName: "Urmi's laptop",
+        platform: 'desktop',
+        createdAt: START + MIN,
+        lastUsedAt: START + MIN,
+        current: false,
+      },
+    ]);
+    const fromLaptop = await req<OwnerDeviceList>('/owner/security/devices', {
+      cookie: laptop.cookie,
+    });
+    expect(fromLaptop.body.devices.map((d) => d.current)).toEqual([false, true]);
+  });
+
+  it('SD-1.2 Remove takes the fingerprint on this device and the PIN, and signs that device out', async () => {
+    const { phone, laptop } = await twoDevices();
+    now = START + 11 * MIN;
+    const answer = await confirm(phone.cookie, phone.auth);
+    const noPin = await remove(laptop.device.id, phone.cookie, answer);
+    expect(noPin.code).toBe('STEP_UP_REQUIRED');
+    await pin(phone.cookie);
+    const r = await remove(laptop.device.id, phone.cookie, answer);
+    expect(r.status, JSON.stringify(r.body)).toBe(200);
+    expect(r.body.devices.map((d) => [d.id, d.current])).toEqual([[phone.device.id, true]]);
+    const row = await db(
+      'SELECT removed_at, removed_by FROM owner_passkeys WHERE id = ?1',
+      laptop.device.id,
+    ).first<{ removed_at: number; removed_by: string }>();
+    expect(row).toEqual({ removed_at: START + 11 * MIN, removed_by: s.ownerId });
+    const sessions = await db(
+      'SELECT revoked_at FROM sessions WHERE passkey_id = ?1',
+      laptop.device.id,
+    ).all<{ revoked_at: number | null }>();
+    expect(sessions.results.map((x) => x.revoked_at)).toEqual([START + 11 * MIN]);
+    expect((await req('/me', { cookie: laptop.cookie })).status).toBe(401);
+    expect((await req('/me', { cookie: phone.cookie })).status).toBe(200);
+    // The removed passkey no longer signs in.
+    const opts = await req<OwnerPasskeyOptions>('/auth/owner/passkey/options', {
+      body: { purpose: 'signin' },
+    });
+    const signIn = await req('/auth/owner/passkey/verify', {
+      body: {
+        challengeId: opts.body.challengeId,
+        credential: await laptop.auth.assert(opts.body.options),
+      },
+    });
+    expect(signIn.status).toBe(401);
+    const rows = await audit('owner_passkey');
+    expect(rows.map((x) => x.action).at(-1)).toBe('owner.device_removed');
+    expect(rows.at(-1)?.after_json).toContain("Urmi's iPhone");
+  });
+
+  it('SD-1.3 the last device cannot be removed, and the fingerprint is not used up', async () => {
+    const first = await firstDevice();
+    await pin(first.cookie);
+    const answer = await confirm(first.cookie, first.auth);
+    const r = await remove(first.device.id, first.cookie, answer);
+    expect(r.status).toBe(422);
+    expect(r.reason).toBe('last_device');
+    const challenge = await db(
+      'SELECT used_at FROM owner_passkey_challenges WHERE id = ?1',
+      answer.challengeId,
+    ).first<{ used_at: number | null }>();
+    expect(challenge?.used_at).toBeNull();
+    expect(
+      (await req<OwnerDeviceList>('/owner/security/devices', { cookie: first.cookie })).body
+        .devices,
+    ).toHaveLength(1);
+  });
+
+  it('SD-1.4 the answer must come from the passkey of this device, for a confirm challenge of this session', async () => {
+    const { phone, laptop } = await twoDevices();
+    await pin(laptop.cookie);
+    // The laptop's passkey answering the phone's challenge.
+    const opts = await req<OwnerPasskeyOptions>('/auth/owner/passkey/options', {
+      body: { purpose: 'confirm' },
+      cookie: phone.cookie,
+    });
+    const other = await remove(laptop.device.id, phone.cookie, {
+      challengeId: opts.body.challengeId,
+      credential: await laptop.auth.assert(opts.body.options),
+    });
+    expect(other.status).toBe(401);
+    expect(other.code).toBe('SIGNATURE_INVALID');
+    // A sign-in challenge does not remove.
+    const signin = await req<OwnerPasskeyOptions>('/auth/owner/passkey/options', {
+      body: { purpose: 'signin' },
+    });
+    const viaSignin = await remove(laptop.device.id, phone.cookie, {
+      challengeId: signin.body.challengeId,
+      credential: await phone.auth.assert(signin.body.options),
+    });
+    expect(viaSignin.code).toBe('NONCE_INVALID');
+    // The phone's challenge and answer sent from the laptop's session.
+    const stolen = await confirm(phone.cookie, phone.auth);
+    expect((await remove(phone.device.id, laptop.cookie, stolen)).code).toBe('NONCE_INVALID');
+    const live = await db(
+      'SELECT COUNT(*) AS n FROM owner_passkeys WHERE removed_at IS NULL',
+    ).first<{
+      n: number;
+    }>();
+    expect(live?.n).toBe(2);
+  });
+
+  it('SD-1.5 removing this device itself signs this browser out; then the other is the last', async () => {
+    const { phone, laptop } = await twoDevices();
+    await pin(laptop.cookie);
+    const r = await remove(
+      laptop.device.id,
+      laptop.cookie,
+      await confirm(laptop.cookie, laptop.auth),
+    );
+    expect(r.status).toBe(200);
+    expect(r.body.devices.map((d) => [d.id, d.current])).toEqual([[phone.device.id, false]]);
+    expect((await req('/me', { cookie: laptop.cookie })).status).toBe(401);
+    expect((await req('/me', { cookie: phone.cookie })).status).toBe(200);
+    const last = await remove(
+      phone.device.id,
+      phone.cookie,
+      await confirm(phone.cookie, phone.auth),
+    );
+    expect(last.status).toBe(422);
+    expect(last.reason).toBe('last_device');
+  });
+
+  it('SD-1.6 an unknown or removed device is not found', async () => {
+    const { phone, laptop } = await twoDevices();
+    await db(
+      'UPDATE owner_passkeys SET removed_at = ?1 WHERE id = ?2',
+      now,
+      laptop.device.id,
+    ).run();
+    const gone = await remove(
+      laptop.device.id,
+      phone.cookie,
+      await confirm(phone.cookie, phone.auth),
+    );
+    expect(gone.status).toBe(404);
+    const unknown = await remove(NO_ID, phone.cookie, await confirm(phone.cookie, phone.auth));
+    expect(unknown.status).toBe(404);
+    const rename = await req(`/owner/security/devices/${laptop.device.id}`, {
+      method: 'PATCH',
+      body: { deviceName: 'Old laptop' },
+      cookie: phone.cookie,
+    });
+    expect(rename.status).toBe(404);
   });
 });

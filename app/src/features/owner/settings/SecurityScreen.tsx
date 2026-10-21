@@ -1,17 +1,20 @@
 /**
  * Security (PRD 4.1.7, 4.17, 10.3): the sign-in email, the password (with the owner PIN, as the
  * fallback when the email link can't arrive), the owner PIN that unlocks payroll, salary and device
- * changes for 10 minutes, the signed-in devices, and "Sign out other devices".
+ * changes for 10 minutes, the signed-in devices, and "Sign out other devices". On the owner host also
+ * the passkey devices (OwnerDevicesSection).
  */
 import { isApiError } from '@fs/contracts';
 import { Button, Field, Input, List, ListRow, Sheet, StatusChip, useToast } from '@fs/ui';
 import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { OWNER_ONLY } from '../../../lib/surface';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { useSecurity, useSetPassword, useSetPin, useSignOutOthers } from '../api/settings';
 import { Meta, Section } from '../components/layout';
 import { QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { clock, shortDate, todayIst } from '../lib/format';
+import { OwnerDevicesSection } from './OwnerDevicesSection';
 
 const PIN_RE = /^\d{6}$/;
 
@@ -42,6 +45,8 @@ export function SecurityScreen() {
           </Section>
           <PinForm pinSet={s.pinSet} />
           <PasswordForm passwordSet={s.passwordSet} pinSet={s.pinSet} />
+          {/* Passkey devices: owner host only (docs/owner-access.md flow 4). */}
+          {OWNER_ONLY ? <OwnerDevicesSection /> : null}
           <Section title={t('owner:security.sessions')}>
             <List>
               {s.sessions.map((x) => (
