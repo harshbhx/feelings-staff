@@ -65,6 +65,8 @@ function ownerOnlyNames() {
   const owner = walk(join(src, 'features/owner'));
   const rest = walk(src).filter((f) => !f.includes('/features/owner/'));
   const others = names(rest);
+  // A module named like a folder elsewhere (features/staff/presence) is not owner-only either.
+  for (const f of rest) for (const part of f.split('/')) others.add(part.replace(/\.tsx?$/, ''));
   // Generic names (index, routes, ...) are shared by many chunks; only distinctive ones count.
   return [...names(owner)].filter((n) => !others.has(n) && n.length >= 8);
 }
@@ -74,7 +76,8 @@ const CONTENT = [
   ['owner route table', /ownerRoutes|ownerAuthRoutes/],
   ['owner sign-in screen', /OwnerSignIn/],
   ['owner source path', /features\/owner/],
-  ['auth/owner path', /auth\/owner/],
+  // `path:"/auth/owner/..."` is the shared API endpoint table (the Worker answers it on the owner host only).
+  ['auth/owner path', /(?<!\bp(?:ath)?:["'`]\/)auth\/owner/],
   ['/o path', /["'`]\/o(?:["'`/?])/],
   ['owner i18n namespace', /["'`]owner:[A-Za-z]/],
   ['owner catalog file', /(?:en|gu)\/owner\.json/],

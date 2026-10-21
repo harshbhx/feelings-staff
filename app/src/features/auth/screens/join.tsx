@@ -325,10 +325,9 @@ function JoinFlow() {
       </div>
     ) : null;
 
-  const footer =
-    step === 'details' && !STAFF_ONLY ? (
-      <TextLink to="/auth/owner">{t('auth:common.ownerSignIn')}</TextLink>
-    ) : undefined;
+  const footer = STAFF_ONLY ? undefined : step === 'details' ? (
+    <TextLink to="/auth/owner">{t('auth:common.ownerSignIn')}</TextLink>
+  ) : undefined;
 
   return (
     <AuthScreen footer={footer} busy={busy}>

@@ -88,28 +88,10 @@ export function stagePublicDir(surface: 'staff' | 'owner', publicDir: string): s
   return out;
 }
 
-/** Client route table entries of owner endpoints (`/owner/...`, `/auth/owner/...`), one per line. */
-const OWNER_ROUTE_LINE = /^[ \t]+\w+: \{[^\n]*p: '\/(?:auth\/)?owner[/']?[^\n]*\},?\r?\n/gm;
-
-/**
- * The staff build knows no owner endpoint: its copy of the generated client route table
- * (`src/api/routes.gen.ts`) is filtered. The Worker keeps answering them on the owner host only.
- */
-export function staffRoutes(): Plugin {
-  return {
-    name: 'fs:staff-routes',
-    enforce: 'pre',
-    transform(code, id) {
-      if (!id.split('?')[0]?.endsWith('/src/api/routes.gen.ts')) return null;
-      return { code: code.replace(OWNER_ROUTE_LINE, ''), map: null };
-    },
-  };
-}
-
 /** The module that starts each build, and the owner page's own title and description. */
 const ENTRY = { staff: '/src/main.staff.tsx', owner: '/src/main.owner.tsx' } as const;
 
-/** Plugins of a split build: the page entry (and the owner page's own text) and, for staff, the filtered route table. */
+/** Plugins of a split build: the page entry and the public files, with the owner page's own text. */
 export function splitPlugins(surface: 'staff' | 'owner', publicDir: string): Plugin[] {
   const entry: Plugin = {
     name: 'fs:split-entry',
@@ -134,5 +116,5 @@ export function splitPlugins(surface: 'staff' | 'owner', publicDir: string): Plu
       },
     },
   };
-  return surface === 'staff' ? [entry, staffRoutes()] : [entry];
+  return [entry];
 }

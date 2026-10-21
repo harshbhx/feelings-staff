@@ -17,6 +17,8 @@ export function safeNext(raw: string | null | undefined): string | null {
 
 /** Owners and managers live under /o; staff everywhere else (PRD 5). */
 export function nextFitsRole(next: string, role: 'owner' | 'manager' | 'staff'): boolean {
-  const owner = !STAFF_ONLY && (next === '/o' || next.startsWith('/o/') || next.startsWith('/o?'));
+  const owner = STAFF_ONLY
+    ? false
+    : next === '/o' || next.startsWith('/o/') || next.startsWith('/o?');
   return role === 'staff' ? !owner : owner;
 }

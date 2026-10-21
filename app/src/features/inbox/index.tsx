@@ -10,8 +10,11 @@ export function InboxBell() {
   const { pathname } = useLocation();
   const count = useUnreadCount();
   useRefetchOnPush();
-  const owner = !STAFF_ONLY && (pathname === '/o' || pathname.startsWith('/o/'));
-  const to = owner ? '/o/inbox' : '/inbox';
+  const to = STAFF_ONLY
+    ? '/inbox'
+    : pathname === '/o' || pathname.startsWith('/o/')
+      ? '/o/inbox'
+      : '/inbox';
   const label = count > 0 ? t('inbox.bellUnread', { count }) : t('inbox.bell');
   return (
     <Link
