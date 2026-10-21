@@ -102,7 +102,7 @@ Open **Staff**, then the person:
 
 - At the top, counters: **Present, Late, Not in yet, On leave, Week off, At a venue**. Tap one to filter.
 - **Needs action** shows how many things are waiting.
-- **Who's in**: name, time in, "+18 m" if late, a place badge (Inside, Edge, Venue) and hours so far.
+- **Who's in**: name, then one line with the time in, hours so far and where the check-in was ("Inside the salon", "At the edge of the salon area"), and one status on the right. The status is the most important thing about that person: "Waiting for you" or "Needs a look" when you have to decide, else "+18 m" if she was late, else the venue, else "On time". Anything else (for example "21 min late" on a check-in that waits for you) is in the line under the name.
 - **Not in yet**: who should be here and is not, with **Call** and **WhatsApp** buttons.
 - **Checked out**: who has gone home.
 

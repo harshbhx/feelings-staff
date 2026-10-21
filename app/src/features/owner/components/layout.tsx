@@ -43,19 +43,37 @@ export function Meta({ children, className }: { children: ReactNode; className?:
 }
 
 /**
- * "Stylist · FBC-003 · 98250 11201": a line may break between the parts, never inside a code or a
- * phone number, and the dot stays at the end of a line, never the start of the next.
+ * One part of a quiet line: a string, or a node with a key (a word set in bold, free text that may
+ * wrap inside itself with `wrap`).
  */
-export function NoBreakParts({ parts }: { parts: readonly (string | null | undefined)[] }) {
-  const shown = parts.filter((p): p is string => Boolean(p));
+export type LinePart =
+  | string
+  | { key: string; node: ReactNode; wrap?: boolean | undefined }
+  | null
+  | undefined
+  | false;
+
+/**
+ * "Stylist · FBC-003 · 98250 11201": a line may break between the parts, never inside a code or a
+ * phone number, and the dot stays at the end of a line, never the start of the next. Each part is
+ * its own element, so the words can be found without the dot.
+ */
+export function NoBreakParts({ parts }: { parts: readonly LinePart[] }) {
+  const shown = parts.filter((p): p is Exclude<LinePart, null | undefined | false> => Boolean(p));
   return (
     <>
-      {shown.map((p, i) => (
-        <span key={p}>
-          <span className="whitespace-nowrap">{i < shown.length - 1 ? `${p} ·` : p}</span>
-          {i < shown.length - 1 ? ' ' : null}
-        </span>
-      ))}
+      {shown.map((p, i) => {
+        const last = i === shown.length - 1;
+        return (
+          <span key={typeof p === 'string' ? p : p.key}>
+            <span className={typeof p !== 'string' && p.wrap ? undefined : 'whitespace-nowrap'}>
+              <span>{typeof p === 'string' ? p : p.node}</span>
+              {last ? null : ' ·'}
+            </span>
+            {last ? null : ' '}
+          </span>
+        );
+      })}
     </>
   );
 }

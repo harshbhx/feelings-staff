@@ -8,6 +8,7 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ### Changed
 
+- Owner Today rows show one status each, picked by importance: "Waiting for you" or "Needs a look" first, then late as the minutes ("+28 m"), then the venue, then "On time". What lost the pick (the late minutes on a check-in that waits for you) and where the check-in was ("Inside the salon", "At the edge of the salon area") are words in the line under the name, no longer extra chips. Away now and roll-call rows do the same with the reason and the hints. For developers: `ROW_STATUS_PRIORITY` and `rowStatus` in `app/src/features/owner/lib/status.ts`, tested for every pair.
 - Register on a phone is a person-first list: one row per person with the last seven days as 36 px cells and the full name on one line; a "Month grid" toggle keeps the table (96 px name column, 40 px cells). Late days show the minutes (`+28`, `+1h`) on the late tint and cells drop the icon. On desktop the Register has a panel for the selected day (status, punches, source, note, Fix this day), the summary is one line and the key opens from a popover.
 
 ### Added

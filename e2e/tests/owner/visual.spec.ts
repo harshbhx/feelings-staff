@@ -173,6 +173,41 @@ test.describe('owner visual', () => {
     await expect(page).toHaveScreenshot('owner-today-early.png', { fullPage: true });
   });
 
+  test('OWN-V Fix 2: one status chip per row, late as minutes, the rest in the quiet line', async ({
+    page,
+  }) => {
+    for (const [path, name] of [
+      ['/o/today', 'Neha Parmar'],
+      ['/o/staff', 'Priya Solanki'],
+      ['/o/credits', 'Neha Parmar'],
+    ] as const) {
+      await openOwner(page, path);
+      await expect(
+        page.locator('#owner-main .fs-list__item', { hasText: name }).first(),
+      ).toBeAttached();
+      const rows = page.locator('#owner-main .fs-list__item');
+      const n = await rows.count();
+      expect(n, path).toBeGreaterThan(0);
+      for (let i = 0; i < n; i += 1)
+        expect(
+          await rows.nth(i).locator('.fs-status').count(),
+          `${path} row ${i}`,
+        ).toBeLessThanOrEqual(1);
+    }
+    await openOwner(page, '/o/today');
+    const row = (name: string) => page.locator('#owner-main .fs-list__item', { hasText: name });
+    // Neha is 28 min late and inside: the chip is the minutes, the place is words.
+    await expect(row('Neha Parmar').locator('.fs-status')).toContainText('+28 m');
+    await expect(row('Neha Parmar').locator('.fs-status')).toContainText('Late by 28 min');
+    await expect(row('Neha Parmar')).toContainText('Inside the salon');
+    // Sejal is late, at the edge and waiting for the owner: waiting wins, late moves to the line.
+    await expect(row('Sejal Makwana').locator('.fs-status')).toHaveText('Waiting for you');
+    await expect(row('Sejal Makwana')).toContainText('21 min late');
+    await expect(row('Sejal Makwana')).toContainText('At the edge of the salon area');
+    await expect(row('Jinal Kotak').locator('.fs-status')).toHaveText('Needs a look');
+    await expect(row('Pooja Bhatt').locator('.fs-status')).toHaveText('On time');
+  });
+
   test('OWN-V actions: all clear', async ({ page, checkA11y }) => {
     await openOwner(page, '/o/actions', ['ownerActions:empty']);
     await expect(page.getByTestId('owner-empty')).toBeVisible();
