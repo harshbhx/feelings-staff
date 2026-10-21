@@ -261,14 +261,23 @@ test.describe('E2E-27 edit everything', () => {
       settings.some((r) => json(r.before).includes('15:00') && json(r.after).includes('15:30')),
       'the roll-call time change is audited old to new',
     ).toBe(true);
-    const awayEdits = byAction('presence.away.edit');
-    expect(awayEdits.length).toBeGreaterThanOrEqual(3);
-    const startEdit = awayEdits.find((r) => json(r.after).includes(`"startTs":${at('15:40')}`));
+    const awayEdits = byAction('presence.away');
+    const startEdit = awayEdits.find(
+      (r) =>
+        r.action === 'presence.away.edit' && json(r.after).includes(`"startTs":${at('15:40')}`),
+    );
+    expect(startEdit, 'the start and end edit is audited').toBeTruthy();
     expect(json(startEdit?.before)).toContain(`"startTs":${at('15:30')}`);
+    expect(json(startEdit?.before)).toContain('"minutes":40');
+    expect(json(startEdit?.after)).toContain('"minutes":25');
     expect(startEdit?.reason).toBe('She left at 15:40 and was back at 16:05');
-    const workEdit = awayEdits.find((r) => r.reason === 'It was an errand for the salon');
-    expect(json(workEdit?.before)).toContain('confirmed');
-    expect(json(workEdit?.after)).toContain('work');
+    const workEdit = awayEdits.find((r) => r.action === 'presence.away.work');
+    expect(json(workEdit?.before)).toContain('"state":"confirmed"');
+    expect(json(workEdit?.after)).toContain('"state":"work"');
+    expect(workEdit?.reason).toBe('It was an errand for the salon');
+    const countedAgain = awayEdits.find((r) => r.action === 'presence.away.confirm');
+    expect(json(countedAgain?.before)).toContain('"state":"work"');
+    expect(countedAgain?.reason).toBe('It was lunch after all');
     const adjAudit = byAction('credits.adjust');
     expect(adjAudit.map((r) => r.reason)).toEqual(
       expect.arrayContaining(['Excused 10 minutes', 'Excused 15 minutes, not 10']),
