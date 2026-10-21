@@ -46,7 +46,9 @@ test.describe('SPLIT-5 owner devices in Settings, Security', () => {
       .getByRole('dialog')
       .getByLabel('Owner PIN')
       .fill(s.owner.pin ?? '');
-    await expect(page.getByText('Approved. Finish on the new device.')).toBeVisible();
+    await expect(
+      page.getByText('Approved. Finish on the new device.', { exact: true }),
+    ).toBeVisible();
     await laptop.page.getByRole('button', { name: 'Make this phone your key' }).click({
       timeout: 15_000,
     });
@@ -68,7 +70,9 @@ test.describe('SPLIT-5 owner devices in Settings, Security', () => {
     // Remove it: the fingerprint on the phone (the PIN from the approval still counts, 10 minutes).
     await section.getByRole('button', { name: 'Remove Old laptop' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Remove', exact: true }).click();
-    await expect(page.getByText('Removed. That device is signed out.')).toBeVisible();
+    await expect(
+      page.getByText('Removed. That device is signed out.', { exact: true }),
+    ).toBeVisible();
     await expect(section.getByRole('listitem')).toHaveCount(1);
     await expect(section.getByRole('button', { name: 'Remove Front desk phone' })).toBeDisabled();
 
