@@ -3,9 +3,13 @@ import { fixtures } from '@fs/contracts/fixtures';
 import { describe, expect, it } from 'vitest';
 import {
   cellDetail,
+  cellMark,
   cellModel,
+  defaultSelection,
+  lateText,
   monthNav,
   monthTotals,
+  shortName,
   stripIndexFor,
   TOTAL_COLUMNS,
   totalValue,
@@ -83,5 +87,41 @@ describe('Register model (O-05)', () => {
       const expected = view.rows.reduce((n, r) => n + totalValue(r, c), 0);
       expect(sum[c]).toBeCloseTo(expected, 5);
     }
+  });
+});
+
+describe('Register cells and selection (redesign slice 7)', () => {
+  it('late shows minutes (+28) under an hour and whole hours (+1h) from 60 minutes', () => {
+    expect(lateText(28)).toBe('+28');
+    expect(lateText(59)).toBe('+59');
+    expect(lateText(60)).toBe('+1h');
+    expect(lateText(135)).toBe('+2h');
+  });
+
+  it('a late present day reads as minutes on the late tint; others keep their letter', () => {
+    const base = view.rows.flatMap((r) => r.cells).find((c) => !c.future && c.status === 'P');
+    if (!base) throw new Error('fixture has a present day');
+    const late = cellMark(cellModel('2026-10-19', { ...base, tags: ['late'], lateMin: 28 }));
+    expect(late).toEqual({ text: '+28', tone: 'late' });
+    const ontime = cellMark(cellModel('2026-10-19', { ...base, tags: [], lateMin: 0 }));
+    expect(ontime).toEqual({ text: 'P', tone: 'present' });
+    const half = cellMark(cellModel('2026-10-19', { ...base, status: 'H', tags: [], lateMin: 0 }));
+    expect(half?.text).toBe('H');
+    expect(cellMark(cellModel('2026-10-19', { ...base, future: true }))).toBeNull();
+  });
+
+  it('the first column shows the first name and the last initial', () => {
+    expect(shortName('Meena Chavda')).toBe('Meena C.');
+    expect(shortName('Priya')).toBe('Priya');
+    expect(shortName('Anita Kumari Shah')).toBe('Anita S.');
+  });
+
+  it('the desktop panel opens on today and the first person who needs a look', () => {
+    const sel = defaultSelection(view, '2026-10-19');
+    expect(sel?.date).toBe('2026-10-19');
+    const r = view.rows.find((x) => x.user.id === sel?.userId);
+    expect(r).toBeTruthy();
+    const empty = { ...view, rows: [] } as RegisterView;
+    expect(defaultSelection(empty, '2026-10-19')).toBeNull();
   });
 });

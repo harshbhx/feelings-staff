@@ -1,42 +1,73 @@
 /**
- * Register (PRD 5.2, O-05). One real table on every size: staff x days, sticky header row and first
- * column, each cell a letter + icon + tint linking to the day, row totals from the engine, arrow
- * keys move between cells. Future days stay narrow and the grid opens scrolled to today, so a phone
- * shows the last week for everyone at once (WP-10). A month summary sits on top; on a phone a name
- * opens that person's month as week strips.
+ * Register (PRD 5.2, O-05). Phone: a person-first list, one row per person with this week as a
+ * strip of seven 36 px cells (a "Month grid" toggle keeps the full table, 96 px first column,
+ * 40 px cells). Desktop: the table (36 px cells, sticky header and first column) beside a panel for
+ * the selected person and day. Cells carry a letter, or late minutes, on a tint, with no icon
+ * (PRD 12.3 amendment); the icon and the word live in the key, the panel and the day screen. Arrow
+ * keys move between cells. A month summary is one line; the key opens from a popover.
  */
 import type { RegisterView } from '@fs/contracts';
-import { istDate, weekday } from '@fs/contracts';
+import { istDate, istTime, weekday } from '@fs/contracts';
 import {
   Badge,
   Banner,
   Button,
+  ChipGroup,
   Icon,
   IconButton,
+  Popover,
   Skeleton,
   SkeletonGroup,
   StatusChip,
 } from '@fs/ui';
-import { type KeyboardEvent, useLayoutEffect, useRef, useState } from 'react';
+import {
+  type KeyboardEvent,
+  type MouseEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
-import { useRegister } from '../api/attendance';
+import { useOwnerDay, useRegister } from '../api/attendance';
+import { Meta, Tag } from '../components/layout';
 import { Empty, QueryView } from '../components/states';
-import { dayLabel, days, monthLabel } from '../lib/format';
-import { CHIP_ICON, type ChipStatus, LATE_META, TINT } from '../lib/status';
+import { dayLabel, days, longDate, monthLabel } from '../lib/format';
+import { CHIP_ICON, type ChipStatus, dayStatusMeta, LATE_META, TINT } from '../lib/status';
 import { useOwnerTitle } from '../shell/chrome';
 import {
   type CellModel,
   cellDetail,
+  cellMark,
   cellModel,
+  defaultSelection,
+  lateText,
   monthNav,
   monthTotals,
   type RegisterRow,
+  type Selection,
+  shortName,
+  stripIndexFor,
   TOTAL_COLUMNS,
   type TotalColumn,
   totalValue,
   weekStrips,
 } from './register-model';
+
+/** Tailwind `xl`: the two-column layout with the day panel. */
+const DESKTOP = '(min-width: 1280px)';
+function useDesktop(): boolean {
+  return useSyncExternalStore(
+    (notify) => {
+      const q = window.matchMedia?.(DESKTOP);
+      q?.addEventListener('change', notify);
+      return () => q?.removeEventListener('change', notify);
+    },
+    () => window.matchMedia?.(DESKTOP).matches ?? false,
+    () => false,
+  );
+}
 
 export function RegisterScreen() {
   const { t } = useTranslation();
@@ -58,22 +89,36 @@ export function RegisterScreen() {
   };
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
-      <div className="flex items-center gap-2">
-        <IconButton
-          icon="caret-left"
-          label={t('owner:register.prevMonth')}
-          onClick={() => go(nav.prev)}
-        />
-        <h2 className="min-w-44 text-center font-bold text-lg text-text" aria-live="polite">
-          {monthLabel(month)}
-        </h2>
-        <IconButton
-          icon="caret-right"
-          label={t('owner:register.nextMonth')}
-          onClick={() => nav.next && go(nav.next)}
-          disabled={!nav.next}
-        />
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1">
+          <IconButton
+            icon="caret-left"
+            label={t('owner:register.prevMonth')}
+            onClick={() => go(nav.prev)}
+          />
+          <h2 className="min-w-40 text-center font-bold text-lg text-text" aria-live="polite">
+            {monthLabel(month)}
+          </h2>
+          <IconButton
+            icon="caret-right"
+            label={t('owner:register.nextMonth')}
+            onClick={() => nav.next && go(nav.next)}
+            disabled={!nav.next}
+          />
+        </div>
+        <Popover
+          align="end"
+          aria-label={t('owner:register.legend')}
+          className="w-72"
+          trigger={
+            <Button size="sm" variant="secondary">
+              {t('owner:register.legend')}
+            </Button>
+          }
+        >
+          <Legend />
+        </Popover>
       </div>
       <QueryView
         query={query}
@@ -89,14 +134,51 @@ export function RegisterScreen() {
                 <PersonMonth view={view} userId={person} />
               </div>
             ) : null}
-            <div className={person ? 'hidden xl:grid xl:gap-5' : 'grid gap-5'}>
-              <MonthSummary view={view} />
-              <Grid view={view} today={today} />
+            <div className={person ? 'hidden xl:block' : 'block'}>
+              <Body view={view} today={today} />
             </div>
-            <Legend />
           </>
         )}
       </QueryView>
+    </div>
+  );
+}
+
+function Body({ view, today }: { view: RegisterView; today: string }) {
+  const { t } = useTranslation();
+  const desktop = useDesktop();
+  const [mode, setMode] = useState<'week' | 'month'>('week');
+  const [picked, setPicked] = useState<Selection | null>(null);
+  const valid =
+    picked !== null &&
+    view.rows.some((r) => r.user.id === picked.userId) &&
+    view.dates.includes(picked.date);
+  const sel = valid ? picked : defaultSelection(view, today);
+  const showGrid = desktop || mode === 'month';
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:items-start xl:gap-6">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3">
+        <MonthSummary view={view} />
+        {desktop ? null : (
+          <ChipGroup
+            legend={t('owner:register.viewLabel')}
+            legendHidden
+            layout="segmented"
+            value={mode}
+            onValueChange={(v) => setMode(v === 'month' ? 'month' : 'week')}
+            options={[
+              { value: 'week', label: t('owner:register.viewWeek') },
+              { value: 'month', label: t('owner:register.viewMonth') },
+            ]}
+          />
+        )}
+        {showGrid ? (
+          <Grid view={view} today={today} desktop={desktop} sel={sel} onSelect={setPicked} />
+        ) : (
+          <WeekList view={view} today={today} />
+        )}
+      </div>
+      {desktop && sel ? <DayPanel view={view} sel={sel} /> : null}
     </div>
   );
 }
@@ -113,23 +195,128 @@ function useCellText() {
   };
 }
 
-function CellMark({ c, size = 'grid' }: { c: CellModel; size?: 'grid' | 'strip' }) {
-  if (!c.meta) return null;
-  const chip: ChipStatus = c.meta.chip;
-  const icon = c.late && chip === 'present' ? CHIP_ICON[LATE_META.chip] : CHIP_ICON[chip];
+const MARK_SIZE = {
+  week: 'size-9 text-sm',
+  grid: 'size-10 text-xs xl:size-9',
+  strip: 'h-12 w-full text-sm',
+} as const;
+
+/** A day cell: letter or late minutes on the tint, no icon (PRD 12.3 amendment 2). */
+function CellMark({ c, size }: { c: CellModel; size: keyof typeof MARK_SIZE }) {
+  const m = cellMark(c);
+  if (!m) return null;
   return (
     <span
-      className={`grid place-items-center rounded-sm ${TINT[chip]} ${size === 'grid' ? 'h-11 w-9 content-center gap-0.5' : 'h-12 w-full content-center gap-0.5'}`}
+      className={`grid place-items-center rounded-sm font-bold tabular-nums leading-none ${TINT[m.tone]} ${MARK_SIZE[size]}`}
+      aria-hidden="true"
     >
-      <Icon name={icon} className={`size-3.5 ${c.late && chip === 'present' ? 'text-late' : ''}`} />
-      <span className="font-bold text-xs leading-none" aria-hidden="true">
-        {c.meta.letter}
-      </span>
+      {m.text}
     </span>
   );
 }
 
-function Grid({ view, today }: { view: RegisterView; today: string }) {
+function Dot({ c }: { c: CellModel }) {
+  return c.flagged || c.pending || c.edited ? (
+    <span
+      aria-hidden="true"
+      className="-top-0.5 -right-0.5 absolute size-2 rounded-full border border-bg bg-accent"
+    />
+  ) : null;
+}
+
+function WeekList({ view, today }: { view: RegisterView; today: string }) {
+  const { t } = useTranslation();
+  const cellText = useCellText();
+  const [params, setParams] = useSearchParams();
+  const strips = view.rows.map((row) => weekStrips(view, row));
+  const first = strips[0];
+  const idx = first ? stripIndexFor(first, today) : 0;
+  const head = first?.[idx];
+  const openPerson = (id: string) => {
+    const next = new URLSearchParams(params);
+    next.set('user', id);
+    setParams(next);
+  };
+  return (
+    <section
+      aria-label={t('owner:register.weekList', { date: head ? dayLabel(head.start) : '' })}
+      className="rounded-md border border-border bg-bg"
+    >
+      <div className="grid grid-cols-7 px-3 pt-2 pb-1" aria-hidden="true">
+        {(head?.days ?? []).map((d, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: seven fixed weekday slots
+          <span key={i} className="grid text-center text-text-muted text-xs leading-tight">
+            {d ? (
+              <>
+                <span className={d.date === today ? 'font-bold text-text' : 'font-semibold'}>
+                  {Number(d.date.slice(8))}
+                </span>
+                <span>{dayLabel(d.date).slice(0, 2)}</span>
+              </>
+            ) : null}
+          </span>
+        ))}
+      </div>
+      <ul>
+        {view.rows.map((row, r) => (
+          <li key={row.user.id} className="border-border border-t px-3 py-1">
+            <button
+              type="button"
+              onClick={() => openPerson(row.user.id)}
+              className="flex min-h-11 w-full items-center gap-2 rounded-sm text-left"
+            >
+              <span className="min-w-0 flex-1 truncate font-bold text-base text-text">
+                {row.user.name}
+              </span>
+              <Icon name="caret-right" className="size-4 shrink-0 text-text-muted" />
+              <span className="sr-only">{t('owner:register.openMonth')}</span>
+            </button>
+            <ol className="grid grid-cols-7">
+              {(strips[r]?.[idx]?.days ?? []).map((d, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: seven fixed weekday slots
+                <li key={i} className="grid place-items-center">
+                  {d?.meta ? (
+                    <Link
+                      to={`/o/register/${row.user.id}/${d.date}`}
+                      className="relative grid h-11 w-full place-items-center rounded-sm"
+                    >
+                      <span className="relative">
+                        <CellMark c={d} size="week" />
+                        <Dot c={d} />
+                      </span>
+                      <span className="sr-only">{cellText(row.user.name, d)}</span>
+                    </Link>
+                  ) : d ? (
+                    <span className="grid h-11 w-full place-items-center">
+                      <span className="size-9 rounded-sm border border-border border-dashed" />
+                      <span className="sr-only">{cellText(row.user.name, d)}</span>
+                    </span>
+                  ) : (
+                    <span className="h-11" aria-hidden="true" />
+                  )}
+                </li>
+              ))}
+            </ol>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function Grid({
+  view,
+  today,
+  desktop,
+  sel,
+  onSelect,
+}: {
+  view: RegisterView;
+  today: string;
+  desktop: boolean;
+  sel: Selection | null;
+  onSelect: (s: Selection) => void;
+}) {
   const { t } = useTranslation();
   const cellText = useCellText();
   const [focus, setFocus] = useState<[number, number]>([0, 0]);
@@ -192,7 +379,7 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
   return (
     <div
       ref={box}
-      className="relative overflow-auto rounded-md border border-border xl:max-h-[calc(100dvh-14rem)]"
+      className="relative overflow-auto rounded-md border border-border bg-bg xl:max-h-[calc(100dvh-16rem)]"
     >
       <table className="border-separate border-spacing-0 text-sm">
         <caption className="sr-only">
@@ -202,7 +389,7 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
           <tr>
             <th
               scope="col"
-              className="sticky top-0 left-0 z-30 w-30 min-w-30 border-border border-r border-b bg-bg px-3 py-2 text-left font-semibold text-text-muted text-xs xl:w-auto xl:min-w-44"
+              className="sticky top-0 left-0 z-30 w-24 min-w-24 max-w-24 border-border border-r border-b bg-bg px-3 py-2 text-left font-semibold text-text-muted text-xs xl:w-auto xl:min-w-44 xl:max-w-none"
             >
               {t('owner:register.staffColumn')}
             </th>
@@ -215,7 +402,7 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
                   key={d}
                   scope="col"
                   data-today={isToday ? '' : undefined}
-                  className={`sticky top-0 z-20 border-border border-b px-0.5 py-1.5 text-center font-semibold text-xs ${future ? 'w-7' : 'w-10'} ${sunday ? 'bg-bg-soft' : 'bg-bg'} ${isToday ? 'text-text' : 'text-text-muted'}`}
+                  className={`sticky top-0 z-20 border-border border-b px-0.5 py-1.5 text-center font-semibold text-xs ${future ? 'w-7' : 'w-10 xl:w-9'} ${sunday ? 'bg-bg-soft' : 'bg-bg'} ${isToday ? 'text-text' : 'text-text-muted'}`}
                   aria-label={dayLabel(d)}
                 >
                   <span className="block leading-tight">{Number(d.slice(8))}</span>
@@ -246,18 +433,19 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
             <tr key={row.user.id}>
               <th
                 scope="row"
-                className="sticky left-0 z-10 max-w-30 border-border border-r border-b bg-bg px-2.5 py-1 text-left font-bold text-sm text-text xl:max-w-none xl:px-3 xl:text-base"
+                className="sticky left-0 z-10 w-24 min-w-24 max-w-24 border-border border-r border-b bg-bg px-2.5 py-0.5 text-left font-bold text-sm text-text xl:w-auto xl:max-w-none xl:px-3 xl:text-base"
               >
                 <button
                   type="button"
                   onClick={() => openPerson(row.user.id)}
                   className="-mx-1 flex min-h-11 w-[calc(100%+0.5rem)] items-center rounded-sm px-1 text-left xl:hidden"
                 >
-                  {/* Two short lines ("Meena / Chavda") instead of "Meena Cha…" on phones. */}
-                  <span className="line-clamp-2 leading-snug [overflow-wrap:anywhere]">
-                    {row.user.name}
+                  <span className="truncate" aria-hidden="true">
+                    {shortName(row.user.name)}
                   </span>
-                  <span className="sr-only">{t('owner:register.openMonth')}</span>
+                  <span className="sr-only">
+                    {row.user.name}, {t('owner:register.openMonth')}
+                  </span>
                 </button>
                 <span className="hidden truncate xl:block">{row.user.name}</span>
                 {row.user.designation ? (
@@ -271,8 +459,14 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
                 const m = cellModel(date, cell);
                 const label = cellText(row.user.name, m);
                 const active = focus[0] === r && focus[1] === c;
+                const selected = desktop && sel?.userId === row.user.id && sel.date === date;
+                const pick = (e: MouseEvent) => {
+                  if (!desktop) return;
+                  e.preventDefault();
+                  onSelect({ userId: row.user.id, date });
+                };
                 return (
-                  <td key={date} className="border-border border-b px-0.5 py-0.5 text-center">
+                  <td key={date} className="border-border border-b p-px text-center">
                     {m.meta ? (
                       <Link
                         id={`reg-${r}-${c}`}
@@ -280,20 +474,17 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
                         tabIndex={active ? 0 : -1}
                         onFocus={() => setFocus([r, c])}
                         onKeyDown={(e) => move(e, r, c)}
+                        onClick={pick}
                         title={label}
-                        className="relative inline-block rounded-sm"
+                        aria-current={selected ? 'true' : undefined}
+                        className={`relative inline-block rounded-sm ${selected ? 'outline-2 outline-text outline-offset-1' : ''}`}
                       >
-                        <CellMark c={m} />
+                        <CellMark c={m} size="grid" />
                         <span className="sr-only">{label}</span>
-                        {m.flagged || m.pending || m.edited ? (
-                          <span
-                            aria-hidden="true"
-                            className="-top-0.5 -right-0.5 absolute size-2 rounded-full border border-bg bg-accent"
-                          />
-                        ) : null}
+                        <Dot c={m} />
                       </Link>
                     ) : (
-                      <span className="inline-block h-11 w-6">
+                      <span className="inline-block h-10 w-6 xl:h-9">
                         <span className="sr-only">{label}</span>
                       </span>
                     )}
@@ -313,6 +504,74 @@ function Grid({ view, today }: { view: RegisterView; today: string }) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+/** The selected person and day on desktop: status, punches, source, note and the way to fix it. */
+function DayPanel({ view, sel }: { view: RegisterView; sel: Selection }) {
+  const { t } = useTranslation();
+  const row = view.rows.find((r) => r.user.id === sel.userId);
+  const cell = row?.cells[view.dates.indexOf(sel.date)];
+  const detail = useOwnerDay(sel.userId, sel.date);
+  if (!row || !cell) return null;
+  const m = cellModel(sel.date, cell);
+  const meta = m.meta ?? dayStatusMeta(cell.status);
+  // Source and notes come from the day itself; show them only when they are this person-day.
+  const day =
+    detail.data?.user.id === sel.userId && detail.data.day.workDate === sel.date
+      ? detail.data
+      : null;
+  const note = day?.punches.map((p) => p.note ?? p.reviewNote).find(Boolean) ?? null;
+  return (
+    <section
+      aria-label={t('owner:register.panel.label')}
+      aria-live="polite"
+      className="grid gap-4 rounded-md border border-border bg-bg p-5 xl:sticky xl:top-4"
+    >
+      <div className="grid gap-0.5">
+        <h2 className="font-extrabold text-lg text-text">{row.user.name}</h2>
+        <Meta>
+          {longDate(sel.date)}
+          {row.user.designation ? ` · ${row.user.designation}` : ''}
+        </Meta>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <StatusChip status={meta.chip} label={t(meta.labelKey)} />
+        {m.late && cell.lateMin > 0 ? (
+          <StatusChip
+            status={LATE_META.chip}
+            label={t('owner:today.row.lateLabel', { min: cell.lateMin })}
+          />
+        ) : null}
+        {m.flagged ? <Tag>{t('owner:status.flagged')}</Tag> : null}
+        {m.pending ? <Tag>{t('owner:status.pending')}</Tag> : null}
+      </div>
+      <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
+        <dt className="text-text-muted">{t('owner:punch.in')}</dt>
+        <dd className="text-right font-semibold text-text tabular-nums">
+          {cell.inTs !== null ? istTime(cell.inTs) : t('owner:register.panel.none')}
+        </dd>
+        <dt className="text-text-muted">{t('owner:punch.out')}</dt>
+        <dd className="text-right font-semibold text-text tabular-nums">
+          {cell.outTs !== null ? istTime(cell.outTs) : t('owner:register.panel.none')}
+        </dd>
+        <dt className="text-text-muted">{t('owner:register.panel.source')}</dt>
+        <dd className="flex flex-wrap justify-end gap-1.5">
+          {day && day.punches.length > 0 ? (
+            [...new Set(day.punches.map((p) => p.source))].map((s) => (
+              <Tag key={s}>{t(`owner:punch.source.${s}`)}</Tag>
+            ))
+          ) : (
+            <span className="font-semibold text-text">{t('owner:register.panel.none')}</span>
+          )}
+        </dd>
+        <dt className="text-text-muted">{t('owner:register.panel.note')}</dt>
+        <dd className="text-right text-text-body">{note ?? t('owner:register.panel.none')}</dd>
+      </dl>
+      <Button variant="primary" block asChild>
+        <Link to={`/o/register/${sel.userId}/${sel.date}`}>{t('owner:register.panel.fix')}</Link>
+      </Button>
+    </section>
   );
 }
 
@@ -343,12 +602,7 @@ function Strip({
                 >
                   <CellMark c={d} size="strip" />
                   <span className="sr-only">{cellText(name, d)}</span>
-                  {d.flagged || d.pending || d.edited ? (
-                    <span
-                      aria-hidden="true"
-                      className="-top-0.5 -right-0.5 absolute size-2 rounded-full border border-bg bg-accent"
-                    />
-                  ) : null}
+                  <Dot c={d} />
                 </Link>
               ) : (
                 <span className="block h-12 rounded-sm border border-border border-dashed">
@@ -410,16 +664,26 @@ function TotalChips({ totals }: { totals: Record<TotalColumn, number> }) {
   );
 }
 
+/** One line of text with the month's counts for everyone (late and overtime join from 640 px). */
 function MonthSummary({ view }: { view: RegisterView }) {
   const { t } = useTranslation();
+  const totals = monthTotals(view);
+  const part = (c: TotalColumn) =>
+    t(`owner:register.line.${c}`, { n: c === 'otHours' ? totals[c].toFixed(1) : days(totals[c]) });
   return (
-    <section
-      aria-label={t('owner:register.summary')}
-      className="grid gap-2 rounded-md border border-border bg-bg px-4 py-3"
-    >
-      <h2 className="font-semibold text-sm text-text-muted">{t('owner:register.summary')}</h2>
-      <TotalChips totals={monthTotals(view)} />
-    </section>
+    <p className="text-sm text-text-body">
+      <span className="font-semibold text-text">{t('owner:register.summaryShort')}</span>{' '}
+      {(['present', 'half', 'absent', 'leave'] as const)
+        .filter((c) => totals[c] > 0)
+        .map(part)
+        .join(' · ')}
+      <span className="hidden sm:inline">
+        {(['lateMin', 'otHours'] as const)
+          .filter((c) => totals[c] > 0)
+          .map((c) => ` · ${part(c)}`)
+          .join('')}
+      </span>
+    </p>
   );
 }
 
@@ -455,7 +719,7 @@ function PersonMonth({ view, userId }: { view: RegisterView; userId: string }) {
 
 const LEGEND: { chip: ChipStatus; key: string; letter: string }[] = [
   { chip: 'present', key: 'owner:status.P', letter: 'P' },
-  { chip: 'late', key: 'owner:status.late', letter: 'P' },
+  { chip: 'late', key: 'owner:status.late', letter: lateText(28) },
   { chip: 'half', key: 'owner:status.H', letter: 'H' },
   { chip: 'absent', key: 'owner:status.A', letter: 'A' },
   { chip: 'leave', key: 'owner:status.L', letter: 'L' },
@@ -465,29 +729,29 @@ const LEGEND: { chip: ChipStatus; key: string; letter: string }[] = [
   { chip: 'waiting', key: 'owner:status.OPEN', letter: 'In' },
 ];
 
+/** The key (popover): the full chip, icon, letter and word, which the 36 px cells leave out. */
 function Legend() {
   const { t } = useTranslation();
   return (
     <section aria-label={t('owner:register.legend')} className="grid gap-2">
       <h2 className="font-semibold text-sm text-text-muted">{t('owner:register.legend')}</h2>
-      <ul className="flex flex-wrap gap-x-4 gap-y-2">
+      <ul className="grid gap-2">
         {LEGEND.map((l) => (
           <li key={l.key} className="flex items-center gap-2 text-sm text-text-body">
             <span
-              className={`inline-grid h-7 min-w-9 grid-flow-col place-items-center gap-0.5 rounded-sm px-1 ${TINT[l.chip === 'late' ? 'present' : l.chip]}`}
+              className={`inline-grid h-7 min-w-14 grid-flow-col place-items-center gap-1 rounded-sm px-1.5 ${TINT[l.chip]}`}
               aria-hidden="true"
             >
-              <Icon
-                name={CHIP_ICON[l.chip]}
-                className={`size-4 ${l.chip === 'late' ? 'text-late' : ''}`}
-              />
+              <Icon name={CHIP_ICON[l.chip]} className="size-4" />
               <span className="font-bold text-xs">{l.letter}</span>
             </span>
             {t(l.key)}
           </li>
         ))}
         <li className="flex items-center gap-2 text-sm text-text-body">
-          <span className="size-2 rounded-full bg-accent" aria-hidden="true" />
+          <span className="grid h-7 min-w-14 place-items-center" aria-hidden="true">
+            <span className="size-2 rounded-full bg-accent" />
+          </span>
           {t('owner:status.flagged')}
         </li>
       </ul>
