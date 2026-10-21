@@ -181,6 +181,7 @@ Each slice is one small PR into `main` (draft first, label `wp`, ready after `ci
 |---|---|---|---|---|---|
 | 0 | **Design spike (no code)**: a one-page mock set at 390 and 1280 for Today (owner and staff), Needs action, Register, as PNGs in the PR, plus the proposed Needs action grouping for Urmi. Opus does this. | `docs/` only, images in the PR body (not committed) | none | none | Lead and Urmi agree the grouping and the logo question; tokens table confirmed |
 | 1 | **Brand tokens and shell**: add the `--role-*` and `--app-page` tokens, page background, logo mask component, shell header and rail logo (owner and staff), amend PRD 12. | `packages/ui/src/styles/app-tokens.css`, `packages/ui/src/components/Logo.tsx` (new), `Rail.tsx`, `app/src/features/owner/shell/*`, `app/src/features/staff/shell/*`, `docs/PRD.md` | Nearly every baseline changes (background, header). Regenerate all. E2E ids unchanged | **Staff entry chunk: the logo must not go into the entry.** Load the mask image lazily or as a CSS background in the route CSS; measure with `scripts/size-budgets.mjs`; if over, drop an unused icon or lazy-load a component | Logo shows on owner phone Today, desktop rail and staff Today; background is `--bg-soft`; axe 0 serious or critical; staff initial JS at or under 170 KB; sign-in and check-in specs green |
+| 1b | **Interaction layer** (see section 5a): motion tokens, press/hover/focus/disabled states and elevation for `Button`, `Chip`, `ListRow`, nav items, `Switch`, `Sheet` controls; pending/optimistic/success pattern in the mutation hook; haptics helper; check-in success moment. | `packages/ui/src/styles/*`, `Button.tsx`, `Chip.tsx`, `ListRow.tsx`, `Switch.tsx`, `Sheet.tsx`, `app/src/lib/haptics.ts`, `app/src/lib/useAction.ts`, `/__kit` page | Kit baselines (`kit-*`) and every screen with a button; regenerate in one snapshots run | Haptics helper tiny and eager (under 0.3 KB gzip); the rest is CSS | Every control has the six states below; no flat identical outlined buttons; axe clean; reduced motion verified; check-in success reviewed on a real phone |
 | 2 | **Status model**: one status per row, late as a number, in Today rows, Staff, Credits lists; `StatusChip` priority helper in `app/src/features/owner/lib/status.ts`. | `status.ts`, `StatusChip.tsx`, owner Today and lists, i18n keys | Owner today, staff, credits, roster baselines; E2E assertions on chips may change (update in the same PR and list them) | Owner chunks only; keep each under 120 KB gzip | No row ever shows more than one chip; late rows show "+N m"; unit tests for the priority function cover every status pair |
 | 3 | **Owner Today hero and filters**: hero card, three-option segmented filter, two-column desktop. | `app/src/features/owner/today/*`, `StatChip.tsx`, `ProgressStrip.tsx`, i18n | `owner-today*` (all variants) at both sizes | Owner chunk; remove the unused chip grid code to compensate | Hero shows "N of M in" and the sentence; one sindoor button; first person visible within 420 px on 390; axe clean |
 | 4 | **Needs action triage**: groups, urgency rule, card hierarchy, one primary per card. | `app/src/features/owner/actions/*`, `Card.tsx`, `Button.tsx`, PRD amendment 1 | `owner-actions*` (phone is tall; keep per-group images small) | Owner chunk | Three groups in the agreed order; max two visible buttons per card; first card has the filled sindoor, others tinted; no new actions; existing approve and reject E2E flows green |
@@ -192,6 +193,96 @@ Each slice is one small PR into `main` (draft first, label `wp`, ready after `ci
 | 10 | **Docs and screens refresh**: update `docs/` screenshots, `STATUS.md` handled by the lead. | docs | none | none | Docs match the shipped UI |
 
 Order rationale: tokens first so later slices reuse them, status model before the screens that show it, Today before Needs action (owner's first screen), staff Today late in the list because of the entry-chunk budget and sign-in risk, Register after the status model since it reuses the cell.
+
+## 5a. Interaction design
+
+Harsh's note (21 Oct 2026): every clickable thing (buttons, chips, rows, nav, toggles, sheets) feels like slop. This section is the contract for how controls behave. It ships with the 8 PM IST redesign, slice 1b, before the screens that use it. It sits inside PRD 12.8 (motion) and amends it where noted; hairlines-not-shadows (12.11) is relaxed only for the pressed/raised states named here.
+
+### Principles
+
+1. **Everything pressable answers within 100 ms**: a visible pressed state, then pending, then a result. Nothing is ever silent.
+2. **Depth comes from tone and a hairline, not blur**: a control is raised by a 1 px lighter top edge and a 1 px darker bottom edge on the same colour (an inner edge, no drop shadow), pressed by removing both and darkening 6 percent. Amendment to PRD 12.11: these inset edges are allowed on buttons and chips; soft shadows stay banned.
+3. **Hierarchy is visible at a glance**: one primary per view, secondaries are quieter but not "all outlined the same", destructive is its own look. No row of three identical outlined buttons.
+4. **Honest states**: disabled controls say why; loading says what is happening; errors say what to do.
+
+### The six states every control has
+
+| State | Behaviour |
+|---|---|
+| Rest | Raised look per its role (table below). Minimum target 44 x 44 px, 48 px for the hero and sheet actions; hit area may be larger than the visible box. |
+| Hover (pointer only, `@media (hover: hover)`) | Tone steps up one notch (for example sindoor 600 to 500), cursor pointer, 140 ms. Rows get a soft `--bg-soft` fill. No hover on touch. |
+| Pressed | `transform: scale(0.97)` (0.98 for rows and chips), tone steps down, raised edges removed, 80 ms in and 140 ms out. A ripple is not used on iOS-style rows; on buttons a 220 ms radial wash from the touch point is allowed (opacity and transform only, one element, removed on end). |
+| Focus-visible | The 2 px sindoor ring with a 2 px offset (PRD 12), never removed, also on rows, chips and nav. Keyboard focus on a primary button keeps the ring outside the hover tone. |
+| Pending | The label stays, a 16 px ring replaces the leading icon (the one allowed spinner, inline in the control only), the control is `aria-busy` and ignores further presses; width does not change (no layout jump). After 8 s without an answer the label becomes "Still trying" and the control offers Cancel where the action is cancellable. |
+| Disabled | 45 percent tone, not 45 percent opacity of text (contrast stays 3:1 for the label); `aria-disabled` rather than `disabled` where a reason is shown, so the reason can be read by touch and screen readers. The reason is a visible line under the control or in a press-and-hold hint ("Check in opens at 09:00", "Ask Urmi to approve your phone"). Never a disabled control without a reason on a primary action. |
+
+### Roles and the look of each
+
+| Role | Used for | Look |
+|---|---|---|
+| Primary | The one thing to do on the view (Check in, Approve, Finalise) | Solid sindoor, white label, raised edges, 48 px, bold. At most one per view and one per card. |
+| Secondary | Common alternatives | Cream-tinted fill (`--bg-soft`) with a 1 px hairline and dark label, raised edges at 60 percent. Not an outline on white. |
+| Tertiary | Low-stakes (Cancel, Skip, See details) | Text button with an underline on hover/focus, 44 px target, no box. |
+| Destructive | Reject, Delete, Void | Never the default focus. Rest: secondary look with a red label and red icon. Armed (after the confirm sheet): solid red, still one tap. The close X on a sheet is neutral, never red. |
+| Chip / segmented | Filters, reasons | Rest: hairline pill; selected: filled tone with a check; pressed scale 0.98; selected state announced (`aria-pressed`). |
+| Row | List rows that open a detail | Whole row is the target (minimum 56 px), chevron at the end, pressed fill, hover fill, and a stable focus ring that wraps the row. |
+| Toggle | Switches | 44 px track area, thumb slides 140 ms, optimistic flip then rollback with a toast on failure, label always states the result ("Selfie on check-in: on"). |
+| Nav (tab bar, rail) | Moving around | Active marker is the bindi (existing); pressed scale 0.96 on the icon; 140 ms cross-fade of the label weight; a badge never covers the icon. |
+
+### Motion tokens (one place, `packages/ui/src/styles/motion.css`)
+
+| Token | Value | Use |
+|---|---|---|
+| `--dur-press` | 80 ms | Press in |
+| `--dur-fast` | 140 ms | Hover, toggles, chips, press out, toast fade |
+| `--dur-base` | 220 ms | Sheets, screen enter (fade + 8 px rise), ripple |
+| `--dur-hero` | 520 ms | The check-in success moment only |
+| `--ease-out` | `cubic-bezier(0.2, 0.8, 0.2, 1)` | Entering and pressing out |
+| `--ease-soft` | `cubic-bezier(0.4, 0, 0.2, 1)` | Colour and state changes |
+| `--ease-spring` | `cubic-bezier(0.34, 1.5, 0.5, 1)` | The bindi landing (existing) |
+
+Animate opacity and transform only (colour for state changes is the one exception). No looping animation anywhere, no shimmer. **Reduced motion:** tier 1 (slides, lifts, ripple, spring, scale) off; tier 2 enters become 160 ms fades; tier 3 colour and focus changes stay; no haptics. The kit page has a "reduce motion" toggle for baselines.
+
+### Feedback on every action: the pattern
+
+One hook, `useAction`, wraps every mutation so the behaviour is the same everywhere:
+
+1. **Press** (visual, instant).
+2. **Pending**: the control shows the inline ring; for reversible changes (toggles, marks, approvals of routine items) apply the result **optimistically** at once and roll back with a toast that says what to do if it fails. Money, check-ins and anything needing the PIN are **never** optimistic: they wait, show the ring, and then show the result.
+3. **Result**: success is a quiet confirmation in place (the card collapses with a 220 ms fade and a one-line toast "Approved. Priya can check in now." with Undo for 6 s where undo is possible), or the hero moment for check-in. Failure keeps the user's input, names the reason in plain words and offers the retry in the same place.
+4. **Offline**: the control says "Saved on this phone, will send when you are online" with the queue count; this already exists for check-in and extends to leave and fix requests.
+5. **Idempotency**: pressing twice never sends twice (the control ignores presses while pending; the idempotency key already exists on the API).
+
+Every list that loads shows skeleton rows of the final height (no layout jump), not a spinner. Every empty state says what it is and the next action.
+
+### Success moments
+
+- **Check-in and check-out (the hero moment)**: after the server confirms, the sheet closes, the bindi lands on the Today header (520 ms spring), the headline reads "You're in at 10:02." and the quiet line shows "At the salon" (and the distance, see the check-in distance slice already shipped). One short vibration (`navigator.vibrate(8)`; a second 8 ms tick 90 ms later for check-out). The "Check in" hero button becomes the "Step out" and "Check out" pair without a layout jump.
+- **Owner approvals** (new phone, overtime, leave): the card collapses, the Needs action count in the hero and tab badge decrements with a 140 ms change, toast with Undo. A light vibration (8 ms) on approve where supported.
+- **Payroll finalise and mark paid**: a calm full-width confirmation strip ("September is final. 12 payslips are ready.") that stays until dismissed; no confetti, no counters.
+- **Failures**: no shake, no red flash. A short, specific sentence and the next step.
+
+### Haptics (where supported, never with reduced motion)
+
+`app/src/lib/haptics.ts`, about 200 bytes: `tick()` = `navigator.vibrate(8)`, `success()` = `[8, 90, 8]`, `warn()` = `[16]`; guarded for iOS Safari (no Vibration API: do nothing, never throw) and for the user's reduced-motion and in-app "Vibration" preference in Me. Used only on: check-in/out success, approve/decline on owner cards, a failed check-in (warn), PIN accepted. Never on plain taps, scrolls or toggles.
+
+### Targets and spacing
+
+- Minimum 44 x 44 px for every pressable (PRD 12.11), 48 px for primary and sheet actions, 56 px for rows. Adjacent targets are at least 8 px apart.
+- The pressed area is at least the visible area; thumb-zone: the primary action of a phone view sits in the lower third (sticky action bar), safe-area aware.
+
+### Enforcement and tests
+
+- `scripts/check-ui.mjs` gains rules: no `button` or `[role=button]` without a pressed style from the kit; no pressable under 44 px (extends KIT-04 to the main screens, not only the kit); no `transition` that animates anything but opacity, transform and color; no hard-coded durations or easings outside `motion.css`; no disabled primary without a reason element.
+- E2E: a spec drives each control type with the keyboard (focus ring visible), asserts `aria-busy` while a delayed route is pending and that a double press sends one request (extends the idempotency test), asserts a disabled primary shows its reason, and that with `reducedMotion: 'reduce'` no transform transition runs and `navigator.vibrate` is never called (spy).
+- Visual baselines: the kit page gets a "States" section (rest, hover, pressed, focus, pending, disabled for every role) captured with forced states, at 390 and 1280; the screens' baselines are regenerated once after slice 1b.
+- Manual check by Harsh on a real Android phone and an iPhone before the layer is called done: press feel, vibration on Android, no accidental double sends over a throttled connection.
+
+### Risks
+
+- The inline pending ring and press states must stay in the shared kit CSS, not per feature, or the staff entry chunk budget (170 KB, about 0.2 KB headroom) is lost. Haptics is the only new eager code.
+- Optimistic UI must never be applied to money, check-ins or PIN-gated actions; the hook takes an explicit `optimistic: false` default for those and the review checklist asks for it.
+- Pressed and hover states are the usual source of screenshot flakes (see #85): baselines park the pointer away from controls before each shot and force states only on the kit page.
 
 ## 6. CI, baselines and review process
 
