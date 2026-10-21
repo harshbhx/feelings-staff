@@ -264,7 +264,7 @@ Every list that loads shows skeleton rows of the final height (no layout jump), 
 
 ### Haptics (where supported, never with reduced motion)
 
-`app/src/lib/haptics.ts`, about 200 bytes: `tick()` = `navigator.vibrate(8)`, `success()` = `[8, 90, 8]`, `warn()` = `[16]`; guarded for iOS Safari (no Vibration API: do nothing, never throw) and for the user's reduced-motion and in-app "Vibration" preference in Me. Used only on: check-in/out success, approve/decline on owner cards, a failed check-in (warn), PIN accepted. Never on plain taps, scrolls or toggles.
+`app/src/lib/haptics.ts`, about 200 bytes: `tick()` = `navigator.vibrate(8)`, `success()` = `[8, 90, 8]`, `warn()` = `[16]`; guarded for iOS Safari (no Vibration API: do nothing, never throw) and for the user's reduced-motion and in-app "Vibration" preference in Me. Used only on: check-in/out success, approve/decline on owner cards, a failed check-in (warn), PIN accepted. Never on plain taps, scrolls or toggles, with one exception decided on 21 Oct 2026: the tick the app already gives on the Check in, Check out, Scan, Step out and I'm back taps stays.
 
 ### Targets and spacing
 
