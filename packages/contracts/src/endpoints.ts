@@ -1470,7 +1470,8 @@ export const endpoints = {
     access: OWNER,
     body: SetPinRequest,
     res: SecurityView,
-    summary: 'Set the owner PIN (first time within 15 min of sign-in) or change it',
+    summary:
+      'Set the owner PIN (first time, or a forgotten one, within 15 min of an email sign-in) or change it',
   }),
   ownerSignOutOthers: ep({
     method: 'POST',
