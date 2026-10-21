@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { type ClientRoute, OWNER_ACCESS_ROUTES, ROUTES } from './routes.gen';
 
 describe('client route table', () => {
-  // Unit tests run as the combined build, so ROUTES has every route except the owner-access ones.
+  const ownerKeys = Object.keys(OWNER_ACCESS_ROUTES).sort();
   const all: Partial<Record<string, ClientRoute>> = { ...ROUTES, ...OWNER_ACCESS_ROUTES };
 
   it('matches the contract endpoint table (run node scripts/gen-client-routes.mjs)', () => {
@@ -23,12 +23,15 @@ describe('client route table', () => {
     }
   });
 
-  it('leaves the owner-host passkey routes out of builds other than the owner build', () => {
-    const owner = Object.keys(OWNER_ACCESS_ROUTES);
-    expect(owner.length).toBeGreaterThan(0);
-    for (const key of owner) {
-      expect(key in ROUTES, key).toBe(false);
-      expect(endpoints[key as keyof typeof endpoints].path).toMatch(/^\/(auth\/owner|owner)\//);
-    }
+  // Unit tests run as the combined build: ROUTES (what the HTTP client calls) has every route but
+  // the owner-host passkey ones, which only the owner build merges in.
+  it('ROUTES holds exactly the routes that are not owner access in this build', () => {
+    expect(ownerKeys.length).toBeGreaterThan(0);
+    const expected = ENDPOINT_KEYS.filter((k) => !ownerKeys.includes(k)).sort();
+    expect(Object.keys(ROUTES).sort()).toEqual(expected);
+    for (const key of ownerKeys)
+      expect(endpoints[key as keyof typeof endpoints].path, key).toMatch(
+        /^\/(auth\/owner|owner)\//,
+      );
   });
 });

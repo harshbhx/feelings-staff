@@ -67,10 +67,10 @@ ${ownerRows.join('\n')}
 } as const satisfies Partial<Record<EndpointKey, ClientRoute>>;
 
 /** Every route this build calls. Outside the owner build the owner-access keys are absent. */
-export const ROUTES = {
+export const ROUTES: Readonly<Partial<Record<EndpointKey, ClientRoute>>> = {
 ${rows.join('\n')}
   ...(OWNER_ONLY ? OWNER_ACCESS_ROUTES : {}),
-} as Readonly<Record<EndpointKey, ClientRoute>>;
+};
 `;
 writeFileSync(join(ROOT, 'app/src/api/routes.gen.ts'), out);
 console.info(`gen-client-routes: ${rows.length} endpoints, ${ownerRows.length} owner-access`);

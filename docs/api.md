@@ -309,10 +309,10 @@ Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-acc
 
 | Method | Path | Who may call | Step-up | Idempotent | Request | Response | Summary |
 |---|---|---|---|---|---|---|---|
-| POST | `/auth/owner/passkey/options` | public | no | no | body `OwnerPasskeyOptionsRequest` | `OwnerPasskeyOptions` | Passkey challenge (5 min, single use) for sign-in or to confirm a device action |
+| POST | `/auth/owner/passkey/options` | public (`confirm`: an owner passkey session) | no | no | body `OwnerPasskeyOptionsRequest` | `OwnerPasskeyOptions` | Passkey challenge (5 min, single use) for sign-in or to confirm a device action |
 | POST | `/auth/owner/passkey/verify` | public | no | no | body `OwnerPasskeyVerifyRequest` | `Me` | Sign in with a passkey: owner session bound to that credential |
-| POST | `/auth/owner/enrol/options` | public | no | no | body `OwnerEnrolOptionsRequest` | `OwnerEnrolOptions` | Passkey creation options: first device after the email code, or an enrolment token |
-| POST | `/auth/owner/enrol/verify` | public | no | no | body `OwnerEnrolVerifyRequest` | `OwnerEnrolResult` (201) | Store the new passkey, approve this device, start a session bound to it |
+| POST | `/auth/owner/enrol/options` | public (an owner session without a passkey, or an enrolment token) | no | no | body `OwnerEnrolOptionsRequest` | `OwnerEnrolOptions` | Passkey creation options: first device after the email code, or an enrolment token |
+| POST | `/auth/owner/enrol/verify` | public (an owner session without a passkey, or an enrolment token) | no | no | body `OwnerEnrolVerifyRequest` | `OwnerEnrolResult` (201) | Store the new passkey, approve this device, start a session bound to it |
 | POST | `/auth/owner/device-requests` | public | no | no | body `OwnerDeviceRequestCreate` | `OwnerDeviceRequestCreated` (201) | Add this device: a request with a 6-digit code (15 min) |
 | POST | `/auth/owner/device-requests/:id/status` | public | no | no | path `IdParams`; body `OwnerDeviceRequestPoll` | `OwnerDeviceRequestState` | The new device polls its own request with its enrolment token |
 | GET | `/owner/device-requests` | owner | no | no | - | `OwnerDeviceRequestList` | Pending device requests (approval cards in Needs action) |
