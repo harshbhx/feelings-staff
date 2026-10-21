@@ -8,6 +8,9 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ### Added
 
+- The app now wears the salon's brand: the page is the website's warm blush band with white cards, the salon's logo leads the owner's Today header on phones, tops the desktop rail and leads the staff Today header (with the date next to the bell), and the owner's More screen closes with the logo and who is signed in. Owner tab-level titles end with the bindi on phones. List lines under a name are darker for contrast. The logo is the typeset name with the bindi until the client confirms the recoloured wordmark.
+- Design tokens for the redesign: `--app-page`, `--logo`, `--logo-mask`, and role tones `--role-*` with avatar tints that keep initials at 4.5:1 or more; a `Logo` component in `@fs/ui` and kit specimens for both.
+
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
 Docs for Time credits and presence (WP-9):
@@ -80,6 +83,8 @@ Also merged since (all with `ci` and `e2e` green on main):
 - Review follow-ups: presence, requests, Me and icons on the staff side https://github.com/harshbhx/feelings-staff/pull/76; presence, roll-call, escalation and seed in the Worker https://github.com/harshbhx/feelings-staff/pull/77; roll-call, presence settings and credits on the owner side https://github.com/harshbhx/feelings-staff/pull/78.
 
 ### Changed
+
+- The inbox copy (`notify` catalog) now loads with the inbox screen instead of with the staff app, which takes about 2 KB off the staff phone's first download; the header bell's label moved to `common`.
 
 - The Content Security Policy no longer sends `upgrade-insecure-requests`. Every source is `'self'`, HSTS already forces HTTPS, and WebKit applies the directive to `http://localhost`, which broke the iPhone project of the CI run.
 - `CONTRIBUTING.md` now covers docs rules, labels and the PR template.

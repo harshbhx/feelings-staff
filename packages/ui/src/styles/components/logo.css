@@ -1,0 +1,55 @@
+/*
+ * Logo (UI redesign slice 1). Two modes, one element:
+ *   typeset (default)  "Feelings" in Plus Jakarta Sans 800, --logo (maroon 800), the bindi as the
+ *                      full stop. No image, so nothing is added to the staff entry or preloaded.
+ *   mask ([data-mask]) the client's wordmark file drawn as a mask in --logo, the website's
+ *                      Logo.astro technique; the text stays for the accessible name only.
+ */
+@layer components {
+  .fs-logo {
+    --logo-h: 1.5rem;
+    display: inline-flex;
+    align-items: baseline;
+    flex: none;
+    color: var(--logo);
+    font-family: var(--font-display);
+    font-size: var(--logo-h);
+    font-weight: var(--weight-display);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .fs-logo[data-size="sm"] {
+    --logo-h: 1.25rem;
+  }
+
+  .fs-logo[data-size="lg"] {
+    --logo-h: 1.75rem;
+  }
+
+  .fs-logo[data-mask] {
+    height: var(--logo-h);
+    aspect-ratio: 1024 / 291;
+    color: transparent;
+    font-size: 0;
+    background: var(--logo);
+    -webkit-mask: var(--logo-mask) center / contain no-repeat;
+    mask: var(--logo-mask) center / contain no-repeat;
+  }
+
+  .fs-logo[data-mask] > .fs-bindi {
+    display: none;
+  }
+
+  @media (forced-colors: active) {
+    .fs-logo {
+      color: CanvasText;
+    }
+
+    .fs-logo[data-mask] {
+      background: CanvasText;
+    }
+  }
+}

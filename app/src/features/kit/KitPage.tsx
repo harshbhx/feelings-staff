@@ -20,6 +20,7 @@ import {
   Input,
   List,
   ListRow,
+  Logo,
   PasswordInput,
   PinPad,
   ProgressStrip,
@@ -57,6 +58,7 @@ const STATUSES: DayStatus[] = [
 
 const SWATCHES = [
   ['bg', '--bg'],
+  ['app-page', '--app-page'],
   ['bg-soft', '--bg-soft'],
   ['bg-tint', '--bg-tint'],
   ['bg-deep', '--bg-deep'],
@@ -67,6 +69,16 @@ const SWATCHES = [
   ['border', '--border'],
   ['border-strong', '--border-strong'],
   ['border-control', '--border-control'],
+] as const;
+
+/** People colour: staff roles on the service tones (docs/ui-redesign-plan.md section 4). */
+const ROLES = [
+  ['makeup', 'Makeup artist', 'Sejal Makwana'],
+  ['nails', 'Nail technician', 'Jinal Kotak'],
+  ['mehndi', 'Mehndi artist', 'Hetal Dave'],
+  ['salon', 'Stylist, beautician', 'Priya Solanki'],
+  ['trainee', 'Trainee', 'Dhara Gohil'],
+  ['neutral', 'Helper, receptionist', 'Kajal Vyas'],
 ] as const;
 
 function Section({
@@ -184,6 +196,34 @@ function Foundations() {
           ))}
         </ul>
       </Specimen>
+      <div className="grid gap-8 lg:grid-cols-2">
+        <Specimen label="Logo: staff header 20 px, owner header 24 px, rail 28 px">
+          <div className="flex flex-wrap items-end gap-8 rounded-md border border-border bg-bg p-4">
+            <Logo name="Feelings" size="sm" />
+            <Logo name="Feelings" />
+            <Logo name="Feelings" size="lg" />
+          </div>
+        </Specimen>
+        <Specimen label="Role tones: initials on the tint, 4.5:1 or more">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {ROLES.map(([role, label, name]) => (
+              <li key={role} className="flex items-center gap-3">
+                <span
+                  className="fs-avatar"
+                  aria-hidden="true"
+                  style={{ background: `var(--role-${role}-bg)`, color: `var(--role-${role})` }}
+                >
+                  {name
+                    .split(' ')
+                    .map((w) => w[0])
+                    .join('')}
+                </span>
+                <span className="text-sm font-semibold text-text">{label}</span>
+              </li>
+            ))}
+          </ul>
+        </Specimen>
+      </div>
       <Specimen label="Bindi: heading full stop, nav marker, success">
         <div className="flex items-end gap-8">
           <p className="text-xl font-extrabold tracking-display text-text">

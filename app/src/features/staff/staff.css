@@ -7,7 +7,7 @@
     max-width: 30rem;
     margin-inline: auto;
     min-height: 100dvh;
-    background: var(--bg);
+    background: var(--app-page);
   }
 
   .staff-main {
@@ -65,6 +65,19 @@
     font-weight: var(--weight-ui);
     color: var(--text-muted);
     letter-spacing: 0;
+  }
+
+  /* Today's brand header (UI redesign slice 1): the warm band, the logo first, the date before the bell. */
+  .staff-header:has(.staff-header__logo) {
+    background: var(--bg-glass-soft);
+  }
+
+  .staff-header__logo {
+    margin-inline-start: var(--space-2);
+  }
+
+  .staff-header__logo + .staff-header__title {
+    text-align: end;
   }
 
   .staff-actionbar {

@@ -3,6 +3,8 @@
  * bottom tab bar Today · Needs action · Register · Staff · More with the count on Needs action.
  * From 64rem: a 15rem left rail with every item (the bindi marks the active one) and the content up
  * to 76rem. Also: the step-up PIN sheet, push refetch, the app badge and the toast region.
+ * Brand (UI redesign slice 1): the page is the warm band; the logo leads the phone header on Today
+ * (the title stays the h1 for assistive tech) and tops the rail; tab-level titles end with the bindi.
  */
 
 import {
@@ -11,6 +13,7 @@ import {
   Bindi,
   Button,
   IconButton,
+  Logo,
   RailGroup,
   RailItem,
   RailNav,
@@ -64,7 +67,7 @@ export function OwnerShell() {
         <ChromeProvider>
           <div
             style={SHELL_VARS}
-            className="min-h-dvh bg-bg [--owner-toast-offset:var(--tabbar-h)] xl:pl-(--owner-rail-w) xl:[--owner-toast-offset:0px]"
+            className="min-h-dvh bg-(--app-page) [--owner-toast-offset:var(--tabbar-h)] xl:pl-(--owner-rail-w) xl:[--owner-toast-offset:0px]"
           >
             <a
               href="#owner-main"
@@ -98,7 +101,10 @@ function SkipLabel() {
 function Header() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { title, titleKey, back } = useScreenChrome();
+  // Today on a phone: the logo leads and the title is read, not shown (the rail has the logo on desktop).
+  const home = pathname === '/o/today';
   return (
     <header className="sticky top-0 z-30 border-border border-b bg-(--bg-glass) backdrop-blur-[10px]">
       <div className="mx-auto flex h-16 w-full max-w-(--container-page) items-center gap-2 px-(--gutter)">
@@ -110,12 +116,17 @@ function Header() {
             className="-ml-3"
           />
         ) : null}
+        {home ? (
+          <Logo name={t('common:app.shortName')} className="mr-auto ml-0.5 xl:hidden" />
+        ) : null}
         <h1
-          className="line-clamp-2 min-w-0 flex-1 text-balance font-extrabold text-text text-xl leading-snug tracking-display"
+          className={`line-clamp-2 min-w-0 flex-1 text-balance font-extrabold text-text text-xl leading-snug tracking-display${home ? ' max-xl:sr-only' : ''}`}
           data-testid="owner-title"
         >
           {/* "Neha Parmar · Mon, 19 Oct": the dot stays on the first line when the title wraps. */}
           {(title ?? t(titleKey)).replaceAll(' · ', '\u00a0· ')}
+          {/* Tab-level screens end their title with the bindi on phones (PRD 12.4, 12.9). */}
+          {back ? null : <Bindi className="xl:hidden" />}
         </h1>
         <InboxBell />
       </div>
@@ -236,11 +247,8 @@ function Rail({ count }: { count: number }) {
   );
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-(--owner-rail-w) flex-col border-border border-r bg-bg xl:flex">
-      <div className="flex h-16 items-center gap-1 px-6">
-        <span className="font-extrabold text-maroon-800 text-xl tracking-display">
-          {t('common:app.shortName')}
-        </span>
-        <Bindi size="heading" className="text-xl" />
+      <div className="flex h-16 items-center px-6">
+        <Logo name={t('common:app.shortName')} size="lg" />
       </div>
       <RailNav label={t('owner:nav.label')} className="flex-1 overflow-y-auto px-3 pt-1 pb-2">
         <RailGroup>{tabs.map(item)}</RailGroup>
