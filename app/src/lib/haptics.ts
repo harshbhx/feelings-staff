@@ -1,7 +1,8 @@
 /**
  * Haptics (docs/ui-redesign-plan.md 5a): one short vibration on the moments that matter (check-in
- * and check-out success, approve or decline on an owner card, a failed check-in, PIN accepted),
- * never on plain taps, scrolls or toggles. In the staff entry, so it stays tiny.
+ * and check-out success, approve or decline on an owner card, a failed check-in, PIN accepted), plus
+ * the ticks the app already had on the Check in, Check out, Scan, Step out and I'm back taps (kept on
+ * 21 Oct 2026). Never on scrolls, toggles or other plain taps. In the staff entry, so it stays tiny.
  *
  * iOS Safari has no Vibration API: every call is then a no-op and never throws. Off with reduced
  * motion, and when the person turned Vibration off in Me (`fs.vibrate` = "off" on this phone).

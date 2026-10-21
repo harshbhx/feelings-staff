@@ -20,6 +20,7 @@ Find the page you need. Plain-language guides for the salon come first, then the
 | [Update and rollback](runbooks/update-rollback.md) | A change is going out, or must be undone |
 | [Backup and restore](runbooks/backup-restore.md) | Taking, verifying or restoring a copy of the data |
 | [Secrets](runbooks/secrets.md) | Rotating a secret |
+| [Owner cutover](runbooks/owner-cutover.md) | Moving the owner to its own host behind Cloudflare Access, and rolling it back |
 | [Incident](runbooks/incident.md) | A leak, abuse or an outage |
 | [Retention purge](runbooks/retention-purge.md) | What is deleted and when, and deleting a person's data on request |
 | [Ops log](ops-log.md) | Recording a manual action on production |

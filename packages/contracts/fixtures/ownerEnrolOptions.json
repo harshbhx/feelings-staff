@@ -1,0 +1,38 @@
+{
+  "challengeId": "01M5995S78KQMYTMVVWTMWHEES",
+  "expiresAt": 1792387020000,
+  "options": {
+    "challenge": "x-vflVNrDSI4-3_47tkDdlqn6XTHrs_AIEeJsqK-eXc",
+    "rp": {
+      "name": "Feelings",
+      "id": "owner.example.test"
+    },
+    "user": {
+      "id": "MDFLODk0UFBLNDE4VEpUMzVBOENERUFORFY",
+      "name": "urmi@feelingsbeautycare.in",
+      "displayName": "Urmi Mengar"
+    },
+    "pubKeyCredParams": [
+      {
+        "alg": -7,
+        "type": "public-key"
+      },
+      {
+        "alg": -257,
+        "type": "public-key"
+      }
+    ],
+    "timeout": 60000,
+    "attestation": "none",
+    "excludeCredentials": [],
+    "authenticatorSelection": {
+      "residentKey": "preferred",
+      "userVerification": "required",
+      "requireResidentKey": false
+    },
+    "extensions": {
+      "credProps": true
+    },
+    "hints": []
+  }
+}
