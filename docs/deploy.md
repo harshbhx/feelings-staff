@@ -87,6 +87,11 @@ Optional variable for the owner host ([owner access](owner-access.md)). Leave it
 | Variable | Example | Meaning |
 |---|---|---|
 | `OWNER_HOST` | `owner.example.test` | Host name only, no scheme. When set, requests with this Host get the owner surface, every other host gets the staff surface (owner paths answer 404), the Origin check uses the answering host's own origin, and owner sign-in links use `https://<OWNER_HOST>`. Invite and join links keep `APP_ORIGIN`. With it set the Worker serves each host from its own build folder (`/_s` staff, `/_o` owner, see [owner access](owner-access.md#build-layout)); unset, the combined build at the asset root serves both. In a local or e2e preview include the port (`owner.example.test:8787`). Rollback: unset it. |
+| `ACCESS_TEAM_DOMAIN` | `team.cloudflareaccess.com` | Cloudflare Zero Trust team domain, with or without `https://`. Not secret. Used to find the signing keys (`https://<team>/cdn-cgi/access/certs`) and as the expected token issuer. |
+| `ACCESS_AUD` | `a1b2...` (64 hex) | Audience tag of the Access application on the owner host. Not secret. **Setting it turns the Access check on** for the owner host (needs `OWNER_HOST`): every owner-host request must carry a valid `Cf-Access-Jwt-Assertion`, otherwise 403 with an empty body. Unset = check off. |
+| `ACCESS_ALLOWED_EMAILS` | `a@example.test,b@example.test` | Comma-separated e-mails allowed through Access, compared case-insensitively. Not secret. With `ACCESS_AUD` set, an empty list or a missing `ACCESS_TEAM_DOMAIN` makes every owner-host request answer 403. |
+
+Set the three Access variables together, after the Access application exists ([owner access](owner-access.md#cloudflare-access)), and only after `OWNER_HOST`. Rollback: unset `ACCESS_AUD`. The ordered cutover steps are in the [owner cutover runbook](runbooks/owner-cutover.md). They are plain variables, not secrets, so they need no rotation ([secrets runbook](runbooks/secrets.md#access-variables)).
 
 ## 4. Email
 

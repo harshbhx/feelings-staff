@@ -122,3 +122,75 @@ export function monthTotals(view: RegisterView): Record<TotalColumn, number> {
     for (const c of TOTAL_COLUMNS) out[c] = Math.round((out[c] + totalValue(row, c)) * 10) / 10;
   return out;
 }
+
+/** What a day cell of 40 px or less shows (PRD 12.3, amendment 2): a letter, or late as minutes. */
+export interface CellMark {
+  /** `+28`, `+1h` (an hour or more), or the status letter (P, H, A, L, WO, HO, OD, In, –). */
+  text: string;
+  /** Tint of the cell: a late present day wears the late tint. */
+  tone: StatusMeta['chip'];
+}
+
+/** The text for lateness: `+28` under an hour, `+1h` from 60 minutes (whole hours). */
+export function lateText(min: number): string {
+  return min >= 60 ? `+${Math.floor(min / 60)}h` : `+${min}`;
+}
+
+export function cellMark(c: CellModel): CellMark | null {
+  if (!c.meta) return null;
+  if (c.meta.chip === 'present' && c.late)
+    return { text: c.cell.lateMin > 0 ? lateText(c.cell.lateMin) : c.meta.letter, tone: 'late' };
+  return { text: c.meta.letter, tone: c.meta.chip };
+}
+
+/** "Meena Chavda" -> "Meena C." for the 96 px first column; one-word names stay as they are. */
+export function shortName(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  const last = parts.length > 1 ? parts[parts.length - 1] : undefined;
+  return last ? `${parts[0]} ${last.charAt(0).toUpperCase()}.` : (parts[0] ?? '');
+}
+
+export interface Selection {
+  userId: string;
+  date: string;
+}
+
+const needsLook = (c: RegisterCell) => c.tags.includes('flagged') || c.tags.includes('pending');
+
+/**
+ * The person and day the desktop panel opens on: today (or the latest past day of the month), and
+ * the first person whose day needs a look (a flagged or waiting punch); else the latest day that
+ * has one; else the first person.
+ */
+export function defaultSelection(view: RegisterView, today: string): Selection | null {
+  const first = view.rows[0];
+  if (!first) return null;
+  const past = view.dates.filter((d) => d <= today);
+  const date = past[past.length - 1] ?? view.dates[0] ?? today;
+  const at = (d: string) => view.dates.indexOf(d);
+  const todayHit = view.rows.find((r) => {
+    const c = r.cells[at(date)];
+    return c ? needsLook(c) : false;
+  });
+  if (todayHit) return { userId: todayHit.user.id, date };
+  for (let i = past.length - 1; i >= 0; i--) {
+    const d = past[i] as string;
+    const hit = view.rows.find((r) => {
+      const c = r.cells[at(d)];
+      return c ? needsLook(c) : false;
+    });
+    if (hit) return { userId: hit.user.id, date: d };
+  }
+  return { userId: first.user.id, date };
+}
+
+/**
+ * The seven days the phone list shows: the last seven ending today (or the month's last day when
+ * the month is over; from the 1st the window starts at the 1st and runs forward).
+ */
+export function recentDates(view: RegisterView, today: string): string[] {
+  const past = view.dates.filter((d) => d <= today).length;
+  const end = Math.max(1, Math.min(past, view.dates.length));
+  const start = Math.max(0, Math.min(end - 7, view.dates.length - 7));
+  return view.dates.slice(start, start + 7);
+}

@@ -18,7 +18,7 @@ import { PrivacyNote, SalonSection } from './SalonSection';
 import { SecurityScreen } from './SecurityScreen';
 import { SettingsForm } from './SettingsForm';
 import { ShiftsSection } from './ShiftsSection';
-import { SECTIONS, sectionById } from './sections';
+import { SECTION_GROUPS, sectionById } from './sections';
 
 export function SettingsRoutes() {
   return (
@@ -33,24 +33,38 @@ function SettingsIndex() {
   const { t } = useTranslation();
   useOwnerTitle(null);
   return (
-    <div className="grid max-w-(--container-narrow) grid-cols-[minmax(0,1fr)] gap-4">
-      <List>
-        {SECTIONS.map((s) => (
-          <ListRow
-            key={s.id}
-            asChild
-            leading={
-              <span className="grid size-10 place-items-center rounded-full bg-bg-tint text-maroon-800">
-                <Icon name={s.icon} className="size-5" />
-              </span>
-            }
-            title={t(`owner:settings.sections.${s.id}.title`)}
-            subtitle={t(`owner:settings.sections.${s.id}.hint`)}
+    <div className="grid max-w-(--container-narrow) grid-cols-[minmax(0,1fr)] gap-8">
+      {SECTION_GROUPS.map((g) => (
+        <section key={g.id} aria-labelledby={`settings-group-${g.id}`} className="grid gap-1">
+          <h2
+            id={`settings-group-${g.id}`}
+            className="font-semibold text-sm text-text-muted tracking-name"
           >
-            <Link to={`/o/settings/${s.id}`} />
-          </ListRow>
-        ))}
-      </List>
+            {t(`owner:settings.groups.${g.id}`)}
+          </h2>
+          <List>
+            {g.sections.map((id) => {
+              const s = sectionById(id);
+              if (!s) return null;
+              return (
+                <ListRow
+                  key={s.id}
+                  asChild
+                  leading={
+                    <span className="grid size-10 place-items-center rounded-full bg-bg-tint text-maroon-800">
+                      <Icon name={s.icon} className="size-5" />
+                    </span>
+                  }
+                  title={t(`owner:settings.sections.${s.id}.title`)}
+                  subtitle={t(`owner:settings.sections.${s.id}.hint`)}
+                >
+                  <Link to={`/o/settings/${s.id}`} />
+                </ListRow>
+              );
+            })}
+          </List>
+        </section>
+      ))}
     </div>
   );
 }

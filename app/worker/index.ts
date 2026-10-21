@@ -19,6 +19,7 @@ import {
 } from './lib/hosts';
 import { isSplitFolderPath, serveSplitAsset } from './lib/split-assets';
 import { ulid } from './lib/ulid';
+import { access } from './middleware/access';
 import { context } from './middleware/context';
 import { errorResponse, onError } from './middleware/errors';
 import { guard } from './middleware/guard';
@@ -34,6 +35,10 @@ export function createApp(): Hono<AppEnv> {
     await next();
     c.res = withSecurityHeaders(c.res, requestId);
   });
+
+  // Cloudflare Access gate for the owner host (docs/owner-access.md). Off until OWNER_HOST and
+  // ACCESS_AUD are both set; first, so nothing on the owner host (shell, assets, API) skips it.
+  app.use('*', access);
 
   // Host routing (ADR-19). A no-op while OWNER_HOST is unset. `/api/v1` is stripped for the checks.
   app.use('*', async (c, next) => {

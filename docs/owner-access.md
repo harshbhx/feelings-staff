@@ -6,7 +6,7 @@ Contents: [What changes](#what-changes) · [The two hosts](#the-two-hosts) · [C
 
 ## What changes
 
-**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default) and slice 1b (split build, below) are built. Nothing changes in production until `OWNER_HOST` is set.
+**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default) and slice 1b (split build, below) are built, and slice 2 (Access JWT verification, `app/worker/middleware/access.ts`) is built. Nothing changes in production until `OWNER_HOST` is set, and the Access check stays off until `ACCESS_AUD` is set as well.
 
 | Today | After |
 |---|---|
@@ -44,6 +44,7 @@ Keep working throughout: the current owner sign-in stays on until the cutover st
 
 - A self-hosted application on the owner host, policy "owners": allow `urmi@feelingsbeautycare.in` and `creharsh@gmail.com`, identity provider One-time PIN, session duration 7 days. (Google sign-in can be added as a second provider later, no code change.)
 - The Worker verifies `Cf-Access-Jwt-Assertion` on every owner-host request: RS256 signature against `https://<team>.cloudflareaccess.com/cdn-cgi/access/certs`, `aud` equal to the application's audience tag, `exp`, `iss`, and the e-mail claim in an allow-list variable. Variables: `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Until they are set the check is off (so builds and previews work); once `ACCESS_AUD` is set it is mandatory and a missing or bad token answers 403 with no detail.
+- Implementation (`app/worker/middleware/access.ts`, first middleware in `index.ts`, so the owner shell, assets and API are all behind it): runs only when the request is for the owner surface and `ACCESS_AUD` is non-empty. It reads the `Cf-Access-Jwt-Assertion` header only (never the cookie), accepts RS256 only, picks the key by `kid` from the JWKS (cached one hour; an unknown `kid` forces one refetch, at most one fetch of the certs URL per minute; if a refresh fails, keys already cached keep working for up to 24 hours, an uncached `kid` is refused), and checks `aud` (string or array), `iss` (`https://<team domain>`), `exp`, `nbf` and `iat` (60 s skew) and the `email` claim against `ACCESS_ALLOWED_EMAILS` (trimmed, case-insensitive). It fails closed: `ACCESS_AUD` set with the team domain or the allow-list empty, a certs fetch failure, or any bad token answers 403 with an empty body. The reason goes to `console.warn` without the token or the e-mail. On success the e-mail is on the Hono context (`accessEmail`) and on `Ctx.accessEmail` for later slices. Tests: `app/worker/test/access.test.ts` (locally signed tokens, stubbed certs URL).
 - The Access email is only a gate. Identity inside the app is the passkey. A person who passes Access but has no approved device sees only the enrolment screens.
 - Zero Trust must be enabled on the account first (free plan: up to 50 users). Exact steps for Harsh are [below](#what-harsh-does-in-cloudflare).
 
@@ -86,7 +87,7 @@ Each is one small PR into `main` with tests, `ci` and `e2e` green; production on
 | # | Slice | Notes |
 |---|---|---|
 | 1 | **Host routing and split build**: two Vite entries, Host-based routing in the Worker, `OWNER_HOST`/origin lists, staff host 404 for owner paths when `OWNER_HOST` is set (off by default), CI marker check on the staff output, e2e config for both hosts (`owner.localhost` style via a host header). | Biggest slice; no behaviour change while `OWNER_HOST` is unset. |
-| 2 | **Access JWT verification**: middleware, JWKS cache, variables, unit tests with a locally signed token, off until `ACCESS_AUD` is set. | |
+| 2 | **Access JWT verification**: middleware, JWKS cache, variables, unit tests with a locally signed token, off until `ACCESS_AUD` is set. | Built. |
 | 3 | **Contract change PR** for the endpoints above. | `contract-change` label. |
 | 4 | **Passkey core**: migration 0004, options and verify with `@simplewebauthn/server`, first-device enrolment through the email code, passkey sign-in and session, tests with a software authenticator (generated credentials). | |
 | 5 | **Device approval**: request, approval card, assertion plus PIN, enrolment token, expiry and decline, tests for every state and for replays. | |
@@ -96,7 +97,7 @@ Each is one small PR into `main` with tests, `ci` and `e2e` green; production on
 
 ## Cutover and rollback
 
-Order: ship slices 1 to 7 with everything off, create the owner host and the Access application, set `OWNER_HOST`, `ACCESS_*`, sign in on the owner host and enrol a passkey on two devices, ask Urmi to do the same, only then close the old owner routes on the staff host. Rollback is a one-line change: unset `OWNER_HOST` and the old owner routes answer again; the passkey tables stay. Recovery codes are tested once before the old path is closed.
+Order: ship slices 1 to 7 with everything off, create the owner host and the Access application, set `OWNER_HOST`, `ACCESS_*`, sign in on the owner host and enrol a passkey on two devices, ask Urmi to do the same, only then close the old owner routes on the staff host. Rollback is a one-line change: unset `OWNER_HOST` and the old owner routes answer again; the passkey tables stay. Recovery codes are tested once before the old path is closed. The ordered checklist is the [owner cutover runbook](runbooks/owner-cutover.md).
 
 ## What Harsh does in Cloudflare
 
