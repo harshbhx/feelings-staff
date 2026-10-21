@@ -7,3 +7,15 @@ onlyBuiltDependencies:
   - esbuild
   - workerd
   - sharp
+
+# basic-ftp: patched upstream, pinned here because @cloudflare/puppeteer pulls it in through proxy-agent.
+overrides:
+  basic-ftp: '>=6.2.1'
+
+# extract-zip has no patched release. It only unpacks browser downloads inside @puppeteer/browsers,
+# a Node-side helper of @cloudflare/puppeteer that does not run in the Worker (Browser Run is a binding).
+# Remove these two when @cloudflare/puppeteer stops depending on it.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-jmr9-qjv8-65gv
+    - GHSA-7pqw-9j4j-h8q3
