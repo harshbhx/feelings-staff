@@ -18,6 +18,7 @@ import {
   getDeviceRecord,
   setDeviceServerState,
 } from '../../../lib/device-key';
+import { STAFF_ONLY } from '../../../lib/surface';
 import { enrolDevice, staffSignIn } from '../lib/device';
 import { describeAuthError, type ErrorCopy } from '../lib/errors';
 import { withFlags } from '../lib/flags';
@@ -151,7 +152,9 @@ function SignInFlow() {
     </div>
   );
 
-  const ownerLink = <TextLink to="/auth/owner">{t('auth:common.ownerSignIn')}</TextLink>;
+  const ownerLink = STAFF_ONLY ? undefined : (
+    <TextLink to="/auth/owner">{t('auth:common.ownerSignIn')}</TextLink>
+  );
 
   if (mode === 'loading') {
     return (

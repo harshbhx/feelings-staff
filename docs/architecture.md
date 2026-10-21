@@ -41,7 +41,7 @@ flowchart TB
   worker -.-> wa
 ```
 
-Static files are served from assets. `/api/*`, `/v/*`, `/q/*`, `/__kit`, `/assets/*` and the owner and staff page paths (`/o`, `/auth/owner`, `/signin`, `/join` and so on; the Worker passes them to the assets unchanged unless `OWNER_HOST` is set) (a missing hashed file is a real 404, never the shell) always reach the Worker code first (`run_worker_first`), everything else falls back to the single-page app ([ADR-01](decisions/0001-one-worker-for-assets-api-and-cron.md)).
+Static files are served from assets. `/api/*`, `/v/*`, `/q/*`, `/__kit`, `/assets/*`, `/`, `/index.html`, `/sw.js`, `/manifest.webmanifest`, the split build folders `/_s/*` and `/_o/*` (always 404 under their own name) and the owner and staff page paths (`/o`, `/auth/owner`, `/signin`, `/join` and so on; the Worker passes them to the assets unchanged unless `OWNER_HOST` is set) (a missing hashed file is a real 404, never the shell) always reach the Worker code first (`run_worker_first`), everything else falls back to the single-page app ([ADR-01](decisions/0001-one-worker-for-assets-api-and-cron.md)).
 
 What the Worker does on every `/api/*` request, in order:
 

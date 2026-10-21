@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && FS_SURFACE=staff vite build && FS_SURFACE=owner vite build",
     "preview": "vite preview",
     "typecheck": "s=0; for p in app worker sw node; do tsc -p tsconfig.$p.json || s=1; done; exit $s",
     "test": "vitest run --project unit",

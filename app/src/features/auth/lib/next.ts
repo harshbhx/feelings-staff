@@ -1,5 +1,9 @@
 /** `?next=` after sign-in (set by RequireRole): only same-origin app paths, never another site. */
-const AUTH_PATHS = ['/signin', '/auth/owner', '/join', '/waiting'];
+import { STAFF_ONLY } from '../../../lib/surface';
+
+const AUTH_PATHS = STAFF_ONLY
+  ? ['/signin', '/join', '/waiting']
+  : ['/signin', '/auth/owner', '/join', '/waiting'];
 
 export function safeNext(raw: string | null | undefined): string | null {
   if (!raw) return null;
@@ -13,6 +17,6 @@ export function safeNext(raw: string | null | undefined): string | null {
 
 /** Owners and managers live under /o; staff everywhere else (PRD 5). */
 export function nextFitsRole(next: string, role: 'owner' | 'manager' | 'staff'): boolean {
-  const owner = next === '/o' || next.startsWith('/o/') || next.startsWith('/o?');
+  const owner = !STAFF_ONLY && (next === '/o' || next.startsWith('/o/') || next.startsWith('/o?'));
   return role === 'staff' ? !owner : owner;
 }

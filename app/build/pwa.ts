@@ -9,6 +9,8 @@
  *    With @cloudflare/vite-plugin the build has a `client` and a Worker environment: the PWA plugins
  *    only apply to `client`, and their output directory is the client's (dist/client), otherwise the
  *    service worker would be built twice and precache the Worker bundle.
+ * Split builds (build/split.ts) reuse this: their manifest is written next to the page by
+ *    `fs:split-entry`, the service worker is built into the split build's own folder and scope `/`.
  * 2. `fs:pwa-assets`: renders every icon and the iOS splash images (PRD 11.2) at build time with
  *    @vite-pwa/assets-generator, emits them into the client build and injects the
  *    `apple-touch-startup-image` links into index.html. Nothing is committed but icons/icon.svg.
@@ -243,7 +245,9 @@ export function pwa(): PluginOption[] {
     },
     integration: {
       configureOptions(viteConfig, options) {
-        options.outDir = viteConfig.environments.client?.build.outDir ?? 'dist/client';
+        // The combined build has a `client` environment (dist/client); a split build is a plain client
+        // build whose outDir is its folder below it.
+        options.outDir = viteConfig.environments.client?.build.outDir ?? viteConfig.build.outDir;
       },
     },
   });

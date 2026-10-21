@@ -86,7 +86,7 @@ Optional variable for the owner host ([owner access](owner-access.md)). Leave it
 
 | Variable | Example | Meaning |
 |---|---|---|
-| `OWNER_HOST` | `owner.example.test` | Host name only, no scheme. When set, requests with this Host get the owner surface, every other host gets the staff surface (owner paths answer 404), the Origin check uses the answering host's own origin, and owner sign-in links use `https://<OWNER_HOST>`. Invite and join links keep `APP_ORIGIN`. Rollback: unset it. |
+| `OWNER_HOST` | `owner.example.test` | Host name only, no scheme. When set, requests with this Host get the owner surface, every other host gets the staff surface (owner paths answer 404), the Origin check uses the answering host's own origin, and owner sign-in links use `https://<OWNER_HOST>`. Invite and join links keep `APP_ORIGIN`. With it set the Worker serves each host from its own build folder (`/_s` staff, `/_o` owner, see [owner access](owner-access.md#build-layout)); unset, the combined build at the asset root serves both. In a local or e2e preview include the port (`owner.example.test:8787`). Rollback: unset it. |
 
 ## 4. Email
 

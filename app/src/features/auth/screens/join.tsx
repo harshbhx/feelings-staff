@@ -21,6 +21,7 @@ import {
   requestPersistentStorage,
   setDeviceServerState,
 } from '../../../lib/device-key';
+import { STAFF_ONLY } from '../../../lib/surface';
 import { enrolDevice } from '../lib/device';
 import { describeAuthError, type ErrorCopy } from '../lib/errors';
 import { withFlags } from '../lib/flags';
@@ -325,7 +326,7 @@ function JoinFlow() {
     ) : null;
 
   const footer =
-    step === 'details' ? (
+    step === 'details' && !STAFF_ONLY ? (
       <TextLink to="/auth/owner">{t('auth:common.ownerSignIn')}</TextLink>
     ) : undefined;
 

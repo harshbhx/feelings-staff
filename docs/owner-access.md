@@ -6,7 +6,7 @@ Contents: [What changes](#what-changes) · [The two hosts](#the-two-hosts) · [C
 
 ## What changes
 
-**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default) is built; slice 1b (split build) follows.
+**Status:** slice 1a (Host-based routing behind `OWNER_HOST`, off by default) and slice 1b (split build, below) are built. Nothing changes in production until `OWNER_HOST` is set.
 
 | Today | After |
 |---|---|
@@ -24,6 +24,21 @@ Keep working throughout: the current owner sign-in stays on until the cutover st
 - `APP_ORIGIN` becomes `APP_ORIGIN_STAFF` and `APP_ORIGIN_OWNER`; the Origin/CSRF check and the CSP use the list for the host that answers. Magic links, payslip links and the owner's emails use the owner host; invite and join links use the staff host.
 - Vite builds two entries (`staff`, `owner`) into separate asset folders with separate `index` pages; the Worker serves only the folder for the host. The shared UI kit is a normal dependency of both. A CI step greps the staff folder for owner markers (route names, `owner` namespaces, the owner host) and fails on a hit.
 - The owner host name is random, not guessable, and not committed: it is a Worker variable `OWNER_HOST` (and the Access application), recorded in the secrets runbook. It never appears in the repo, the staff bundle, staff docs, email footers to staff or logs shown to staff. The production Worker's `workers.dev` route is switched off at cutover.
+
+### Build layout
+
+`pnpm build` runs three client builds from one source tree:
+
+| Build | Command | Output | Used when |
+|---|---|---|---|
+| combined | `vite build` (with the Worker) | `app/dist/client` | `OWNER_HOST` unset: one host serves everything, exactly as before |
+| staff | `FS_SURFACE=staff vite build` | `app/dist/client/_s` | `OWNER_HOST` set: every host except the owner host |
+| owner | `FS_SURFACE=owner vite build` | `app/dist/client/_o` | `OWNER_HOST` set: the owner host |
+
+- Entries: `src/main.tsx` + `router.tsx` (combined), `main.staff.tsx` + `router.staff.tsx` (no `/o`, no `/auth/owner`, no owner shell, no lazy owner route table, no kit page, owner catalogs and client owner endpoints left out), `main.owner.tsx` + `router.owner.tsx` (owner sign-in and the owner panel). `__FS_SURFACE__` (see `src/lib/surface.ts`) folds owner links and paths out of the staff output.
+- Each split folder has its own `index.html`, hashed `assets/`, `sw.js` (scope `/`) and `manifest.webmanifest` (derived from `public/manifest.webmanifest` by `app/build/split.ts`: staff without the owner shortcut and screenshot; owner "Feelings Owner", starts at `/o/today`).
+- The Worker (`worker/lib/split-assets.ts`) serves the folder of the answering host as the site root: any path with a file extension must exist in the folder (a miss is a real 404), every other path gets the folder's shell. `/_s/*` and `/_o/*` answer 404 under their own names on every host. `/`, `/index.html`, `/sw.js` and `/manifest.webmanifest` are in `run_worker_first` for this; while `OWNER_HOST` is unset the Worker hands them to the assets unchanged.
+- CI: `scripts/check-staff-bundle.mjs` fails when the staff folder holds an owner marker (and, with `--expect-hits`, when the combined build does not, so the check cannot go blind); `scripts/size-budgets.mjs` measures all three builds, the staff initial JS is strict (170 KB) in the split. The e2e workflow has a second run with `OWNER_HOST=owner.example.test:8787` (`E2E_SPLIT=1`, project `split-hosts`).
 
 ## Cloudflare Access
 

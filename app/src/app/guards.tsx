@@ -6,9 +6,10 @@ import type { Role } from '@fs/contracts';
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router';
 import { useMe } from '../api/hooks';
+import { STAFF_ONLY } from '../lib/surface';
 
 export function homeFor(role: Role): string {
-  return role === 'staff' ? '/' : '/o/today';
+  return role === 'staff' || STAFF_ONLY ? '/' : '/o/today';
 }
 
 export function RequireRole({
