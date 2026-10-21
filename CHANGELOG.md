@@ -17,6 +17,10 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 - Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
+Owner access, contracts (`contracts-v1.3`, [owner access](docs/owner-access.md#api)):
+
+- 12 owner-host endpoints for passkeys: sign-in and confirm challenges, first-device enrolment, device requests with a 6-digit code (create, poll, list, approve or decline), the device list (rename, remove) and recovery. WebAuthn JSON schemas, fixtures with UI-state variants. Nothing is built behind them yet: they answer 501 (404 on the staff host when `OWNER_HOST` is set).
+
 Docs for Time credits and presence (WP-9):
 
 - Owner guide sections on Time credits, the Credits screen, settling at payroll, legal overtime at 2x, roll-call and step-outs; staff guide section on Step out and I'm back and the payslip Time adjustment line; data model for migration 0003 with retention; ADR-17 and ADR-18.

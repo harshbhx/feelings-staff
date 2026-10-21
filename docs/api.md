@@ -303,6 +303,45 @@ The credits routes are owner only; managers get 403 on all of them. Roll-call an
 | POST | `/owner/presence/away/:id/decide` | owner | no | yes | path `IdParams`; body `AwayDecideRequest` | `AwayIntervalView` | Confirm, mark as work or ignore a pending step-out |
 | GET | `/owner/presence/:userId/:date` | owner, manager with `rollcall` | no | no | path `UserDateParams` | `OwnerPresenceDay` | One person's roll-calls, away intervals and checks for a day |
 
+### Owner access: passkeys, devices, recovery
+
+Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host. The schemas are in `packages/contracts/src/api/owner-access.ts`.
+
+| Method | Path | Who may call | Step-up | Idempotent | Request | Response | Summary |
+|---|---|---|---|---|---|---|---|
+| POST | `/auth/owner/passkey/options` | public (`confirm`: an owner passkey session) | no | no | body `OwnerPasskeyOptionsRequest` | `OwnerPasskeyOptions` | Passkey challenge (5 min, single use) for sign-in or to confirm a device action |
+| POST | `/auth/owner/passkey/verify` | public | no | no | body `OwnerPasskeyVerifyRequest` | `Me` | Sign in with a passkey: owner session bound to that credential |
+| POST | `/auth/owner/enrol/options` | public (an owner session without a passkey, or an enrolment token) | no | no | body `OwnerEnrolOptionsRequest` | `OwnerEnrolOptions` | Passkey creation options: first device after the email code, or an enrolment token |
+| POST | `/auth/owner/enrol/verify` | public (an owner session without a passkey, or an enrolment token) | no | no | body `OwnerEnrolVerifyRequest` | `OwnerEnrolResult` (201) | Store the new passkey, approve this device, start a session bound to it |
+| POST | `/auth/owner/device-requests` | public | no | no | body `OwnerDeviceRequestCreate` | `OwnerDeviceRequestCreated` (201) | Add this device: a request with a 6-digit code (15 min) |
+| POST | `/auth/owner/device-requests/:id/status` | public | no | no | path `IdParams`; body `OwnerDeviceRequestPoll` | `OwnerDeviceRequestState` | The new device polls its own request with its enrolment token |
+| GET | `/owner/device-requests` | owner | no | no | - | `OwnerDeviceRequestList` | Pending device requests (approval cards in Needs action) |
+| POST | `/owner/device-requests/:id/decide` | owner | yes | no | path `IdParams`; body `OwnerDeviceRequestDecision` | `OwnerDeviceRequestView` | Approve (passkey on this device + PIN) or decline a device request |
+| GET | `/owner/security/devices` | owner | no | no | - | `OwnerDeviceList` | Approved devices (passkeys) of the signed-in owner |
+| PATCH | `/owner/security/devices/:id` | owner | no | no | path `IdParams`; body `OwnerDeviceRenameRequest` | `OwnerDeviceView` | Rename an approved device |
+| POST | `/owner/security/devices/:id/remove` | owner | yes | no | path `IdParams`; body `OwnerDeviceRemoveRequest` | `OwnerDeviceList` | Remove a device (passkey on this device + PIN); never the last one |
+| POST | `/auth/owner/recovery` | public | no | no | body `OwnerRecoveryRedeemRequest` | `OwnerRecoveryRedeemResult` | Recovery code (admin-issued, single use) -> enrolment token for a fresh first device |
+
+How the routes fit together:
+
+- **Sign in.** `POST /auth/owner/passkey/options` with `purpose: "signin"` returns a challenge and the options for `navigator.credentials.get()` (usernameless: no allow list, user verification required). `emailCode` is true while an owner of the salon has no passkey yet; only then does the page offer "Email me a code". The browser's answer goes to `POST /auth/owner/passkey/verify` with the `challengeId`.
+- **First device.** The existing `POST /auth/owner/magic` and `POST /auth/owner/verify` sign the owner in with the email code; then `POST /auth/owner/enrol/options` (no token) and `POST /auth/owner/enrol/verify` create the passkey. From then on the email-code routes refuse that owner on the owner host.
+- **Another device.** The new device calls `POST /auth/owner/device-requests` and keeps the `enrolToken` (never shown); it shows the `code` and polls `POST /auth/owner/device-requests/:id/status`. On an approved device the owner sees the request in `GET /owner/device-requests`, gets a challenge with `purpose: "confirm"` and approves with `POST /owner/device-requests/:id/decide` (passkey on that device, then the PIN). The new device then has 10 minutes to call the enrol routes with its `enrolToken`.
+- **Recovery.** `POST /auth/owner/recovery` turns an admin-issued code into an `enrolToken`; enrolling with it removes the owner's old passkeys.
+- **Confirming a device action.** Approve and Remove carry a passkey assertion made on the device that holds the session (`purpose: "confirm"`: the options allow only that session's credential) and need step-up.
+
+Errors these routes use (no new codes):
+
+| Code | When |
+|---|---|
+| `NONCE_INVALID` (409) | The challenge is unknown, used, expired (5 min) or was issued for another purpose or session. Get a new one. |
+| `SIGNATURE_INVALID` (401) | The passkey answer does not verify: signature, origin, relying-party id, user verification flag, counter, or an unknown or removed credential. |
+| `FORBIDDEN` (403), `details.reason: "passkey_enrolled"` | The email-code sign-in on the owner host for an owner who has a passkey. |
+| `RULE_VIOLATION` (422), `details.reason` | `already_enrolled` (first-device enrolment for an owner with a passkey), `last_device` (removing the only device). |
+| `LINK_EXPIRED` (410) | An enrolment token or device request that expired, was declined or was used; a recovery code that expired or was used. |
+| `ALREADY_DECIDED` (409) | Deciding a device request that is no longer pending. |
+| `CODE_WRONG` (401) | A recovery code that does not match. |
+
 ### Door device
 
 The kiosk screen at the door.
@@ -397,6 +436,9 @@ Short windows use the Workers rate-limit bindings (10 or 60 second periods; coun
 | Magic code tries, per link | 5, then the link dies | D1 |
 | Exports, per organisation | 10 per hour | D1, `exports` |
 | Google Maps link resolve, per organisation | 20 per hour | D1 |
+| Owner passkey challenges (`/auth/owner/passkey/options`, `/auth/owner/enrol/options`) | 20 per IP per 15 min; each verify uses up one challenge, so verifies are capped too | D1, owner access challenges |
+| Owner device requests | 5 per IP per hour; 3 pending at a time per organisation | D1, `owner_device_requests` |
+| Recovery code tries | 5 per IP per hour | D1 |
 
 Locally the IP and session limits are off unless a test sends `X-FS-Test-RateLimit: on`.
 

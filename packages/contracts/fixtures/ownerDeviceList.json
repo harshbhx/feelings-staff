@@ -1,0 +1,20 @@
+{
+  "devices": [
+    {
+      "id": "01M51HZK80QB75BAEXYQHS65P2",
+      "deviceName": "Urmi's iPhone",
+      "platform": "ios",
+      "createdAt": 1792127520000,
+      "lastUsedAt": 1792386720000,
+      "current": true
+    },
+    {
+      "id": "01M4ACD480NSMZDH2M7MB4GQFA",
+      "deviceName": "Urmi's Pixel",
+      "platform": "android",
+      "createdAt": 1791349920000,
+      "lastUsedAt": 1792208220000,
+      "current": false
+    }
+  ]
+}

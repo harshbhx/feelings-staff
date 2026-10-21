@@ -4,6 +4,10 @@
  * HTTP client needs), so the client shell does not bundle every contract schema (PRD 11.10).
  * Source: packages/contracts/src/endpoints.ts. A client unit test fails when the two drift.
  *
+ * The rows of the "Owner access" section (owner-host passkey routes, ADR-19) go to a second table
+ * that only the owner build merges in: they answer 404 on every other build's host, and leaving them
+ * out keeps the staff and combined initial JS at its size.
+ *
  *   node scripts/gen-client-routes.mjs
  */
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -13,8 +17,14 @@ import { ROOT } from './lib.mjs';
 const src = readFileSync(join(ROOT, 'packages/contracts/src/endpoints.ts'), 'utf8');
 const table = src.slice(src.indexOf('export const endpoints = {'));
 const entry = /^ {2}(\w+): ep\(\{\n([\s\S]*?)^ {2}\}\),$/gm;
+// The owner-access section runs from its heading comment to the next section heading.
+const ownerStart = table.indexOf('// ---- Owner access');
+if (ownerStart === -1) throw new Error('gen-client-routes: no "Owner access" section');
+const ownerEnd = table.indexOf('// ----', ownerStart + 1);
 const rows = [];
-for (const [, key, body] of table.matchAll(entry)) {
+const ownerRows = [];
+for (const match of table.matchAll(entry)) {
+  const [, key, body] = match;
   const method = /^ {4}method: '(\w+)'/m.exec(body)?.[1];
   const path = /^ {4}path: '([^']+)'/m.exec(body)?.[1];
   if (!method || !path) throw new Error(`gen-client-routes: cannot read ${key}`);
@@ -24,7 +34,8 @@ for (const [, key, body] of table.matchAll(entry)) {
   if (/^ {4}binary: true/m.test(body)) flags.push('b: 1');
   const status = /^ {4}status: (\d+)/m.exec(body)?.[1];
   if (status) flags.push(`s: ${status}`);
-  rows.push(
+  const inOwner = match.index > ownerStart && (ownerEnd === -1 || match.index < ownerEnd);
+  (inOwner ? ownerRows : rows).push(
     `  ${key}: { m: '${method}', p: '${path}'${flags.length ? `, ${flags.join(', ')}` : ''} },`,
   );
 }
@@ -36,6 +47,7 @@ const out = `/**
  * multipart (mp), binary (b) and success status (s). routes.gen.test.ts checks it against the table.
  */
 import type { EndpointKey, HttpMethod } from '@fs/contracts';
+import { OWNER_ONLY } from '../lib/surface';
 
 export interface ClientRoute {
   readonly m: HttpMethod;
@@ -46,9 +58,19 @@ export interface ClientRoute {
   readonly s?: 200 | 201 | 202 | 204;
 }
 
-export const ROUTES: Readonly<Record<EndpointKey, ClientRoute>> = {
+/**
+ * Owner-host passkey routes (ADR-19). Only the owner build has them: everywhere else they answer
+ * 404, so the staff and combined builds leave the rows out (the bundler drops this table there).
+ */
+export const OWNER_ACCESS_ROUTES = {
+${ownerRows.join('\n')}
+} as const satisfies Partial<Record<EndpointKey, ClientRoute>>;
+
+/** Every route this build calls. Outside the owner build the owner-access keys are absent. */
+export const ROUTES: Readonly<Partial<Record<EndpointKey, ClientRoute>>> = {
 ${rows.join('\n')}
+  ...(OWNER_ONLY ? OWNER_ACCESS_ROUTES : {}),
 };
 `;
 writeFileSync(join(ROOT, 'app/src/api/routes.gen.ts'), out);
-console.info(`gen-client-routes: ${rows.length} endpoints`);
+console.info(`gen-client-routes: ${rows.length} endpoints, ${ownerRows.length} owner-access`);
