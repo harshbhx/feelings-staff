@@ -237,7 +237,7 @@
     "notice": {
       "open": "Open it in Feelings Staff: {{url}}",
       "button": "Open Feelings Staff",
-      "footer": "You get this email because it is switched on for you. Change it in Settings."
+      "footer": "You get this email because it is switched on for your account."
     }
   },
   "inbox": {
