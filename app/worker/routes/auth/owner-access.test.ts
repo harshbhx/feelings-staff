@@ -571,7 +571,11 @@ describe('PK-3 passkey sign-in', () => {
       body: { pin: '739164' },
     });
     expect(reset.status).toBe(200);
-    expect(await auditActions()).toContain('owner.pin_reset');
+    const audit = await db(
+      "SELECT action FROM audit_log WHERE entity = 'user' AND entity_id = ?1",
+      s.ownerId,
+    ).all<{ action: string }>();
+    expect(audit.results.map((r) => r.action)).toContain('owner.pin_reset');
     const again = await req('/owner/security/pin', {
       cookie: r.cookie,
       method: 'PUT',
