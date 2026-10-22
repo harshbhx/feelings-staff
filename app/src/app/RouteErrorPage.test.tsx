@@ -1,5 +1,5 @@
 import { createI18n } from '@fs/i18n';
-import { act, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -21,6 +21,7 @@ async function show() {
 
 describe('root error page', () => {
   afterEach(() => {
+    cleanup();
     vi.restoreAllMocks();
   });
 
