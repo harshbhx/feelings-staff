@@ -10,7 +10,9 @@ test.describe('not found screen', () => {
     test.skip(!info.project.name.startsWith('staff-'), 'staff projects');
     await page.clock.setFixedTime(VISUAL_NOW);
     await page.goto('/no-such-page?mock=1&allowBrowser=1');
-    await expect(page.getByRole('heading', { level: 1, name: /That page isn't here/ })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: /That page isn't here/ }),
+    ).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     if (info.project.name === 'staff-android')
       await expect(page).toHaveScreenshot('staff-not-found.png');
@@ -24,7 +26,9 @@ test.describe('not found screen', () => {
     test.skip(!info.project.name.startsWith('owner-'), 'owner projects');
     await page.clock.setFixedTime(VISUAL_NOW);
     await page.goto('/o/no-such-page?mock=1&variant=me:owner');
-    await expect(page.getByRole('heading', { level: 1, name: /That page isn't here/ })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: /That page isn't here/ }),
+    ).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     await expect(page).toHaveScreenshot('owner-not-found.png');
     await checkA11y();
@@ -36,7 +40,9 @@ test.describe('not found screen', () => {
     test.skip(info.project.name !== 'staff-android', 'one run is enough');
     await reset('basic-salon');
     await page.goto('/no-such-page');
-    await expect(page.getByRole('heading', { level: 1, name: /That page isn't here/ })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: /That page isn't here/ }),
+    ).toBeVisible();
     await page.getByTestId('not-found-home').click();
     await expect(page).toHaveURL(/\/signin/);
   });
