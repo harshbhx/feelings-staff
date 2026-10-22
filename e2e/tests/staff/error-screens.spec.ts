@@ -58,7 +58,7 @@ test.describe('error screens', () => {
     await checkA11y();
   });
 
-  test('ERRSCREEN-3 the Worker's 404 page needs no script', async ({
+  test('ERRSCREEN-3 the 404 page from the Worker needs no script', async ({
     page,
     request,
     checkA11y,

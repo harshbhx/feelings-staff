@@ -18,8 +18,12 @@ const get = (path: string, message: string, headers: Record<string, string> = {}
 
 describe('database unreachable (error pages slice 3)', () => {
   it('ERR-503.1 recognises a database that is down, not a bad query', () => {
-    expect(isDatabaseUnavailable(new Error('D1 DB is overloaded. Requests queued for too long.'))).toBe(true);
-    expect(isDatabaseUnavailable(new Error('D1_ERROR: D1 DB reset because its code was updated'))).toBe(true);
+    expect(
+      isDatabaseUnavailable(new Error('D1 DB is overloaded. Requests queued for too long.')),
+    ).toBe(true);
+    expect(
+      isDatabaseUnavailable(new Error('D1_ERROR: D1 DB reset because its code was updated')),
+    ).toBe(true);
     expect(isDatabaseUnavailable(new Error('Network connection lost'))).toBe(true);
     expect(isDatabaseUnavailable(new Error('D1_ERROR: no such table: nope'))).toBe(false);
     expect(isDatabaseUnavailable(new Error('boom'))).toBe(false);
