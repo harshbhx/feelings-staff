@@ -53,7 +53,7 @@ export const routes: RouteObject[] = [
     ),
     children: staffRoutes,
   },
-  { path: '*', element: <Navigate to="/" replace /> },
+  { path: '*', lazy: () => import('./app/NotFound') },
 ];
 
 export function createRouter() {
