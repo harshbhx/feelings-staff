@@ -556,6 +556,34 @@ describe('PK-3 passkey sign-in', () => {
     const other = await sessionFor(s.ownerId);
     expect((await req('/me', { cookie: other, host: STAFF_HOST, split: false })).status).toBe(200);
   });
+
+  it('PK-3.11 a passkey sign-in opens the forgotten-PIN window like the email code (flow 6)', async () => {
+    const { auth } = await enrolled();
+    now += 2 * MIN;
+    const r = await signIn(auth);
+    if (!r.cookie) throw new Error('no session');
+    const view = await req<{ pinResetUntil?: number | null }>('/owner/security', {
+      cookie: r.cookie,
+    });
+    expect(view.body.pinResetUntil).toBe(now + 15 * MIN);
+    const reset = await req('/owner/security/pin', {
+      cookie: r.cookie,
+      method: 'PUT',
+      body: { pin: '739164' },
+    });
+    expect(reset.status).toBe(200);
+    const audit = await db(
+      "SELECT action FROM audit_log WHERE entity = 'user' AND entity_id = ?1",
+      s.ownerId,
+    ).all<{ action: string }>();
+    expect(audit.results.map((r) => r.action)).toContain('owner.pin_reset');
+    const again = await req('/owner/security/pin', {
+      cookie: r.cookie,
+      method: 'PUT',
+      body: { pin: '518206' },
+    });
+    expect(again.reason).toBe('recent_sign_in_required');
+  });
 });
 
 describe('PK-4 no email code after the first device', () => {

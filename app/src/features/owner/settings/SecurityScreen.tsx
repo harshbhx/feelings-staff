@@ -1,8 +1,8 @@
 /**
  * Security (PRD 4.1.7, 4.17, 10.3): the sign-in email, the password (with the owner PIN, as the
  * fallback when the email link can't arrive), the owner PIN that unlocks payroll, salary and device
- * changes for 10 minutes, the signed-in devices, and "Sign out other devices". On the owner host also
- * the passkey devices (OwnerDevicesSection).
+ * changes for 10 minutes (with "Forgot your PIN?", PinReset.tsx), the signed-in devices, and "Sign
+ * out other devices". On the owner host also the passkey devices (OwnerDevicesSection).
  */
 import { isApiError } from '@fs/contracts';
 import { Button, Field, Input, List, ListRow, Sheet, StatusChip, useToast } from '@fs/ui';
@@ -15,6 +15,7 @@ import { Meta, Section } from '../components/layout';
 import { QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { clock, shortDate, todayIst } from '../lib/format';
 import { OwnerDevicesSection } from './OwnerDevicesSection';
+import { ForgotPin, PinResetForm } from './PinReset';
 
 const PIN_RE = /^\d{6}$/;
 
@@ -43,7 +44,11 @@ export function SecurityScreen() {
             <p className="font-semibold text-text">{s.email}</p>
             <Meta>{t('owner:security.emailHint')}</Meta>
           </Section>
-          <PinForm pinSet={s.pinSet} />
+          {s.pinSet && s.pinResetUntil ? (
+            <PinResetForm until={s.pinResetUntil} />
+          ) : (
+            <PinForm pinSet={s.pinSet} />
+          )}
           <PasswordForm passwordSet={s.passwordSet} pinSet={s.pinSet} />
           {/* Passkey devices: owner host only (docs/owner-access.md flow 4). */}
           {OWNER_ONLY ? <OwnerDevicesSection /> : null}
@@ -147,7 +152,7 @@ function PinForm({ pinSet }: { pinSet: boolean }) {
             />
           </Field>
         </div>
-        <div>
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="submit"
             variant={pinSet ? 'secondary' : 'primary'}
@@ -160,6 +165,7 @@ function PinForm({ pinSet }: { pinSet: boolean }) {
                 ? t('owner:security.changePin')
                 : t('owner:security.setPin')}
           </Button>
+          {pinSet ? <ForgotPin /> : null}
         </div>
       </form>
     </Section>
