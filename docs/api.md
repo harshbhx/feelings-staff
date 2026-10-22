@@ -329,7 +329,7 @@ How the routes fit together:
 - **Sign in.** `POST /auth/owner/passkey/options` with `purpose: "signin"` returns a challenge and the options for `navigator.credentials.get()` (usernameless: no allow list, user verification required). `emailCode` is true while an owner of the salon has no passkey yet; only then does the page offer "Email me a code". The browser's answer goes to `POST /auth/owner/passkey/verify` with the `challengeId`.
 - **First device.** The existing `POST /auth/owner/magic` and `POST /auth/owner/verify` sign the owner in with the email code; then `POST /auth/owner/enrol/options` (no token) and `POST /auth/owner/enrol/verify` create the passkey. From then on the email-code routes refuse that owner on the owner host.
 - **Another device.** The new device calls `POST /auth/owner/device-requests` and keeps the `enrolToken` (never shown); it shows the `code` and polls `POST /auth/owner/device-requests/:id/status`. On an approved device the owner sees the request in `GET /owner/device-requests`, gets a challenge with `purpose: "confirm"` and approves with `POST /owner/device-requests/:id/decide` (passkey on that device, then the PIN). The new device then has 10 minutes to call the enrol routes with its `enrolToken`.
-- **Recovery.** `POST /auth/owner/recovery` turns an admin-issued code into an `enrolToken`; enrolling with it removes the owner's old passkeys.
+- **Recovery.** `POST /auth/owner/recovery` turns an admin-issued code into an `enrolToken` (valid 10 minutes, `expiresAt`); enrolling with it (`/auth/owner/enrol/options` and `/verify` with `enrolToken`) removes every old passkey and signs the owner out everywhere. The code works once. Every refusal (no such code, expired, used, wrong shape, owner no longer active) answers `LINK_EXPIRED` with the same words, so the route never says whether a code or an owner exists; each refusal is audited as `owner.recovery_failed`.
 - **Confirming a device action.** Approve and Remove carry a passkey assertion made on the device that holds the session (`purpose: "confirm"`: the options allow only that session's credential) and need step-up.
 
 Errors these routes use (no new codes):
@@ -342,9 +342,8 @@ Errors these routes use (no new codes):
 | `RULE_VIOLATION` (422), `details.reason` | `already_enrolled` (first-device enrolment for an owner with a passkey), `no_device` (a device request while no owner has a passkey to approve it), `last_device` (removing the only device). |
 | `FORBIDDEN` (403), `details.reason: "passkey_session"` | A confirm challenge, the request list or a decision from a session that did not sign in with a passkey. |
 | `NOT_FOUND` (404) | Polling a request with a token that is not its own (wrong or another request's). |
-| `LINK_EXPIRED` (410) | An enrolment token or device request that expired (15 minutes pending, 10 minutes after approval), was declined, was not approved yet or was used; a recovery code that expired or was used. Polling a used token answers it too; a declined or expired request polls as `status: "declined"` or `"expired"`. |
+| `LINK_EXPIRED` (410) | An enrolment token or device request that expired (15 minutes pending, 10 minutes after approval), was declined, was not approved yet or was used; a recovery code that does not exist, expired or was used (all three look the same). Polling a used token answers it too; a declined or expired request polls as `status: "declined"` or `"expired"`. |
 | `ALREADY_DECIDED` (409) | Deciding a device request that is no longer pending. |
-| `CODE_WRONG` (401) | A recovery code that does not match. |
 
 ### Door device
 
@@ -442,7 +441,7 @@ Short windows use the Workers rate-limit bindings (10 or 60 second periods; coun
 | Google Maps link resolve, per organisation | 20 per hour | D1 |
 | Owner passkey challenges (`/auth/owner/passkey/options`, `/auth/owner/enrol/options`) | 20 per IP per 15 min; each verify uses up one challenge, so verifies are capped too | D1, owner access challenges |
 | Owner device requests | 5 per IP per hour; 3 pending at a time per organisation | D1, `owner_device_requests` |
-| Recovery code tries | 5 per IP per hour | D1 |
+| Wrong recovery codes | 5 per IP and 20 per salon per 15 minutes, then `RATE_LIMITED` (counted from the `owner.recovery_failed` audit rows) | D1 |
 
 Locally the IP and session limits are off unless a test sends `X-FS-Test-RateLimit: on`.
 

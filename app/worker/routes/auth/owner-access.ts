@@ -4,7 +4,8 @@
  * request, slice 5), and the device list. Device requests are in owner-device-requests.ts. Every
  * handler answers NOT_FOUND off the owner host (the host routing already does so; this is the second
  * line). Remove (slice 6) needs the fingerprint on this device plus the PIN and never takes the last
- * device. Recovery (slice 7) is not built yet and answers 501.
+ * device. Recovery (slice 7): a code issued by an admin becomes an enrolment token (ownerRecoveryRedeem);
+ * enrolling with it replaces every old passkey and signs the owner out everywhere.
  * Owner: WP-3.
  */
 import type { Handlers } from '../../lib/api';
@@ -19,6 +20,7 @@ import {
   enrolOpen,
   requestByToken,
 } from '../../services/owner-devices';
+import { RECOVERY_MARK, redeemRecoveryCode } from '../../services/owner-recovery';
 import {
   assertChallengeBudget,
   assertionOptions,
@@ -197,17 +199,24 @@ export const ownerAccessHandlers: Handlers = {
     requireOrg(ctx);
     let owner: OwnerRow;
     let bind: { sessionHash: string } | { requestId: string };
+    let recovering = false;
     if (body.enrolToken !== undefined) {
       const t = await tokenEnrolment(ctx, body.enrolToken);
       owner = t.owner;
       bind = { requestId: t.request.id };
+      recovering = t.request.approved_by_credential === RECOVERY_MARK;
     } else {
       const f = await firstDeviceOwner(ctx);
       owner = f.owner;
       bind = { sessionHash: f.sessionHash };
     }
     await assertChallengeBudget(ctx);
-    const options = await registrationOptions(rp, owner, await livePasskeys(ctx, owner.id));
+    const options = await registrationOptions(
+      rp,
+      owner,
+      // A recovery replaces every old passkey, so none of them may block the new one.
+      recovering ? [] : await livePasskeys(ctx, owner.id),
+    );
     const { challengeId, expiresAt } = await storeChallenge(ctx, {
       purpose: 'enrol',
       challenge: options.challenge,
@@ -252,6 +261,7 @@ export const ownerAccessHandlers: Handlers = {
       );
       if (claimed.meta.changes !== 1) fail('LINK_EXPIRED', TOKEN_GONE);
     }
+    const recovery = request?.approved_by_credential === RECOVERY_MARK;
     const passkeyId = ulid(now);
     const row: PasskeyRow = {
       id: passkeyId,
@@ -273,14 +283,39 @@ export const ownerAccessHandlers: Handlers = {
       after: {
         deviceName: row.device_name,
         platform: row.platform,
-        via: request ? 'device_request' : 'email_code',
+        via: recovery ? 'recovery' : request ? 'device_request' : 'email_code',
         ...(request ? { requestId: request.id } : {}),
         deviceType: reg.deviceType,
         backedUp: reg.backedUp,
       },
       ...(request ? { actorType: 'user' as const, actorId: owner.id } : {}),
     });
-    if (request) {
+    if (recovery) {
+      // Every device was lost: the old passkeys go (removed_by 'recovery'), every session ends, and
+      // this one becomes the only device.
+      await ctx.db.batch([
+        ctx.db.stmt(
+          `UPDATE owner_passkeys SET removed_at = ?, removed_by = 'recovery'
+            WHERE org_id = ?org AND user_id = ? AND removed_at IS NULL`,
+          now,
+          owner.id,
+        ),
+        ctx.db.insert('owner_passkeys', { ...row }),
+        ctx.db.stmt(
+          `UPDATE users SET passkey_enrolled_at = COALESCE(passkey_enrolled_at, ?), updated_at = ?
+            WHERE org_id = ?org AND id = ?`,
+          now,
+          now,
+          owner.id,
+        ),
+        ctx.db.stmt(
+          `UPDATE sessions SET revoked_at = ? WHERE org_id = ?org AND user_id = ? AND revoked_at IS NULL`,
+          now,
+          owner.id,
+        ),
+        audit,
+      ]);
+    } else if (request) {
       // Another device of an owner who already has a passkey: nothing else changes.
       await ctx.db.batch([ctx.db.insert('owner_passkeys', { ...row }), audit]);
     } else {
@@ -304,7 +339,7 @@ export const ownerAccessHandlers: Handlers = {
       ]);
     }
     // Sign-in codes already sent to this owner stop working too.
-    if (!request && owner.email)
+    if ((!request || recovery) && owner.email)
       await ctx.sys.run(
         'UPDATE magic_links SET used_at = ?1 WHERE email = ?2 AND used_at IS NULL',
         now,
@@ -321,6 +356,14 @@ export const ownerAccessHandlers: Handlers = {
     await openPinResetWindow(ctx, started.tokenHash);
     const me = await buildMe(ctx, owner.id, { deviceId: null, stepUpUntil: null });
     return { me, device: deviceView(row, passkeyId) };
+  },
+
+  // ---- Recovery: an admin's one-time code becomes an enrolment token -----------------------------
+
+  async ownerRecoveryRedeem({ body }, ctx, c) {
+    ownerRelyingParty(c);
+    requireOrg(ctx);
+    return redeemRecoveryCode(ctx, body.code);
   },
 
   // ---- Approved devices -----------------------------------------------------------------------------

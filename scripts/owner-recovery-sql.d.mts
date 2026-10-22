@@ -9,3 +9,16 @@ export function clearPinStatements(opts: {
   auditId: string;
   reason: string;
 }): string[];
+export const RECOVERY_CODE_TTL_MS: number;
+export function newRecoveryCode(): string;
+export function normalizeRecoveryCode(input: string): string | null;
+export function recoveryCodeHash(code: string): Promise<string>;
+export function issueCodeStatements(opts: {
+  ownerId: string;
+  orgId: string;
+  now: number;
+  codeId: string;
+  codeHash: string;
+  auditId: string;
+  reason: string;
+}): string[];

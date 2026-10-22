@@ -184,9 +184,14 @@ export function OwnerPasskeySignInScreen() {
             {t('owner:access.signIn.lostPhone')}
           </button>
           {lostOpen ? (
-            <p className="mt-2 text-sm text-pretty text-text-body">
-              {t('owner:access.signIn.lostPhoneHelp')}
-            </p>
+            <div className="mt-2 flex flex-col items-center gap-3">
+              <p className="text-sm text-pretty text-text-body">
+                {t('owner:access.signIn.lostPhoneHelp')}
+              </p>
+              <Button variant="secondary" block onClick={() => navigate('/auth/owner/recovery')}>
+                {t('owner:access.signIn.recoveryCode')}
+              </Button>
+            </div>
           ) : null}
         </div>
       </div>

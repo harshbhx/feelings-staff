@@ -166,7 +166,7 @@ Passkeys on approved owner devices ([ADR-19](decisions/0019-owner-access-on-its-
 |---|---|---|
 | `owner_passkeys` | `user_id`, `credential_id` (unique, base64url), `public_key` (base64url COSE key, ES256 or RS256), `sign_count`, `transports` (JSON), `device_name`, `platform`, `created_at`, `last_used_at`, `removed_at`, `removed_by` | One WebAuthn credential, which is one approved device in Settings, Security. `sign_count` is the last signature counter; a passkey that syncs between a person's devices reports 0 every time, and then the counter check is skipped. A removed row stays (sessions and audit rows name it) until the purge. |
 | `owner_device_requests` | `user_id` (the owner who decided; empty while pending), `code` (6 digits), `device_name`, `platform`, `city`, `status` (`pending`, `approved`, `declined`, `expired`), `approved_by_credential`, `enrol_token_hash` (unique), `ip_hmac`, `expires_at` (15 minutes), `decided_at`, `used_at`, `created_at` | "Add this device" (slice 5): a new device asks, an approved device approves with its passkey and the PIN. Approval opens a 10-minute window for the new device's single-use enrolment token. |
-| `owner_recovery_codes` | `user_id`, `code_hash` (unique), `issued_by`, `expires_at` (24 hours), `used_at`, `created_at` | Admin-issued recovery codes (slice 7), stored hashed, single use. |
+| `owner_recovery_codes` | `user_id`, `code_hash` (unique), `issued_by`, `expires_at` (24 hours), `used_at`, `created_at` | Admin-issued recovery codes (slice 7), single use. `code_hash` is SHA-256 of `owner-recovery:` plus the 16 normalised characters (the script has no Worker secret; 80 random bits make an offline guess hopeless). A new code ends the owner's earlier unused ones (`expires_at` set to now). Redeeming it writes an already approved device request (`approved_by_credential = 'recovery'`) whose token starts the enrolment. |
 | `owner_passkey_challenges` | `purpose` (`signin`, `confirm`, `enrol`), `challenge` (unique), `user_id`, `session_hash`, `passkey_id`, `request_id`, `ip_hmac`, `expires_at` (5 minutes), `used_at`, `created_at` | WebAuthn challenges, used up by one conditional update. `enrol` and `confirm` ones belong to the session that asked; a `confirm` one accepts only `passkey_id`. Also the rate-limit count (20 per IP per 15 minutes). |
 
 | Changed table | Change |
@@ -174,7 +174,7 @@ Passkeys on approved owner devices ([ADR-19](decisions/0019-owner-access-on-its-
 | `users` | `passkey_enrolled_at`: when the owner's first passkey was enrolled. From then on the owner host offers no email-code or password sign-in to that owner. |
 | `sessions` | `passkey_id`: the credential an owner session signed in with. Such a session lasts 12 hours idle and 7 days at most, and ends when the credential is removed. |
 
-Audit actions (category `security`): `owner.passkey_enrolled`, `owner.signin_passkey`, `owner.device_renamed`, and in the next slices `owner.device_requested`, `owner.device_approved`, `owner.device_declined`, `owner.device_removed`, `owner.recovery_issued`, `owner.recovery_used`.
+Audit actions (category `security`): `owner.passkey_enrolled`, `owner.signin_passkey`, `owner.device_renamed`, `owner.device_requested`, `owner.device_approved`, `owner.device_declined`, `owner.device_removed`, `owner.recovery_issued` (by the script, actor `system`), `owner.recovery_used` and `owner.recovery_failed` (a wrong, used or expired code; carries the IP hash the rate limit counts).
 
 ## Retention
 

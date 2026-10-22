@@ -5,7 +5,7 @@
  * only) and prints what it would change. Nothing is written without --yes. It never prints a PIN, a
  * hash, a salt or a token.
  *
- *   node scripts/owner-recovery.mjs --clear-pin --database <name> (--remote | --local)
+ *   node scripts/owner-recovery.mjs (--clear-pin | --issue-code) --database <name> (--remote | --local)
  *        [--config <wrangler config>] [--env <wrangler env>] [--email <owner email>]
  *        [--reason "<text>"] [--yes]
  *
@@ -13,14 +13,24 @@
  *   --clear-pin   Clear the owner PIN, its failures and lock, and sign the owner out everywhere.
  *                 The next sign-in by email code goes through the first-PIN flow. Audit row
  *                 owner.pin_cleared_by_admin.
- *   (--issue-code, a one-time recovery code, follows with owner access slice 7 part B.)
+ *   --issue-code  Issue a one-time recovery code for an owner who lost every device: stored hashed,
+ *                 valid 24 hours, single use, earlier unused codes stop working. The code is shown
+ *                 once, after the write, and never in a dry run. Audit row owner.recovery_issued.
  *
  * Wrangler runs as `pnpm exec wrangler` from app/ (set WRANGLER_CMD to use another command).
  */
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import { clearPinStatements, OWNER_LOOKUP_SQL, ulid } from './owner-recovery-sql.mjs';
+import {
+  clearPinStatements,
+  issueCodeStatements,
+  newRecoveryCode,
+  OWNER_LOOKUP_SQL,
+  RECOVERY_CODE_TTL_MS,
+  recoveryCodeHash,
+  ulid,
+} from './owner-recovery-sql.mjs';
 
 const APP_DIR = new URL('../app/', import.meta.url).pathname;
 
@@ -34,7 +44,8 @@ const APP_DIR = new URL('../app/', import.meta.url).pathname;
 const ACTIONS = {
   'clear-pin': {
     title: 'Clear the owner PIN',
-    plan(owner, { now, reason }) {
+    defaultReason: 'Owner forgot the PIN',
+    async plan(owner, { now, reason }) {
       const auditId = ulid(now);
       const statements = clearPinStatements({
         ownerId: owner.id,
@@ -59,9 +70,43 @@ const ACTIONS = {
       };
     },
   },
+  'issue-code': {
+    title: 'Issue a recovery code',
+    defaultReason: 'Owner lost every device',
+    async plan(owner, { now, reason }) {
+      const code = newRecoveryCode();
+      const codeId = ulid(now);
+      const auditId = ulid(now);
+      const statements = issueCodeStatements({
+        ownerId: owner.id,
+        orgId: owner.org_id,
+        now,
+        codeId,
+        codeHash: await recoveryCodeHash(code.replaceAll('-', '')),
+        auditId,
+        reason,
+      });
+      const hours = RECOVERY_CODE_TTL_MS / 3_600_000;
+      return {
+        lines: [
+          `Code: one new code for this owner, valid ${hours} hours (until ${new Date(now + RECOVERY_CODE_TTL_MS).toISOString()}), single use`,
+          'Earlier unused codes of this owner stop working',
+          'Stored hashed: the code itself is shown once, after the write, never in a dry run',
+          'Sessions and passkeys stay as they are until she redeems the code on the owner host',
+          `Audit: owner.recovery_issued, row ${auditId}`,
+        ],
+        statements,
+        shown: statements.map((sql) => sql.replace(/'[0-9a-f]{64}'/, "'<hash of the code>'")),
+        after: () => [
+          `Recovery code (shown once, give it to her by phone): ${code}`,
+          `Code id ${codeId}, audit row id: ${auditId}`,
+        ],
+      };
+    },
+  },
 };
 
-const USAGE = `Usage: node scripts/owner-recovery.mjs --clear-pin --database <name> (--remote | --local)
+const USAGE = `Usage: node scripts/owner-recovery.mjs (--clear-pin | --issue-code) --database <name> (--remote | --local)
        [--config <wrangler config>] [--env <wrangler env>] [--email <owner email>]
        [--reason "<text>"] [--yes]
 Dry run unless --yes. See docs/runbooks/owner-recovery.md.`;
@@ -88,6 +133,7 @@ function parse(argv) {
       args: argv,
       options: {
         'clear-pin': { type: 'boolean' },
+        'issue-code': { type: 'boolean' },
         database: { type: 'string' },
         config: { type: 'string' },
         env: { type: 'string' },
@@ -127,7 +173,7 @@ function parse(argv) {
     env: v.env ?? null,
     target: v.remote ? '--remote' : '--local',
     email: v.email?.trim().toLowerCase() ?? null,
-    reason: (v.reason ?? 'Owner forgot the PIN').slice(0, 200),
+    reason: (v.reason ?? ACTIONS[actions[0]].defaultReason).slice(0, 200),
     yes: Boolean(v.yes),
   };
 }
@@ -167,13 +213,13 @@ function findOwner(opts) {
   return owners[0];
 }
 
-function main() {
+async function main() {
   const opts = parse(process.argv.slice(2));
   const action = ACTIONS[opts.action];
   const where = `${opts.database} (${opts.target.slice(2)}${opts.env ? `, env ${opts.env}` : ''}${opts.config ? `, ${opts.config}` : ''})`;
   const owner = findOwner(opts);
   const now = Date.now();
-  const plan = action.plan(owner, { now, reason: opts.reason });
+  const plan = await action.plan(owner, { now, reason: opts.reason });
 
   console.info(`${action.title}: ${opts.yes ? '' : 'dry run, '}database ${where}`);
   console.info(`Owner: ${owner.name} <${maskEmail(owner.email)}>, id ${owner.id}`);
@@ -191,4 +237,4 @@ function main() {
   console.info('Done. Add an entry to docs/ops-log.md (no codes, no secrets).');
 }
 
-main();
+await main();
