@@ -5,7 +5,8 @@
  * Both folders themselves answer 404 on every host. With `OWNER_HOST` unset none of this runs and the
  * combined build at the asset root serves everything, as before.
  */
-import type { Surface } from './hosts';
+import { notFoundPage } from './error-pages';
+import { isAppRoute, type Surface } from './hosts';
 
 export type SplitSurface = Exclude<Surface, 'combined'>;
 
@@ -30,9 +31,12 @@ export async function serveSplitAsset(
   assets: Fetcher,
   req: Request,
   surface: SplitSurface,
+  nonProd = false,
 ): Promise<Response> {
   const url = new URL(req.url);
   const file = isFile(url.pathname) && url.pathname !== '/index.html';
+  // An address that is neither a file nor an app route of this host is a real 404, never the shell.
+  if (!file && !isAppRoute(url.pathname, surface, nonProd)) return notFoundPage(req.method);
   const target = file ? `${FOLDER[surface]}${url.pathname}` : `${FOLDER[surface]}/`;
   const res = await assets.fetch(new Request(new URL(target, url), req));
   const html = res.headers.get('Content-Type')?.includes('text/html') ?? false;

@@ -48,9 +48,26 @@ async function fetchAs(
   return { res, requested };
 }
 
+describe('X-SPLIT-1b unknown addresses are a real 404', () => {
+  it('X-SPLIT-1b.1 a path that is no client route of the host answers the 404 page, not the shell', async () => {
+    for (const [host, path] of [
+      [STAFF, '/some/deep/link'],
+      [STAFF, '/o/today'],
+      [OWNER, '/month'],
+      [OWNER, '/nope'],
+    ] as const) {
+      const { res, requested } = await fetchAs(host, path);
+      expect(res.status, `${host}${path}`).toBe(404);
+      expect(res.headers.get('Content-Type')).toContain('text/html');
+      expect(await res.text()).toContain("That page isn't here");
+      expect(requested).toEqual([]);
+    }
+  });
+});
+
 describe('X-SPLIT-1 files come from the folder of the answering host', () => {
   it('X-SPLIT-1.1 each host gets its own shell for app routes and the root', async () => {
-    for (const path of ['/', '/index.html', '/me', '/some/deep/link'])
+    for (const path of ['/', '/index.html', '/me', '/me/data', '/v/abc'])
       expect(await (await fetchAs(STAFF, path)).res.text()).toBe('staff shell');
     expect(await (await fetchAs(OWNER, '/o/today')).res.text()).toBe('owner shell');
     expect(await (await fetchAs(OWNER, '/index.html')).res.text()).toBe('owner shell');

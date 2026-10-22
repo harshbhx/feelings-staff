@@ -10,6 +10,7 @@ import { registerApi } from './lib/api';
 import type { AppEnv } from './lib/app-env';
 import { ApiException } from './lib/errors';
 import {
+  isAppRoute,
   isOwnerAccessApiPath,
   isOwnerApiPath,
   isOwnerAppPath,
@@ -18,6 +19,7 @@ import {
   STAFF_APP_PATHS,
   surfaceOf,
 } from './lib/hosts';
+import { notFoundPage } from './lib/error-pages';
 import { isSplitFolderPath, serveSplitAsset } from './lib/split-assets';
 import { ulid } from './lib/ulid';
 import { access } from './middleware/access';
@@ -26,6 +28,8 @@ import { errorResponse, onError } from './middleware/errors';
 import { guard } from './middleware/guard';
 import { withSecurityHeaders } from './middleware/headers';
 import { allHandlers } from './routes';
+
+const hasExtension = (path: string) => /\.[A-Za-z0-9]+$/.test(path.slice(path.lastIndexOf('/') + 1));
 
 export function createApp(): Hono<AppEnv> {
   const app = new Hono<AppEnv>();
@@ -71,7 +75,7 @@ export function createApp(): Hono<AppEnv> {
     const isRead = c.req.method === 'GET' || c.req.method === 'HEAD';
     const own = !url.pathname.startsWith('/api/') && !/^\/q(\/|$)/.test(url.pathname);
     if (surface === 'combined' || !isRead || !own) return next();
-    return serveSplitAsset(c.env.ASSETS, c.req.raw, surface);
+    return serveSplitAsset(c.env.ASSETS, c.req.raw, surface, isNonProd(c.env));
   });
 
   // Entry files that reach the Worker (wrangler `run_worker_first`) in the combined build.
@@ -116,6 +120,18 @@ export function createApp(): Hono<AppEnv> {
       ? c.env.ASSETS.fetch(new Request(new URL('/', c.req.url)))
       : c.text('Not found', 404),
   );
+
+  // Everything else (the Worker runs first for every request, wrangler `run_worker_first: true`): a
+  // real file comes from the asset layer; the layer's SPA fallback only stands for a client route.
+  // An address that is neither is a real 404, so a typo or a scanner does not get a 200 shell.
+  app.on(['GET', 'HEAD'], '*', async (c) => {
+    const { pathname } = new URL(c.req.url);
+    const res = await c.env.ASSETS.fetch(c.req.raw);
+    const html = res.headers.get('Content-Type')?.includes('text/html') ?? false;
+    if (res.status !== 404 && !(html && !isAppRoute(pathname, 'combined', isNonProd(c.env))))
+      return res;
+    return hasExtension(pathname) ? c.text('Not found', 404) : notFoundPage(c.req.method);
+  });
 
   app.onError(onError);
   return app;

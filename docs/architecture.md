@@ -41,7 +41,7 @@ flowchart TB
   worker -.-> wa
 ```
 
-Static files are served from assets. `/api/*`, `/v/*`, `/q/*`, `/__kit`, `/assets/*`, `/`, `/index.html`, `/sw.js`, `/manifest.webmanifest`, the split build folders `/_s/*` and `/_o/*` (always 404 under their own name) and the owner and staff page paths (`/o`, `/auth/owner`, `/signin`, `/join` and so on; the Worker passes them to the assets unchanged unless `OWNER_HOST` is set) (a missing hashed file is a real 404, never the shell) always reach the Worker code first (`run_worker_first`), everything else falls back to the single-page app ([ADR-01](decisions/0001-one-worker-for-assets-api-and-cron.md)).
+Static files are served from assets, but every request reaches the Worker code first (`run_worker_first: true`). The Worker answers `/api/*`, `/q/*`, the split build folders `/_s/*` and `/_o/*` (always 404 under their own name) and the host rules itself; a file comes from the asset layer (a missing file is a real 404, never the shell); a client route (`isAppRoute` in `worker/lib/hosts.ts`: `/`, the staff pages, `/v/*`, `/o`, `/auth/owner`, `/__kit` off production) gets the single-page app shell; any other address answers a real 404 with a small static page (`worker/lib/error-pages.ts`). Below a known prefix an unknown path still gets the shell, and the app's own not-found screen answers it ([ADR-01](decisions/0001-one-worker-for-assets-api-and-cron.md)).
 
 What the Worker does on every `/api/*` request, in order:
 

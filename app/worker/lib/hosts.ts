@@ -74,7 +74,7 @@ export function originForPath(env: HostEnv, path: string): string {
   return isOwnerAppPath(path) ? ownerOrigin(env) : env.APP_ORIGIN;
 }
 
-/** Staff SPA entry paths. Also listed in `run_worker_first` of wrangler.jsonc so the Worker can 404 them. */
+/** Staff SPA entry paths (client routes; `isAppRoute` is what the Worker answers with the shell). */
 export const STAFF_APP_PATHS = [
   '/door',
   '/join',
@@ -116,4 +116,19 @@ export function isOwnerHostApiPath(path: string): boolean {
   if (/^\/payslips\/[^/]+\/pdf$/.test(path)) return true;
   if (/^\/notifications\/[^/]+\/opened$/.test(path)) return true;
   return OWNER_HOST_API_EXACT.includes(path) || OWNER_HOST_API_PREFIX.some((p) => prefix(path, p));
+}
+
+/**
+ * Client routes of the SPA, per surface: the paths the Worker answers with the app shell (so a deep
+ * link, a reload or a notification tap works). Anything else is not an address of the app and gets a
+ * real 404 (worker/lib/error-pages.ts). Below a known prefix unknown paths still get the shell: the
+ * app's own "That page isn't here" screen answers them (app/src/app/NotFound.tsx).
+ */
+export function isAppRoute(path: string, surface: Surface, nonProd = false): boolean {
+  if (path === '/' || path === '/index.html') return true;
+  const staff = surface !== 'owner';
+  const owner = surface !== 'staff';
+  if (staff && (isStaffAppPath(path) || prefix(path, '/v'))) return true;
+  if (owner && isOwnerAppPath(path)) return true;
+  return nonProd && surface === 'combined' && path === '/__kit';
 }

@@ -6,9 +6,30 @@ test.describe('platform smoke', () => {
     const api = await request.get('/api/v1/does-not-exist');
     expect(api.status()).toBe(404);
     expect(api.headers()['content-type']).toContain('application/json');
-    const spa = await request.get('/some/spa/route');
+    const spa = await request.get('/month/some/spa/route');
     expect(spa.status()).toBe(200);
     expect(await spa.text()).toContain('<div id="root">');
+  });
+
+  test('ERR-404 an address that is not part of the app is a real 404, client routes still load', async ({
+    request,
+  }) => {
+    const lost = await request.get('/some/spa/route');
+    expect(lost.status()).toBe(404);
+    expect(lost.headers()['content-type']).toContain('text/html');
+    const body = await lost.text();
+    expect(body).toContain("That page isn't here");
+    expect(body).not.toContain('<div id="root">');
+    expect(lost.headers()['content-security-policy']).toContain("default-src 'self'");
+    for (const path of ['/signin', '/join', '/month', '/o/today', '/auth/owner', '/v/abc']) {
+      const res = await request.get(path);
+      expect(res.status(), path).toBe(200);
+      expect(await res.text(), path).toContain('<div id="root">');
+    }
+    const asset = await request.get('/assets/missing-abc.js');
+    expect(asset.status()).toBe(404);
+    expect((await request.get('/manifest.webmanifest')).status()).toBe(200);
+    expect((await request.get('/icons/missing.png')).status()).toBe(404);
   });
 
   test('X-03.1 security headers on API responses', async ({ request }) => {
