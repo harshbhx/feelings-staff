@@ -24,6 +24,10 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 - Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
 
+Owner PIN reset, contracts (`contracts-v1.4`):
+
+- `SecurityView.pinResetUntil`: until when the signed-in owner may set a new PIN without the old one (15 minutes after an email-code or magic-link sign-in, once per sign-in). Optional, so a server without the reset still matches. Fixture variant `ownerSecurityGet.pin-reset`.
+
 Owner access, device approval (slice 5, off until `OWNER_HOST` is set):
 
 - "Add this device" on the owner sign-in page: the new device shows a 6-digit code ("482 913") with "Expires in 14 minutes" and waits. On a phone that already has a passkey the request is a card in Needs action (device, when, city, the code to compare): Approve asks for the fingerprint on that phone, then the owner PIN; Decline asks for the PIN. The new device then makes its own passkey within 10 minutes and is signed in. Requests expire after 15 minutes; a declined or expired one can ask again.
