@@ -72,6 +72,7 @@ Harsh: if someone may have used a lost phone, follow "A staff phone is lost" in 
 - **Staff forgot the PIN.** Urmi: **Staff**, the person, **Devices**, **Reset PIN**. The person gets a new code on WhatsApp, types it, and sets a new PIN. The phone stays approved.
 - **Locked after five wrong tries.** It unlocks by itself after 15 minutes. Urmi is told if it happens many times in a day.
 - **Owner PIN locked.** Sign in with an email link, which unlocks it, then set it again in **Settings, Security**.
+- **Owner forgot the PIN.** **Settings, Security, Forgot your PIN?**: sign in again with an email code, then set a new PIN within 15 minutes. If that does not work, Harsh clears it with the [owner recovery runbook](owner-recovery.md).
 - **Every PIN stopped at once.** `PIN_PEPPER` was changed. Follow [the secrets runbook](secrets.md#pin_pepper).
 
 ## A payslip is wrong

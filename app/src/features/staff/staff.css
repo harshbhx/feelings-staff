@@ -80,6 +80,62 @@
     text-align: end;
   }
 
+  /* Today's greeting on the warm band (UI redesign slice 6): full bleed under the brand header. */
+  .staff-band {
+    margin-block-start: calc(-1 * var(--space-4));
+    margin-inline: calc(-1 * var(--gutter));
+    padding: var(--space-4) var(--gutter) var(--space-5);
+    background: var(--bg-tint);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .staff-band__greeting {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-display);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-tight);
+    color: var(--text);
+  }
+
+  .staff-band p {
+    color: var(--text-body);
+  }
+
+  /* "Not checked in" once the shift has started (problem 8): late tint, henna text, the clock. */
+  .staff-late-banner {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--status-late-bg);
+    color: var(--status-late);
+    font-size: var(--text-base);
+    font-weight: var(--weight-strong);
+    line-height: 1.35;
+  }
+
+  /* Payslips hero (slice 6): the latest month's take-home is the page's main number. */
+  .staff-pay-hero {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--bg-tint);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .staff-pay-hero__amount {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-display);
+    letter-spacing: -0.03em;
+    line-height: var(--leading-tight);
+    font-variant-numeric: tabular-nums;
+  }
+
   .staff-actionbar {
     position: fixed;
     inset-inline: 0;

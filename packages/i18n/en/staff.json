@@ -113,6 +113,7 @@
     "done": "You're out at {{time}}. {{duration}} today.",
     "startsAt": "Your shift starts at {{time}}.",
     "startedAt": "Your shift started at {{time}}.",
+    "lateBanner": "Not checked in. Shift started at {{time}}, {{ago}} ago.",
     "canCheckInFrom": "You can check in from {{time}}.",
     "endsAt": "Your shift ends at {{time}}.",
     "shiftTitle": "Your shift",
@@ -369,6 +370,7 @@
     },
     "today": "Today",
     "dayLabel": "{{date}}: {{status}}",
+    "lateDay": "late {{duration}}",
     "noData": "Nothing recorded this month yet.",
     "duties": "Venue duties",
     "loadError": "We couldn't load this month."
@@ -515,6 +517,7 @@
   "payslips": {
     "paid": "Paid {{date}} by {{mode}}",
     "notPaid": "Not marked paid yet",
+    "older": "Earlier months",
     "revision": "Revision {{n}}",
     "superseded": "Replaced by a newer version",
     "empty": "Your first payslip will appear here after the month closes.",

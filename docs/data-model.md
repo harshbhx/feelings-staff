@@ -1,8 +1,8 @@
 # Data model
 
-One D1 (SQLite) database per environment, plus one private R2 bucket. This page says what each table is for, the rules every table follows, how long data is kept and where files live. The schema itself is in [`migrations/0001_init.sql`](../migrations/0001_init.sql) (copied from PRD 8.2), [`migrations/0002_platform.sql`](../migrations/0002_platform.sql) and [`migrations/0003_time_credits_presence.sql`](../migrations/0003_time_credits_presence.sql) (WP-9). When this page and a migration disagree, the migration wins; fix the page.
+One D1 (SQLite) database per environment, plus one private R2 bucket. This page says what each table is for, the rules every table follows, how long data is kept and where files live. The schema itself is in [`migrations/0001_init.sql`](../migrations/0001_init.sql) (copied from PRD 8.2), [`migrations/0002_platform.sql`](../migrations/0002_platform.sql) and [`migrations/0003_time_credits_presence.sql`](../migrations/0003_time_credits_presence.sql) (WP-9) [`migrations/0004_owner_access.sql`](../migrations/0004_owner_access.sql) (owner access) and [`migrations/0005_session_pin_reset.sql`](../migrations/0005_session_pin_reset.sql) (forgotten owner PIN). When this page and a migration disagree, the migration wins; fix the page.
 
-Contents: [Conventions](#conventions) · [Tables](#tables) · [Platform tables (0002)](#platform-tables-0002_platformsql) · [Time credits and presence (0003)](#time-credits-and-presence-tables-0003_time_credits_presencesql) · [Retention](#retention) · [R2 layout](#r2-layout) · [Migrations](#migrations)
+Contents: [Conventions](#conventions) · [Tables](#tables) · [Platform tables (0002)](#platform-tables-0002_platformsql) · [Time credits and presence (0003)](#time-credits-and-presence-tables-0003_time_credits_presencesql) · [Owner access (0004)](#owner-access-tables-0004_owner_accesssql) · [Retention](#retention) · [R2 layout](#r2-layout) · [Migrations](#migrations)
 
 ## Conventions
 
@@ -36,7 +36,7 @@ Grouped as in PRD 8.2.
 |---|---|
 | `invites` | Join codes and PIN-reset codes. Only an HMAC of the code is stored. Single use, expires in 48 hours, counts failed tries. |
 | `devices` | A phone's public key (JWK and RFC 7638 thumbprint), label, platform and status (`pending`, `approved`, `rejected`, `revoked`). One approved device per person. |
-| `sessions` | Server side of the `fs_session` cookie: SHA-256 of the token, user, device, expiry, `step_up_until`, kind (`user` or `door`). |
+| `sessions` | Server side of the `fs_session` cookie: SHA-256 of the token, user, device, expiry, `step_up_until`, kind (`user` or `door`). `pin_reset_until` (0005): until then an owner session may set a new owner PIN without the old one; set only by an email-code or magic-link sign-in (`created_at` + 15 min), cleared by any PIN change in the session ([owner recovery](runbooks/owner-recovery.md)). |
 | `challenges` | Single-use nonces: login challenges and punch nonces (5 minutes) and offline nonces (24 hours). |
 | `magic_links` | Owner sign-in links and 6-digit codes (15 minutes, single use, limited tries). |
 
@@ -158,6 +158,24 @@ Both live in `orgs.settings_json` (no table):
 
 Audit actions: `credits.settle`, `credits.adjust`, `credits.adjust.void`, `credits.export`, `rollcall.submit`, `rollcall.edit`, `presence.away.confirm`, `presence.away.work`, `presence.away.ignore`, `presence.away.edit`, `presence.step_out`.
 
+## Owner access tables (0004_owner_access.sql)
+
+Passkeys on approved owner devices ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), [owner access](owner-access.md)). Nothing reads these tables or columns while the Worker variable `OWNER_HOST` is unset. Owner only: no staff route returns them.
+
+| Table | Columns | What it is for |
+|---|---|---|
+| `owner_passkeys` | `user_id`, `credential_id` (unique, base64url), `public_key` (base64url COSE key, ES256 or RS256), `sign_count`, `transports` (JSON), `device_name`, `platform`, `created_at`, `last_used_at`, `removed_at`, `removed_by` | One WebAuthn credential, which is one approved device in Settings, Security. `sign_count` is the last signature counter; a passkey that syncs between a person's devices reports 0 every time, and then the counter check is skipped. A removed row stays (sessions and audit rows name it) until the purge. |
+| `owner_device_requests` | `user_id` (the owner who decided; empty while pending), `code` (6 digits), `device_name`, `platform`, `city`, `status` (`pending`, `approved`, `declined`, `expired`), `approved_by_credential`, `enrol_token_hash` (unique), `ip_hmac`, `expires_at` (15 minutes), `decided_at`, `used_at`, `created_at` | "Add this device" (slice 5): a new device asks, an approved device approves with its passkey and the PIN. Approval opens a 10-minute window for the new device's single-use enrolment token. |
+| `owner_recovery_codes` | `user_id`, `code_hash` (unique), `issued_by`, `expires_at` (24 hours), `used_at`, `created_at` | Admin-issued recovery codes (slice 7), single use. `code_hash` is SHA-256 of `owner-recovery:` plus the 16 normalised characters (the script has no Worker secret; 80 random bits make an offline guess hopeless). A new code ends the owner's earlier unused ones (`expires_at` set to now). Redeeming it writes an already approved device request (`approved_by_credential = 'recovery'`) whose token starts the enrolment. |
+| `owner_passkey_challenges` | `purpose` (`signin`, `confirm`, `enrol`), `challenge` (unique), `user_id`, `session_hash`, `passkey_id`, `request_id`, `ip_hmac`, `expires_at` (5 minutes), `used_at`, `created_at` | WebAuthn challenges, used up by one conditional update. `enrol` and `confirm` ones belong to the session that asked; a `confirm` one accepts only `passkey_id`. Also the rate-limit count (20 per IP per 15 minutes). |
+
+| Changed table | Change |
+|---|---|
+| `users` | `passkey_enrolled_at`: when the owner's first passkey was enrolled. From then on the owner host offers no email-code or password sign-in to that owner. |
+| `sessions` | `passkey_id`: the credential an owner session signed in with. Such a session lasts 12 hours idle and 7 days at most, and ends when the credential is removed. |
+
+Audit actions (category `security`): `owner.passkey_enrolled`, `owner.signin_passkey`, `owner.device_renamed`, `owner.device_requested`, `owner.device_approved`, `owner.device_declined`, `owner.device_removed`, `owner.recovery_issued` (by the script, actor `system`), `owner.recovery_used` and `owner.recovery_failed` (a wrong, used or expired code; carries the IP hash the rate limit counts).
+
 ## Retention
 
 What the nightly job (03:00 IST) and the monthly purge delete. Details and how to check it: [retention runbook](runbooks/retention-purge.md).
@@ -171,6 +189,9 @@ What the nightly job (03:00 IST) and the monthly purge delete. Details and how t
 | Audit log `change` and `export` rows | 5 years (part of the wage records) | Deleted | Monthly |
 | Audit log `security` and `access` rows | 1 year (DPDP Rules 2025, Rule 8(3)) | Deleted | Nightly |
 | Sessions, challenges, magic links | Until expiry plus 7 days | Deleted | Nightly |
+| Owner passkey challenges | Until expiry plus 7 days | Deleted | Nightly |
+| Owner device requests, owner recovery codes | Until expiry plus 30 days | Deleted | Nightly |
+| Removed owner passkeys | 1 year after removal (as long as the security audit rows that name them) | Deleted | Nightly |
 | Notifications | 180 days | Deleted | Nightly |
 | Push subscriptions | Until 404 or 410, device revoked, or staff exit | Deleted at once | On the event |
 | Devices | Until revoked plus 30 days | Deleted (the id stays in audit references) | Nightly |
@@ -202,4 +223,4 @@ Object metadata: `content-type`, `x-org-id`, `x-sha256`. Owners get selfie thumb
 - Files live in `migrations/` as `NNNN_name.sql` and are applied with `wrangler d1 migrations apply`. `app/wrangler.jsonc` points both databases at `../migrations`.
 - Locally and in CI the E2E run applies them to a local database. For the shared preview database, the `preview` workflow runs `wrangler d1 migrations apply fbc-staff-preview --remote -c wrangler.preview-migrations.jsonc`. In production, the `deploy` workflow exports the database first and then applies them ([deploy guide](deploy.md), [backup runbook](runbooks/backup-restore.md)).
 - A bad migration is fixed forward with a new file. D1 Time Travel (30 days) is the safety net for the data.
-- Current files: `0001_init.sql` (the PRD 8.2 schema), `0002_platform.sql` (idempotency keys and the preview outbox) and `0003_time_credits_presence.sql` (time credits and presence, WP-9).
+- Current files: `0001_init.sql` (the PRD 8.2 schema), `0002_platform.sql` (idempotency keys and the preview outbox) `0003_time_credits_presence.sql` (time credits and presence, WP-9) `0004_owner_access.sql` (owner passkeys, device requests, recovery codes, passkey challenges) and `0005_session_pin_reset.sql` (`sessions.pin_reset_until`, the forgotten owner PIN window).
