@@ -31,6 +31,7 @@ import {
   verifyAssertion,
   verifyRegistration,
 } from '../../services/passkey';
+import { openPinResetWindow } from '../../services/pin-reset';
 import type { Ctx } from '../../services/ports';
 import { startUserSession } from '../../services/session';
 import { deviceRequestHandlers } from './owner-device-requests';
@@ -173,7 +174,15 @@ export const ownerAccessHandlers: Handlers = {
         actorId: stored.user_id,
       }),
     ]);
-    await startUserSession(ctx, c, { id: stored.user_id, orgId, role: 'owner' }, null, stored.id);
+    const started = await startUserSession(
+      ctx,
+      c,
+      { id: stored.user_id, orgId, role: 'owner' },
+      null,
+      stored.id,
+    );
+    // A passkey sign-in is fresh too: it opens the forgotten-PIN window (services/pin-reset.ts).
+    await openPinResetWindow(ctx, started.tokenHash);
     return buildMe(ctx, stored.user_id, { deviceId: null, stepUpUntil: null });
   },
 
@@ -297,7 +306,15 @@ export const ownerAccessHandlers: Handlers = {
         now,
         owner.email,
       );
-    await startUserSession(ctx, c, { id: owner.id, orgId, role: 'owner' }, null, passkeyId);
+    const started = await startUserSession(
+      ctx,
+      c,
+      { id: owner.id, orgId, role: 'owner' },
+      null,
+      passkeyId,
+    );
+    // The email code plus a new passkey: as fresh as a sign-in (forgotten-PIN window).
+    await openPinResetWindow(ctx, started.tokenHash);
     const me = await buildMe(ctx, owner.id, { deviceId: null, stepUpUntil: null });
     return { me, device: deviceView(row, passkeyId) };
   },

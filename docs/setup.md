@@ -97,7 +97,7 @@ Root `package.json`:
 | `pnpm size` | `scripts/size-budgets.mjs`: staff initial JS 170 KB gzip, each owner route chunk 120 KB (map chunks excluded), CSS 25 KB | CI, after the build |
 | `pnpm e2e` | Playwright (`e2e` package) | CI only |
 
-`app/package.json` adds `dev` (`vite`), `preview`, `db:migrate:local` and `cf-typegen`; these are for a machine that can afford them, not the shared VM. Other scripts: `scripts/gen-secrets.mjs` (below) and `scripts/lib.mjs` (shared helpers).
+`app/package.json` adds `dev` (`vite`), `preview`, `db:migrate:local` and `cf-typegen`; these are for a machine that can afford them, not the shared VM. Other scripts: `scripts/gen-secrets.mjs` (below), `scripts/lib.mjs` (shared helpers) and `scripts/owner-recovery.mjs` (admin owner recovery against a D1 you name, dry run unless `--yes`; [owner recovery runbook](runbooks/owner-recovery.md)).
 
 ## Secrets for tests and dev vars
 
