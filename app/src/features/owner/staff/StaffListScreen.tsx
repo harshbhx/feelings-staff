@@ -12,6 +12,7 @@ import { useStaffList } from '../api/staff';
 import { Meta, NoBreakParts, WRAP_ROW } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { shortDate } from '../lib/format';
+import { roleTone } from '../lib/people';
 
 const FILTERS: StaffStatusFilter[] = ['active', 'invited', 'exited', 'all'];
 
@@ -115,7 +116,7 @@ function StaffListRow({ row, filter }: { row: StaffRow; filter: StaffStatusFilte
     <ListRow
       asChild
       className={WRAP_ROW}
-      leading={<Avatar name={row.name} />}
+      leading={<Avatar name={row.name} tone={roleTone(row.designation)} />}
       title={row.name}
       subtitle={<NoBreakParts parts={[row.designation, row.employeeCode]} />}
       trailing={trailing}

@@ -25,6 +25,7 @@ import { useTodayBoard } from '../api/attendance';
 import { Meta, NoBreakParts, Section, useNow, WRAP_ROW } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { clock, dayLabel, duration } from '../lib/format';
+import { roleTone } from '../lib/people';
 import { telLink, waLink } from '../lib/share';
 import { inRowStatus, leaveKey, type RowStatus } from '../lib/status';
 import { AwayNowSection } from '../rollcall/AwayNow';
@@ -218,7 +219,7 @@ function Board({ board }: { board: TodayBoard }) {
             {s.dueLater.map((r) => (
               <ListRow
                 key={r.user.id}
-                leading={<Avatar name={r.user.name} />}
+                leading={<Avatar name={r.user.name} tone={roleTone(r.user.designation)} />}
                 title={r.user.name}
                 subtitle={
                   r.shiftStart ? t('owner:today.row.shiftAt', { time: r.shiftStart }) : undefined
@@ -339,7 +340,7 @@ function InRow({ row, date, worked }: { row: BoardInRow; date: string; worked: n
     <ListRow
       asChild
       className={WRAP_ROW}
-      leading={<Avatar name={row.user.name} />}
+      leading={<Avatar name={row.user.name} tone={roleTone(row.user.designation)} />}
       title={row.user.name}
       subtitle={
         <span className="tabular-nums">
@@ -365,7 +366,7 @@ function NotInRow({ row }: { row: BoardNotInRow }) {
   return (
     <ListRow
       className={WRAP_ROW}
-      leading={<Avatar name={row.user.name} />}
+      leading={<Avatar name={row.user.name} tone={roleTone(row.user.designation)} />}
       title={row.user.name}
       subtitle={<span className="tabular-nums">{when}</span>}
       trailing={
@@ -412,7 +413,11 @@ function AwayRow({ row }: { row: BoardAwayRow }) {
       <StatusChip status="off" label={t('owner:today.row.away.week_off')} />
     );
   return (
-    <ListRow leading={<Avatar name={row.user.name} />} title={row.user.name} trailing={chip} />
+    <ListRow
+      leading={<Avatar name={row.user.name} tone={roleTone(row.user.designation)} />}
+      title={row.user.name}
+      trailing={chip}
+    />
   );
 }
 

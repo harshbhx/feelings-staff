@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useCreditsOverview } from '../api/credits';
+import { useRoleTones } from '../api/staff';
 import { Meta, WRAP_ROW } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { longDate, money, monthName } from '../lib/format';
@@ -140,6 +141,7 @@ function AwayBadge({ count }: { count: number }) {
 function CreditsList({ rows }: { rows: CreditsRow[] }) {
   const { t } = useTranslation();
   const estimate = useEstimateText();
+  const tones = useRoleTones();
   return (
     <List>
       {rows.map((r) => (
@@ -147,12 +149,12 @@ function CreditsList({ rows }: { rows: CreditsRow[] }) {
           key={r.userId}
           asChild
           className={WRAP_ROW}
-          leading={<Avatar name={r.name} />}
+          leading={<Avatar name={r.name} tone={tones.get(r.userId)} />}
           title={r.name}
           subtitle={
             <span className="grid gap-0.5">
               <span>{estimate(r.estimatePaise, r.balanceMin)}</span>
-              <span className="tabular-nums">{lastSettled(r, t)}</span>
+              <span className="fs-row__caption tabular-nums">{lastSettled(r, t)}</span>
             </span>
           }
           meta={r.awayPending > 0 ? <AwayBadge count={r.awayPending} /> : undefined}

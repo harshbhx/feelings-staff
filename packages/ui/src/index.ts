@@ -6,7 +6,7 @@
  * aria labels come from the `ui` i18n namespace; everything a user reads otherwise is a prop.
  */
 
-export { Avatar, type AvatarProps, initials } from './components/Avatar';
+export { Avatar, type AvatarProps, type AvatarTone, initials } from './components/Avatar';
 export { Badge, type BadgeProps, type BadgeTone } from './components/Badge';
 export { Banner, type BannerProps } from './components/Banner';
 export { Bindi, type BindiProps, type BindiSize } from './components/Bindi';

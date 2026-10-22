@@ -83,7 +83,12 @@
     min-width: 0;
   }
 
+  /* Hierarchy (redesign Fix 5, PRD 12.4): the name at --text-base 700, the first line under it in
+     body ink, a second line as a muted caption. Secondary text is 4.5:1 or more on white, the page
+     band and the row's hover tint (--text-body 10.53:1 on white, 9.18:1 on --bg-tint; --text-muted
+     5.47:1 on white, 5.18:1 on --bg-soft, 4.77:1 on --bg-tint). */
   .fs-row__title {
+    font-size: var(--text-base);
     font-weight: var(--weight-strong);
     line-height: 1.35;
     letter-spacing: -0.01em;
@@ -96,6 +101,12 @@
     font-size: var(--text-sm);
     line-height: 1.45;
     color: var(--text-body);
+  }
+
+  .fs-row__caption {
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--text-muted);
   }
 
   .fs-row__meta {

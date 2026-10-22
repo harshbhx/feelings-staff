@@ -209,16 +209,7 @@ function Foundations() {
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {ROLES.map(([role, label, name]) => (
               <li key={role} className="flex items-center gap-3">
-                <span
-                  className="fs-avatar"
-                  aria-hidden="true"
-                  style={{ background: `var(--role-${role}-bg)`, color: `var(--role-${role})` }}
-                >
-                  {name
-                    .split(' ')
-                    .map((w) => w[0])
-                    .join('')}
-                </span>
+                <Avatar name={name} tone={role} />
                 <span className="text-sm font-semibold text-text">{label}</span>
               </li>
             ))}
@@ -603,39 +594,31 @@ function Lists() {
         <Specimen label="Who's in">
           <List>
             <ListRow
-              leading={<Avatar name="Priya Shah" />}
+              leading={<Avatar name="Priya Shah" tone="salon" />}
               title="Priya Shah"
-              subtitle="In at 10:28 · at the salon"
-              trailing={<StatusChip status="late" label="+18 m" />}
+              subtitle="In 10:28 · 14 m so far · Inside the salon"
+              trailing={<StatusChip status="late" className="text-sm" label="+18 m" />}
               onClick={() => undefined}
             />
             <ListRow
-              leading={<Avatar name="Neha Patel" />}
+              leading={<Avatar name="Neha Patel" tone="nails" />}
               title="Neha Patel"
-              subtitle="In at 09:56 · 3 h 14 m so far"
-              trailing={<StatusChip status="present" />}
+              subtitle="In 09:56 · 3 h 14 m so far · Inside the salon"
+              trailing={<StatusChip status="present" label="On time" />}
               onClick={() => undefined}
             />
             <ListRow
-              leading={<Avatar name="Kajal Mehta" />}
+              leading={<Avatar name="Kajal Mehta" tone="makeup" />}
               title="Kajal Mehta"
-              subtitle="Hotel Aram · venue duty"
+              subtitle="In 09:40 · 3 h 30 m so far"
               trailing={<StatusChip status="venue" />}
               onClick={() => undefined}
             />
             <ListRow
-              leading={<Avatar name="Sejal Makwana" />}
+              leading={<Avatar name="Sejal Makwana" tone="mehndi" />}
               title="Sejal Makwana"
-              subtitle="In 10:21 · 21 m so far"
-              meta={
-                <>
-                  <StatusChip status="late" label="+21 m" />
-                  <StatusChip status="waiting" label="Waiting for you" />
-                  <Badge tone="warning" icon="warning-circle">
-                    Edge
-                  </Badge>
-                </>
-              }
+              subtitle="In 10:21 · 21 min late · 0 m so far · At the edge of the salon area"
+              trailing={<StatusChip status="waiting" label="Waiting for you" />}
               onClick={() => undefined}
             />
           </List>
@@ -645,7 +628,12 @@ function Lists() {
             <ListRow
               leading={<Icon name="currency-inr" />}
               title="March"
-              subtitle="Paid 3 Apr by UPI"
+              subtitle={
+                <span className="grid gap-0.5">
+                  <span>Take-home after the advance</span>
+                  <span className="fs-row__caption">Paid 3 Apr by UPI</span>
+                </span>
+              }
               trailing="₹14,032"
             />
             <ListRow
