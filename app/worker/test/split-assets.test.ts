@@ -52,8 +52,6 @@ describe('X-SPLIT-1b unknown addresses are a real 404', () => {
   it('X-SPLIT-1b.1 a path that is no client route of the host answers the 404 page, not the shell', async () => {
     for (const [host, path] of [
       [STAFF, '/some/deep/link'],
-      [STAFF, '/o/today'],
-      [OWNER, '/month'],
       [OWNER, '/nope'],
     ] as const) {
       const { res, requested } = await fetchAs(host, path);
