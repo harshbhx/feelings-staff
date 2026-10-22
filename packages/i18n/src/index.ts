@@ -1,7 +1,7 @@
 /**
  * i18n for Feelings Staff (PRD 11.9). Keys are semantic and namespaced: `t('staff:today.checkIn')`.
  * Namespaces and owners: common, staff, errors (WP-7); owner (WP-6); payslip (WP-5); auth (WP-3);
- * door (WP-4); notify (WP-8); presence (WP-9, step-out, away and notice copy); ui (WP-2,
+ * door (WP-4); notify (WP-8); presence (WP-9, step-out, away and notice copy); pages (not-found and offline screens, English only, lazy); ui (WP-2,
  * component-level strings such as aria labels).
  * English is the source of truth; Gujarati falls back to English key by key.
  *
@@ -27,6 +27,7 @@ export const NAMESPACES = [
   'auth',
   'door',
   'presence',
+  'pages',
   'ui',
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];
@@ -73,6 +74,7 @@ const lazyCatalogs: Record<AppLang, Partial<Record<Namespace, Loader>>> = {
     notify: () => import('../en/notify.json'),
     payslip: () => import('../en/payslip.json'),
     presence: () => import('../en/presence.json'),
+    pages: () => import('../en/pages.json'),
   },
   gu: {
     common: () => import('../gu/common.json'),
