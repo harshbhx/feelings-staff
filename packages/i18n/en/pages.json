@@ -1,0 +1,8 @@
+{
+  "notFound": {
+    "title": "That page isn't here",
+    "body": "The link may be old, or a letter got lost on the way. Nothing is wrong with your account.",
+    "home": "Back to Today",
+    "signIn": "Sign in"
+  }
+}

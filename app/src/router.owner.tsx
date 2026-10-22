@@ -34,7 +34,7 @@ export const routes: RouteObject[] = [
     ),
     children: [{ index: true, element: <Navigate to="/o/today" replace /> }],
   },
-  { path: '*', element: <Navigate to="/o/today" replace /> },
+  { path: '*', lazy: () => import('./app/NotFound') },
 ];
 
 export function createRouter() {
