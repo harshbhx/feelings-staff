@@ -16,14 +16,14 @@ test.describe('not found screen', () => {
       await expect(page).toHaveScreenshot('staff-not-found.png');
     await checkA11y();
     await page.getByTestId('not-found-home').click();
-    await expect(page).toHaveURL(/\/\?/);
+    await expect(page).toHaveURL(/localhost:8787\/$/);
     await expect(page.getByRole('heading', { level: 1, name: /Good morning/ })).toBeVisible();
   });
 
   test('NOTFOUND-2 owner: the way back is owner Today', async ({ page, checkA11y }, info) => {
     test.skip(!info.project.name.startsWith('owner-'), 'owner projects');
     await page.clock.setFixedTime(VISUAL_NOW);
-    await page.goto('/o/no-such-page?mock=1');
+    await page.goto('/o/no-such-page?mock=1&variant=me:owner');
     await expect(page.getByRole('heading', { level: 1, name: /That page isn't here/ })).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     await expect(page).toHaveScreenshot('owner-not-found.png');
