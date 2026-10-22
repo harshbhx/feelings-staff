@@ -128,7 +128,8 @@ export function isAppRoute(path: string, surface: Surface, nonProd = false): boo
   if (path === '/' || path === '/index.html') return true;
   const staff = surface !== 'owner';
   const owner = surface !== 'staff';
-  if (staff && (isStaffAppPath(path) || prefix(path, '/v'))) return true;
+  if (prefix(path, '/v')) return true;
+  if (staff && isStaffAppPath(path)) return true;
   if (owner && isOwnerAppPath(path)) return true;
   return nonProd && surface === 'combined' && path === '/__kit';
 }
