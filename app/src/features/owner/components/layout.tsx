@@ -14,17 +14,25 @@ export function Section({
   action,
   children,
   className,
+  headingHidden,
 }: {
   title: ReactNode;
   count?: number | undefined;
   action?: ReactNode;
   children: ReactNode;
   className?: string | undefined;
+  /**
+   * `phone`: the heading is read but not drawn below 64rem, where a switch above the list already
+   * names it (Today's In, Not in yet, Away).
+   */
+  headingHidden?: 'phone' | undefined;
 }) {
   const id = useId();
   return (
     <section aria-labelledby={id} className={className ?? 'grid gap-2'}>
-      <div className="flex items-baseline justify-between gap-3">
+      <div
+        className={`flex items-baseline justify-between gap-3${headingHidden === 'phone' ? ' max-xl:sr-only' : ''}`}
+      >
         <h2 id={id} className="font-bold text-lg text-text tracking-name">
           {title}
           {count !== undefined ? (

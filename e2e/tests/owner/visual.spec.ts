@@ -208,6 +208,51 @@ test.describe('owner visual', () => {
     await expect(row('Pooja Bhatt').locator('.fs-status')).toHaveText('On time');
   });
 
+  test('OWN-V Fix 3: one hero card with one sindoor button, the first person within 420 px', async ({
+    page,
+    checkA11y,
+  }, info) => {
+    await openOwner(page, '/o/today');
+    const hero = page.getByTestId('today-hero');
+    await expect(hero.getByTestId('today-headline')).toHaveText('8 of 9 in');
+    await expect(hero.getByTestId('today-sentence')).toHaveText(
+      '3 late, 1 not in yet, 1 due later, 1 on leave, 1 off today.',
+    );
+    await expect(hero.getByRole('link', { name: '9 things need your OK' })).toBeVisible();
+    // The view's one sindoor button (PRD 12.2), and no counter tiles any more.
+    await expect(
+      page.locator('#owner-main .fs-btn[data-variant="primary"]').filter({ visible: true }),
+    ).toHaveCount(1);
+    await expect(page.locator('#owner-main .fs-stat')).toHaveCount(0);
+    if (info.project.name !== 'owner-phone') {
+      // Two columns: who is in on the left, not in yet and away on the right, no switch.
+      await expect(
+        page.locator('#owner-main').getByRole('radio', { name: /Not in yet/ }),
+      ).toBeHidden();
+      await expect(shown(page, 'Kajal Vyas')).toBeVisible();
+      await expect(shown(page, 'Komal Rathod')).toBeVisible();
+      return;
+    }
+    const first = page
+      .locator('#owner-main .fs-list__item .fs-row__title')
+      .filter({ visible: true });
+    await expect(first.first()).toHaveText('Neha Parmar');
+    const box = await first.first().boundingBox();
+    expect(box && box.y + box.height).toBeLessThanOrEqual(420);
+    // The switch: In (default), Not in yet, Away.
+    await page
+      .locator('#owner-main')
+      .getByRole('radio', { name: /Not in yet/ })
+      .check();
+    await expect(shown(page, 'Kajal Vyas')).toBeVisible();
+    await expect(shown(page, 'Bhumi Trivedi')).toBeVisible();
+    await expect(shown(page, 'Neha Parmar')).toHaveCount(0);
+    await checkA11y();
+    await page.locator('#owner-main').getByRole('radio', { name: /Away/ }).check();
+    await expect(shown(page, 'Komal Rathod')).toBeVisible();
+    await expect(shown(page, 'Kajal Vyas')).toHaveCount(0);
+  });
+
   test('OWN-V actions: all clear', async ({ page, checkA11y }) => {
     await openOwner(page, '/o/actions', ['ownerActions:empty']);
     await expect(page.getByTestId('owner-empty')).toBeVisible();

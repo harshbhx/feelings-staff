@@ -100,11 +100,12 @@ Open **Staff**, then the person:
 
 <!-- screenshot: owner-today -->
 
-- At the top, counters: **Present, Late, Not in yet, On leave, Week off, At a venue**. Tap one to filter.
-- **Needs action** shows how many things are waiting.
+- At the top, one card: the date and when it was updated, "8 of 9 in" with a bar (on time, late, not in yet), and one sentence such as "3 late, 1 not in yet, 1 on leave, 1 off today". When something waits for you, the card ends with a red button, "9 things need your OK", that opens **Needs action**.
+- On a phone, a switch under the card picks the list: **In**, **Not in yet** or **Away**, each with its count. On a computer you see all of them side by side: who is in on the left, who is not in yet and who is off on the right.
 - **Who's in**: name, then one line with the time in, hours so far and where the check-in was ("Inside the salon", "At the edge of the salon area"), and one status on the right. The status is the most important thing about that person: "Waiting for you" or "Needs a look" when you have to decide, else "+18 m" if she was late, else the venue, else "On time". Anything else (for example "21 min late" on a check-in that waits for you) is in the line under the name.
-- **Not in yet**: who should be here and is not, with **Call** and **WhatsApp** buttons.
-- **Checked out**: who has gone home.
+- **Checked out** (under In): who has gone home.
+- **Not in yet**: who should be here and is not, with **Call** and **WhatsApp** buttons, then who is due later.
+- **Away**: who is on leave, on a week off or on holiday.
 
 Before the first shift it says "No one is due yet. First shift starts at 10:00." On a Sunday off or a holiday: "Salon closed today (Diwali)."
 

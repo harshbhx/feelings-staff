@@ -1,21 +1,20 @@
 /**
- * Today board (PRD 5.2, O-03): readable in two seconds. One line says how the day is going, the
- * counters filter the lists, and the lists say who is in, who is not in yet (with Call and
- * WhatsApp), who has checked out and who is away. Polls every 30 s while visible; a push refetches.
+ * Today board (PRD 5.2, O-03; UI redesign Fix 3): readable in two seconds. One hero card says how
+ * the day is going ("8 of 9 in", the strip, one sentence) and holds the one sindoor button when
+ * something needs the owner's OK. On a phone a three-way switch (In, Not in yet, Away) picks the
+ * list; on a wide screen the people who are in sit on the left and the rest on the right. Polls
+ * every 30 s while visible; a push refetches.
  */
 import type { TodayBoard } from '@fs/contracts';
 import {
   Avatar,
   Button,
-  Icon,
+  ChipGroup,
   List,
   ListRow,
   ProgressStrip,
   Skeleton,
   SkeletonGroup,
-  StatChipGroup,
-  type StatOption,
-  type StatTone,
   StatusChip,
 } from '@fs/ui';
 import type { TFunction } from 'i18next';
@@ -31,25 +30,16 @@ import { inRowStatus, leaveKey, type RowStatus } from '../lib/status';
 import { AwayNowSection } from '../rollcall/AwayNow';
 import { RollCallCard } from '../rollcall/RollCallCard';
 import {
+  BOARD_VIEWS,
   type BoardAwayRow,
   type BoardInRow,
   type BoardNotInRow,
+  type BoardView,
   boardModel,
-  COUNTER_ORDER,
-  type CounterKey,
   dayProgress,
+  heroParts,
   liveWorkedMin,
 } from './today-model';
-
-/** Each counter's tint and icon (PRD 12.3). Not in yet waits; it is not an absence. */
-const COUNTER_TONE: Record<CounterKey, { tone: StatTone; icon?: StatOption['icon'] }> = {
-  present: { tone: 'present' },
-  late: { tone: 'late' },
-  notInYet: { tone: 'waiting', icon: 'hourglass' },
-  onLeave: { tone: 'leave' },
-  weekOff: { tone: 'off' },
-  atVenue: { tone: 'venue' },
-};
 
 export function TodayScreen() {
   const board = useTodayBoard();
@@ -60,11 +50,17 @@ export function TodayScreen() {
   );
 }
 
+/** Below the two-column width only the chosen view shows; from `xl` every view does. */
+const shownWhen = (on: boolean) =>
+  on
+    ? 'grid grid-cols-[minmax(0,1fr)] gap-8'
+    : 'hidden xl:grid xl:grid-cols-[minmax(0,1fr)] xl:gap-8';
+
 function Board({ board }: { board: TodayBoard }) {
   const { t } = useTranslation();
-  const [filter, setFilter] = useState<CounterKey | null>(null);
+  const [view, setView] = useState<BoardView>('in');
   const now = useNow();
-  const m = boardModel(board, filter);
+  const m = boardModel(board);
   const s = m.sections;
   const dayMeta = t('owner:today.dateUpdated', {
     date: dayLabel(board.date),
@@ -81,18 +77,6 @@ function Board({ board }: { board: TodayBoard }) {
   }
 
   const p = dayProgress(board);
-  // Zero counts stay out of the way, unless that filter is the one on.
-  const options: StatOption[] = [
-    { value: 'all', label: t('owner:today.stats.all'), count: p.everyone },
-    ...COUNTER_ORDER.filter(
-      (key) => key === 'present' || board.counters[key] > 0 || filter === key,
-    ).map((key) => ({
-      value: key,
-      label: t(`owner:today.stats.${key}`),
-      count: board.counters[key],
-      ...COUNTER_TONE[key],
-    })),
-  ];
   const stripParts = [
     {
       key: 'onTime',
@@ -115,28 +99,94 @@ function Board({ board }: { board: TodayBoard }) {
   ];
   const dueLaterPart =
     p.dueLater > 0 ? [t('owner:today.strip.dueLater', { count: p.dueLater })] : [];
-  const progressLabel = t('owner:today.progress', { in: p.inCount, total: p.total });
+  const parts = heroParts(board, p);
+  const sentence =
+    parts.length > 0
+      ? t('owner:today.hero.sentence', {
+          parts: parts.map((x) => t(`owner:today.hero.${x.key}`, { count: x.count })).join(', '),
+        })
+      : m.mode.kind === 'live'
+        ? t('owner:today.hero.allIn')
+        : null;
 
-  const lists = (
-    <>
-      {s.in.length > 0 || (filter === null && m.mode.kind === 'live') ? (
-        <Section title={t('owner:today.sections.in')} count={s.in.length}>
-          {s.in.length > 0 ? (
-            <List>
-              {s.in.map((r) => (
-                <InRow
-                  key={r.user.id}
-                  row={r}
-                  date={board.date}
-                  worked={liveWorkedMin(r, board.updatedAt, now)}
-                />
-              ))}
-            </List>
-          ) : (
-            <Meta>{t('owner:today.nobodyIn')}</Meta>
-          )}
-        </Section>
+  const hero = (
+    <section
+      aria-label={t('owner:today.hero.label')}
+      className="grid grid-cols-[minmax(0,1fr)] gap-2 rounded-md border border-border bg-bg p-4"
+      data-testid="today-hero"
+    >
+      <div className="grid gap-1">
+        <Meta className="leading-[1.4]">{dayMeta}</Meta>
+        {m.mode.kind === 'before' ? (
+          <p className="text-balance font-extrabold text-text text-xl tracking-display">
+            {m.mode.firstShiftStart
+              ? t('owner:today.before', { time: m.mode.firstShiftStart })
+              : t('owner:today.beforeNoShift')}
+          </p>
+        ) : (
+          <ProgressStrip
+            size="lg"
+            className="gap-2"
+            label={
+              <span data-testid="today-headline">
+                {t('owner:today.progress', { in: p.inCount, total: p.total })}
+              </span>
+            }
+            total={p.total}
+            legend={false}
+            segments={stripParts}
+            description={t('owner:today.progressDesc', {
+              in: p.inCount,
+              total: p.total,
+              parts: [
+                ...stripParts.filter((x) => x.value > 0).map((x) => x.label),
+                ...dueLaterPart,
+              ].join(', '),
+            })}
+          />
+        )}
+      </div>
+      {sentence ? (
+        <p
+          className="text-pretty text-sm text-text-body leading-[1.45]"
+          data-testid="today-sentence"
+        >
+          {sentence}
+        </p>
       ) : null}
+      {/* The screen's one sindoor button, only when something waits for the owner (PRD 12.2). */}
+      {board.actionsCount > 0 ? (
+        <Button
+          asChild
+          variant="primary"
+          iconEnd="arrow-right"
+          className="mt-1 sm:justify-self-start"
+        >
+          <Link to="/o/actions">{t('owner:today.needsAction', { count: board.actionsCount })}</Link>
+        </Button>
+      ) : null}
+    </section>
+  );
+
+  const inView = (
+    <>
+      <Section title={t('owner:today.sections.in')} count={s.in.length} headingHidden="phone">
+        {s.in.length > 0 ? (
+          <List>
+            {s.in.map((r) => (
+              <InRow
+                key={r.user.id}
+                row={r}
+                date={board.date}
+                worked={liveWorkedMin(r, board.updatedAt, now)}
+              />
+            ))}
+          </List>
+        ) : (
+          <Meta>{t('owner:today.nobodyIn')}</Meta>
+        )}
+      </Section>
+      <AwayNowSection />
       {s.out.length > 0 ? (
         <Section title={t('owner:today.sections.out')} count={s.out.length}>
           <List>
@@ -149,18 +199,19 @@ function Board({ board }: { board: TodayBoard }) {
     </>
   );
 
-  const side = (
+  const notInView = (
     <>
-      {filter === null ? <AwayNowSection /> : null}
-      {s.notIn.length > 0 ? (
-        <Section title={t('owner:today.sections.notIn')} count={s.notIn.length}>
+      <Section title={t('owner:today.sections.notIn')} count={s.notIn.length} headingHidden="phone">
+        {s.notIn.length > 0 ? (
           <List>
             {s.notIn.map((r) => (
               <NotInRow key={r.user.id} row={r} />
             ))}
           </List>
-        </Section>
-      ) : null}
+        ) : (
+          <Meta>{t('owner:today.nobodyNotIn')}</Meta>
+        )}
+      </Section>
       {s.dueLater.length > 0 ? (
         <Section title={t('owner:today.sections.dueLater')} count={s.dueLater.length}>
           <List>
@@ -177,92 +228,52 @@ function Board({ board }: { board: TodayBoard }) {
           </List>
         </Section>
       ) : null}
-      {s.away.length > 0 ? (
-        <Section title={t('owner:today.sections.away')} count={s.away.length}>
-          <List>
-            {s.away.map((r) => (
-              <AwayRow key={r.user.id} row={r} />
-            ))}
-          </List>
-        </Section>
-      ) : null}
     </>
   );
 
-  const nothing =
-    m.filtered &&
-    s.in.length + s.out.length + s.notIn.length + s.dueLater.length + s.away.length === 0;
+  const awayView = (
+    <Section title={t('owner:today.sections.away')} count={s.away.length} headingHidden="phone">
+      {s.away.length > 0 ? (
+        <List>
+          {s.away.map((r) => (
+            <AwayRow key={r.user.id} row={r} />
+          ))}
+        </List>
+      ) : (
+        <Meta>{t('owner:today.nobodyAway')}</Meta>
+      )}
+    </Section>
+  );
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
-      <div className="grid gap-2">
-        <Meta>{dayMeta}</Meta>
-        {m.mode.kind === 'before' ? (
-          <p className="font-extrabold text-text text-xl tracking-display">
-            {m.mode.firstShiftStart
-              ? t('owner:today.before', { time: m.mode.firstShiftStart })
-              : t('owner:today.beforeNoShift')}
-          </p>
-        ) : (
-          <ProgressStrip
-            size="lg"
-            label={<span data-testid="today-headline">{progressLabel}</span>}
-            total={p.total}
-            legend={false}
-            segments={stripParts}
-            description={t('owner:today.progressDesc', {
-              in: p.inCount,
-              total: p.total,
-              parts: [
-                ...stripParts.filter((x) => x.value > 0).map((x) => x.label),
-                ...dueLaterPart,
-              ].join(', '),
-            })}
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3 xl:grid-cols-[minmax(0,58fr)_minmax(0,42fr)] xl:items-start xl:gap-x-10">
+      {/* Tight on phones so the first person sits above 420 px (Fix 3). */}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-2 xl:gap-8">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-2 xl:gap-3">
+          {hero}
+          {/* PRD 4.18.3: the roll-call that is open or missed (N33), else one quiet line. */}
+          <RollCallCard slot={board.rollCall} primary={board.actionsCount === 0} />
+          <ChipGroup
+            type="radio"
+            layout="segmented"
+            className="xl:hidden"
+            legend={t('owner:today.views.label')}
+            legendHidden
+            value={view}
+            onValueChange={(v) => setView(v as BoardView)}
+            options={BOARD_VIEWS.map((v) => ({
+              value: v,
+              label: t(`owner:today.views.${v}`),
+              count: m.viewCounts[v],
+            }))}
           />
-        )}
-      </div>
-
-      {board.actionsCount > 0 ? (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-md border border-border-strong bg-bg-soft px-4 py-3">
-          <Icon name="warning-circle" className="size-6 shrink-0 text-accent" />
-          <p className="min-w-0 flex-1 basis-48 font-bold text-text">
-            {t('owner:today.needsAction', { count: board.actionsCount })}
-          </p>
-          <Button asChild variant="primary" size="sm" iconEnd="arrow-right">
-            <Link to="/o/actions">{t('owner:today.needsActionCta')}</Link>
-          </Button>
         </div>
-      ) : null}
-
-      {/* PRD 4.18.3: the roll-call that is open or missed (N33), else one quiet line. */}
-      <RollCallCard slot={board.rollCall} primary={board.actionsCount === 0} />
-
-      <div className="xl:sticky xl:top-16 xl:z-20 xl:-my-3 xl:bg-(--app-page) xl:py-3">
-        <StatChipGroup
-          legend={t('owner:today.counters.label')}
-          legendHidden
-          options={options}
-          value={filter ?? 'all'}
-          onValueChange={(v) => setFilter(v === 'all' ? null : (v as CounterKey))}
-        />
+        <div className={shownWhen(view === 'in')}>{inView}</div>
       </div>
-
-      {nothing ? (
-        <Empty
-          action={
-            <Button size="sm" variant="secondary" onClick={() => setFilter(null)}>
-              {t('owner:today.showAll')}
-            </Button>
-          }
-        >
-          {t('owner:today.emptyFilter')}
-        </Empty>
-      ) : (
-        <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] xl:items-start xl:gap-12">
-          <div className="grid grid-cols-[minmax(0,1fr)] gap-8">{lists}</div>
-          <div className="grid grid-cols-[minmax(0,1fr)] gap-8 xl:sticky xl:top-36">{side}</div>
-        </div>
-      )}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 xl:gap-8">
+        <div className={shownWhen(view === 'notIn')}>{notInView}</div>
+        <div className={shownWhen(view === 'away')}>{awayView}</div>
+      </div>
     </div>
   );
 }
@@ -407,26 +418,20 @@ function AwayRow({ row }: { row: BoardAwayRow }) {
 
 function TodaySkeleton() {
   return (
-    <div className="grid gap-6">
-      <SkeletonGroup className="grid gap-3">
-        <Skeleton width="11rem" />
-        <Skeleton width="min(14rem, 70%)" height="2.25rem" />
-        <Skeleton height="0.5rem" />
-      </SkeletonGroup>
-      {/* Phones show the counts as tiles (StatChipGroup `tiles`), wider screens as pills. */}
-      <SkeletonGroup className="grid grid-cols-3 gap-2 md:hidden">
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <Skeleton key={i} shape="block" height="3.75rem" />
-        ))}
-      </SkeletonGroup>
-      <SkeletonGroup className="hidden gap-2 overflow-hidden md:flex">
-        {[8, 6, 6, 9, 8].map((w, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder chips
-          <Skeleton key={i} shape="pill" width={`${w}rem`} height="3rem" />
-        ))}
-      </SkeletonGroup>
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] xl:gap-12">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3 xl:grid-cols-[minmax(0,58fr)_minmax(0,42fr)] xl:items-start xl:gap-x-10">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 xl:gap-8">
+        <SkeletonGroup className="grid gap-3 rounded-md border border-border bg-bg p-4">
+          <Skeleton width="11rem" />
+          <Skeleton width="min(12rem, 60%)" height="2.25rem" />
+          <Skeleton height="0.5rem" />
+          <Skeleton width="85%" />
+          <Skeleton shape="pill" height="3rem" />
+        </SkeletonGroup>
+        {/* The In, Not in yet, Away switch is a phone control. */}
+        <Skeleton shape="pill" height="3.375rem" className="xl:hidden" />
         <RowsSkeleton rows={6} />
+      </div>
+      <div className="hidden xl:block">
         <RowsSkeleton rows={3} />
       </div>
     </div>

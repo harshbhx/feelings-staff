@@ -1,20 +1,9 @@
 /**
- * Today board view model (PRD 5.2 Today, O-03). Pure: takes the TodayBoard from the API and the
- * chosen counter filter, returns what the screen draws. Readable in two seconds: one headline,
- * counters that filter, then Who's in / Not in yet / Checked out / Away.
+ * Today board view model (PRD 5.2 Today, O-03). Pure: takes the TodayBoard from the API and returns
+ * what the screen draws. Readable in two seconds: one hero card ("8 of 9 in", the strip, one
+ * sentence), then three views of the people (In, Not in yet, Away; UI redesign Fix 3).
  */
 import type { TodayBoard } from '@fs/contracts';
-
-export type CounterKey = 'present' | 'late' | 'notInYet' | 'onLeave' | 'weekOff' | 'atVenue';
-
-export const COUNTER_ORDER: readonly CounterKey[] = [
-  'present',
-  'late',
-  'notInYet',
-  'onLeave',
-  'weekOff',
-  'atVenue',
-];
 
 export type BoardInRow = TodayBoard['in'][number];
 export type BoardNotInRow = TodayBoard['notIn'][number];
@@ -27,11 +16,6 @@ export type BoardMode =
   | { kind: 'before'; firstShiftStart: string | null }
   | { kind: 'live' };
 
-export interface Counter {
-  key: CounterKey;
-  value: number;
-}
-
 export interface BoardSections {
   in: BoardInRow[];
   /** Due now and not in (shift started). */
@@ -42,12 +26,16 @@ export interface BoardSections {
   away: BoardAwayRow[];
 }
 
+/** The three views of the segmented control on phones; on a wide screen all three show at once. */
+export type BoardView = 'in' | 'notIn' | 'away';
+
+export const BOARD_VIEWS: readonly BoardView[] = ['in', 'notIn', 'away'];
+
 export interface BoardModel {
   mode: BoardMode;
-  counters: Counter[];
   sections: BoardSections;
-  /** Rows hidden by the current filter, so the screen can say "Showing 3 of 11". */
-  filtered: boolean;
+  /** People in each view, for the segment counts. */
+  viewCounts: Record<BoardView, number>;
 }
 
 export function boardMode(board: TodayBoard): BoardMode {
@@ -58,65 +46,49 @@ export function boardMode(board: TodayBoard): BoardMode {
   return { kind: 'live' };
 }
 
-export function counters(board: TodayBoard): Counter[] {
-  return COUNTER_ORDER.map((key) => ({ key, value: board.counters[key] }));
-}
-
-const isVenue = (r: BoardInRow) => r.place === 'venue';
-
-/** Apply a counter filter (tap a counter to filter, tap again to clear). */
-export function sections(board: TodayBoard, filter: CounterKey | null): BoardSections {
-  const all: BoardSections = {
+export function sections(board: TodayBoard): BoardSections {
+  return {
     in: board.in,
     notIn: board.notIn.filter((r) => r.state === 'not_in_yet'),
     dueLater: board.notIn.filter((r) => r.state === 'due_later'),
     out: board.out,
     away: board.away,
   };
-  const none: BoardSections = { in: [], notIn: [], dueLater: [], out: [], away: [] };
-  switch (filter) {
-    case null:
-      return all;
-    case 'present':
-      return { ...none, in: all.in, out: all.out };
-    case 'late':
-      return {
-        ...none,
-        in: all.in.filter((r) => r.lateMin > 0),
-        out: all.out.filter((r) => r.lateMin > 0),
-      };
-    case 'notInYet':
-      return { ...none, notIn: all.notIn };
-    case 'onLeave':
-      return { ...none, away: all.away.filter((r) => r.reason === 'leave') };
-    case 'weekOff':
-      return { ...none, away: all.away.filter((r) => r.reason === 'week_off') };
-    case 'atVenue':
-      return { ...none, in: all.in.filter(isVenue), out: all.out.filter(isVenue) };
-  }
 }
 
-export function boardModel(board: TodayBoard, filter: CounterKey | null): BoardModel {
+/** In: still in and checked out. Not in yet: due now and due later. Away: leave, week off, holiday. */
+export function viewCounts(s: BoardSections): Record<BoardView, number> {
   return {
-    mode: boardMode(board),
-    counters: counters(board),
-    sections: sections(board, filter),
-    filtered: filter !== null,
+    in: s.in.length + s.out.length,
+    notIn: s.notIn.length + s.dueLater.length,
+    away: s.away.length,
   };
 }
 
-/** The 2-second line: "8 in · 3 late · 1 not in yet", only the parts that are not zero. */
-export function headlineParts(board: TodayBoard): { key: string; count: number }[] {
-  const c = board.counters;
+export function boardModel(board: TodayBoard): BoardModel {
+  const s = sections(board);
+  return { mode: boardMode(board), sections: s, viewCounts: viewCounts(s) };
+}
+
+/**
+ * The hero's one sentence ("3 late, 1 not in yet, 1 due later, 1 on leave, 1 off today"), only the
+ * parts that are not zero, in this order. Late is the strip's late count, so the sentence and the
+ * strip agree; the others count the rows the views list.
+ */
+export function heroParts(
+  board: TodayBoard,
+  p: DayProgress,
+): { key: 'late' | 'notInYet' | 'dueLater' | 'atVenue' | 'onLeave' | 'off'; count: number }[] {
+  const s = sections(board);
   const parts = [
-    { key: 'owner:today.headline.in', count: c.present },
-    { key: 'owner:today.headline.late', count: c.late },
-    { key: 'owner:today.headline.notInYet', count: c.notInYet },
-    { key: 'owner:today.headline.onLeave', count: c.onLeave },
-    { key: 'owner:today.headline.atVenue', count: c.atVenue },
+    { key: 'late' as const, count: p.late },
+    { key: 'notInYet' as const, count: s.notIn.length },
+    { key: 'dueLater' as const, count: s.dueLater.length },
+    { key: 'atVenue' as const, count: board.counters.atVenue },
+    { key: 'onLeave' as const, count: s.away.filter((r) => r.reason === 'leave').length },
+    { key: 'off' as const, count: s.away.filter((r) => r.reason !== 'leave').length },
   ];
-  const shown = parts.filter((p, i) => i === 0 || p.count > 0);
-  return shown;
+  return parts.filter((x) => x.count > 0);
 }
 
 /** Minutes since a check-in for rows that are still in, at the client's clock (live hours). */
@@ -135,11 +107,9 @@ export interface DayProgress {
   dueLater: number;
   /** Working today: in + not in yet + due later. Leave and week off are not counted. */
   total: number;
-  /** Everyone on the board, away included ("11 everyone"). */
-  everyone: number;
 }
 
-/** "8 of 10 in" and its parts, for the progress strip over the counters (WP-10). */
+/** "8 of 10 in" and its parts, for the hero's progress strip (WP-10, redesign Fix 3). */
 export function dayProgress(board: TodayBoard): DayProgress {
   const c = board.counters;
   const dueLater = board.notIn.filter((r) => r.state === 'due_later').length;
@@ -153,6 +123,5 @@ export function dayProgress(board: TodayBoard): DayProgress {
     notInYet,
     dueLater,
     total: c.present + notInYet + dueLater,
-    everyone: c.present + board.notIn.length + board.away.length,
   };
 }
