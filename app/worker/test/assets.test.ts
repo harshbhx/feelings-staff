@@ -50,10 +50,13 @@ describe('unknown addresses are a real 404 (error pages slice 2)', () => {
   });
 
   it('ERR-404.2 HEAD answers the status and no body', async () => {
-    const res = await createApp().fetch(new Request('https://staff.test/nope', { method: 'HEAD' }), {
-      ...testEnv,
-      ASSETS: assets,
-    });
+    const res = await createApp().fetch(
+      new Request('https://staff.test/nope', { method: 'HEAD' }),
+      {
+        ...testEnv,
+        ASSETS: assets,
+      },
+    );
     expect(res.status).toBe(404);
     expect(await res.text()).toBe('');
   });
