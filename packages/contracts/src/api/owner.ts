@@ -771,6 +771,12 @@ export const SecurityView = z.object({
   email: Email,
   passwordSet: z.boolean(),
   pinSet: z.boolean(),
+  /**
+   * Forgotten owner PIN (docs/owner-access.md, Passkeys flow 6): until when this session may set a
+   * new PIN without the current one. Open for 15 minutes after an email-code or magic-link sign-in
+   * (later also a passkey sign-in), once per sign-in; null or absent otherwise and while no PIN is set.
+   */
+  pinResetUntil: EpochMs.nullable().optional(),
   sessions: z.array(
     z.object({
       id: z.string(),

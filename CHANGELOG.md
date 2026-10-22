@@ -26,6 +26,9 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 Owner access, Security devices (slice 6, off until `OWNER_HOST` is set):
 
 - Settings, Security on the owner host lists "Passkey devices": name, platform, added, last used and "This device". Rename a device, or Remove it with the fingerprint on this phone and the owner PIN: that device is signed out at once (`owner.device_removed`). The only device cannot be removed; its Remove is disabled and says "Add another device first".
+Owner PIN reset, contracts (`contracts-v1.4`):
+
+- `SecurityView.pinResetUntil`: until when the signed-in owner may set a new PIN without the old one (15 minutes after an email-code or magic-link sign-in, once per sign-in). Optional, so a server without the reset still matches. Fixture variant `ownerSecurityGet.pin-reset`.
 
 Owner access, device approval (slice 5, off until `OWNER_HOST` is set):
 

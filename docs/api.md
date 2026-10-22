@@ -275,12 +275,14 @@ Organisation settings, the first-run checklist, the owner's own security, the au
 | POST | `/owner/setup/steps/:step` | owner | no | no | path `SetupStepParams`; body `SetupStepRequest` | `SetupView` | Mark a setup step done or skipped |
 | GET | `/owner/security` | owner | no | no | - | `SecurityView` | Email, password/PIN state, sessions |
 | PUT | `/owner/security/password` | owner | yes | no | body `SetPasswordRequest` | `SecurityView` | Set or change the fallback password |
-| PUT | `/owner/security/pin` | owner | no | no | body `SetPinRequest` | `SecurityView` | Set the owner PIN (first time within 15 min of sign-in) or change it |
+| PUT | `/owner/security/pin` | owner | no | no | body `SetPinRequest` | `SecurityView` | Set the owner PIN (first time, or a forgotten one, within 15 min of an email sign-in) or change it |
 | POST | `/owner/security/sign-out-others` | owner | no | no | - | `SecurityView` | Revoke every other session |
 | GET | `/owner/audit` | owner | no | no | query `AuditQuery` | `AuditPage` | Audit log |
 | GET | `/owner/managers` | owner | no | no | - | `ManagerView[]` | Managers (P1) |
 | PUT | `/owner/managers` | owner | yes | no | body `ManagerUpsert` | `ManagerView` | Grant manager rights (P1) |
 | DELETE | `/owner/managers/:id` | owner | yes | no | path `IdParams` | no body (204) | Remove manager rights (P1) |
+
+Forgotten owner PIN ([owner access](owner-access.md#passkeys), flow 6): `PUT /owner/security/pin` without `currentPin` while a PIN exists sets a new one only while `SecurityView.pinResetUntil` is in the future. The server opens that window for 15 minutes after an email-code or magic-link sign-in (a password sign-in never opens it), once per sign-in; otherwise it answers `RULE_VIOLATION` with `reason: recent_sign_in_required`.
 
 ### Owner: Time credits and presence
 
