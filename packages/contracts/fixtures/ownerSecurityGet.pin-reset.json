@@ -1,0 +1,15 @@
+{
+  "email": "urmi@feelingsbeautycare.in",
+  "passwordSet": true,
+  "pinSet": true,
+  "pinResetUntil": 1792387500000,
+  "sessions": [
+    {
+      "id": "ses_03",
+      "current": true,
+      "createdAt": 1792386600000,
+      "lastSeenAt": 1792386720000,
+      "label": "This device"
+    }
+  ]
+}

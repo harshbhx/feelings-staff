@@ -151,6 +151,7 @@ import ownerRollCalls from './ownerRollCalls.json';
 import ownerRosterGet from './ownerRosterGet.json';
 import ownerRosterPut from './ownerRosterPut.json';
 import ownerSecurityGet from './ownerSecurityGet.json';
+import ownerSecurityGet_pinReset from './ownerSecurityGet.pin-reset.json';
 import ownerSetPassword from './ownerSetPassword.json';
 import ownerSetPin from './ownerSetPin.json';
 import ownerSettingsGet from './ownerSettingsGet.json';
@@ -436,6 +437,9 @@ export const variants: Partial<Record<EndpointKey, Record<string, unknown>>> = {
   },
   ownerDeviceList: {
     'one-device': ownerDeviceList_oneDevice,
+  },
+  ownerSecurityGet: {
+    'pin-reset': ownerSecurityGet_pinReset,
   },
   ownerPayrollGet: {
     finalised: ownerPayrollGet_finalised,

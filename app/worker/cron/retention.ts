@@ -114,6 +114,18 @@ export async function purgeNightly(ctx: Ctx, at: number, settings: OrgSettings):
   );
   c.sessions = await del(ctx, 'sessions', 'expires_at < ?', day(7));
   c.challenges = await del(ctx, 'challenges', 'expires_at < ?', day(7));
+  // Owner access (docs/owner-access.md): passkey challenges like the other challenges; device requests
+  // and recovery codes 30 days after they ran out; a removed passkey after a year, with the security
+  // audit rows that name it.
+  c.owner_passkey_challenges = await del(ctx, 'owner_passkey_challenges', 'expires_at < ?', day(7));
+  c.owner_device_requests = await del(ctx, 'owner_device_requests', 'expires_at < ?', day(30));
+  c.owner_recovery_codes = await del(ctx, 'owner_recovery_codes', 'expires_at < ?', day(30));
+  c.owner_passkeys = await del(
+    ctx,
+    'owner_passkeys',
+    'removed_at IS NOT NULL AND removed_at < ?',
+    day(365),
+  );
   c.magic_links = await loop(async () => {
     const res = await ctx.sys.run(
       `DELETE FROM magic_links WHERE rowid IN

@@ -62,6 +62,7 @@ describe('fixtures', () => {
       ownerDeviceRequestStatus: ['approved', 'declined'],
       ownerDeviceRequestList: ['empty'],
       ownerDeviceList: ['one-device'],
+      ownerSecurityGet: ['pin-reset'],
     };
     for (const [key, names] of Object.entries(need)) {
       for (const name of names) {
