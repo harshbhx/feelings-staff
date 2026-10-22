@@ -39,6 +39,28 @@ const NOT_FOUND = render({
   link: { href: '/', label: 'Back to Feelings' },
 });
 
+const MAINTENANCE = render({
+  title: 'Back in a few minutes',
+  heading: 'Back in a few minutes',
+  body: "We're fixing something and the app can't load its data right now. Please try again in a few minutes.",
+  link: { href: '/', label: 'Try again' },
+});
+
+/**
+ * 503 for a page request when the database cannot be reached. `Retry-After` tells browsers and
+ * monitors when to come back; the page itself needs nothing from the Worker or the database.
+ */
+export function maintenancePage(method = 'GET'): Response {
+  return new Response(method === 'HEAD' ? null : MAINTENANCE, {
+    status: 503,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'Retry-After': '30',
+    },
+  });
+}
+
 /** A real 404 for an address that is not part of the app. HEAD gets the headers only. */
 export function notFoundPage(method = 'GET'): Response {
   return new Response(method === 'HEAD' ? null : NOT_FOUND, {

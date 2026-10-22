@@ -4,6 +4,15 @@
   "details": "Details",
   "requestId": "Request id {{id}}",
   "loadFailed": "We couldn't load this.",
+  "crash": {
+    "title": "Something went wrong",
+    "body": "Try again. If it keeps happening, tell the owner and say what you were doing.",
+    "stamp": "Seen at {{time}}"
+  },
+  "offline": {
+    "title": "You're offline",
+    "body": "This page needs the internet. It opens again by itself when you're back online."
+  },
   "code": {
     "VALIDATION": "Some details need fixing.",
     "BAD_REQUEST": "We couldn't read that request.",
