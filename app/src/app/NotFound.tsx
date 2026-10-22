@@ -31,7 +31,7 @@ function NotFoundScreen() {
   const target = notFoundTarget(me.data?.user.role ?? null, pathname);
   return (
     <main
-      className="mx-auto grid min-h-dvh max-w-sm content-center gap-3 p-6"
+      className="mx-auto grid min-h-dvh max-w-sm content-center gap-3 p-6 sm:justify-items-center sm:text-center"
       data-testid="not-found"
     >
       <h1 className="text-2xl font-extrabold text-text">
@@ -41,7 +41,7 @@ function NotFoundScreen() {
       <p className="text-text-body">{t('notFound.body')}</p>
       <div>
         {me.isPending ? null : (
-          <Button asChild data-testid="not-found-home">
+          <Button variant="primary" asChild data-testid="not-found-home">
             <Link to={target.to} replace>
               {target.signedIn ? t('notFound.home') : t('notFound.signIn')}
             </Link>
