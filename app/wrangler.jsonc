@@ -12,47 +12,9 @@
   "assets": {
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": [
-      "/api/*",
-      "/v/*",
-      "/q/*",
-      "/__kit",
-      "/assets/*",
-      "/",
-      "/index.html",
-      "/sw.js",
-      "/manifest.webmanifest",
-      "/_s/*",
-      "/_o/*",
-      "/o",
-      "/o/*",
-      "/auth/owner",
-      "/auth/owner/*",
-      "/door",
-      "/door/*",
-      "/join",
-      "/join/*",
-      "/waiting",
-      "/waiting/*",
-      "/signin",
-      "/signin/*",
-      "/month",
-      "/month/*",
-      "/day",
-      "/day/*",
-      "/requests",
-      "/requests/*",
-      "/payslips",
-      "/payslips/*",
-      "/inbox",
-      "/inbox/*",
-      "/me",
-      "/me/*",
-      "/scan",
-      "/scan/*",
-      "/fix",
-      "/fix/*"
-    ]
+    // The Worker answers every request first: client routes get the shell, files come from the asset
+    // layer, and anything else is a real 404 (worker/index.ts, worker/lib/hosts.ts isAppRoute).
+    "run_worker_first": true
   },
   "d1_databases": [
     {

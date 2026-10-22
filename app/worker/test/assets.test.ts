@@ -36,3 +36,68 @@ describe('static asset misses (X-02.9)', () => {
     expect(await res.text()).toContain('id="root"');
   });
 });
+
+describe('unknown addresses are a real 404 (error pages slice 2)', () => {
+  it('ERR-404.1 an address that is no client route is a 404 page, not the shell', async () => {
+    for (const path of ['/wp-login.php', '/some/spa/route', '/admin', '/favicon.ico', '/.env']) {
+      const res = await get(path);
+      expect(res.status, path).toBe(404);
+      expect(await res.text(), path).not.toContain('id="root"');
+    }
+    const page = await get('/some/spa/route');
+    expect(page.headers.get('Content-Type')).toContain('text/html');
+    expect(await page.text()).toContain("That page isn't here");
+  });
+
+  it('ERR-404.2 HEAD answers the status and no body', async () => {
+    const res = await createApp().fetch(
+      new Request('https://staff.test/nope', { method: 'HEAD' }),
+      {
+        ...testEnv,
+        ASSETS: assets,
+      },
+    );
+    expect(res.status).toBe(404);
+    expect(await res.text()).toBe('');
+  });
+
+  it('ERR-404.3 every client route and deep link still returns the shell', async () => {
+    for (const path of [
+      '/',
+      '/signin',
+      '/join',
+      '/join/ABCD1234',
+      '/waiting',
+      '/door',
+      '/month',
+      '/day/2026-10-15',
+      '/requests/leave',
+      '/payslips/01K885',
+      '/inbox',
+      '/me/privacy',
+      '/scan',
+      '/fix/camera',
+      '/v/abc',
+      '/o',
+      '/o/today',
+      '/o/staff/abc',
+      '/auth/owner',
+      '/auth/owner/email',
+      '/__kit',
+    ]) {
+      const res = await get(path);
+      expect(res.status, path).toBe(200);
+      expect(await res.text(), path).toContain('id="root"');
+    }
+  });
+
+  it('ERR-404.4 an unknown path below a client prefix gets the shell (the app shows its own screen)', async () => {
+    expect((await get('/month/nope/nope')).status).toBe(200);
+  });
+
+  it('ERR-404.5 a missing file is a plain 404, an existing one is served', async () => {
+    const miss = await get('/icons/missing.png');
+    expect(miss.status).toBe(404);
+    expect(miss.headers.get('Content-Type')).not.toContain('html');
+  });
+});
