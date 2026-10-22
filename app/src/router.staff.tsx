@@ -3,7 +3,7 @@
  * everything owner: no `/o`, no `/auth/owner`, no owner shell, no lazy owner route table and no
  * component kit page (it renders owner screens). Used when OWNER_HOST is set.
  */
-import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
+import { createBrowserRouter, type RouteObject } from 'react-router';
 import { RequireRole } from './app/guards';
 import { withNamespaces } from './app/with-namespaces-route';
 import { staffAuthRoutes } from './features/auth/routes.staff';
@@ -27,7 +27,7 @@ export const routes: RouteObject[] = [
     ),
     children: staffRoutes,
   },
-  { path: '*', element: <Navigate to="/" replace /> },
+  { path: '*', lazy: () => import('./app/NotFound') },
 ];
 
 export function createRouter() {
