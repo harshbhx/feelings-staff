@@ -8,6 +8,7 @@ import type { Env } from './env';
 import { isNonProd } from './env';
 import { registerApi } from './lib/api';
 import type { AppEnv } from './lib/app-env';
+import { notFoundPage } from './lib/error-pages';
 import { ApiException } from './lib/errors';
 import {
   isAppRoute,
@@ -19,7 +20,6 @@ import {
   STAFF_APP_PATHS,
   surfaceOf,
 } from './lib/hosts';
-import { notFoundPage } from './lib/error-pages';
 import { isSplitFolderPath, serveSplitAsset } from './lib/split-assets';
 import { ulid } from './lib/ulid';
 import { access } from './middleware/access';
@@ -29,7 +29,8 @@ import { guard } from './middleware/guard';
 import { withSecurityHeaders } from './middleware/headers';
 import { allHandlers } from './routes';
 
-const hasExtension = (path: string) => /\.[A-Za-z0-9]+$/.test(path.slice(path.lastIndexOf('/') + 1));
+const hasExtension = (path: string) =>
+  /\.[A-Za-z0-9]+$/.test(path.slice(path.lastIndexOf('/') + 1));
 
 export function createApp(): Hono<AppEnv> {
   const app = new Hono<AppEnv>();
