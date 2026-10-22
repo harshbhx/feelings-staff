@@ -10,7 +10,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useMonth } from '../api';
 import { type Fmt, useFmt } from '../lib/format';
 import { ScreenHeader } from '../shell/ScreenHeader';
-import { calendarWeeks, chipStatusOf, monthNav } from './month-model';
+import { calendarWeeks, chipStatusOf, lateMark, monthNav } from './month-model';
 
 export function MonthScreen() {
   const { t } = useTranslation();
@@ -203,14 +203,19 @@ function Calendar({
               const cell = week[i] ?? null;
               if (!cell) return <td key={wdName} />;
               const chip = cell.summary ? chipStatusOf(cell.summary) : null;
+              const late = cell.summary && !cell.isFuture ? lateMark(cell.summary) : null;
               const word = cell.isFuture
                 ? statusWord('future')
                 : cell.summary
                   ? statusWord(cell.summary.status)
                   : '';
+              const spoken =
+                late && cell.summary
+                  ? `${word}, ${t('staff:month.lateDay', { duration: fmt.duration(cell.summary.lateMin) })}`
+                  : word;
               const label = t('staff:month.dayLabel', {
                 date: fmt.weekday(cell.date),
-                status: word,
+                status: spoken,
               });
               const inner = (
                 <span className="flex min-h-14 flex-col items-center gap-1 py-1">
@@ -223,7 +228,14 @@ function Calendar({
                   >
                     {cell.day}
                   </span>
-                  {chip && !cell.isFuture ? (
+                  {late ? (
+                    <span
+                      aria-hidden="true"
+                      className="grid h-6 min-w-9 place-items-center rounded-sm bg-late-bg px-1 text-xs font-bold text-late leading-none tabular-nums"
+                    >
+                      {late}
+                    </span>
+                  ) : chip && !cell.isFuture ? (
                     <StatusChip
                       status={chip}
                       variant="letter"
@@ -265,6 +277,7 @@ function Legend() {
   const items = [
     { status: 'present', word: t('staff:status.P') },
     { status: 'half', word: t('staff:status.H') },
+    { status: 'late', word: t('staff:status.late') },
     { status: 'absent', word: t('staff:status.A') },
     { status: 'leave', word: t('staff:status.L') },
     { status: 'off', word: t('staff:status.WO') },

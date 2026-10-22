@@ -370,6 +370,7 @@
     },
     "today": "Today",
     "dayLabel": "{{date}}: {{status}}",
+    "lateDay": "late {{duration}}",
     "noData": "Nothing recorded this month yet.",
     "duties": "Venue duties",
     "loadError": "We couldn't load this month."
