@@ -6,7 +6,6 @@
 import type { TodayBoard } from '@fs/contracts';
 import {
   Avatar,
-  Badge,
   Button,
   Icon,
   List,
@@ -24,11 +23,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useTodayBoard } from '../api/attendance';
-import { Meta, Section, useNow, WRAP_ROW } from '../components/layout';
+import { Meta, NoBreakParts, Section, useNow, WRAP_ROW } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { clock, dayLabel, duration } from '../lib/format';
 import { telLink, waLink } from '../lib/share';
-import { leaveKey } from '../lib/status';
+import { inRowStatus, leaveKey, type RowStatus } from '../lib/status';
 import { AwayNowSection } from '../rollcall/AwayNow';
 import { RollCallCard } from '../rollcall/RollCallCard';
 import {
@@ -268,47 +267,63 @@ function Board({ board }: { board: TodayBoard }) {
   );
 }
 
-function placeTag(row: BoardInRow, t: TFunction) {
-  switch (row.place) {
+/** Where the check-in was, as words for the row's quiet line (Fix 2: location is never a chip). */
+function placeWords(row: BoardInRow, t: TFunction): string {
+  if (row.place === 'venue')
+    return row.placeName
+      ? t('owner:place.venueNamed', { name: row.placeName })
+      : t('owner:place.venue');
+  return t(`owner:place.${row.place}`);
+}
+
+/**
+ * The row's one chip (PRD 12.3 as amended): the highest status from `inRowStatus`. Late reads as
+ * minutes ("+28 m") with the clock, and says "Late by 28 min" to screen readers.
+ */
+function InRowChip({ row, status }: { row: BoardInRow; status: RowStatus }) {
+  const { t } = useTranslation();
+  switch (status) {
+    case 'pending':
+      return <StatusChip status="waiting" label={t('owner:today.row.pending')} />;
+    case 'flag':
+      return <StatusChip status="flag" label={t('owner:today.row.flagged')} />;
+    case 'late':
+      return (
+        <StatusChip
+          status="late"
+          className="text-sm"
+          label={
+            <>
+              <span aria-hidden="true">{t('owner:today.row.lateBy', { min: row.lateMin })}</span>
+              <span className="sr-only">
+                {t('owner:today.row.lateLabel', { min: row.lateMin })}
+              </span>
+            </>
+          }
+        />
+      );
     case 'venue':
-      return <StatusChip status="venue" label={row.placeName ?? t('owner:place.venue')} />;
-    case 'edge':
-      return (
-        <Badge tone="warning" icon="warning-circle">
-          {t('owner:place.edge')}
-        </Badge>
-      );
-    case 'inside':
-      return (
-        <Badge tone="success" icon="map-pin">
-          {t('owner:place.inside')}
-        </Badge>
-      );
-    case 'offline':
-      return (
-        <Badge tone="neutral" icon="wifi-slash">
-          {t('owner:place.offline')}
-        </Badge>
-      );
-    case 'owner':
-      return (
-        <Badge tone="outline" icon="pencil-simple">
-          {t('owner:place.owner')}
-        </Badge>
-      );
+      return <StatusChip status="venue" label={row.placeName ?? t('owner:status.OD')} />;
+    default:
+      return <StatusChip status="present" label={t('owner:today.row.onTime')} />;
   }
 }
 
 function InRow({ row, date, worked }: { row: BoardInRow; date: string; worked: number }) {
   const { t } = useTranslation();
-  const times =
-    row.outTs !== null
-      ? `${t('owner:today.row.inAt', { time: clock(row.inTs) })} · ${t('owner:today.row.outAt', { time: clock(row.outTs) })}`
-      : t('owner:today.row.inAt', { time: clock(row.inTs) });
-  const hours =
+  const status = inRowStatus(row);
+  // The statuses that lost to the chip become words in the quiet line, never a second chip.
+  const parts = [
+    t('owner:today.row.inAt', { time: clock(row.inTs) }),
+    row.outTs !== null ? t('owner:today.row.outAt', { time: clock(row.outTs) }) : null,
+    row.lateMin > 0 && status !== 'late'
+      ? t('owner:today.row.lateWords', { min: row.lateMin })
+      : null,
     row.outTs !== null
       ? t('owner:today.row.worked', { duration: duration(worked) })
-      : t('owner:today.row.soFar', { duration: duration(worked) });
+      : t('owner:today.row.soFar', { duration: duration(worked) }),
+    status === 'venue' ? null : placeWords(row, t),
+  ];
   return (
     <ListRow
       asChild
@@ -317,25 +332,10 @@ function InRow({ row, date, worked }: { row: BoardInRow; date: string; worked: n
       title={row.user.name}
       subtitle={
         <span className="tabular-nums">
-          {times} · {hours}
+          <NoBreakParts parts={parts} />
         </span>
       }
-      meta={
-        <>
-          {row.lateMin > 0 ? (
-            <StatusChip
-              status="late"
-              label={t('owner:today.row.lateBy', { min: row.lateMin })}
-              title={t('owner:today.row.lateLabel', { min: row.lateMin })}
-            />
-          ) : null}
-          {row.flagged ? <StatusChip status="flag" label={t('owner:today.row.flagged')} /> : null}
-          {row.pending ? (
-            <StatusChip status="waiting" label={t('owner:today.row.pending')} />
-          ) : null}
-          {placeTag(row, t)}
-        </>
-      }
+      trailing={<InRowChip row={row} status={status} />}
     >
       <Link to={`/o/register/${row.user.id}/${date}`} />
     </ListRow>

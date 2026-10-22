@@ -56,6 +56,15 @@ export function chipStatusOf(d: DaySummary): ChipStatus | null {
   return map[d.status];
 }
 
+/**
+ * A late present day shows its minutes instead of the P (PRD 12.3, amendment 2): `+28` under an
+ * hour, `+1h` from 60 minutes (whole hours). Null for every other day.
+ */
+export function lateMark(d: DaySummary): string | null {
+  if (d.status !== 'P' || d.lateMin <= 0) return null;
+  return d.lateMin >= 60 ? `+${Math.floor(d.lateMin / 60)}h` : `+${d.lateMin}`;
+}
+
 /** Previous and next month, never past the current month. */
 export function monthNav(month: string, current: string): { prev: string; next: string | null } {
   const [y, m] = month.split('-').map(Number) as [number, number];

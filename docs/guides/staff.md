@@ -202,7 +202,7 @@ A check-in that was saved for many hours may need Urmi's approval. The time stil
 
 ## Your month
 
-**Month** shows your calendar. Each day has a letter and a picture, not only a colour: present, half day, absent, leave, week off or holiday. At the top you see your totals for the month: days present, late minutes and overtime that Urmi approved.
+**Month** shows your calendar. Each day has a letter and a picture, not only a colour: present, half day, absent, leave, week off or holiday. A day you were late shows how many minutes, for example **+28** (or **+1h** from an hour), on a warm tint. At the top you see your totals for the month: days present, late minutes and overtime that Urmi approved.
 
 Tap a day to see what happened: your check-in and check-out times, where, the shift, hours worked, and what it does to your pay, in words and in rupees. For example "Late by 25 min. 10 min grace, so 15 min count." If Urmi changed something, it says "Edited by Urmi".
 

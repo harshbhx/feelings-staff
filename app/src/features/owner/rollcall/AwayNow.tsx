@@ -3,10 +3,10 @@
  * here or a step-out, with Edit times. Owner only (the list is owner-only in 9.4); it hides when
  * nobody is away or the presence API is not there yet.
  */
-import { Avatar, Badge, List, ListRow } from '@fs/ui';
+import { Avatar, List, ListRow } from '@fs/ui';
 import { useTranslation } from 'react-i18next';
 import { useAwayNow, useIsOwner } from '../api/presence';
-import { Section, WRAP_ROW } from '../components/layout';
+import { NoBreakParts, Section, WRAP_ROW } from '../components/layout';
 import { clock } from '../lib/format';
 import { EditAwaySheet } from './EditAwaySheet';
 
@@ -34,13 +34,13 @@ export function AwayNowSection() {
               className={WRAP_ROW}
               leading={<Avatar name={a.user.name} />}
               title={a.user.name}
-              subtitle={<span className="tabular-nums">{line}</span>}
-              meta={
-                a.reason ? (
-                  <Badge tone="neutral" icon="sign-out">
-                    {t(`owner:presence.reason.${a.reason}`)}
-                  </Badge>
-                ) : undefined
+              subtitle={
+                // The reason is words in the quiet line, not a second chip (Fix 2).
+                <span className="tabular-nums">
+                  <NoBreakParts
+                    parts={[line, a.reason ? t(`owner:presence.reason.${a.reason}`) : null]}
+                  />
+                </span>
               }
               trailing={
                 <EditAwaySheet

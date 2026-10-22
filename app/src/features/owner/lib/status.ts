@@ -3,7 +3,14 @@
  * alone. These helpers map contract values to the kit's StatusChip status (which carries the colour
  * and the icon), a register letter and an `owner:status.*` word.
  */
-import type { DayStatus, DayTag, LeaveCode, PunchStatus, RiskReason } from '@fs/contracts';
+import type {
+  BoardInRow,
+  DayStatus,
+  DayTag,
+  LeaveCode,
+  PunchStatus,
+  RiskReason,
+} from '@fs/contracts';
 import type { DayStatus as ChipStatus, IconName } from '@fs/ui';
 
 export type { ChipStatus };
@@ -88,6 +95,94 @@ export const CHIP_ICON: Record<ChipStatus, IconName> = {
   waiting: 'hourglass',
   venue: 'map-pin',
 };
+
+/**
+ * One status per row (UI redesign Fix 2, PRD 12.3 as amended). A row can match several statuses at
+ * once (late, waiting for the owner and at the edge of the area); only the highest one becomes the
+ * row's chip, the rest go into the row's quiet line as words. Highest first:
+ *   1. the owner has to act: waiting for you (the check-in does not count until approved), then
+ *      needs a look;
+ *   2. absent, then half day;
+ *   3. late, shown as minutes ("+28 m");
+ *   4. present: at a venue (the more specific word), then present;
+ *   5. leave, holiday, week off, not scheduled.
+ */
+export type RowStatus =
+  | 'pending'
+  | 'flag'
+  | 'absent'
+  | 'half'
+  | 'late'
+  | 'venue'
+  | 'present'
+  | 'leave'
+  | 'holiday'
+  | 'off'
+  | 'unscheduled';
+
+export const ROW_STATUS_PRIORITY: readonly RowStatus[] = [
+  'pending',
+  'flag',
+  'absent',
+  'half',
+  'late',
+  'venue',
+  'present',
+  'leave',
+  'holiday',
+  'off',
+  'unscheduled',
+];
+
+const RANK = new Map(ROW_STATUS_PRIORITY.map((s, i) => [s, i]));
+
+/** The kit chip (colour, tint and icon) for each row status. */
+export const ROW_CHIP: Record<RowStatus, ChipStatus> = {
+  pending: 'waiting',
+  flag: 'flag',
+  absent: 'absent',
+  half: 'half',
+  late: 'late',
+  venue: 'venue',
+  present: 'present',
+  leave: 'leave',
+  holiday: 'holiday',
+  off: 'off',
+  unscheduled: 'off',
+};
+
+/** The one status a row shows: the highest of the statuses it matches, or null when none. */
+export function rowStatus(matches: Iterable<RowStatus>): RowStatus | null {
+  let best: RowStatus | null = null;
+  let rank = Number.POSITIVE_INFINITY;
+  for (const s of matches) {
+    const r = RANK.get(s) ?? Number.POSITIVE_INFINITY;
+    if (r < rank) {
+      best = s;
+      rank = r;
+    }
+  }
+  return best;
+}
+
+/** What a Today row (checked in, or in and out) matches, before the priority picks one. */
+export function inRowMatches(
+  row: Pick<BoardInRow, 'pending' | 'flagged' | 'lateMin' | 'place'>,
+): RowStatus[] {
+  const out: RowStatus[] = ['present'];
+  if (row.pending) out.push('pending');
+  if (row.flagged) out.push('flag');
+  if (row.lateMin > 0) out.push('late');
+  if (row.place === 'venue') out.push('venue');
+  return out;
+}
+
+/** The chip of a Today row: never null, a row that came in is at least present. */
+export function inRowStatus(
+  row: Pick<BoardInRow, 'pending' | 'flagged' | 'lateMin' | 'place'>,
+): RowStatus {
+  return rowStatus(inRowMatches(row)) ?? 'present';
+}
 
 /** `owner:leave.CL` etc. */
 export function leaveKey(code: LeaveCode): string {
