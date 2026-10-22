@@ -1729,6 +1729,7 @@
       "org_update": "Salon details changed",
       "owner_device_approved": "Owner device approved",
       "owner_device_declined": "Owner device declined",
+      "owner_device_removed": "Owner device removed",
       "owner_device_renamed": "Owner device renamed",
       "owner_device_requested": "Owner device asked to be added",
       "owner_passkey_enrolled": "Passkey added",
@@ -2171,6 +2172,33 @@
       "cancelled": "Nothing happened. Try again.",
       "expired": "This request ran out of time. Ask again on the new device.",
       "failed": "That fingerprint didn't work. Try again."
+    },
+    "devices": {
+      "title": "Passkey devices",
+      "what": "The phones and computers that sign you in with a fingerprint, face or screen lock.",
+      "line": "{{platform}} · added {{added}} · last used {{used}}",
+      "notUsed": "not yet",
+      "platform": {
+        "ios": "iPhone or iPad",
+        "android": "Android",
+        "desktop": "Computer",
+        "other": "Other"
+      },
+      "thisDevice": "This device",
+      "rename": "Rename",
+      "renameTitle": "Rename this device",
+      "nameLabel": "Name",
+      "nameInvalid": "Give it a name of up to 80 characters.",
+      "save": "Save",
+      "remove": "Remove",
+      "removing": "Removing…",
+      "removeTitle": "Remove {{name}}?",
+      "removeBody": "That device can no longer sign in as you and is signed out now. To use it again, add it again. You confirm with your fingerprint, then your owner PIN.",
+      "removeThisBody": "This device can no longer sign in as you and you are signed out here now. You confirm with your fingerprint, then your owner PIN.",
+      "removeConfirm": "Remove",
+      "removed": "Removed. That device is signed out.",
+      "removedThis": "Removed. This device is signed out.",
+      "lastWhy": "Add another device first. Your only device cannot be removed."
     },
     "deviceName": {
       "ios": "{{name}}'s iPhone",

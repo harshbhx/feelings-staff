@@ -307,7 +307,7 @@ The credits routes are owner only; managers get 403 on all of them. Roll-call an
 
 ### Owner access: passkeys, devices, recovery
 
-Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host: built are the passkey options and verify, enrolment (the first device, and another device with the `enrolToken` of an approved device request), device requests (create, poll, list, decide), the device list and rename; Remove and recovery come in the next slices. The schemas are in `packages/contracts/src/api/owner-access.ts`.
+Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host: built are the passkey options and verify, enrolment (the first device, and another device with the `enrolToken` of an approved device request), device requests (create, poll, list, decide), the device list, rename and Remove; recovery comes in the next slice. The schemas are in `packages/contracts/src/api/owner-access.ts`.
 
 | Method | Path | Who may call | Step-up | Idempotent | Request | Response | Summary |
 |---|---|---|---|---|---|---|---|

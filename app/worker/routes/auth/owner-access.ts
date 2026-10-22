@@ -3,14 +3,17 @@
  * device after the email code, slice 4; another device with the enrolment token of an approved device
  * request, slice 5), and the device list. Device requests are in owner-device-requests.ts. Every
  * handler answers NOT_FOUND off the owner host (the host routing already does so; this is the second
- * line). Remove (slice 6) and recovery (slice 7) are not built yet and answer 501.
+ * line). Remove (slice 6) needs the fingerprint on this device plus the PIN and never takes the last
+ * device. Recovery (slice 7) is not built yet and answers 501.
  * Owner: WP-3.
  */
 import type { Handlers } from '../../lib/api';
 import { fail } from '../../lib/errors';
 import { ulid } from '../../lib/ulid';
+import { clearSessionCookie } from '../../middleware/session';
 import { buildMe, requireOrg } from '../../services/auth';
 import {
+  confirmOnThisDevice,
   type DeviceRequestRow,
   ENROL_WINDOW_MS,
   enrolOpen,
@@ -37,6 +40,7 @@ import { startUserSession } from '../../services/session';
 import { deviceRequestHandlers } from './owner-device-requests';
 
 const TOKEN_GONE = 'This request has run out. Ask again on this phone.';
+const LAST_DEVICE = 'This is your only device. Add another device before you remove it.';
 
 interface OwnerRow {
   id: string;
@@ -354,5 +358,53 @@ export const ownerAccessHandlers: Handlers = {
         }),
       ]);
     return deviceView({ ...row, device_name: body.deviceName }, ctx.session?.passkeyId ?? null);
+  },
+
+  async ownerDeviceRemove({ params, body }, ctx, c) {
+    const rp = ownerRelyingParty(c);
+    const user = ctx.user;
+    if (!user) fail('UNAUTHENTICATED');
+    const live = await livePasskeys(ctx, user.id);
+    const target = live.find((r) => r.id === params.id);
+    if (!target) fail('NOT_FOUND');
+    // Checked before the fingerprint, so the phone's challenge is not used up for nothing.
+    if (live.length <= 1) fail('RULE_VIOLATION', LAST_DEVICE, { reason: 'last_device' });
+    const { own, touch } = await confirmOnThisDevice(ctx, rp, body.challengeId, body.credential);
+    const now = ctx.now();
+    // One conditional UPDATE: it removes only while another live passkey of this owner remains, so two
+    // removals at once can never take the last device.
+    const removed = await ctx.db.run(
+      `UPDATE owner_passkeys SET removed_at = ?, removed_by = ?
+        WHERE org_id = ?org AND id = ? AND removed_at IS NULL
+          AND (SELECT COUNT(*) FROM owner_passkeys
+                WHERE org_id = ?org AND user_id = ? AND removed_at IS NULL) > 1`,
+      now,
+      user.id,
+      target.id,
+      user.id,
+    );
+    if (removed.meta.changes !== 1) fail('RULE_VIOLATION', LAST_DEVICE, { reason: 'last_device' });
+    await ctx.db.batch([
+      touch,
+      // Every session that signed in with it ends now (the session check refuses them anyway).
+      ctx.db.stmt(
+        `UPDATE sessions SET revoked_at = ? WHERE org_id = ?org AND passkey_id = ? AND revoked_at IS NULL`,
+        now,
+        target.id,
+      ),
+      ctx.services.audit.stmt(ctx, {
+        category: 'security',
+        action: 'owner.device_removed',
+        entity: 'owner_passkey',
+        entityId: target.id,
+        before: { deviceName: target.device_name, platform: target.platform },
+        after: { removedOn: own.device_name, thisDevice: own.id === target.id },
+      }),
+    ]);
+    // Removing this device signs this browser out as well.
+    const self = own.id === target.id;
+    if (self) clearSessionCookie(c);
+    const rows = await livePasskeys(ctx, user.id);
+    return { devices: rows.map((r) => deviceView(r, self ? null : own.id)) };
   },
 };
