@@ -147,10 +147,11 @@
     "LOP": "Unpaid leave"
   },
   "place": {
-    "inside": "Inside",
-    "edge": "Edge",
-    "venue": "Venue",
-    "offline": "Offline",
+    "inside": "Inside the salon",
+    "edge": "At the edge of the salon area",
+    "venue": "At a venue",
+    "venueNamed": "At {{name}}",
+    "offline": "Checked in offline",
     "owner": "Added by you"
   },
   "punch": {
@@ -268,8 +269,10 @@
       "outAt": "Out {{time}}",
       "lateBy": "+{{min}} m",
       "lateLabel": "Late by {{min}} min",
+      "lateWords": "{{min}} min late",
       "soFar": "{{duration}} so far",
       "worked": "{{duration}} worked",
+      "onTime": "On time",
       "shiftAt": "Shift {{time}}",
       "lateNow": "{{min}} min past shift start",
       "flagged": "Needs a look",

@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { useIsOwner, useRollCall, useRollCallDay, useRollCallSubmit } from '../api/presence';
-import { Meta } from '../components/layout';
+import { Meta, NoBreakParts } from '../components/layout';
 import { Empty, QueryView, RowsSkeleton, useErrorText } from '../components/states';
 import { clock } from '../lib/format';
 import { useOwnerTitle } from '../shell/chrome';
@@ -256,13 +256,6 @@ function hintText(h: RowHint, t: ReturnType<typeof useTranslation>['t']): string
   }
 }
 
-const HINT_ICON = {
-  away_since: 'sign-out',
-  stepped_out: 'sign-out',
-  seems_away: 'map-pin',
-  on_break: 'coffee',
-} as const;
-
 /**
  * One person: the whole row is the target (56 px+). A native checkbox carries "Not here" for
  * screen readers and the keyboard; the status on the right says Here or Not here in words.
@@ -296,23 +289,23 @@ function PersonRow({
             <span className="sr-only">{t('owner:presence.view.notHereFor')} </span>
             {person.name}
           </span>
+          {/* Hints are words in the quiet line, not chips: the row's one status is Here or Not here. */}
           <span className="fs-row__subtitle tabular-nums">
-            {t('owner:presence.view.inAt', { time: clock(person.inAt) })}
+            <NoBreakParts
+              parts={[
+                t('owner:presence.view.inAt', { time: clock(person.inAt) }),
+                ...hints.map((h) =>
+                  h.kind === 'seems_away'
+                    ? {
+                        key: h.kind,
+                        node: <strong className="font-semibold text-text">{hintText(h, t)}</strong>,
+                      }
+                    : // A step-out note is free text: it may wrap inside itself.
+                      { key: h.kind, node: hintText(h, t), wrap: true },
+                ),
+              ]}
+            />
           </span>
-          {hints.length > 0 ? (
-            <span className="fs-row__meta">
-              {hints.map((h) => (
-                <Badge
-                  key={h.kind}
-                  className="max-w-full whitespace-normal"
-                  tone={h.kind === 'seems_away' ? 'warning' : 'neutral'}
-                  icon={HINT_ICON[h.kind]}
-                >
-                  {hintText(h, t)}
-                </Badge>
-              ))}
-            </span>
-          ) : null}
         </span>
         <span className="fs-row__trailing" aria-hidden="true">
           {notHere ? (
