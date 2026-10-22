@@ -170,6 +170,17 @@ export function buildTodayModel(
   };
 }
 
+/**
+ * Whole minutes since the shift started when it is a working day, the shift has started and there
+ * is no check-in yet (the "Not checked in" banner); null otherwise.
+ */
+export function minutesLateToStart(model: TodayModel, nowMs: number): number | null {
+  if (model.status !== 'not_in' || model.dayKind !== 'work' || model.shiftStartTs === null)
+    return null;
+  if (nowMs < model.shiftStartTs) return null;
+  return Math.floor((nowMs - model.shiftStartTs) / 60_000);
+}
+
 /** IST part of the day for the greeting. */
 export function greetingPart(nowMs: number): 'morning' | 'afternoon' | 'evening' {
   const istHour = new Date(nowMs + 330 * 60_000).getUTCHours();

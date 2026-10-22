@@ -8,6 +8,7 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 ### Changed
 
+- Staff Today: the greeting and shift sit on a warm blush band under the logo; once the shift has started and you have not checked in, a henna banner says "Not checked in. Shift started at 10:00, 42 min ago." (before the shift the calm chip stays). Payslips: the latest month is a hero card with the take-home in large type and "Not marked paid yet" or the paid date; older months are rows under "Earlier months".
 - Register on a phone is a person-first list: one row per person with the last seven days as 36 px cells and the full name on one line; a "Month grid" toggle keeps the table (96 px name column, 40 px cells). Late days show the minutes (`+28`, `+1h`) on the late tint and cells drop the icon. On desktop the Register has a panel for the selected day (status, punches, source, note, Fix this day), the summary is one line and the key opens from a popover.
 - E2E: one shared way to answer the presence notice, driven by the server's `consentNeeded` instead of a locator handler that raced the explicit click (the cause of the E2E-07, E2E-09, E2E-10 and E2E-11 timeouts and the two-dialog failures). On Today the notice now waits for the Check in or Step out sheet to leave the page before it opens, so two dialogs are never on screen together. Manual `e2e` runs can add load (`hogs`) and extra Playwright arguments (`args`), and keep the first pass traces.
 

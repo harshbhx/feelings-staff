@@ -82,6 +82,8 @@ Each person can have **one** approved phone. If you join on a second phone, it r
 
 The **Today** screen has one big red button. It says **Check in**. After you check in, it says **Check out**.
 
+If your shift has already started and you have not checked in, a henna box under your greeting says "Not checked in. Shift started at 10:00, 42 min ago." Tap **Check in** to start your day.
+
 <!-- screenshot: staff-today -->
 
 ### Checking in
@@ -243,7 +245,7 @@ If Urmi records an advance for you, you get a message such as "Urmi recorded an 
 
 After Urmi finishes the month, you get "Your October payslip is ready".
 
-1. **Payslips**, tap the month.
+1. **Payslips**. The newest month is the big card at the top with your take-home and whether it is marked paid. Older months are listed under it. Tap a month.
 2. The payslip shows every line and how it was worked out, for example "₹15,000 / 31 days x 29 paid days".
 3. **Download PDF** saves it. **Share** sends it, for example to your family on WhatsApp.
 4. The PDF has a small code. Anyone who scans it sees only your first name's initial, the month, the amount and the version. Nothing else.
