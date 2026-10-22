@@ -1,7 +1,7 @@
 import { MonthView } from '@fs/contracts';
 import { fixtures } from '@fs/contracts/fixtures';
 import { describe, expect, it } from 'vitest';
-import { calendarWeeks, chipStatusOf, monthNav } from './month-model';
+import { calendarWeeks, chipStatusOf, lateMark, monthNav } from './month-model';
 
 const month = MonthView.parse(fixtures.meDays);
 
@@ -37,5 +37,17 @@ describe('My month (PRD 5.1, AC S-11)', () => {
   it('never moves past the current month', () => {
     expect(monthNav('2026-10', '2026-10')).toEqual({ prev: '2026-09', next: null });
     expect(monthNav('2026-01', '2026-10')).toEqual({ prev: '2025-12', next: '2026-02' });
+  });
+
+  it('a late present day shows minutes (+28, +1h from 60), other days show nothing', () => {
+    const base = month.days.find((d) => d.status === 'P');
+    expect(base).toBeDefined();
+    if (!base) return;
+    expect(lateMark({ ...base, lateMin: 28 })).toBe('+28');
+    expect(lateMark({ ...base, lateMin: 59 })).toBe('+59');
+    expect(lateMark({ ...base, lateMin: 60 })).toBe('+1h');
+    expect(lateMark({ ...base, lateMin: 125 })).toBe('+2h');
+    expect(lateMark({ ...base, lateMin: 0 })).toBeNull();
+    expect(lateMark({ ...base, status: 'A', lateMin: 30 })).toBeNull();
   });
 });

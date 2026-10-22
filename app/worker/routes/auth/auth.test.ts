@@ -743,7 +743,11 @@ describe('owner security settings', () => {
       cookie: owner,
       body: { pin: '739164' },
     });
-    expect((await errorCode(noCurrent)).code).toBe('VALIDATION');
+    // Without the current PIN only a fresh email sign-in may set a new one (pin-reset.test.ts).
+    expect(await errorCode(noCurrent)).toMatchObject({
+      code: 'RULE_VIOLATION',
+      details: { reason: 'recent_sign_in_required' },
+    });
     const changed = await callJson<SecurityView>('PUT', '/owner/security/pin', {
       cookie: owner,
       body: { pin: '739164', currentPin: OWNER_PIN },

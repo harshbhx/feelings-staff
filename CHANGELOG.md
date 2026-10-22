@@ -10,10 +10,15 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 
 - Owner Today opens with one card instead of six counter tiles and a separate callout: "8 of 9 in" in large type with the bar, one sentence ("3 late, 1 not in yet, 1 due later, 1 on leave, 1 off today") and, when something waits, the one red button "9 things need your OK". On a phone a three-way switch (In, Not in yet, Away, with counts) picks the list, so the first person shows without scrolling; on a computer the people who are in sit on the left and everyone else on the right.
 - Owner Today rows show one status each, picked by importance: "Waiting for you" or "Needs a look" first, then late as the minutes ("+28 m"), then the venue, then "On time". What lost the pick (the late minutes on a check-in that waits for you) and where the check-in was ("Inside the salon", "At the edge of the salon area") are words in the line under the name, no longer extra chips. Away now and roll-call rows do the same with the reason and the hints. For developers: `ROW_STATUS_PRIORITY` and `rowStatus` in `app/src/features/owner/lib/status.ts`, tested for every pair.
+- Staff Month: a late day shows its minutes (+28, or +1h from an hour) on the late tint instead of the P, like the register; the key now lists Late.
+- Staff Today: the greeting and shift sit on a warm blush band under the logo; once the shift has started and you have not checked in, a henna banner says "Not checked in. Shift started at 10:00, 42 min ago." (before the shift the calm chip stays). Payslips: the latest month is a hero card with the take-home in large type and "Not marked paid yet" or the paid date; older months are rows under "Earlier months".
 - Register on a phone is a person-first list: one row per person with the last seven days as 36 px cells and the full name on one line; a "Month grid" toggle keeps the table (96 px name column, 40 px cells). Late days show the minutes (`+28`, `+1h`) on the late tint and cells drop the icon. On desktop the Register has a panel for the selected day (status, punches, source, note, Fix this day), the summary is one line and the key opens from a popover.
+- E2E: one shared way to answer the presence notice, driven by the server's `consentNeeded` instead of a locator handler that raced the explicit click (the cause of the E2E-07, E2E-09, E2E-10 and E2E-11 timeouts and the two-dialog failures). On Today the notice now waits for the Check in or Step out sheet to leave the page before it opens, so two dialogs are never on screen together. Manual `e2e` runs can add load (`hogs`) and extra Playwright arguments (`args`), and keep the first pass traces.
 
 ### Added
 
+- Forgotten owner PIN: **Settings, Security, Forgot your PIN?** sends the owner through the email-code sign-in and back to Security, where she can set a new PIN without the old one for 15 minutes, once. A password sign-in never opens this. The reset clears wrong tries and the lock, signs out her other devices, emails "Your Feelings Staff owner PIN was changed" and is audited (`owner.pin_reset`). Migration `0005_session_pin_reset.sql` adds `sessions.pin_reset_until`. `PUT /owner/security/pin` without the current PIN now answers `RULE_VIOLATION` (`recent_sign_in_required`) instead of `VALIDATION` when no reset window is open.
+- `scripts/owner-recovery.mjs --clear-pin`: an admin clears the owner PIN (audited as `owner.pin_cleared_by_admin`, every owner session signed out) so the next sign-in sets a first PIN. Dry run unless `--yes`, never prints secrets. [Owner recovery runbook](docs/runbooks/owner-recovery.md).
 - Every control now answers a press the same way: a pressed state within 80 ms, a ring inside the button while it waits (the label and width stay, "Still trying" after 8 s, a second press does nothing), and a disabled main button says why. Buttons have distinct looks per role (solid sindoor, cream secondary, text tertiary, red-labelled destructive), the sheet's close X is neutral, and chips, rows, tabs, the rail and switches have hover, pressed and focus states. Reduced motion turns off every slide and scale.
 - A short vibration on check-in (one tick) and check-out (two ticks) on Android, with a Vibration switch in Me; never with reduced motion.
 - For developers: `useAction` (pending, double-press safe, optimistic only when asked, Cancel, "slow" after 8 s), `app/src/lib/haptics.ts`, motion tokens in `motion.css`, a Control states section on the kit page with forced-state baselines (INT-01 to INT-06), and check-ui rules for transitions and literal durations.
@@ -23,6 +28,24 @@ Each work package adds its own lines under **Unreleased** in the PR that lands i
 - Owner cutover runbook (`docs/runbooks/owner-cutover.md`): the ordered checklist for the owner host and Cloudflare Access, with placeholders instead of real values and the one-line rollback.
 - Owner host Cloudflare Access check (owner access slice 2): when `OWNER_HOST` and `ACCESS_AUD` are both set, every owner-host request must carry a valid Cloudflare Access token (RS256, audience, issuer, expiry and an allowed e-mail) or answers 403 with an empty body. New optional variables `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`. Off, and no change anywhere, while either is unset.
 - Setup and the demo seed now propose Gujarat public holidays for 2027 as well as 2026. The 2027 list has no lunar festivals (Holi, Janmashtami, Dussehra, Diwali): add them in Settings, Holidays.
+
+Owner access, Security devices (slice 6, off until `OWNER_HOST` is set):
+
+- Settings, Security on the owner host lists "Passkey devices": name, platform, added, last used and "This device". Rename a device, or Remove it with the fingerprint on this phone and the owner PIN: that device is signed out at once (`owner.device_removed`). The only device cannot be removed; its Remove is disabled and says "Add another device first".
+Owner PIN reset, contracts (`contracts-v1.4`):
+
+- `SecurityView.pinResetUntil`: until when the signed-in owner may set a new PIN without the old one (15 minutes after an email-code or magic-link sign-in, once per sign-in). Optional, so a server without the reset still matches. Fixture variant `ownerSecurityGet.pin-reset`.
+
+Owner access, device approval (slice 5, off until `OWNER_HOST` is set):
+
+- "Add this device" on the owner sign-in page: the new device shows a 6-digit code ("482 913") with "Expires in 14 minutes" and waits. On a phone that already has a passkey the request is a card in Needs action (device, when, city, the code to compare): Approve asks for the fingerprint on that phone, then the owner PIN; Decline asks for the PIN. The new device then makes its own passkey within 10 minutes and is signed in. Requests expire after 15 minutes; a declined or expired one can ask again.
+- The enrolment token is single use and stored only hashed; approve and decline are audited (`owner.device_requested`, `owner.device_approved`, `owner.device_declined`), and the audit log has labels for the owner passkey actions. 5 requests per IP and 20 per salon in 15 minutes.
+
+Owner access, passkey core (slice 4, off until `OWNER_HOST` is set):
+
+- On the owner host the owner signs in with a passkey ("Use your fingerprint", or "Use Face ID" on an iPhone). The first device is enrolled after the existing email code ("Make this phone your key"), with a name for the phone. From then on that owner gets no email code and no password sign-in on the owner host. A passkey session lasts 12 hours idle and 7 days at most and ends when the passkey is removed.
+- Migration `0004_owner_access.sql`: owner passkeys, device requests, recovery codes and single-use passkey challenges, `users.passkey_enrolled_at`, `sessions.passkey_id`. The nightly purge covers the new tables.
+- `@simplewebauthn/server` 13.3.3 in the Worker (user verification required, attestation none, ES256 and RS256, counter check, 20 challenges per IP per 15 minutes). While `OWNER_HOST` is unset the passkey routes answer 404 and sign-in is unchanged.
 
 Owner access, contracts (`contracts-v1.3`, [owner access](docs/owner-access.md#api)):
 

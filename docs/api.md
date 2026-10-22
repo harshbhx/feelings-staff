@@ -18,7 +18,7 @@ Contents: [Conventions](#conventions) · [Endpoints](#endpoints) · [Error shape
 
 ### Sign-in, cookie and roles
 
-- A session is the cookie `fs_session` (`HttpOnly; Secure; SameSite=Strict; Path=/`). It holds a random token; the database keeps only its SHA-256. Staff sessions slide for 30 days, owner and manager sessions for 14, door sessions for 365.
+- A session is the cookie `fs_session` (`HttpOnly; Secure; SameSite=Strict; Path=/`). It holds a random token; the database keeps only its SHA-256. Staff sessions slide for 30 days, owner and manager sessions for 14, door sessions for 365. On the owner host ([owner access](owner-access.md)) an owner session started with a passkey is bound to that credential: 12 hours idle, 7 days at most, and it ends when the credential is removed; an owner who has a passkey has no other kind of session there.
 - The **Who may call** column uses these words:
 
 | Word | Meaning |
@@ -275,12 +275,14 @@ Organisation settings, the first-run checklist, the owner's own security, the au
 | POST | `/owner/setup/steps/:step` | owner | no | no | path `SetupStepParams`; body `SetupStepRequest` | `SetupView` | Mark a setup step done or skipped |
 | GET | `/owner/security` | owner | no | no | - | `SecurityView` | Email, password/PIN state, sessions |
 | PUT | `/owner/security/password` | owner | yes | no | body `SetPasswordRequest` | `SecurityView` | Set or change the fallback password |
-| PUT | `/owner/security/pin` | owner | no | no | body `SetPinRequest` | `SecurityView` | Set the owner PIN (first time within 15 min of sign-in) or change it |
+| PUT | `/owner/security/pin` | owner | no | no | body `SetPinRequest` | `SecurityView` | Set the owner PIN (first time, or a forgotten one, within 15 min of an email sign-in) or change it |
 | POST | `/owner/security/sign-out-others` | owner | no | no | - | `SecurityView` | Revoke every other session |
 | GET | `/owner/audit` | owner | no | no | query `AuditQuery` | `AuditPage` | Audit log |
 | GET | `/owner/managers` | owner | no | no | - | `ManagerView[]` | Managers (P1) |
 | PUT | `/owner/managers` | owner | yes | no | body `ManagerUpsert` | `ManagerView` | Grant manager rights (P1) |
 | DELETE | `/owner/managers/:id` | owner | yes | no | path `IdParams` | no body (204) | Remove manager rights (P1) |
+
+Forgotten owner PIN ([owner access](owner-access.md#passkeys), flow 6): `PUT /owner/security/pin` without `currentPin` while a PIN exists sets a new one only while `SecurityView.pinResetUntil` is in the future. The server opens that window for 15 minutes after an email-code or magic-link sign-in (a password sign-in never opens it), once per sign-in; otherwise it answers `RULE_VIOLATION` with `reason: recent_sign_in_required`. A reset clears the PIN failures and lock, revokes the owner's other sessions, emails "Your Feelings Staff owner PIN was changed" to the owner address and writes the audit row `owner.pin_reset`; any PIN set or change closes the window for that session. The admin path is `scripts/owner-recovery.mjs --clear-pin` ([owner recovery runbook](runbooks/owner-recovery.md)).
 
 ### Owner: Time credits and presence
 
@@ -305,7 +307,7 @@ The credits routes are owner only; managers get 403 on all of them. Roll-call an
 
 ### Owner access: passkeys, devices, recovery
 
-Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host. The schemas are in `packages/contracts/src/api/owner-access.ts`.
+Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host: built are the passkey options and verify, enrolment (the first device, and another device with the `enrolToken` of an approved device request), device requests (create, poll, list, decide), the device list, rename and Remove; recovery comes in the next slice. The schemas are in `packages/contracts/src/api/owner-access.ts`.
 
 | Method | Path | Who may call | Step-up | Idempotent | Request | Response | Summary |
 |---|---|---|---|---|---|---|---|
@@ -337,8 +339,10 @@ Errors these routes use (no new codes):
 | `NONCE_INVALID` (409) | The challenge is unknown, used, expired (5 min) or was issued for another purpose or session. Get a new one. |
 | `SIGNATURE_INVALID` (401) | The passkey answer does not verify: signature, origin, relying-party id, user verification flag, counter, or an unknown or removed credential. |
 | `FORBIDDEN` (403), `details.reason: "passkey_enrolled"` | The email-code sign-in on the owner host for an owner who has a passkey. |
-| `RULE_VIOLATION` (422), `details.reason` | `already_enrolled` (first-device enrolment for an owner with a passkey), `last_device` (removing the only device). |
-| `LINK_EXPIRED` (410) | An enrolment token or device request that expired, was declined or was used; a recovery code that expired or was used. |
+| `RULE_VIOLATION` (422), `details.reason` | `already_enrolled` (first-device enrolment for an owner with a passkey), `no_device` (a device request while no owner has a passkey to approve it), `last_device` (removing the only device). |
+| `FORBIDDEN` (403), `details.reason: "passkey_session"` | A confirm challenge, the request list or a decision from a session that did not sign in with a passkey. |
+| `NOT_FOUND` (404) | Polling a request with a token that is not its own (wrong or another request's). |
+| `LINK_EXPIRED` (410) | An enrolment token or device request that expired (15 minutes pending, 10 minutes after approval), was declined, was not approved yet or was used; a recovery code that expired or was used. Polling a used token answers it too; a declined or expired request polls as `status: "declined"` or `"expired"`. |
 | `ALREADY_DECIDED` (409) | Deciding a device request that is no longer pending. |
 | `CODE_WRONG` (401) | A recovery code that does not match. |
 

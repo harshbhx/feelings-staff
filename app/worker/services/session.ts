@@ -15,6 +15,8 @@ export async function startUserSession(
   c: Context<AppEnv>,
   user: { id: string; orgId: string; role: Role },
   deviceId: string | null,
+  /** Owner passkey the session is bound to (owner host, docs/owner-access.md). */
+  passkeyId?: string,
 ): Promise<{ tokenHash: string; createdAt: number }> {
   if (ctx.session) await revokeSession(ctx, null, ctx.session.tokenHash);
   const tokenHash = await issueSession(ctx, c, {
@@ -23,6 +25,7 @@ export async function startUserSession(
     userId: user.id,
     deviceId,
     role: user.role,
+    ...(passkeyId ? { passkeyId } : {}),
   });
   return { tokenHash, createdAt: ctx.now() };
 }
