@@ -3,7 +3,14 @@
  * virtual authenticator (the CDP WebAuthn domain) in place of a fingerprint, report screenshots, and
  * the first device enrolled through the email code. Not a spec file itself.
  */
-import { type CDPSession, expect, type Page, test } from '@playwright/test';
+import {
+  type Browser,
+  type BrowserContext,
+  type CDPSession,
+  expect,
+  type Page,
+  test,
+} from '@playwright/test';
 
 /**
  * The owner host of the split run. A `*.localhost` name: Chromium resolves it to loopback and treats it
@@ -57,4 +64,26 @@ export async function enrolFirstDevice(page: Page, email: string, outbox: Outbox
   await page.getByLabel('Name of this phone').fill('Front desk phone');
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page).toHaveURL(/\/o\/today/);
+}
+
+/** The new device: a separate browser (no cookies, its own authenticator) on "Add this device". */
+export async function newDevice(
+  browser: Browser,
+): Promise<{ context: BrowserContext; page: Page }> {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  await virtualAuthenticator(page);
+  await page.goto(`http://${OWNER}/auth/owner`);
+  await page.getByRole('button', { name: 'Add this device' }).click();
+  await expect(page).toHaveURL(/\/auth\/owner\/add/);
+  return { context, page };
+}
+
+/** The code the new device shows ("482 913" on screen). */
+export async function codeOn(page: Page): Promise<string> {
+  const card = page.getByTestId('device-code');
+  await expect(card).toContainText(/\d{3} \d{3}/);
+  const m = (await card.textContent())?.match(/(\d{3}) (\d{3})/);
+  if (!m) throw new Error('no code on the new device');
+  return `${m[1]} ${m[2]}`;
 }

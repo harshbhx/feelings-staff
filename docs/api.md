@@ -275,12 +275,14 @@ Organisation settings, the first-run checklist, the owner's own security, the au
 | POST | `/owner/setup/steps/:step` | owner | no | no | path `SetupStepParams`; body `SetupStepRequest` | `SetupView` | Mark a setup step done or skipped |
 | GET | `/owner/security` | owner | no | no | - | `SecurityView` | Email, password/PIN state, sessions |
 | PUT | `/owner/security/password` | owner | yes | no | body `SetPasswordRequest` | `SecurityView` | Set or change the fallback password |
-| PUT | `/owner/security/pin` | owner | no | no | body `SetPinRequest` | `SecurityView` | Set the owner PIN (first time within 15 min of sign-in) or change it |
+| PUT | `/owner/security/pin` | owner | no | no | body `SetPinRequest` | `SecurityView` | Set the owner PIN (first time, or a forgotten one, within 15 min of an email sign-in) or change it |
 | POST | `/owner/security/sign-out-others` | owner | no | no | - | `SecurityView` | Revoke every other session |
 | GET | `/owner/audit` | owner | no | no | query `AuditQuery` | `AuditPage` | Audit log |
 | GET | `/owner/managers` | owner | no | no | - | `ManagerView[]` | Managers (P1) |
 | PUT | `/owner/managers` | owner | yes | no | body `ManagerUpsert` | `ManagerView` | Grant manager rights (P1) |
 | DELETE | `/owner/managers/:id` | owner | yes | no | path `IdParams` | no body (204) | Remove manager rights (P1) |
+
+Forgotten owner PIN ([owner access](owner-access.md#passkeys), flow 6): `PUT /owner/security/pin` without `currentPin` while a PIN exists sets a new one only while `SecurityView.pinResetUntil` is in the future. The server opens that window for 15 minutes after an email-code or magic-link sign-in (a password sign-in never opens it), once per sign-in; otherwise it answers `RULE_VIOLATION` with `reason: recent_sign_in_required`. A reset clears the PIN failures and lock, revokes the owner's other sessions, emails "Your Feelings Staff owner PIN was changed" to the owner address and writes the audit row `owner.pin_reset`; any PIN set or change closes the window for that session. The admin path is `scripts/owner-recovery.mjs --clear-pin` ([owner recovery runbook](runbooks/owner-recovery.md)).
 
 ### Owner: Time credits and presence
 
@@ -305,7 +307,7 @@ The credits routes are owner only; managers get 403 on all of them. Roll-call an
 
 ### Owner access: passkeys, devices, recovery
 
-Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host: built are the passkey options and verify, enrolment (the first device, and another device with the `enrolToken` of an approved device request), device requests (create, poll, list, decide), the device list and rename; Remove and recovery come in the next slices. The schemas are in `packages/contracts/src/api/owner-access.ts`.
+Sign-in with passkeys on the owner's own host ([ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare-access-with-passkeys.md), design in [owner access](owner-access.md)). These routes answer only on the owner host: on the staff host, and everywhere while `OWNER_HOST` is unset, they answer `NOT_FOUND` (404). A route that is not built yet answers `NOT_IMPLEMENTED` (501) instead, except on the staff host: built are the passkey options and verify, enrolment (the first device, and another device with the `enrolToken` of an approved device request), device requests (create, poll, list, decide), the device list, rename and Remove; recovery comes in the next slice. The schemas are in `packages/contracts/src/api/owner-access.ts`.
 
 | Method | Path | Who may call | Step-up | Idempotent | Request | Response | Summary |
 |---|---|---|---|---|---|---|---|
