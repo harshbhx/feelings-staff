@@ -45,24 +45,44 @@ What it changes, all in one `wrangler d1 execute`: `users.pin_hash`, `pin_salt` 
 
 | Option | Meaning |
 |---|---|
-| `--clear-pin` | The action (exactly one). `--issue-code` comes with [recovery codes](#lost-every-device-recovery-code). |
+| `--clear-pin` or `--issue-code` | The action (exactly one). `--issue-code` is [recovery codes](#lost-every-device-recovery-code). |
 | `--database <name>` | D1 database name: `fbc-staff` (production) or `fbc-staff-preview`. Required. |
 | `--remote` or `--local` | Which copy. One of them is required, so a command never hits production by default. |
 | `--config <file>` | Wrangler config, relative to where you run the command (`app/wrangler.jsonc`, `app/wrangler.preview-migrations.jsonc`). Optional. |
 | `--env <name>` | Wrangler environment. Optional. |
 | `--email <address>` | Which owner, when the database has more than one. |
-| `--reason "<text>"` | Written to the audit row (200 characters at most). Default "Owner forgot the PIN". |
+| `--reason "<text>"` | Written to the audit row (200 characters at most). Default "Owner forgot the PIN" or, with `--issue-code`, "Owner lost every device". |
 | `--yes` | Do it. Without it nothing is written. |
 
-It never prints a PIN, a hash, a salt or a token, and it masks the owner email (`u***@feelingsbeautycare.in`). The SQL lives in `scripts/owner-recovery-sql.mjs`; the Workers tests (`app/worker/routes/auth/pin-reset.test.ts`) run the same statements against the real schema.
+It never prints a PIN, a hash, a salt or a token (the one thing it shows is the recovery code, once, after the write), and it masks the owner email (`u***@feelingsbeautycare.in`). The SQL lives in `scripts/owner-recovery-sql.mjs`; the Workers tests (`app/worker/routes/auth/pin-reset.test.ts`) run the same statements against the real schema.
 
 ## Lost every device: recovery code
 
-Not built yet. It comes with owner access slice 7 part B, after the passkey core: `--issue-code` issues a one-time code (shown once, stored hashed, 24 hours, audited as `owner.recovery_issued`), and "I lost my phone" on the owner host accepts it. Until the owner host cutover the owner signs in by email, so this case cannot happen yet. The [cutover runbook](owner-cutover.md) requires it to be tested once before the old owner routes are closed.
+Use this only when the owner has no phone or computer that signs her in (an approved device can always add another with **Add this device**), and only when she asked for it herself. It works on the owner host, so it needs `OWNER_HOST` set and the Access policy in place; before the cutover the owner signs in by email and this case cannot happen.
+
+1. **Confirm the request.** Call Urmi on the number you know. Never act on an email or a chat message alone.
+2. **Practise on preview first** if you have not issued a code before (same commands with `--database fbc-staff-preview --remote --config app/wrangler.preview-migrations.jsonc`).
+3. **Dry run** on production. It looks the owner up (read only) and prints the plan and the SQL. The SQL shows only a placeholder for the hash, and the code itself is never printed in a dry run.
+
+   ```sh
+   node scripts/owner-recovery.mjs --issue-code --database fbc-staff --remote --config app/wrangler.jsonc \
+     --reason "Urmi lost her phone, asked by phone"
+   ```
+
+4. **Run it** with the same command plus `--yes`. After the write it prints the code once (`K7QM-4T9X-B2NE-VH5R` style) and the audit row id. Copy it now: nothing stores it in a readable form, and a second run makes a different code and ends the first.
+5. **Give it to her by phone**, not in a chat or an email. It works for 24 hours, once.
+6. **She** opens the owner host, taps **Lost your phone?**, **Use a recovery code**, types the code (capitals, dashes and spaces do not matter), then **Make this phone your key** and names the phone. Inside 10 minutes of the code being accepted, once.
+7. **What that does:** every old passkey is removed, every session of hers is signed out, the new phone is her only device. She should then add a second one with **Add this device**.
+8. **Ops log:** add an entry to [the ops log](../ops-log.md) with the time, who asked and how, the command (without `--yes` is fine) and the audit row id. Never the code.
+
+If she says the code does not work: the screen gives the same answer for a typo, a used code, an expired one and a stale one, on purpose. Check the audit log for `owner.recovery_used` (it was accepted; the 10 minutes may have passed, issue a new code) and `owner.recovery_failed` (typed wrongly; five misses per phone in 15 minutes pause the screen for 15 minutes). Then issue a new code; that ends the old one.
+
+What `--issue-code` changes, in one `wrangler d1 execute`: earlier unused codes of the owner end (`expires_at` set to now); one `owner_recovery_codes` row (SHA-256 of the code, `issued_by = admin`, 24 hours); one `audit_log` row `owner.recovery_issued` (`actor_type = system`, your `--reason`). It touches no session and no passkey: those change only when she redeems the code and enrols. The [cutover runbook](owner-cutover.md) requires one practice run on a spare device before the old owner routes are closed.
 
 ## Ops notes
 
 - A person runs the script, after a dry run, at the owner's request. Never from CI, a scheduled job or an automated agent, and never without `--remote`/`--local` chosen on purpose.
 - Self-service resets need no ops log entry (the audit row is the record). An admin clear always gets one.
+- Audit rows to look for with recovery codes: `owner.recovery_issued` (system, with the reason), `owner.recovery_used`, `owner.passkey_enrolled` with `via: recovery`, and `owner.recovery_failed` (several in a row from one place: someone is guessing; the route stops after five per IP, and a code has 80 random bits, but tell Harsh).
 - Audit rows to look for: `owner.pin_reset` (the owner, self-service), `owner.pin_cleared_by_admin` (system, with the reason), then `owner.pin_set` when she sets the new one.
 - A "PIN was changed" email nobody expected, or several resets in a short time, means someone else may have her email: follow the [incident runbook](incident.md), sign out other devices, and secure the email account first. The email account is the key to the owner account.

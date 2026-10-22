@@ -1738,6 +1738,9 @@
       "owner_passkey_enrolled": "Passkey added",
       "owner_pin_cleared_by_admin": "Owner PIN cleared by the admin",
       "owner_pin_reset": "Owner PIN reset after a new sign-in",
+      "owner_recovery_failed": "Wrong owner recovery code",
+      "owner_recovery_issued": "Owner recovery code issued",
+      "owner_recovery_used": "Owner recovery code used",
       "owner_signin_passkey": "Owner signed in with a passkey",
       "payroll_adjustment_add": "Added to a payslip",
       "payroll_adjustment_delete": "Removed from a payslip",
@@ -2113,7 +2116,20 @@
       "emailCode": "Email me a code",
       "lostPhone": "Lost your phone?",
       "lostPhoneHelp": "Ask Harsh for a one-time recovery code. With it you set up a new phone as your key.",
-      "addDevice": "Add this device"
+      "addDevice": "Add this device",
+      "recoveryCode": "Use a recovery code"
+    },
+    "recovery": {
+      "title": "Use a recovery code",
+      "lead": "Type the one-time code you were given. With it you set up a new phone as your key. Your old phones stop signing in.",
+      "label": "Recovery code",
+      "hint": "16 letters and numbers, like K7QM-4T9X-B2NE-VH5R.",
+      "submit": "Continue",
+      "checking": "Checking…",
+      "short": "A recovery code has 16 letters and numbers.",
+      "refused": "That code did not work. Check it, or ask for a new one.",
+      "rateLimited": "Too many tries. Wait 15 minutes and try again.",
+      "failed": "We couldn't check the code. Check your internet and try again."
     },
     "enrol": {
       "title": "Make this phone your key",
