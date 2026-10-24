@@ -250,6 +250,7 @@
     "emptyTitle": "Nothing here yet",
     "emptyBody": "Reminders and updates from the salon will show up here.",
     "errorTitle": "We couldn't load your inbox",
-    "errorBody": "Check your connection and try again."
+    "errorBody": "Check your connection and try again.",
+    "markRead": "Mark read"
   }
 }

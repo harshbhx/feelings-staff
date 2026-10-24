@@ -69,7 +69,7 @@
 
   /* Waiting: white with a dashed control outline. */
   .fs-status[data-status="waiting"] {
-    --fs-status-fg: var(--ink-700);
+    --fs-status-fg: var(--text-body);
     --fs-status-bg: var(--bg);
     border: 1px dashed var(--border-control);
   }

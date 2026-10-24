@@ -116,6 +116,23 @@ function useStaffBoot(standalone: boolean) {
   }, [api]);
 
   useEffect(() => {
+    // Pull to refresh (iOS layer): refetches what is on screen. Its own chunk, after first paint.
+    let off: (() => void) | undefined;
+    let gone = false;
+    void import('../../../lib/pull-refresh').then((m) => {
+      if (!gone)
+        off = m.attachPullRefresh(
+          () => qc.refetchQueries({ type: 'active' }),
+          i18n.t('common:states.refreshing'),
+        );
+    });
+    return () => {
+      gone = true;
+      off?.();
+    };
+  }, [qc, i18n]);
+
+  useEffect(() => {
     // PRD 4.1.4, 11.8: persist storage once installed so the device key and queue survive.
     if (standalone) void ensurePersisted();
   }, [standalone]);

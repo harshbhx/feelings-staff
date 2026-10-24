@@ -175,4 +175,59 @@
     max-width: 34em;
     color: var(--text-body);
   }
+
+  /* Pull to refresh (app/src/lib/pull-refresh.ts): a ring in a cell-coloured disc under the bar,
+     following the finger (--ptr 0..1), turning while the screen refetches. */
+  .fs-ptr {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 3.5rem);
+    left: 50%;
+    z-index: 25;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-left: -1.125rem;
+    border-radius: 50%;
+    background: var(--bg);
+    box-shadow: var(--shadow-float);
+    opacity: var(--ptr, 0);
+    transform: translateY(calc(var(--ptr, 0) * 1.5rem)) scale(calc(0.6 + var(--ptr, 0) * 0.4));
+    pointer-events: none;
+  }
+
+  .fs-ptr__ring {
+    width: 1.125rem;
+    height: 1.125rem;
+    border: 2px solid var(--fill-2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    rotate: calc(var(--ptr, 0) * 300deg);
+  }
+
+  .fs-ptr[data-armed] .fs-ptr__ring {
+    border-right-color: var(--accent);
+  }
+
+  .fs-ptr[data-busy] {
+    --ptr: 1;
+  }
+
+  .fs-ptr[data-busy] .fs-ptr__ring {
+    animation: fs-spin var(--dur-spin) linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fs-ptr {
+      transform: none;
+    }
+
+    .fs-ptr__ring {
+      rotate: none;
+    }
+
+    .fs-ptr[data-busy] .fs-ptr__ring {
+      animation: none;
+    }
+  }
 }

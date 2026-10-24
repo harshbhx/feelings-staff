@@ -22,7 +22,7 @@ import {
   ToastProvider,
 } from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { type CSSProperties, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { useMe } from '../../../api/hooks';
@@ -64,6 +64,7 @@ export function OwnerShell() {
   const count = actions.data ? openActionCount(actions.data) : null;
   usePushRefetch();
   useAppBadge(count);
+  usePullRefresh();
   return (
     <ToastProvider bottomOffset="var(--owner-toast-offset)">
       <StepUpProvider>
@@ -100,6 +101,27 @@ export function OwnerShell() {
       </StepUpProvider>
     </ToastProvider>
   );
+}
+
+/** Pull to refresh (iOS layer): refetches what is on screen; its own small chunk. */
+function usePullRefresh() {
+  const qc = useQueryClient();
+  const { t } = useTranslation();
+  useEffect(() => {
+    let off: (() => void) | undefined;
+    let gone = false;
+    void import('../../../lib/pull-refresh').then((m) => {
+      if (!gone)
+        off = m.attachPullRefresh(
+          () => qc.refetchQueries({ type: 'active' }),
+          t('common:states.refreshing'),
+        );
+    });
+    return () => {
+      gone = true;
+      off?.();
+    };
+  }, [qc, t]);
 }
 
 function SkipLabel() {

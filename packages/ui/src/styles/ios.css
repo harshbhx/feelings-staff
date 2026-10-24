@@ -30,8 +30,8 @@
   --on-tint: var(--maroon-800);
   --fill: color-mix(in srgb, var(--text) 7%, transparent);
   --fill-2: color-mix(in srgb, var(--text) 12%, transparent);
-  --material: color-mix(in srgb, var(--app-page) 80%, transparent);
-  --material-cell: color-mix(in srgb, var(--bg) 78%, transparent);
+  --material: color-mix(in srgb, var(--app-page) 86%, transparent);
+  --material-cell: color-mix(in srgb, var(--bg) 88%, transparent);
   --blur: saturate(1.8) blur(20px);
   --shadow-float: 0 8px 28px -10px rgb(30 18 20 / 0.3), 0 1px 3px rgb(30 18 20 / 0.08);
   --row-hover-bg: color-mix(in oklab, var(--bg) 95%, var(--text));
@@ -77,8 +77,8 @@
     --tap: rgb(240 87 80 / 0.18);
     --scrim-soft: rgb(0 0 0 / 0.56);
     --logo: var(--rose-50);
-    --material: color-mix(in srgb, var(--ink-900) 72%, transparent);
-    --material-cell: color-mix(in srgb, var(--bg-soft) 76%, transparent);
+    --material: color-mix(in srgb, var(--ink-900) 82%, transparent);
+    --material-cell: color-mix(in srgb, var(--bg-soft) 86%, transparent);
     --sheet-bg: color-mix(in oklab, var(--ink-900) 80%, black);
     --seg-thumb: color-mix(in oklab, var(--ink-900) 78%, var(--white));
     --seg-shadow: 0 3px 8px rgb(0 0 0 / 0.3);

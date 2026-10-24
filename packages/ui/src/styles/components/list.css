@@ -132,10 +132,55 @@
     color: var(--text-muted);
   }
 
+  /* The chevron sits centred at the trailing edge, so a wrapping row never strands it. */
+  .fs-row:has(> .fs-row__chevron) {
+    position: relative;
+    padding-right: 2.25rem;
+  }
+
   .fs-row__chevron {
+    position: absolute;
+    top: 50%;
+    right: 0.875rem;
     width: 1rem;
     height: 1rem;
-    margin-right: -0.25rem;
     color: var(--border-control);
+    translate: 0 -50%;
+  }
+
+  /* The iOS settings icon tile: a white glyph on a rounded square in one of the five service tones. */
+  .fs-tile {
+    display: grid;
+    place-items: center;
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: 0.5rem;
+    background: var(--tone-bridal);
+    color: var(--white);
+  }
+
+  .fs-tile > .fs-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .fs-tile[data-tone="nails"] {
+    background: var(--tone-nails);
+  }
+
+  .fs-tile[data-tone="mehndi"] {
+    background: var(--tone-mehndi);
+  }
+
+  .fs-tile[data-tone="salon"] {
+    background: var(--tone-salon);
+  }
+
+  .fs-tile[data-tone="academy"] {
+    background: var(--tone-academy);
+  }
+
+  .fs-list__item:has(.fs-tile) + .fs-list__item:has(.fs-tile)::before {
+    --fs-sep-inset: 3.75rem;
   }
 }

@@ -7,6 +7,8 @@
     -webkit-tap-highlight-color: transparent;
     scroll-padding-top: calc(var(--header-h) + var(--space-4));
     scroll-padding-bottom: calc(var(--app-bar-h) + var(--space-4));
+    /* Keeps the iOS bounce but stops a browser's own pull-to-reload; the app's own pull refetches. */
+    overscroll-behavior-y: contain;
   }
 
   body {
