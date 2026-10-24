@@ -222,9 +222,7 @@ export const prefixedClass =
   'flex min-h-[3.25rem] w-full items-stretch rounded-sm border border-border-control bg-bg hover:border-text focus-within:border-accent focus-within:outline-2 focus-within:outline-offset-0 focus-within:outline-accent has-[[aria-invalid=true]]:border-accent';
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={`rounded-md bg-bg p-5 ${className ?? ''}`}>{children}</div>
-  );
+  return <div className={`rounded-md bg-bg p-5 ${className ?? ''}`}>{children}</div>;
 }
 
 export type ChipTone = 'waiting' | 'approved' | 'rejected';

@@ -43,11 +43,7 @@ export function ErrorCard({ error, onRetry }: { error: unknown; onRetry?: () => 
   // "Try again" can't help with a part of the server that isn't switched on yet.
   const canRetry = onRetry && !(error instanceof ApiError && error.code === 'NOT_IMPLEMENTED');
   return (
-    <div
-      role="alert"
-      className="grid gap-3 rounded-md bg-bg p-5"
-      data-testid="owner-error"
-    >
+    <div role="alert" className="grid gap-3 rounded-md bg-bg p-5" data-testid="owner-error">
       <p className="flex items-start gap-2 font-bold text-text">
         <Icon name="warning-circle" className="mt-1 size-5 shrink-0 text-accent" />
         <span>{t('owner:errors.title')}</span>

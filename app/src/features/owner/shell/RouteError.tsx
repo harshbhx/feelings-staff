@@ -14,11 +14,7 @@ export function RouteError() {
   useStaleChunkRecovery(error);
   const detail = error instanceof Error ? error.message : null;
   return (
-    <div
-      role="alert"
-      className="grid gap-3 rounded-md bg-bg p-5"
-      data-testid="owner-route-error"
-    >
+    <div role="alert" className="grid gap-3 rounded-md bg-bg p-5" data-testid="owner-route-error">
       <p className="font-bold text-text">{t('owner:errors.screenTitle')}</p>
       <p className="text-text-body">{t('owner:errors.screenBody')}</p>
       <div>

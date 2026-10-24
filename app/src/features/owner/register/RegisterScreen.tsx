@@ -235,10 +235,7 @@ function WeekList({ view, today }: { view: RegisterView; today: string }) {
     setParams(next);
   };
   return (
-    <section
-      aria-label={t('owner:register.weekList')}
-      className="rounded-md bg-bg"
-    >
+    <section aria-label={t('owner:register.weekList')} className="rounded-md bg-bg">
       <div className="grid grid-cols-7 px-3 pt-2 pb-1" aria-hidden="true">
         {dates.map((d) => (
           <span key={d} className="grid text-center text-text-muted text-xs leading-tight">
