@@ -67,7 +67,7 @@
 .owner-large-title {
   max-width: var(--container-page);
   margin-inline: auto;
-  padding: var(--space-1) var(--gutter) var(--space-2);
+  padding: var(--space-1) var(--gutter) var(--space-1);
 }
 
 .owner-large-title:empty {

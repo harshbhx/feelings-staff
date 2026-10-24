@@ -91,7 +91,7 @@ export function OwnerShell() {
             <main
               id="owner-main"
               tabIndex={-1}
-              className="mx-auto w-full max-w-(--container-page) px-(--gutter) pt-3 pb-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+2.5rem)] outline-none xl:pt-4 xl:pb-16"
+              className="mx-auto w-full max-w-(--container-page) px-(--gutter) pt-2 pb-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+2.5rem)] outline-none xl:pt-4 xl:pb-16"
             >
               <Outlet />
             </main>
