@@ -91,7 +91,7 @@ function QrCode({ value, label }: { value: string; label: string }) {
       aria-label={label}
       viewBox={`0 0 ${qr.size} ${qr.size}`}
       shapeRendering="crispEdges"
-      className="aspect-square w-full max-w-[min(80vw,60vh)] rounded-md border border-border bg-bg"
+      className="aspect-square w-full max-w-[min(80vw,60vh)] rounded-md bg-bg"
       data-testid="door-qr"
     >
       <path d={qr.d} className="fill-ink-900" />

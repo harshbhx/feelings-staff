@@ -36,7 +36,7 @@ export function MoreScreen() {
           </Section>
         );
       })}
-      <div className="grid gap-4 rounded-md border border-border bg-bg p-4 xl:hidden">
+      <div className="grid gap-4 rounded-md bg-bg p-4 xl:hidden">
         <Logo name={t('common:app.shortName')} mask={LOGO_MASK} />
         {me.data ? (
           <div className="flex items-center gap-3">

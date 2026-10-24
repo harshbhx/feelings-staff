@@ -126,7 +126,7 @@ export function OwnerAddDeviceScreen() {
 
       {phase.kind === 'waiting' || phase.kind === 'asking' ? (
         <div
-          className="mt-8 grid gap-2 rounded-md border border-border bg-bg p-6 text-center"
+          className="mt-8 grid gap-2 rounded-md bg-bg p-6 text-center"
           data-testid="device-code"
         >
           <p className="font-semibold text-sm text-text-muted">{t('owner:access.add.codeLabel')}</p>

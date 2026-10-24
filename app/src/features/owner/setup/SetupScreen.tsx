@@ -115,7 +115,7 @@ function Checklist() {
               </section>
             ) : null}
             {layout.done.length > 0 ? (
-              <details className="group rounded-md border border-border bg-bg">
+              <details className="group rounded-md bg-bg">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 px-4 py-2 font-semibold text-sm text-text [&::-webkit-details-marker]:hidden">
                   <Icon name="check-circle" className="size-5 text-[var(--status-present)]" />
                   <span className="flex-1">

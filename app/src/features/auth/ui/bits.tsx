@@ -223,7 +223,7 @@ export const prefixedClass =
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-md border border-border bg-bg p-5 ${className ?? ''}`}>{children}</div>
+    <div className={`rounded-md bg-bg p-5 ${className ?? ''}`}>{children}</div>
   );
 }
 

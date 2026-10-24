@@ -51,19 +51,23 @@
   white-space: nowrap;
 }
 
-.owner-bar__title[aria-hidden] {
+.owner-bar__title[data-twin] {
   opacity: 0;
   transition: opacity var(--dur-fast) var(--ease-soft);
 }
 
-.owner-bar[data-under] .owner-bar__title[aria-hidden] {
+.owner-bar__title[data-twin]::before {
+  content: attr(data-twin);
+}
+
+.owner-bar[data-under] .owner-bar__title[data-twin] {
   opacity: 1;
 }
 
 .owner-large-title {
   max-width: var(--container-page);
   margin-inline: auto;
-  padding: var(--space-1) var(--gutter) 0;
+  padding: var(--space-1) var(--gutter) var(--space-2);
 }
 
 .owner-large-title:empty {

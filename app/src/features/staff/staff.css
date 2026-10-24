@@ -76,12 +76,16 @@
   }
 
   /* The large title's small twin: shown only once the large title is under the bar. */
-  .staff-header__title[aria-hidden] {
+  .staff-header__title[data-twin] {
     opacity: 0;
     transition: opacity var(--dur-fast) var(--ease-soft);
   }
 
-  .staff-header[data-under] .staff-header__title[aria-hidden] {
+  .staff-header__title[data-twin]::before {
+    content: attr(data-twin);
+  }
+
+  .staff-header[data-under] .staff-header__title[data-twin] {
     opacity: 1;
   }
 
@@ -111,7 +115,7 @@
   }
 
   .staff-large-title {
-    padding: var(--space-1) var(--gutter) 0;
+    padding: var(--space-1) var(--gutter) var(--space-2);
   }
 
   .staff-large-title:empty {

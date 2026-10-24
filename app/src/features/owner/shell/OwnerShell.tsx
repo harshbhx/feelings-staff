@@ -166,9 +166,7 @@ function Header() {
               {text}
             </h1>
           ) : (
-            <p className="owner-bar__title" aria-hidden="true">
-              {text}
-            </p>
+            <p className="owner-bar__title" data-twin={text} aria-hidden="true" />
           )}
           <InboxBell />
         </div>

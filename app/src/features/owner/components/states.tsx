@@ -45,7 +45,7 @@ export function ErrorCard({ error, onRetry }: { error: unknown; onRetry?: () => 
   return (
     <div
       role="alert"
-      className="grid gap-3 rounded-md border border-border bg-bg p-5"
+      className="grid gap-3 rounded-md bg-bg p-5"
       data-testid="owner-error"
     >
       <p className="flex items-start gap-2 font-bold text-text">

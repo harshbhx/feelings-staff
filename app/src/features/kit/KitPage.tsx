@@ -199,7 +199,7 @@ function Foundations() {
       </Specimen>
       <div className="grid gap-8 lg:grid-cols-2">
         <Specimen label="Logo: staff header 20 px, owner header 24 px, rail 28 px">
-          <div className="flex flex-wrap items-end gap-8 rounded-md border border-border bg-bg p-4">
+          <div className="flex flex-wrap items-end gap-8 rounded-md bg-bg p-4">
             <Logo name="Feelings" size="sm" />
             <Logo name="Feelings" />
             <Logo name="Feelings" size="lg" />

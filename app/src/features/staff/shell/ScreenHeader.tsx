@@ -57,12 +57,15 @@ export function ScreenHeader({ title, as = 'h1', back, dataAt }: ScreenHeaderPro
           ) : null}
           {as === 'h1' && !large ? (
             <h1 className="staff-header__title">{title}</h1>
-          ) : (
+          ) : large ? (
+            // The large title's twin: drawn from the attribute, so it is neither read nor found twice.
             <p
               className="staff-header__title"
-              data-quiet={as === 'h1' ? undefined : ''}
-              aria-hidden={large ? 'true' : undefined}
-            >
+              data-twin={typeof title === 'string' ? title : ''}
+              aria-hidden="true"
+            />
+          ) : (
+            <p className="staff-header__title" data-quiet="">
               {title}
             </p>
           )}
