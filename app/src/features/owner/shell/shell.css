@@ -1,0 +1,71 @@
+/*
+ * Owner navigation bar (iOS layer): clear over the grouped page at the top, the material with a
+ * hairline once content runs under it (data-under, from useUnderBar). Back or logo, the small centred
+ * title, the bell. The large title sits on the page under it on tab-level screens.
+ */
+.owner-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding-top: env(safe-area-inset-top);
+  background: var(--app-page);
+  transition: background-color var(--dur-fast) var(--ease-soft);
+}
+
+.owner-bar[data-under] {
+  background: var(--material);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.owner-bar__row {
+  display: grid;
+  grid-template-columns: minmax(2.75rem, 1fr) minmax(0, auto) minmax(2.75rem, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  max-width: var(--container-page);
+  min-height: 3.25rem;
+  margin-inline: auto;
+  padding-inline: calc(var(--gutter) - 0.25rem);
+}
+
+.owner-bar__row > :first-child {
+  justify-self: start;
+}
+
+.owner-bar__row > :last-child {
+  justify-self: end;
+}
+
+.owner-bar__title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-base);
+  font-weight: var(--weight-strong);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.owner-bar__title[aria-hidden] {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-soft);
+}
+
+.owner-bar[data-under] .owner-bar__title[aria-hidden] {
+  opacity: 1;
+}
+
+.owner-large-title {
+  max-width: var(--container-page);
+  margin-inline: auto;
+  padding: var(--space-1) var(--gutter) 0;
+}
+
+.owner-large-title:empty {
+  padding: 0;
+}

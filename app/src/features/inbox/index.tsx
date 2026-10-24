@@ -20,7 +20,7 @@ export function InboxBell() {
     <Link
       to={to}
       aria-label={label}
-      className="relative inline-flex size-11 items-center justify-center text-[var(--text)]"
+      className="fs-bar-btn relative inline-flex size-11 items-center justify-center rounded-full text-[var(--text)]"
     >
       <svg
         width="24"
@@ -40,7 +40,7 @@ export function InboxBell() {
         <span
           data-testid="inbox-bell-count"
           aria-hidden="true"
-          className="absolute right-1 top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-[var(--accent)] px-1 text-[length:var(--text-xs)] font-bold leading-5 text-[var(--text-on-deep)]"
+          className="absolute -right-0.5 -top-0.5 inline-flex min-w-5 items-center justify-center rounded-full bg-(--accent-fill) px-1 text-[length:var(--text-xs)] font-bold leading-5 text-[var(--text-on-deep)]"
         >
           {count > 99 ? '99+' : count}
         </span>

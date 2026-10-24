@@ -76,9 +76,22 @@ const SHOTS: Shot[] = [
   { name: 'owner-more', path: '/o/more', owner: true, full: true },
   { name: 'owner-settings', path: '/o/settings', owner: true, full: true },
   { name: 'owner-signin', path: '/auth/owner' },
-  // Component kit
-  { name: 'kit', path: '/__kit', full: true },
 ];
+
+/** Component kit sections, each saved on its own (the whole kit is taller than a PNG allows). */
+const KIT = [
+  'foundations',
+  'buttons',
+  'fields',
+  'chips',
+  'status',
+  'stats',
+  'cards',
+  'lists',
+  'overlays',
+  'pinpad',
+  'navigation',
+] as const;
 
 function url(s: Shot): string {
   const [base, query = ''] = s.path.split('?');
@@ -119,3 +132,18 @@ for (const s of SHOTS) {
       await page.screenshot({ ...opts, path: join(dir, `${s.name}--full.png`), fullPage: true });
   });
 }
+
+test('shot kit sections', async ({ page }, info) => {
+  const dir = join(OUT, info.project.name);
+  mkdirSync(dir, { recursive: true });
+  await open(page, { name: 'kit', path: '/__kit' });
+  for (const id of KIT) {
+    const section = page.locator(`[data-kit-section="${id}"]`);
+    if ((await section.count()) === 0) continue;
+    await section.screenshot({
+      animations: 'disabled',
+      caret: 'hide',
+      path: join(dir, `kit-${id}.png`),
+    });
+  }
+});

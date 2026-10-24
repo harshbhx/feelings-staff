@@ -16,10 +16,11 @@ export const focusRing =
 const buttonBase = `inline-flex min-h-12 items-center justify-center gap-[0.55em] rounded-full border px-[1.4rem] py-3 text-base leading-[1.1] font-bold transition-[transform,background-color,border-color] duration-(--dur-fast) select-none active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100 disabled:cursor-not-allowed disabled:active:scale-100 ${focusRing}`;
 
 const variants = {
-  primary: 'border-transparent bg-accent text-white hover:bg-accent-hover disabled:bg-accent-hover',
-  secondary: 'border-border-strong bg-bg text-text hover:border-text disabled:text-text-muted',
+  primary:
+    'border-transparent bg-accent-fill text-white hover:bg-sindoor-700 active:bg-sindoor-700 disabled:bg-sindoor-700',
+  secondary: 'border-transparent bg-fill text-text active:bg-(--fill-2) disabled:text-text-muted',
   quiet:
-    'min-h-11 border-transparent bg-transparent px-2 text-text underline decoration-border-control underline-offset-4 hover:decoration-text',
+    'min-h-11 border-transparent bg-transparent px-2 font-semibold text-accent underline decoration-transparent underline-offset-4 hover:decoration-current active:opacity-60',
 } as const;
 
 export type ButtonVariant = keyof typeof variants;
@@ -106,7 +107,7 @@ export function Title({ children, id }: { children: ReactNode; id?: string }) {
     <h1
       id={id}
       tabIndex={-1}
-      className="text-xl leading-[1.15] font-extrabold tracking-[-0.025em] text-balance text-text focus:outline-none"
+      className="text-[length:var(--text-title)] leading-[1.15] font-extrabold tracking-[-0.03em] text-balance text-text focus:outline-none"
     >
       {children}
     </h1>

@@ -32,7 +32,7 @@
     height: 2.5rem;
     border-radius: 50%;
     background: var(--bg-tint);
-    color: var(--bg-deep);
+    color: var(--on-tint);
     font-size: var(--text-sm);
     font-weight: var(--weight-strong);
     line-height: 1;
@@ -90,7 +90,7 @@
     width: 100%;
     height: 1em;
     border-radius: var(--radius-sm);
-    background: var(--bg-tint);
+    background: var(--fill);
   }
 
   .fs-skeleton::after {
@@ -98,7 +98,7 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: var(--border);
+    background: var(--fill);
     opacity: 0;
     animation: fs-breathe var(--dur-breathe) ease-in-out 6 alternate;
   }
@@ -133,11 +133,20 @@
     align-items: center;
     gap: 0.875rem;
     min-height: 4.125rem;
-    padding: 0.75rem 0;
+    padding: 0.75rem var(--space-4);
+    background: var(--bg);
+  }
+
+  .fs-skeleton-list__row:first-child {
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+
+  .fs-skeleton-list__row:last-child {
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
   }
 
   .fs-skeleton-list__row + .fs-skeleton-list__row {
-    border-top: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 var(--border);
   }
 
   .fs-skeleton-list__text {
@@ -158,10 +167,8 @@
     justify-items: start;
     gap: var(--space-4);
     padding: var(--space-5);
-    /* Solid hairline: a dashed edge means "waiting" in this app (PRD 12.3). */
-    border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    background: var(--bg-soft);
+    background: var(--bg);
   }
 
   .fs-empty__text {

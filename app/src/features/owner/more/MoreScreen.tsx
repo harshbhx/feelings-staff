@@ -56,7 +56,7 @@ function MoreRow({ item }: { item: NavItem }) {
     <ListRow
       asChild
       leading={
-        <span className="grid size-10 place-items-center rounded-full bg-bg-tint text-maroon-800">
+        <span className="grid size-10 place-items-center rounded-full bg-bg-tint text-on-tint">
           <Icon name={item.icon} className="size-5" />
         </span>
       }

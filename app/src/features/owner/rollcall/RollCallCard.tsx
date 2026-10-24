@@ -29,7 +29,7 @@ export function RollCallCard({ slot, primary }: { slot: Slot | null; primary: bo
       >
         <Icon
           name={missed ? 'warning-circle' : 'users'}
-          className={`size-6 shrink-0 ${missed ? 'text-accent' : 'text-maroon-800'}`}
+          className={`size-6 shrink-0 ${missed ? 'text-accent' : 'text-on-tint'}`}
         />
         <div className="grid min-w-0 flex-1 basis-56 gap-0.5">
           <h2 id="today-roll-call" className="font-bold text-text tabular-nums">

@@ -3,7 +3,8 @@
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    -webkit-tap-highlight-color: var(--tap);
+    /* Controls draw their own held state (iOS highlight), so the grey flash is off. */
+    -webkit-tap-highlight-color: transparent;
     scroll-padding-top: calc(var(--header-h) + var(--space-4));
     scroll-padding-bottom: calc(var(--app-bar-h) + var(--space-4));
   }
@@ -55,6 +56,14 @@
   }
 
   /* The one emphasised word on the greeting: italic and sindoor. */
+  /* The iOS large title: 34 px, 800, on the page under the navigation bar. */
+  .fs-large-title {
+    font-size: var(--text-large);
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    overflow-wrap: anywhere;
+  }
+
   h1 em,
   h2 em {
     font-style: italic;

@@ -1,17 +1,40 @@
-/* List and ListRow (PRD 12.5, 12.6): hairline rows, 56px or taller, never a stack of shadowed cards. */
+/*
+ * List and ListRow (PRD 12.5, 12.6) as an iOS inset grouped list: one rounded cell group on the
+ * page, rows 56 px or taller with 16 px insets, separators inset to the text, a chevron in the
+ * tertiary ink. Held, a row takes the iOS highlight at once (no scale: rows do not move on iOS).
+ * Inside a card body the group is the card's cell, so it adds no second surface.
+ */
 @layer components {
   .fs-list {
     margin: 0;
     padding: 0;
     list-style: none;
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    overflow: clip;
   }
 
-  .fs-list__item + .fs-list__item {
+  .fs-card .fs-list {
+    border-radius: 0;
+    background: none;
+  }
+
+  .fs-list__item {
+    position: relative;
+  }
+
+  /* The separator starts where the text starts (after a leading avatar or icon). */
+  .fs-list__item + .fs-list__item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: var(--fs-sep-inset, var(--space-4));
     border-top: 1px solid var(--border);
   }
 
-  .fs-list[data-framed] {
-    border-block: 1px solid var(--border);
+  .fs-list__item:has(.fs-row__leading) + .fs-list__item:has(.fs-row__leading)::before {
+    --fs-sep-inset: 4.375rem;
   }
 
   .fs-row {
@@ -20,7 +43,7 @@
     gap: 0.875rem;
     width: 100%;
     min-height: 3.5rem;
-    padding: 0.75rem 0;
+    padding: 0.625rem var(--space-4);
     border: 0;
     background: transparent;
     color: inherit;
@@ -30,45 +53,32 @@
   }
 
   .fs-row[data-interactive] {
-    --fs-row-fill: transparent;
-    position: relative;
     cursor: pointer;
-    background: var(--fs-row-fill);
-    /* The fill bleeds into the gutter so the row text stays aligned with the page. */
-    box-shadow:
-      calc(var(--space-3) * -1) 0 0 var(--fs-row-fill),
-      var(--space-3) 0 0 var(--fs-row-fill);
-    transition:
-      background-color var(--dur-fast) var(--ease-soft),
-      scale var(--dur-fast) var(--ease-out);
+    transition: background-color var(--dur-fast) var(--ease-soft);
   }
 
   @media (hover: hover) {
     .fs-row[data-interactive]:hover {
-      --fs-row-fill: var(--row-hover-bg);
+      background: var(--row-hover-bg);
     }
   }
 
-  /* Pressed (5a): the fill steps down and the row dips to 0.98, 80 ms in. */
   .fs-row[data-interactive]:active {
-    --fs-row-fill: var(--row-press-bg);
-    scale: 0.98;
-    transition-duration: var(--dur-press);
+    background: var(--row-press-bg);
+    transition: none;
   }
 
-  /* The ring wraps the whole row, gutter included, and never moves. */
   .fs-row[data-interactive]:focus-visible {
     border-radius: var(--radius-sm);
-    box-shadow: none;
     outline: 2px solid var(--focus);
-    outline-offset: 2px;
+    outline-offset: -2px;
   }
 
   .fs-row__leading {
     display: grid;
     place-items: center;
     flex: none;
-    color: var(--text-muted);
+    color: var(--accent);
   }
 
   .fs-row__leading > .fs-icon {
@@ -79,33 +89,28 @@
   .fs-row__text {
     display: grid;
     flex: 1;
-    gap: 0.1rem;
+    gap: 0.0625rem;
     min-width: 0;
   }
 
-  /* Hierarchy (redesign Fix 5, PRD 12.4): the name at --text-base 700, the first line under it in
-     body ink, a second line as a muted caption. Secondary text is 4.5:1 or more on white, the page
-     band and the row's hover tint (--text-body 10.53:1 on white, 9.18:1 on --bg-tint; --text-muted
-     5.47:1 on white, 5.18:1 on --bg-soft, 4.77:1 on --bg-tint). */
+  /* iOS headline over subhead: 17 semibold, then 15 in body ink, then a muted caption. */
   .fs-row__title {
     font-size: var(--text-base);
-    font-weight: var(--weight-strong);
-    line-height: 1.35;
-    letter-spacing: -0.01em;
+    font-weight: var(--weight-ui);
+    line-height: 1.3;
+    letter-spacing: -0.012em;
     color: var(--text);
     overflow-wrap: anywhere;
   }
 
-  /* The first secondary line is body ink (PRD 12.4 as amended); --text-muted is for captions. */
-  .fs-row__subtitle {
+  .fs-row__subtitle,
+  .fs-row__caption {
     font-size: var(--text-sm);
-    line-height: 1.45;
+    line-height: 1.35;
     color: var(--text-body);
   }
 
   .fs-row__caption {
-    font-size: var(--text-sm);
-    line-height: 1.45;
     color: var(--text-muted);
   }
 
@@ -121,17 +126,16 @@
     align-items: center;
     flex: none;
     gap: 0.375rem;
-    font-size: var(--text-sm);
-    font-weight: var(--weight-ui);
+    font-size: var(--text-base);
     font-variant-numeric: tabular-nums;
     text-align: right;
-    color: var(--text);
+    color: var(--text-muted);
   }
 
   .fs-row__chevron {
-    width: 1.1rem;
-    height: 1.1rem;
-    margin-right: -0.2rem;
-    color: var(--text-muted);
+    width: 1rem;
+    height: 1rem;
+    margin-right: -0.25rem;
+    color: var(--border-control);
   }
 }

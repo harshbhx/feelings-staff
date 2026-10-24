@@ -1,4 +1,6 @@
-/* Field, Input, Textarea (PRD 12.6), from the website's contact form. Hints and errors sit above the control. */
+/* Field, Input, Textarea (PRD 12.6) in the iOS form idiom: a 15 px label over a rounded cell-coloured
+   field, 12 px corners. The 3:1 control edge stays (WCAG 1.4.11), softened to a hairline in the
+   control ink. Hints and errors sit above the control. */
 @layer components {
   .fs-field {
     display: grid;
@@ -12,10 +14,11 @@
   }
 
   .fs-field__label {
-    padding: 0;
-    font-weight: var(--weight-strong);
+    padding: 0 0.25rem;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-ui);
     line-height: 1.35;
-    color: var(--text);
+    color: var(--text-body);
   }
 
   .fs-field__optional {
@@ -27,6 +30,7 @@
 
   .fs-field__hint {
     margin-top: calc(var(--space-1) * -1);
+    padding-inline: 0.25rem;
     font-size: var(--text-sm);
     line-height: 1.5;
     color: var(--text-muted);
@@ -51,9 +55,9 @@
   .fs-input,
   .fs-input-wrap {
     width: 100%;
-    min-height: 3.25rem;
+    min-height: 3rem;
     border: 1px solid var(--border-control);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     background: var(--bg);
     color: var(--text);
     transition:
@@ -63,7 +67,7 @@
 
   .fs-input {
     display: block;
-    padding: 0.8rem 1rem;
+    padding: 0.7rem 1rem;
     font: inherit;
     font-size: max(16px, var(--text-base));
     line-height: 1.4;
@@ -74,14 +78,16 @@
     opacity: 1;
   }
 
-  .fs-input:hover:not(:disabled),
-  .fs-input-wrap:hover:not([data-disabled]) {
-    border-color: var(--text);
+  @media (hover: hover) {
+    .fs-input:hover:not(:disabled),
+    .fs-input-wrap:hover:not([data-disabled]) {
+      border-color: var(--text-muted);
+    }
   }
 
   .fs-input:focus-visible {
-    border-color: var(--accent);
-    outline: 2px solid var(--accent);
+    border-color: var(--focus);
+    outline: 2px solid var(--focus);
     outline-offset: 1px;
   }
 
@@ -93,13 +99,13 @@
   .fs-input:disabled,
   .fs-input-wrap[data-disabled] {
     border-color: var(--border);
-    background: var(--bg-soft);
+    background: var(--fill);
     color: var(--text-muted);
     cursor: not-allowed;
   }
 
   .fs-input:read-only:not(:disabled) {
-    background: var(--bg-soft);
+    background: var(--fill);
   }
 
   .fs-textarea {
@@ -117,7 +123,7 @@
   .fs-input-wrap > .fs-input {
     flex: 1;
     min-width: 0;
-    min-height: calc(3.25rem - 2px);
+    min-height: calc(3rem - 2px);
     border: 0;
     background: transparent;
   }
@@ -127,8 +133,8 @@
   }
 
   .fs-input-wrap:has(> .fs-input:focus-visible) {
-    border-color: var(--accent);
-    outline: 2px solid var(--accent);
+    border-color: var(--focus);
+    outline: 2px solid var(--focus);
     outline-offset: 1px;
   }
 

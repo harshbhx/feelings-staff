@@ -1,0 +1,115 @@
+/*
+ * iOS layer (iOS redesign). The app keeps the brand palette exactly (tokens.css, app-tokens.css are
+ * untouched); this file maps it onto iOS roles and adds the dark appearance. Every value here is a
+ * brand token, a mix of two brand tokens in oklab, or a brand colour at an alpha: no new hue.
+ *
+ *   type      the SF type ramp on Plus Jakarta Sans: large title 34, title 28/22, headline and body
+ *             17, subhead 15, footnote 13 (13 stays the floor, PRD 12.4). All rem, so text zoom and
+ *             the Safari text size setting scale it; layouts wrap instead of clipping.
+ *   surfaces  grouped page (the warm band one step toward the blush) with white cells, iOS fills
+ *             (ink at 7 and 12 percent), materials (the page or the cell at about 80 percent, blurred)
+ *   tint      sindoor; --accent-fill is the filled-button colour, --accent the tint for text and
+ *             icons. They are the same in light and split in dark (sindoor text is too dim there).
+ *   float     the floating tab bar and action buttons: the one soft shadow outside sheets (PRD 12.11
+ *             as amended for the iOS layer).
+ *
+ * Dark: the system setting decides (no in-app switch). Surfaces come from --ink-900 (cells) and
+ * --ink-900 mixed toward black (page); text is --rose-50 at iOS label alphas (1, 0.86, 0.62); the
+ * tint is --red-400 (the brand's on-deep red, 5.4:1 on cells); statuses are their light colour
+ * mixed 55 percent toward --rose-50 on a 28 percent tint (4.9:1 or more, checked in the PR).
+ */
+:root {
+  --gutter: 1rem;
+  --text-large: 2.125rem;
+  --text-title: 1.75rem;
+  --leading-body: 1.47;
+
+  --app-page: color-mix(in oklab, var(--rose-50) 45%, var(--rose-100));
+  --accent-fill: var(--accent);
+  --accent-soft: color-mix(in oklab, var(--accent) 11%, var(--bg));
+  --on-tint: var(--maroon-800);
+  --fill: color-mix(in srgb, var(--text) 7%, transparent);
+  --fill-2: color-mix(in srgb, var(--text) 12%, transparent);
+  --material: color-mix(in srgb, var(--app-page) 80%, transparent);
+  --material-cell: color-mix(in srgb, var(--bg) 78%, transparent);
+  --blur: saturate(1.8) blur(20px);
+  --shadow-float: 0 8px 28px -10px rgb(30 18 20 / 0.3), 0 1px 3px rgb(30 18 20 / 0.08);
+  --row-hover-bg: color-mix(in oklab, var(--bg) 95%, var(--text));
+  --row-press-bg: color-mix(in oklab, var(--bg) 88%, var(--text));
+  --sheet-bg: var(--app-page);
+  --seg-thumb: var(--bg);
+  --seg-shadow: 0 3px 8px rgb(30 18 20 / 0.12), 0 1px 1px rgb(30 18 20 / 0.06);
+
+  /* Floating tab bar: a 60 px capsule plus the gap under it (the home indicator area adds its own). */
+  --tabbar-bar: 3.75rem;
+  --tabbar-gap: 0.5rem;
+  --tabbar-h: calc(var(--tabbar-bar) + var(--tabbar-gap));
+  --app-bar-h: 4.5rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --gutter: clamp(1.25rem, 0.6rem + 2.6vw, 2.5rem);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: var(--ink-900);
+    --bg-soft: color-mix(in oklab, var(--ink-900) 93%, var(--white));
+    --bg-tint: color-mix(in oklab, var(--maroon-800) 45%, var(--ink-900));
+    --app-page: color-mix(in oklab, var(--ink-900) 55%, black);
+    --text: var(--rose-50);
+    --text-body: rgb(255 247 246 / 0.86);
+    --text-muted: rgb(255 247 246 / 0.62);
+    --accent: var(--red-400);
+    --accent-hover: color-mix(in oklab, var(--red-400) 80%, var(--white));
+    --accent-fill: var(--red-600);
+    --accent-soft: color-mix(in oklab, var(--red-600) 20%, var(--ink-900));
+    --on-tint: var(--rose-50);
+    --border: rgb(255 247 246 / 0.1);
+    --border-strong: rgb(255 247 246 / 0.17);
+    --border-control: rgb(255 247 246 / 0.42);
+    --focus: var(--red-400);
+    --bg-glass: rgb(30 18 20 / 0.84);
+    --bg-glass-soft: rgb(30 18 20 / 0.84);
+    --tap: rgb(240 87 80 / 0.18);
+    --scrim-soft: rgb(0 0 0 / 0.56);
+    --logo: var(--rose-50);
+    --material: color-mix(in srgb, var(--ink-900) 72%, transparent);
+    --material-cell: color-mix(in srgb, var(--bg-soft) 76%, transparent);
+    --sheet-bg: color-mix(in oklab, var(--ink-900) 80%, black);
+    --seg-thumb: color-mix(in oklab, var(--ink-900) 78%, var(--white));
+    --seg-shadow: 0 3px 8px rgb(0 0 0 / 0.3);
+    --shadow-float: 0 10px 30px -8px rgb(0 0 0 / 0.7), 0 0 0 0.5px rgb(255 247 246 / 0.14);
+
+    --status-present: color-mix(in oklab, #2f6b47 55%, var(--rose-50));
+    --status-present-bg: color-mix(in oklab, #2f6b47 28%, var(--ink-900));
+    --status-late: color-mix(in oklab, var(--henna-600) 55%, var(--rose-50));
+    --status-late-bg: color-mix(in oklab, var(--henna-600) 28%, var(--ink-900));
+    --status-half: color-mix(in oklab, var(--coral-600) 55%, var(--rose-50));
+    --status-half-bg: color-mix(in oklab, var(--coral-600) 28%, var(--ink-900));
+    --status-absent: color-mix(in oklab, var(--red-700) 55%, var(--rose-50));
+    --status-absent-bg: color-mix(in oklab, var(--red-700) 28%, var(--ink-900));
+    --status-leave: color-mix(in oklab, var(--plum-700) 55%, var(--rose-50));
+    --status-leave-bg: color-mix(in oklab, var(--plum-700) 28%, var(--ink-900));
+    --status-off: color-mix(in oklab, var(--ink-500) 55%, var(--rose-50));
+    --status-off-bg: color-mix(in oklab, var(--ink-500) 28%, var(--ink-900));
+    --status-flag: color-mix(in oklab, var(--ink-700) 55%, var(--rose-50));
+    --status-flag-bg: color-mix(in oklab, var(--ink-700) 28%, var(--ink-900));
+
+    --role-makeup: var(--red-400);
+    --role-makeup-bg: color-mix(in oklab, var(--red-600) 20%, var(--ink-900));
+    --role-nails: var(--rose-400);
+    --role-nails-bg: color-mix(in oklab, var(--rose-600) 20%, var(--ink-900));
+    --role-mehndi: var(--henna-400);
+    --role-mehndi-bg: color-mix(in oklab, var(--henna-600) 20%, var(--ink-900));
+    --role-salon: var(--coral-400);
+    --role-salon-bg: color-mix(in oklab, var(--coral-600) 20%, var(--ink-900));
+    --role-trainee: var(--plum-400);
+    --role-trainee-bg: color-mix(in oklab, var(--plum-700) 20%, var(--ink-900));
+    --role-neutral: var(--status-off);
+    --role-neutral-bg: var(--status-off-bg);
+  }
+}

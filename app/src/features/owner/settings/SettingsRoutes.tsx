@@ -51,7 +51,7 @@ function SettingsIndex() {
                   key={s.id}
                   asChild
                   leading={
-                    <span className="grid size-10 place-items-center rounded-full bg-bg-tint text-maroon-800">
+                    <span className="grid size-10 place-items-center rounded-full bg-bg-tint text-on-tint">
                       <Icon name={s.icon} className="size-5" />
                     </span>
                   }
