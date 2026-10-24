@@ -1,4 +1,5 @@
-/* Chip and ChipGroup (PRD 12.6): real radios and checkboxes drawn as pills, from the website's Chip.astro. */
+/* Chip and ChipGroup (PRD 12.6): real radios and checkboxes drawn as iOS filter capsules (gray fill at
+   rest, the tint capsule with a check when chosen); with a description, a selectable cell. */
 @layer components {
   /* A legend is not a grid item, so the fieldset's gap does not reach it. */
   .fs-chip-group > legend {
@@ -62,9 +63,9 @@
     width: 100%;
     min-height: 2.75rem;
     padding: 0.45rem 1rem 0.45rem 0.75rem;
-    border: 1px solid var(--border-control);
+    border: 0;
     border-radius: var(--radius-pill);
-    background: var(--bg);
+    background: var(--fill);
     font-size: var(--text-sm);
     font-weight: var(--weight-ui);
     line-height: 1.25;
@@ -81,6 +82,7 @@
     min-height: 3.25rem;
     padding: 0.8rem 1rem 0.8rem 0.8rem;
     border-radius: var(--radius-md);
+    background: var(--bg);
     font-size: var(--text-base);
   }
 
@@ -105,7 +107,7 @@
     width: 0.5rem;
     height: 0.5rem;
     border-radius: 50%;
-    background: var(--border-control);
+    background: var(--text-muted);
     transition:
       opacity var(--dur-fast) var(--ease-out),
       transform var(--dur-base) var(--ease-out);
@@ -161,11 +163,11 @@
     margin-left: auto;
   }
 
-  /* Selected (5a): the filled tone with the check, a 2 px sindoor edge. */
+  /* Selected (5a): the tint capsule with the check and a sindoor edge. */
   .fs-chip__input:checked + .fs-chip__face {
-    border-color: var(--accent);
-    background: var(--bg-tint);
-    box-shadow: inset 0 0 0 1px var(--accent);
+    background: var(--accent-soft);
+    box-shadow: inset 0 0 0 1.5px var(--accent);
+    color: var(--accent);
   }
 
   .fs-chip__input:checked + .fs-chip__face .fs-chip__count {
@@ -174,6 +176,7 @@
 
   .fs-chip[data-has-desc] .fs-chip__input:checked + .fs-chip__face .fs-chip__label {
     font-weight: var(--weight-strong);
+    color: var(--text);
   }
 
   .fs-chip__input:checked + .fs-chip__face :is(.fs-chip__dot, .fs-chip__icon) {
@@ -192,26 +195,28 @@
   }
 
   .fs-chip[data-invalid] .fs-chip__input:not(:checked) + .fs-chip__face {
-    border-color: var(--status-absent);
+    box-shadow: inset 0 0 0 1.5px var(--status-absent);
   }
 
   .fs-chip[data-disabled] .fs-chip__input:disabled + .fs-chip__face {
-    border-color: var(--border);
-    background: var(--bg-soft);
+    background: var(--fill);
     box-shadow: none;
     color: var(--text-muted);
   }
 
+  /* Hover and held: the fill steps up ([data-press] scales the chip, motion.css). */
+  .fs-chip:active:not([data-disabled]) .fs-chip__input:not(:checked) + .fs-chip__face {
+    background: var(--fill-2);
+  }
+
   @media (hover: hover) {
     .fs-chip:hover:not([data-disabled]) .fs-chip__input:not(:checked) + .fs-chip__face {
-      border-color: var(--text);
-      background: var(--bg-soft);
+      background: var(--fill-2);
     }
   }
 
-  /* Pressed: the face darkens a step while held ([data-press] scales the chip, motion.css). */
-  .fs-chip:active:not([data-disabled]) .fs-chip__input:not(:checked) + .fs-chip__face {
-    background: var(--bg-tint);
+  .fs-chip[data-has-desc]:is(:hover, :active) .fs-chip__input:not(:checked) + .fs-chip__face {
+    background: var(--row-press-bg);
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -1,6 +1,7 @@
 /*
- * Staff shell chrome (PRD 12.5): sticky glass header, bottom action bar above the tab bar, content
- * column of max 30rem centred on larger screens. Brand tokens only; components come from @fs/ui.
+ * Staff shell chrome (PRD 12.5, iOS layer): the navigation bar with large titles, floating action
+ * capsules over the floating tab bar, content column of max 30rem centred on larger screens. Brand
+ * tokens only; components come from @fs/ui.
  */
 @layer components {
   .staff-frame {
@@ -12,8 +13,8 @@
 
   .staff-main {
     padding-inline: var(--gutter);
-    padding-top: var(--space-4);
-    /* Room for the action bar and the tab bar, plus the home indicator. */
+    padding-top: var(--space-2);
+    /* Room for the floating action buttons and the tab bar, plus the home indicator. */
     padding-bottom: calc(
       var(--tabbar-h) +
       var(--app-bar-h) +
@@ -22,78 +23,115 @@
     );
   }
 
+  /* The iOS navigation bar: clear over the page at the top, the material and a hairline once the
+     content runs under it (data-under, set by an IntersectionObserver in ScreenHeader). */
   .staff-header {
     position: sticky;
     top: 0;
     z-index: 20;
     padding-top: env(safe-area-inset-top);
-    background: var(--bg-glass);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-1);
+    background: var(--app-page);
+    transition: background-color var(--dur-fast) var(--ease-soft);
+  }
+
+  .staff-header[data-under] {
+    background: var(--material);
+    -webkit-backdrop-filter: var(--blur);
+    backdrop-filter: var(--blur);
+    box-shadow: 0 1px 0 var(--border);
   }
 
   .staff-header__row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(2.75rem, 1fr) minmax(0, auto) minmax(2.75rem, 1fr);
     align-items: center;
     gap: var(--space-2);
-    min-height: var(--header-h);
-    padding-inline: calc(var(--gutter) - var(--space-2)) var(--space-2);
+    min-height: 3.25rem;
+    padding-inline: calc(var(--gutter) - 0.25rem);
   }
 
-  .staff-header__row[data-back] {
-    padding-inline-start: var(--space-1);
+  .staff-header__row > :first-child {
+    justify-self: start;
+  }
+
+  .staff-header__row > :last-child {
+    grid-column: 3;
+    justify-self: end;
   }
 
   .staff-header__title {
-    flex: 1;
+    grid-column: 2;
     min-width: 0;
     margin: 0;
-    padding-inline-start: var(--space-2);
-    font-size: var(--text-lg);
-    font-weight: var(--weight-display);
-    letter-spacing: -0.015em;
-    line-height: 1.2;
+    font-size: var(--text-base);
+    font-weight: var(--weight-strong);
+    letter-spacing: -0.01em;
+    line-height: 1.25;
     color: var(--text);
+    text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .staff-header__title--quiet {
+  /* The large title's small twin: shown only once the large title is under the bar. */
+  .staff-header__title[data-twin] {
+    opacity: 0;
+    transition: opacity var(--dur-fast) var(--ease-soft);
+  }
+
+  .staff-header__title[data-twin]::before {
+    content: attr(data-twin);
+  }
+
+  .staff-header[data-under] .staff-header__title[data-twin] {
+    opacity: 1;
+  }
+
+  .staff-header__title[data-quiet] {
     font-size: var(--text-sm);
     font-weight: var(--weight-ui);
     color: var(--text-muted);
-    letter-spacing: 0;
   }
 
-  /* Today's brand header (UI redesign slice 1): the warm band, the logo first, the date before the bell. */
-  .staff-header:has(.staff-header__logo) {
-    background: var(--bg-glass-soft);
-  }
-
+  /* Today's brand bar: the logo leads, the date sits before the bell. */
   .staff-header__logo {
-    margin-inline-start: var(--space-2);
+    margin-inline-start: 0.25rem;
   }
 
   .staff-header__logo + .staff-header__title {
+    grid-column: 2 / 3;
+    justify-self: end;
     text-align: end;
   }
 
-  /* Today's greeting on the warm band (UI redesign slice 6): full bleed under the brand header. */
+  .staff-header__row:has(.staff-header__logo) {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .staff-header .fs-banner {
+    margin: var(--space-2) var(--gutter) 0;
+  }
+
+  .staff-large-title {
+    padding: var(--space-1) var(--gutter) var(--space-2);
+  }
+
+  .staff-large-title:empty {
+    padding: 0;
+  }
+
+  /* Today's greeting is the large title (UI redesign slice 6, iOS layer). */
   .staff-band {
-    margin-block-start: calc(-1 * var(--space-4));
-    margin-inline: calc(-1 * var(--gutter));
-    padding: var(--space-4) var(--gutter) var(--space-5);
-    background: var(--bg-tint);
-    border-bottom: 1px solid var(--border);
+    padding-block: var(--space-1) var(--space-3);
   }
 
   .staff-band__greeting {
-    font-size: var(--text-xl);
+    font-size: var(--text-large);
     font-weight: var(--weight-display);
-    letter-spacing: -0.02em;
-    line-height: var(--leading-tight);
+    letter-spacing: -0.03em;
+    line-height: 1.12;
     color: var(--text);
   }
 
@@ -106,7 +144,7 @@
     display: flex;
     gap: var(--space-3);
     align-items: flex-start;
-    padding: var(--space-4);
+    padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-md);
     background: var(--status-late-bg);
     color: var(--status-late);
@@ -115,17 +153,21 @@
     line-height: 1.35;
   }
 
-  /* Payslips hero (slice 6): the latest month's take-home is the page's main number. */
+  /* Payslips hero (slice 6): the latest month's take-home, a large tappable cell. */
   .staff-pay-hero {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
     padding: var(--space-5) var(--space-4);
-    border-radius: var(--radius-md);
-    background: var(--bg-tint);
-    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--bg);
     color: var(--text);
     text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-soft);
+  }
+
+  .staff-pay-hero:active {
+    background: var(--row-press-bg);
   }
 
   .staff-pay-hero__amount {
@@ -136,36 +178,43 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* The screen's one or two actions float as capsules above the tab bar (iOS 26), no bar behind. */
   .staff-actionbar {
     position: fixed;
     inset-inline: 0;
-    bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+    bottom: calc(
+      var(--tabbar-h) +
+      max(calc(env(safe-area-inset-bottom) - 0.5rem), var(--tabbar-gap))
+    );
     z-index: 30;
     pointer-events: none;
   }
 
   .staff-actionbar__inner {
-    pointer-events: auto;
     max-width: 30rem;
     margin-inline: auto;
-    min-height: var(--app-bar-h);
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    padding: var(--space-3) var(--gutter);
-    background: var(--bg-glass);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid var(--border);
-    box-shadow: var(--shadow-header);
+    padding: var(--space-2) var(--space-3);
   }
 
   .staff-actionbar__inner > * {
     flex: 1;
     min-width: 0;
+    pointer-events: auto;
   }
 
-  /* Fixed to the bottom under the action bar; the kit's TabBar draws the hairline and glass. */
+  .staff-actionbar .fs-btn {
+    box-shadow: var(--shadow-float);
+  }
+
+  .staff-actionbar .fs-btn[data-variant="secondary"] {
+    background: var(--material-cell);
+    -webkit-backdrop-filter: var(--blur);
+    backdrop-filter: var(--blur);
+  }
+
   .staff-tabbar {
     position: fixed;
     inset-inline: 0;
@@ -231,17 +280,15 @@
     }
   }
 
-  /* A hairline card (PRD 12.5): white, 1 px border, radius md, no shadow. */
+  /* A grouped cell (PRD 12.5, iOS layer): white on the grouped page, 12 px corners, no border. */
   .staff-card {
     background: var(--bg);
-    border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: var(--space-4);
   }
 
   .staff-card--soft {
-    background: var(--bg-soft);
-    border-color: var(--border-strong);
+    background: var(--bg-tint);
   }
 
   .staff-overlay {
@@ -261,12 +308,12 @@
     margin-inline: auto;
   }
 
+  /* Always dark on white, so every scanner reads it in the dark appearance too. */
   .staff-qr {
     width: 12rem;
     height: 12rem;
-    color: var(--text);
-    background: var(--bg);
-    border: 1px solid var(--border);
+    color: var(--ink-900);
+    background: var(--white);
     border-radius: var(--radius-md);
     padding: var(--space-3);
   }
@@ -279,7 +326,7 @@
     height: 2rem;
     border-radius: 999px;
     background: var(--bg-tint);
-    color: var(--maroon-800);
+    color: var(--on-tint);
     font-weight: var(--weight-strong);
     font-size: var(--text-sm);
     font-variant-numeric: tabular-nums;
@@ -293,7 +340,6 @@
     gap: var(--space-3);
     min-height: 2.75rem;
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);
     background: var(--bg);
     font-size: var(--text-sm);

@@ -74,7 +74,7 @@ export function PinPad({
           {hint}
         </p>
       ) : null}
-      <div className="relative mt-3 flex h-14 items-center justify-center gap-4 rounded-md border border-border bg-bg-soft has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent has-[[aria-invalid=true]]:border-accent">
+      <div className="relative mt-3 flex h-14 items-center justify-center gap-4 rounded-md has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent has-[[aria-invalid=true]]:border-accent">
         <span aria-hidden="true" className="flex items-center gap-4">
           {Array.from({ length: length.max }, (_, i) => {
             const filled = i < value.length;
@@ -115,7 +115,10 @@ export function PinPad({
           <span>{error}</span>
         </p>
       ) : null}
-      <div aria-hidden="true" className="mx-auto mt-5 grid max-w-[18rem] grid-cols-3 gap-3">
+      <div
+        aria-hidden="true"
+        className="mx-auto mt-6 grid max-w-[17.5rem] grid-cols-3 justify-items-center gap-x-6 gap-y-3.5"
+      >
         {KEYS.map((key, i) =>
           key === '' ? (
             // biome-ignore lint/suspicious/noArrayIndexKey: the one empty slot of a fixed grid
@@ -129,7 +132,7 @@ export function PinPad({
               data-key={key}
               onPointerDown={(e) => e.preventDefault()}
               onClick={() => set(pressKey(value, key, length.max))}
-              className="flex h-16 touch-manipulation items-center justify-center rounded-md border border-border bg-bg text-xl font-extrabold text-text tabular-nums transition-[transform,background-color] duration-(--dur-press) select-none hover:bg-bg-soft active:scale-[0.97] active:bg-bg-tint disabled:opacity-60 motion-reduce:transition-none motion-reduce:active:scale-100"
+              className="flex size-[4.75rem] touch-manipulation items-center justify-center rounded-full bg-fill text-[2rem] font-normal text-text tabular-nums transition-[transform,background-color] duration-(--dur-press) select-none active:scale-[0.96] active:bg-border-control disabled:opacity-60 data-[key=delete]:bg-transparent motion-reduce:transition-none motion-reduce:active:scale-100"
             >
               {key === 'delete' ? (
                 <Icon name="backspace" className="size-6" label={t('auth:pin.delete')} />

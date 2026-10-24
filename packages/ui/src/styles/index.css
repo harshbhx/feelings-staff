@@ -4,6 +4,7 @@
  *   tokens.css      brand tokens, byte-for-byte copy (PRD 12.1); never edited
  *   app-tokens.css  status colours and app chrome (PRD 12.3), the brand layer (page, logo, role tones)
  *   intent-tokens.css  kit aliases (WP-10): intents, tab bar, rail, meter; no new values
+ *   ios.css         iOS layer: type ramp, grouped surfaces, materials, tint, dark appearance
  *   @theme below    the locked Tailwind v4 theme (docs/research/brand-and-stack.md 6.3): every
  *                   default scale cleared, brand values only, semantic names (bg-bg-soft,
  *                   text-text-muted, bg-accent). No default greys, blues, large radii or large
@@ -18,6 +19,7 @@
 @import "./tokens.css";
 @import "./app-tokens.css";
 @import "./intent-tokens.css";
+@import "./ios.css";
 @import "./base.css";
 @import "./motion.css";
 @import "./components/button.css";
@@ -74,7 +76,7 @@
   --text-xs: 0.8125rem;
   --text-sm: 0.9375rem;
   --text-base: 1.0625rem;
-  --text-base--line-height: 1.65;
+  --text-base--line-height: 1.47;
   --text-lg: 1.25rem;
   --text-xl: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem);
   --text-2xl: clamp(1.875rem, 1.3rem + 2.3vw, 3rem);
@@ -87,7 +89,7 @@
   --tracking-eyebrow: 0.09em;
   --leading-tight: 1.04;
   --leading-snug: 1.1;
-  --leading-body: 1.65;
+  --leading-body: 1.47;
 
   /* Shape and depth (rounded-full = pill buttons) */
   --radius-sm: 6px;
@@ -152,6 +154,11 @@
   --color-text-on-deep: var(--text-on-deep);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-fill: var(--accent-fill);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-tint: var(--on-tint);
+  --color-fill: var(--fill);
+  --color-page: var(--app-page);
   --color-on-accent: var(--on-accent);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);

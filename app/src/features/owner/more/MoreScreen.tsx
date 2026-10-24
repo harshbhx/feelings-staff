@@ -14,6 +14,8 @@ import { Section } from '../components/layout';
 import { allowed, MORE, type NavItem } from '../shell/nav';
 
 const GROUPS = ['money', 'people', 'salon'] as const;
+/** iOS settings tiles: each group takes one of the brand's service tones. */
+const TONE = { money: 'bridal', people: 'academy', salon: 'mehndi' } as const;
 
 export function MoreScreen() {
   const { t } = useTranslation();
@@ -28,13 +30,13 @@ export function MoreScreen() {
           <Section key={group} title={t(`owner:more.groups.${group}`)}>
             <List>
               {rows.map((item) => (
-                <MoreRow key={item.key} item={item} />
+                <MoreRow key={item.key} item={item} tone={TONE[group]} />
               ))}
             </List>
           </Section>
         );
       })}
-      <div className="grid gap-4 rounded-md border border-border bg-bg p-4 xl:hidden">
+      <div className="grid gap-4 rounded-md bg-bg p-4 xl:hidden">
         <Logo name={t('common:app.shortName')} mask={LOGO_MASK} />
         {me.data ? (
           <div className="flex items-center gap-3">
@@ -50,14 +52,14 @@ export function MoreScreen() {
   );
 }
 
-function MoreRow({ item }: { item: NavItem }) {
+function MoreRow({ item, tone }: { item: NavItem; tone: string }) {
   const { t } = useTranslation();
   return (
     <ListRow
       asChild
       leading={
-        <span className="grid size-10 place-items-center rounded-full bg-bg-tint text-maroon-800">
-          <Icon name={item.icon} className="size-5" />
+        <span className="fs-tile" data-tone={tone}>
+          <Icon name={item.icon} />
         </span>
       }
       title={t(item.labelKey)}

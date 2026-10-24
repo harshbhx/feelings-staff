@@ -185,7 +185,7 @@ function Calendar({
   };
   const statusWord = (s: string) => t(`staff:status.${s}`);
   return (
-    <table className="w-full table-fixed border-collapse">
+    <table className="staff-card w-full table-fixed border-separate border-spacing-0 px-1.5">
       <caption className="sr-only">{fmt.month(month)}</caption>
       <thead>
         <tr>

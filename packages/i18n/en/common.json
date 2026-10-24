@@ -25,7 +25,8 @@
     "offline": "You're offline. Showing what we had at {{time}}.",
     "offlineNoData": "You're offline. This needs the internet.",
     "needsInternet": "This needs the internet.",
-    "comingSoon": "This screen is being built."
+    "comingSoon": "This screen is being built.",
+    "refreshing": "Updating"
   },
   "language": {
     "en": "English",

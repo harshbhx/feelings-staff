@@ -349,7 +349,7 @@ export function InstallGuide({ code, link }: { code: string | null; link: string
       return (
         <Section title={t('auth:install.onPhone')}>
           <p className="mt-2 text-base text-text-body">{t('auth:install.onPhoneDetail')}</p>
-          <div className="mt-5 inline-flex rounded-md border border-border bg-bg p-3">
+          <div className="mt-5 inline-flex rounded-md bg-bg p-3">
             <QrImage text={link} label={t('auth:install.qrLabel')} />
           </div>
           <div className="mt-5 max-w-[16rem]">

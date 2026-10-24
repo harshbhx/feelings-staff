@@ -169,7 +169,7 @@
     gap: 0.625rem;
     min-height: 3rem;
     padding: 0.375rem 1rem 0.375rem 0.375rem;
-    border: 1px solid var(--border-strong);
+    border: 1px solid transparent;
     border-radius: var(--radius-pill);
     background: var(--bg);
     color: var(--text);
@@ -236,13 +236,12 @@
   }
 
   .fs-stat[data-disabled] .fs-stat__face {
-    border-color: var(--border);
-    background: var(--bg-soft);
+    background: var(--fill);
     color: var(--text-muted);
   }
 
-  .fs-stat:hover:not([data-disabled]) .fs-stat__input:not(:checked) + .fs-stat__face {
-    border-color: var(--border-control);
+  .fs-stat:is(:hover, :active):not([data-disabled]) .fs-stat__input:not(:checked) + .fs-stat__face {
+    background: var(--row-press-bg);
   }
 
   /* ---- ProgressStrip ---- */

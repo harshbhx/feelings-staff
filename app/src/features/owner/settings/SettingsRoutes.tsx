@@ -20,6 +20,9 @@ import { SettingsForm } from './SettingsForm';
 import { ShiftsSection } from './ShiftsSection';
 import { SECTION_GROUPS, sectionById } from './sections';
 
+/** iOS settings tiles: each group takes one of the brand's service tones. */
+const TILE_TONES = ['bridal', 'academy', 'mehndi', 'nails', 'salon'] as const;
+
 export function SettingsRoutes() {
   return (
     <Routes>
@@ -34,7 +37,7 @@ function SettingsIndex() {
   useOwnerTitle(null);
   return (
     <div className="grid max-w-(--container-narrow) grid-cols-[minmax(0,1fr)] gap-8">
-      {SECTION_GROUPS.map((g) => (
+      {SECTION_GROUPS.map((g, gi) => (
         <section key={g.id} aria-labelledby={`settings-group-${g.id}`} className="grid gap-1">
           <h2
             id={`settings-group-${g.id}`}
@@ -51,8 +54,8 @@ function SettingsIndex() {
                   key={s.id}
                   asChild
                   leading={
-                    <span className="grid size-10 place-items-center rounded-full bg-bg-tint text-maroon-800">
-                      <Icon name={s.icon} className="size-5" />
+                    <span className="fs-tile" data-tone={TILE_TONES[gi % TILE_TONES.length]}>
+                      <Icon name={s.icon} />
                     </span>
                   }
                   title={t(`owner:settings.sections.${s.id}.title`)}

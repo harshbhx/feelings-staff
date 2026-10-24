@@ -22,17 +22,6 @@
   --dur-breathe: 1.6s; /* a skeleton's breath, at most six times */
   --dur-spin: 720ms; /* one turn of the pending ring, the one looping motion (inline, while pending) */
   --ease-spring: cubic-bezier(0.34, 1.5, 0.5, 1);
-
-  /* Raised controls: a 1 px lighter top edge and a 1 px darker bottom edge, inside the shape. */
-  --edge-hi: rgb(255 255 255 / 0.2);
-  --edge-lo: rgb(30 18 20 / 0.22);
-  --edge-hi-soft: rgb(255 255 255 / 0.9);
-  --edge-lo-soft: rgb(30 18 20 / 0.08);
-  --raised: inset 0 1px 0 var(--edge-hi), inset 0 -1px 0 var(--edge-lo);
-  --raised-soft: inset 0 1px 0 var(--edge-hi-soft), inset 0 -1px 0 var(--edge-lo-soft);
-
-  /* A row held down: the tint one step darker. */
-  --row-press-bg: color-mix(in oklab, var(--bg-tint) 94%, var(--ink-900));
 }
 
 /*

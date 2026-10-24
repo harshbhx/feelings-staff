@@ -235,10 +235,7 @@ function WeekList({ view, today }: { view: RegisterView; today: string }) {
     setParams(next);
   };
   return (
-    <section
-      aria-label={t('owner:register.weekList')}
-      className="rounded-md border border-border bg-bg"
-    >
+    <section aria-label={t('owner:register.weekList')} className="rounded-md bg-bg">
       <div className="grid grid-cols-7 px-3 pt-2 pb-1" aria-hidden="true">
         {dates.map((d) => (
           <span key={d} className="grid text-center text-text-muted text-xs leading-tight">
@@ -372,7 +369,7 @@ function Grid({
   return (
     <div
       ref={box}
-      className="relative overflow-auto rounded-md border border-border bg-bg xl:max-h-[calc(100dvh-16rem)]"
+      className="relative overflow-auto rounded-md bg-bg xl:max-h-[calc(100dvh-16rem)]"
     >
       <table className="border-separate border-spacing-0 text-sm">
         <caption className="sr-only">
@@ -519,7 +516,7 @@ function DayPanel({ view, sel }: { view: RegisterView; sel: Selection }) {
     <section
       aria-label={t('owner:register.panel.label')}
       aria-live="polite"
-      className="grid gap-4 rounded-md border border-border bg-bg p-5 xl:sticky xl:top-4"
+      className="grid gap-4 rounded-md bg-bg p-5 xl:sticky xl:top-4"
     >
       <div className="grid gap-0.5">
         <h2 className="font-extrabold text-lg text-text">{row.user.name}</h2>

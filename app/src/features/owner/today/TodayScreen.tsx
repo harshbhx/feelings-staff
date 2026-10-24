@@ -113,7 +113,7 @@ function Board({ board }: { board: TodayBoard }) {
   const hero = (
     <section
       aria-label={t('owner:today.hero.label')}
-      className="grid grid-cols-[minmax(0,1fr)] gap-2 rounded-md border border-border bg-bg p-4"
+      className="grid grid-cols-[minmax(0,1fr)] gap-2 rounded-md bg-bg p-4"
       data-testid="today-hero"
     >
       <div className="grid gap-1">
@@ -425,7 +425,7 @@ function TodaySkeleton() {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-3 xl:grid-cols-[minmax(0,58fr)_minmax(0,42fr)] xl:items-start xl:gap-x-10">
       <div className="grid grid-cols-[minmax(0,1fr)] gap-3 xl:gap-8">
-        <SkeletonGroup className="grid gap-3 rounded-md border border-border bg-bg p-4">
+        <SkeletonGroup className="grid gap-3 rounded-md bg-bg p-4">
           <Skeleton width="11rem" />
           <Skeleton width="min(12rem, 60%)" height="2.25rem" />
           <Skeleton height="0.5rem" />

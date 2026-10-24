@@ -23,10 +23,23 @@ describe('WP-10 kit tokens', () => {
     expect(css).not.toMatch(/rgb\(|hsl\(|oklch\(/i);
   });
 
-  it('PRD 12.2 the tab bar is a solid surface, not glass', () => {
+  it('iOS layer: the tab bar is a floating material capsule', () => {
     const css = readFileSync(resolve(styles, 'components/tabbar.css'), 'utf8');
-    expect(css).not.toMatch(/backdrop-filter/);
-    expect(css).toMatch(/background: var\(--tabbar-bg\)/);
+    expect(css).toMatch(/background: var\(--material-cell\)/);
+    expect(css).toMatch(/backdrop-filter: var\(--blur\)/);
+  });
+
+  it('iOS layer: ios.css brings no new hue (brand and status hex only)', () => {
+    const known = new Set(
+      ['tokens.css', 'app-tokens.css'].flatMap((f) =>
+        [...readFileSync(resolve(styles, f), 'utf8').matchAll(/#[0-9a-f]{6}\b/gi)].map((m) =>
+          m[0].toLowerCase(),
+        ),
+      ),
+    );
+    const css = readFileSync(resolve(styles, 'ios.css'), 'utf8');
+    for (const m of css.matchAll(/#[0-9a-f]{3,8}\b/gi))
+      expect(known.has(m[0].toLowerCase())).toBe(true);
   });
 });
 
