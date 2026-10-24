@@ -235,7 +235,7 @@ function Buttons() {
     <Section
       id="buttons"
       title="Buttons"
-      intro="One sindoor button per view. Secondary is a white pill, destructive is a secondary pill with absent-red text and a confirm step."
+      intro="One filled sindoor button per view. Secondary is the gray fill, tertiary a plain tinted label, destructive the tinted red capsule with a confirm step."
     >
       <div className="grid gap-8 lg:grid-cols-2">
         <Specimen label="Variants, 48 px">
