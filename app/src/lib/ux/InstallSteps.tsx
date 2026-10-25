@@ -1,6 +1,6 @@
 /**
  * The iOS "Add to Home Screen" guide: three numbered steps, each with the glyph the person will
- * look for. Shared by the install sheet (owner, any phone browser tab) and the staff install gate.
+ * look for. Used by the install gate and the kit.
  */
 import { Bindi, Icon, type IconName } from '@fs/ui';
 import type { ReactNode } from 'react';

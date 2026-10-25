@@ -395,16 +395,6 @@
     margin-inline: auto;
   }
 
-  /* Always dark on white, so every scanner reads it in the dark appearance too. */
-  .staff-qr {
-    width: 12rem;
-    height: 12rem;
-    color: var(--ink-900);
-    background: var(--white);
-    border-radius: var(--radius-md);
-    padding: var(--space-3);
-  }
-
   .staff-step-num {
     display: inline-grid;
     place-items: center;
@@ -419,7 +409,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* A drawn settings row for the fix-it guides and install steps: no screenshots, no stock art. */
+  /* A drawn settings row for the fix-it guides: no screenshots, no stock art. */
   .staff-mock-row {
     display: flex;
     align-items: center;

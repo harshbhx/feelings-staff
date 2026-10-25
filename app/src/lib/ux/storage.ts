@@ -15,14 +15,6 @@ export function writeKey(key: string, value: string): void {
   }
 }
 
-export function removeKey(key: string): void {
-  try {
-    localStorage.removeItem(key);
-  } catch {
-    // see writeKey
-  }
-}
-
 /**
  * Automated browsers (Playwright shots, the E2E suite) never get unprompted guidance, so it cannot
  * cover a screen under test. `?guide=1` turns it back on for the shots that show it.

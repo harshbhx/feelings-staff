@@ -7,8 +7,7 @@
     "iosAddHint": "Scroll the list down a little if you do not see it.",
     "iosOpen": "Tap Add, then open Feelings",
     "iosOpenHint": "The new icon is on your Home Screen. Open it from there.",
-    "mockSafari": "Safari",
-    "mockShare": "Share"
+    "mockSafari": "Safari"
   },
   "permission": {
     "later": "Not now",

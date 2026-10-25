@@ -87,9 +87,29 @@ export function Tour({
     card.current?.focus();
   }, [index]);
 
+  // Keep keyboard focus inside the card (the page behind is dimmed and inert), and give focus back
+  // to where it was when the tour ends.
+  useEffect(() => {
+    const before = document.activeElement as HTMLElement | null;
+    return () => before?.focus?.();
+  }, []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
+      if (e.key !== 'Tab' || !card.current) return;
+      const items = [...card.current.querySelectorAll<HTMLElement>('button:not(:disabled)')];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (!first || !last) return;
+      const at = document.activeElement;
+      if (e.shiftKey && (at === first || at === card.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && at === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
