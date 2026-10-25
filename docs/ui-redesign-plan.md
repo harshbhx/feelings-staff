@@ -326,6 +326,18 @@ PRD amendments this needs, for the lead: 12.11 (soft shadows on floating chrome)
 - Docs links: `node scripts/check-docs-links.mjs` (light, allowed locally).
 - **Deploy to production only from a green `main`**, using the redeploy recipe in `STATUS.md` (LEAD 5 21 Oct 06:55 UTC entry): download the `app-dist` artifact of a green `main` `ci` run and run `wrangler deploy -c dist/feelings_staff/wrangler.json --secrets-file deploy/prod-secrets.json` from the dist directory with the account id in `STATUS.md`. The lead or the deployer agent does this, not the designer, and not after every slice: batch slices, redeploy once, and check sign-in and check-in on the live site right after. The preview (https://demo-feelings-staff.creharsh.workers.dev, seeded demo data) is redeployed with `deploy/redeploy.sh <green main ci run id> --seed` and is where the owner reviews a slice first.
 
+## 6b. Round 2 of the iOS layer: fields, guidance, motion (PR #127)
+
+Decisions taken in this round. Each needs an amendment to PRD 12 when the PR is accepted.
+
+- **Fields.** Inputs, date and time fields and textareas are iOS filled fields: the tertiary fill (`--fill`) with a hairline edge in `--border-strong`, lifting to the cell colour under the 2 px sindoor ring on focus. The edge stays so the control is visible against the page in light and dark (WCAG 1.4.11 asks for it where the fill alone is faint); label, hint and placeholder still name it. Search is the iOS search bar: filled capsule, magnifier, no edge at rest.
+- **Guidance layer** (`app/src/lib/ux`). Nothing asks or interrupts on first paint. The layer mounts two seconds after the shell, as its own chunk, and never in an automated browser unless the URL has `?guide=1`.
+  - *Permissions.* A card says what the permission is for, in three lines, then the Allow tap triggers the browser prompt. Refused permissions get the how-to-fix steps for the phone's platform and a "try again" that re-reads the state. Alerts on iPhone outside the Home Screen send the person to the install guide first.
+  - *Install guide.* Browser tab only (owner; staff in a tab already meet the install gate, which now uses the same steps). iPhone Safari gets three numbered steps with their glyphs; Android gets our Install button once Chrome offers it. Shown after the tour, once the person has opened two screens, at most once a week; "Don't show this again" is remembered. Always reachable from More.
+  - *Tour.* Staff and owner each get a short coach-mark tour on first sign-in: a welcome card, then one lit tab per step. Skippable at every step, remembered per person and role in localStorage, replayable from Me (staff) and More (owner).
+- **Motion.** One sheet curve (`--ease-sheet`, 380 ms) and one settle (`--ease-settle`, a small overshoot covered by the sheet's skirt). Screens enter with a short slide and fade (`.fs-route`, owner main keyed by path; `.staff-main`); toasts settle in; the selected tab's icon bounces once. Reduced motion turns every slide and bounce into a 160 ms fade or nothing.
+- **Desktop for staff.** From 48rem the column is 40rem. From 64rem the tab bar becomes a left rail like the owner's and the content a 44rem reading column with the action button floating at its foot.
+
 ## 7. Risks and rules
 
 ### Risks
