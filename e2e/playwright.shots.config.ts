@@ -32,19 +32,19 @@ export default defineConfig({
   },
   projects: [
     ...SIZES.flatMap((size) =>
-    SCHEMES.map((colorScheme) => ({
-      name: `i${size.id}-${colorScheme}`,
-      use: {
-        ...devices['iPhone 15'],
-        browserName: 'webkit' as const,
-        viewport: size.viewport,
-        deviceScaleFactor: 3,
-        isMobile: true,
-        hasTouch: true,
-        userAgent: IOS_UA,
-        colorScheme,
-      },
-    })),
+      SCHEMES.map((colorScheme) => ({
+        name: `i${size.id}-${colorScheme}`,
+        use: {
+          ...devices['iPhone 15'],
+          browserName: 'webkit' as const,
+          viewport: size.viewport,
+          deviceScaleFactor: 3,
+          isMobile: true,
+          hasTouch: true,
+          userAgent: IOS_UA,
+          colorScheme,
+        },
+      })),
     ),
     /* The shared kit is not an iPhone thing: a tablet (Safari engine) and a desktop (Chromium) too. */
     {
