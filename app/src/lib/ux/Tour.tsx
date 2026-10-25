@@ -9,8 +9,10 @@ import { useTranslation } from 'react-i18next';
 import './ux.css';
 
 export interface TourStep {
-  /** Catalog key prefix: `<key>.title` and `<key>.body`. */
   key: string;
+  /** Catalog keys for the card. */
+  title: string;
+  body: string;
   /** A link to light up, e.g. `/month`; the first visible match wins. */
   href?: string;
   /** Or a CSS selector. */
@@ -41,7 +43,12 @@ function measure(step: TourStep): Rect | null {
   const el = findTarget(step);
   if (!el) return null;
   const r = el.getBoundingClientRect();
-  return { top: r.top - PAD, left: r.left - PAD, width: r.width + PAD * 2, height: r.height + PAD * 2 };
+  return {
+    top: r.top - PAD,
+    left: r.left - PAD,
+    width: r.width + PAD * 2,
+    height: r.height + PAD * 2,
+  };
 }
 
 export function Tour({
@@ -122,9 +129,9 @@ export function Tour({
         tabIndex={-1}
       >
         <h2 id="ux-tour-title" className="ux-tour__title">
-          {step ? t(`${step.key}.title`) : t('common:ux.tour.welcomeTitle')}
+          {step ? t(step.title) : t('common:ux.tour.welcomeTitle')}
         </h2>
-        <p className="ux-tour__body">{step ? t(`${step.key}.body`) : t('common:ux.tour.welcomeBody')}</p>
+        <p className="ux-tour__body">{step ? t(step.body) : t('common:ux.tour.welcomeBody')}</p>
         <div className="ux-tour__meta">
           <span className="ux-tour__dots" aria-hidden="true">
             {steps.map((s, i) => (
@@ -147,10 +154,7 @@ export function Tour({
               {t('common:ux.tour.skip')}
             </Button>
           )}
-          <Button
-            variant="primary"
-            onClick={() => (last ? onClose() : setIndex(index + 1))}
-          >
+          <Button variant="primary" onClick={() => (last ? onClose() : setIndex(index + 1))}>
             {index < 0
               ? t('common:ux.tour.start')
               : last

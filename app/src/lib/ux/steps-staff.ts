@@ -1,9 +1,34 @@
 import type { TourStep } from './Tour';
 
 export const STAFF_STEPS: readonly TourStep[] = [
-  { key: 'common:ux.tour.staff.today', href: '/' },
-  { key: 'common:ux.tour.staff.month', href: '/month' },
-  { key: 'common:ux.tour.staff.requests', href: '/requests' },
-  { key: 'common:ux.tour.staff.payslips', href: '/payslips' },
-  { key: 'common:ux.tour.staff.me', href: '/me' },
+  {
+    key: 'staff-today',
+    title: 'common:ux.tour.staff.today.title',
+    body: 'common:ux.tour.staff.today.body',
+    href: '/',
+  },
+  {
+    key: 'staff-month',
+    title: 'common:ux.tour.staff.month.title',
+    body: 'common:ux.tour.staff.month.body',
+    href: '/month',
+  },
+  {
+    key: 'staff-requests',
+    title: 'common:ux.tour.staff.requests.title',
+    body: 'common:ux.tour.staff.requests.body',
+    href: '/requests',
+  },
+  {
+    key: 'staff-payslips',
+    title: 'common:ux.tour.staff.payslips.title',
+    body: 'common:ux.tour.staff.payslips.body',
+    href: '/payslips',
+  },
+  {
+    key: 'staff-me',
+    title: 'common:ux.tour.staff.me.title',
+    body: 'common:ux.tour.staff.me.body',
+    href: '/me',
+  },
 ];

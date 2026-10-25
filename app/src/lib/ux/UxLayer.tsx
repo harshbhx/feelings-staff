@@ -10,7 +10,7 @@ import { useInstallPrompt } from '../../features/staff/install/prompt';
 import { onGuide } from './bus';
 import { InstallSheet } from './InstallSheet';
 import { guidanceSuppressed, readKey, writeKey } from './storage';
-import { type TourStep, Tour } from './Tour';
+import { Tour, type TourStep } from './Tour';
 
 type Role = 'staff' | 'owner';
 
@@ -38,7 +38,7 @@ export function UxLayer({
   const { pathname } = useLocation();
   const [tour, setTour] = useState(false);
   const [install, setInstall] = useState(false);
-  const moves = useRef(0);
+  const [moves, setMoves] = useState(0);
   const first = useRef(pathname);
   const prompt = useInstallPrompt();
   const context = currentInstallContext();
@@ -46,7 +46,7 @@ export function UxLayer({
 
   // Count screens the person has opened: the install guide waits for a second one.
   useEffect(() => {
-    if (pathname !== first.current) moves.current += 1;
+    if (pathname !== first.current) setMoves((n) => n + 1);
   }, [pathname]);
 
   // First login: the tour, once per person, a moment after the screen has settled.
@@ -65,10 +65,10 @@ export function UxLayer({
     if (readKey(tourKey(role, userId)) !== '1' || installBlocked(Date.now())) return;
     if (platform === 'android' && !prompt.available) return;
     const id = window.setTimeout(() => {
-      if (moves.current >= 2 && !document.querySelector('[role="dialog"]')) setInstall(true);
+      if (moves >= 2 && !document.querySelector('[role="dialog"]')) setInstall(true);
     }, 4000);
     return () => window.clearTimeout(id);
-  }, [platform, role, userId, tour, prompt.available, pathname]);
+  }, [platform, role, userId, tour, prompt.available, moves]);
 
   useEffect(
     () =>
@@ -95,7 +95,12 @@ export function UxLayer({
           open
           platform={platform ?? 'ios'}
           onClose={(choice) => {
-            writeKey(INSTALL_KEY, choice === 'never' ? 'never' : String(Date.now() + (choice === 'done' ? 30 : 7) * DAY));
+            writeKey(
+              INSTALL_KEY,
+              choice === 'never'
+                ? 'never'
+                : String(Date.now() + (choice === 'done' ? 30 : 7) * DAY),
+            );
             setInstall(false);
           }}
         />

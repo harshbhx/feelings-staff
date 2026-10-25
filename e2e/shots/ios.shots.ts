@@ -25,6 +25,8 @@ interface Shot {
   /** Owner screens sign in as the owner through the mock (`variant=me:owner`). */
   owner?: boolean;
   variant?: string;
+  /** Guidance shots: the first-login tour (welcome, then the first lit step) or the install sheet. */
+  guide?: 'tour' | 'tour-step' | 'install';
 }
 
 const PROFILE = '/o/staff/01K86AFQDXWDHQ8238N67SVDDK';
@@ -103,6 +105,37 @@ const SHOTS: Shot[] = [
   { name: 'owner-set-audit', path: '/o/settings/audit', owner: true, full: true },
   { name: 'owner-auth-add', path: '/auth/owner/add' },
   { name: 'owner-auth-recovery', path: '/auth/owner/recovery' },
+
+  // Guidance: needs ?guide=1 (automated browsers get none otherwise).
+  {
+    name: 'staff-tour-welcome',
+    path: '/',
+    staff: true,
+    guide: 'tour',
+    ready: 'Welcome to Feelings',
+  },
+  {
+    name: 'staff-tour-step',
+    path: '/',
+    staff: true,
+    guide: 'tour-step',
+    ready: 'Welcome to Feelings',
+  },
+  {
+    name: 'owner-tour-welcome',
+    path: '/o/today',
+    owner: true,
+    guide: 'tour',
+    ready: 'Welcome to Feelings',
+  },
+  {
+    name: 'owner-tour-step',
+    path: '/o/today',
+    owner: true,
+    guide: 'tour-step',
+    ready: 'Welcome to Feelings',
+  },
+  { name: 'owner-install-sheet', path: '/o/today', owner: true, guide: 'install' },
 ];
 
 /** Component kit sections, each saved on its own (the whole kit is taller than a PNG allows). */
@@ -118,6 +151,7 @@ const KIT = [
   'overlays',
   'pinpad',
   'navigation',
+  'guides',
 ] as const;
 
 function url(s: Shot): string {
@@ -125,6 +159,7 @@ function url(s: Shot): string {
   const q = new URLSearchParams(query);
   q.set('mock', '1');
   if (s.staff) q.set('allowBrowser', '1');
+  if (s.guide) q.set('guide', '1');
   const variants = [s.owner ? 'me:owner' : '', s.variant ?? ''].filter(Boolean);
   if (variants.length > 0) q.set('variant', variants.join(','));
   return `${base}?${q}`;
@@ -132,6 +167,15 @@ function url(s: Shot): string {
 
 async function open(page: Page, s: Shot): Promise<void> {
   await page.clock.setFixedTime(VISUAL_NOW);
+  if (s.guide === 'install') {
+    // The tour is "already seen" for whoever signs in, so only the install sheet shows.
+    await page.addInitScript(() => {
+      const get = Storage.prototype.getItem;
+      Storage.prototype.getItem = function (key: string) {
+        return key.startsWith('fs.ux.tour.') ? '1' : get.call(this, key);
+      };
+    });
+  }
   await page.route('https://tile.openstreetmap.org/**', (route) => route.abort());
   await page.goto(url(s));
   const soft = { timeout: 10_000 };
@@ -141,6 +185,22 @@ async function open(page: Page, s: Shot): Promise<void> {
     await expect(page.locator('.fs-skeleton')).toHaveCount(0, soft);
   } catch {
     // Captured anyway: the sheet then shows the screen as it was.
+  }
+  if (s.guide === 'tour-step')
+    await page
+      .getByRole('button', { name: 'Show me around' })
+      .click({ timeout: 5000 })
+      .catch(() => {});
+  if (s.guide === 'install') {
+    await page.waitForTimeout(3000);
+    await page.evaluate(() =>
+      window.dispatchEvent(new CustomEvent('fs:guide', { detail: 'install' })),
+    );
+    await page
+      .getByText('Add Feelings to your Home Screen')
+      .first()
+      .waitFor({ timeout: 8000 })
+      .catch(() => {});
   }
   await page.evaluate(() => document.fonts.ready);
   // Let late queries (presence, notifications) land and the sheet finish opening.

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import type { TourStep } from './Tour';
 import { guidanceSuppressed } from './storage';
+import type { TourStep } from './Tour';
 
 const UxLayer = lazy(() => import('./UxLayer').then((m) => ({ default: m.UxLayer })));
 
@@ -9,11 +9,11 @@ const UxLayer = lazy(() => import('./UxLayer').then((m) => ({ default: m.UxLayer
  * tour or the install guide is in the first paint. Does nothing in automated browsers.
  */
 export function LazyUx({
-  role,
+  audience,
   userId,
   steps,
 }: {
-  role: 'staff' | 'owner';
+  audience: 'staff' | 'owner';
   userId: string | undefined;
   steps: readonly TourStep[];
 }) {
@@ -28,7 +28,7 @@ export function LazyUx({
   if (!ready || !userId) return null;
   return (
     <Suspense fallback={null}>
-      <UxLayer role={role} userId={userId} steps={steps} />
+      <UxLayer role={audience} userId={userId} steps={steps} />
     </Suspense>
   );
 }

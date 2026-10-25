@@ -24,7 +24,12 @@
   --ease-spring: cubic-bezier(0.34, 1.5, 0.5, 1);
   --dur-sheet: 380ms; /* a sheet or a pushed screen settling */
   --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1); /* the iOS sheet curve: fast out, long settle */
-  --ease-settle: cubic-bezier(0.34, 1.25, 0.64, 1); /* a small overshoot, covered by the sheet's skirt */
+  --ease-settle: cubic-bezier(
+    0.34,
+    1.25,
+    0.64,
+    1
+  ); /* a small overshoot, covered by the sheet's skirt */
 }
 
 /*

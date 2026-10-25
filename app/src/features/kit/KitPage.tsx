@@ -42,6 +42,8 @@ import {
   useToast,
 } from '@fs/ui';
 import { type ReactNode, useEffect, useState } from 'react';
+import { InstallSteps } from '../../lib/ux/InstallSteps';
+import { PermissionCard } from '../../lib/ux/PermissionCard';
 import { ControlStates } from './ControlStates';
 
 const STATUSES: DayStatus[] = [
@@ -689,10 +691,12 @@ function States() {
         </Specimen>
         <div className="grid content-start gap-6">
           <Specimen label="Empty">
-            <EmptyState>All clear. Nothing waiting.</EmptyState>
+            <EmptyState icon="check-circle">All clear. Nothing waiting.</EmptyState>
           </Specimen>
           <Specimen label="Empty with one action">
             <EmptyState
+              icon="calendar-check"
+              title="No requests yet"
               action={
                 <Button variant="secondary" size="sm" icon="plus">
                   Ask for leave
@@ -904,6 +908,32 @@ function Navigation() {
   );
 }
 
+function Guides() {
+  const noop = () => undefined;
+  return (
+    <Section
+      id="guides"
+      title="Guides"
+      intro="Asking for a permission, turning it back on, adding the app to the Home Screen. Each is a card that sits in a sheet on phones; nothing asks until the person taps Allow."
+    >
+      <div className="grid gap-8 lg:grid-cols-3">
+        <Specimen label="Before the location prompt">
+          <PermissionCard kind="location" view="ask" onAllow={noop} onLater={noop} />
+        </Specimen>
+        <Specimen label="Alerts, refused">
+          <PermissionCard kind="notifications" view="denied" onAllow={noop} onLater={noop} />
+        </Specimen>
+        <Specimen label="Add to Home Screen (iPhone)">
+          <div className="ux-perm">
+            <h3 className="ux-perm__title">Add Feelings to your Home Screen</h3>
+            <InstallSteps />
+          </div>
+        </Specimen>
+      </div>
+    </Section>
+  );
+}
+
 export function KitPage() {
   useEffect(() => {
     document.title = 'Kit · Feelings Staff';
@@ -943,6 +973,7 @@ export function KitPage() {
         <Overlays />
         <PinPads />
         <Navigation />
+        <Guides />
       </main>
     </ToastProvider>
   );

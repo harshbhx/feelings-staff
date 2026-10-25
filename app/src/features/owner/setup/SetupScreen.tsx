@@ -256,12 +256,7 @@ function Install() {
       <NotificationSheet push={push} open={ask} onOpenChange={setAsk} />
       {push.state === 'default' || push.state === 'granted-unsubscribed' ? (
         <div>
-          <Button
-            variant="secondary"
-            icon="bell"
-            disabled={push.busy}
-            onClick={() => setAsk(true)}
-          >
+          <Button variant="secondary" icon="bell" disabled={push.busy} onClick={() => setAsk(true)}>
             {t('owner:setup.install.enable')}
           </Button>
         </div>

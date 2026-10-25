@@ -70,7 +70,7 @@
     text-align: left;
   }
 
-  .ux-reasons > li {
+  .ux-reasons__item {
     display: flex;
     align-items: flex-start;
     gap: var(--space-3);
@@ -80,11 +80,11 @@
     color: var(--text);
   }
 
-  .ux-reasons > li + li {
+  .ux-reasons__item + .ux-reasons__item {
     box-shadow: inset 0 1px 0 var(--border);
   }
 
-  .ux-reasons > li > .fs-icon {
+  .ux-reasons__tick {
     flex: none;
     width: 1.25rem;
     height: 1.25rem;
@@ -141,7 +141,7 @@
     animation: fs-tab-pop var(--dur-hero) var(--ease-settle) var(--dur-hero) 2;
   }
 
-  .ux-safari__share > .fs-icon {
+  .ux-safari__icon {
     width: 1.25rem;
     height: 1.25rem;
   }
@@ -158,14 +158,14 @@
     text-align: left;
   }
 
-  .ux-steps > li {
+  .ux-steps__item {
     display: flex;
     align-items: center;
     gap: var(--space-3);
     padding: 0.875rem var(--space-4);
   }
 
-  .ux-steps > li + li {
+  .ux-steps__item + .ux-steps__item {
     box-shadow: inset 0 1px 0 var(--border);
   }
 
@@ -180,7 +180,7 @@
     color: var(--accent);
   }
 
-  .ux-steps__glyph > .fs-icon {
+  .ux-steps__icon {
     width: 1.5rem;
     height: 1.5rem;
   }
@@ -220,7 +220,7 @@
   }
 
   /* Plain steps (how to turn a permission back on): the text only, with the number. */
-  .ux-steps--plain > li {
+  .ux-steps--plain .ux-steps__item {
     align-items: flex-start;
     font-size: var(--text-sm);
     line-height: 1.45;

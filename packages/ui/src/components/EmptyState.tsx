@@ -2,7 +2,8 @@ import type { HTMLAttributes, ReactNode } from 'react';
 import { Icon, type IconName } from '../icons/Icon';
 import { cx } from '../lib/cx';
 
-export interface EmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title'> {
+export interface EmptyStateProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title'> {
   /** One sentence, in the salon's voice ("All clear. Nothing waiting."). */
   children: ReactNode;
   /** A short heading above the sentence, when the sentence alone is not enough. */

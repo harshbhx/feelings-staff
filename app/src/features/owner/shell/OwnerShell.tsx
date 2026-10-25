@@ -38,11 +38,7 @@ import { ownerKeys } from '../api/keys';
 import { clock } from '../lib/format';
 import { ChromeProvider, useScreenChrome } from './chrome';
 import './shell.css';
-import {
-  useAppBadge,
-  useOnline,
-  usePushRefetch,
-} from './hooks';
+import { useAppBadge, useOnline, usePushRefetch } from './hooks';
 import {
   activeItem,
   activeTab,
@@ -108,7 +104,7 @@ export function OwnerShell() {
 /** The first-login tour and the install guide (lazy, after first paint). */
 function OwnerGuides() {
   const me = useMe();
-  return <LazyUx role="owner" userId={me.data?.user.id} steps={OWNER_STEPS} />;
+  return <LazyUx audience="owner" userId={me.data?.user.id} steps={OWNER_STEPS} />;
 }
 
 /** Pull to refresh (iOS layer): refetches what is on screen; its own small chunk. */

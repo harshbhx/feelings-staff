@@ -16,11 +16,11 @@ export interface PermissionCardProps {
   kind: PermissionKind;
   view: PermissionView;
   /** The tap that triggers the browser prompt. */
-  onAllow: () => void | Promise<unknown>;
+  onAllow: () => unknown;
   /** "Not now". Omit to hide it. */
   onLater?: (() => void) | undefined;
   /** After the person fixed it in settings ("I turned it on"). Defaults to `onAllow`. */
-  onRetry?: (() => void | Promise<unknown>) | undefined;
+  onRetry?: (() => unknown) | undefined;
   /** For `needs-install`: open the install guide. */
   onShowInstall?: (() => void) | undefined;
   busy?: boolean | undefined;
@@ -48,7 +48,8 @@ export function PermissionCard({
   const [retried, setRetried] = useState(false);
   const base = `common:ux.permission.${kind}`;
   const platform = currentPlatform();
-  const steps = platform === 'ios' ? 'iosSteps' : platform === 'android' ? 'androidSteps' : 'otherSteps';
+  const steps =
+    platform === 'ios' ? 'iosSteps' : platform === 'android' ? 'androidSteps' : 'otherSteps';
 
   if (view === 'ask') {
     return (
@@ -60,14 +61,20 @@ export function PermissionCard({
         <p className="ux-perm__lead">{lead ?? t(`${base}.lead`)}</p>
         <ul className="ux-reasons">
           {(['r1', 'r2', 'r3'] as const).map((r) => (
-            <li key={r}>
-              <Icon name="check-circle" />
+            <li key={r} className="ux-reasons__item">
+              <Icon name="check-circle" className="ux-reasons__tick" />
               <span>{t(`${base}.${r}`)}</span>
             </li>
           ))}
         </ul>
         <div className="ux-perm__actions">
-          <Button variant="primary" block icon={ICON[kind]} loading={busy} onClick={() => void onAllow()}>
+          <Button
+            variant="primary"
+            block
+            icon={ICON[kind]}
+            loading={busy}
+            onClick={() => void onAllow()}
+          >
             {allowLabel ?? t(`${base}.allow`)}
           </Button>
           {onLater ? (
@@ -91,7 +98,7 @@ export function PermissionCard({
         <p className="ux-perm__lead">{t(`${base}.deniedLead`)}</p>
         <ol className="ux-steps ux-steps--plain">
           {(['1', '2', '3'] as const).map((n) => (
-            <li key={n}>
+            <li key={n} className="ux-steps__item">
               <span className="ux-steps__num" aria-hidden="true">
                 {n}
               </span>

@@ -55,7 +55,7 @@ function StaffApp({ standalone }: { standalone: boolean }) {
       <StaffTabBar />
       <UpdateToast />
       <UpgradeOverlay />
-      <LazyUx role="staff" userId={me.user.id} steps={STAFF_STEPS} />
+      <LazyUx audience="staff" userId={me.user.id} steps={STAFF_STEPS} />
     </ToastProvider>
   );
 }

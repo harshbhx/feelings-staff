@@ -13,8 +13,14 @@ interface Step {
 }
 
 const STEPS: readonly Step[] = [
-  { key: 'iosShare', glyph: <Icon name={'export' satisfies IconName} /> },
-  { key: 'iosAdd', glyph: <Icon name={'plus-square' satisfies IconName} /> },
+  {
+    key: 'iosShare',
+    glyph: <Icon name={'export' satisfies IconName} className="ux-steps__icon" />,
+  },
+  {
+    key: 'iosAdd',
+    glyph: <Icon name={'plus-square' satisfies IconName} className="ux-steps__icon" />,
+  },
   { key: 'iosOpen', glyph: <Bindi size="success" /> },
 ];
 
@@ -25,12 +31,12 @@ export function InstallSteps() {
       <div className="ux-safari" aria-hidden="true">
         <span className="ux-safari__url">{t('common:ux.install.mockSafari')}</span>
         <span className="ux-safari__share">
-          <Icon name="export" />
+          <Icon name="export" className="ux-safari__icon" />
         </span>
       </div>
       <ol className="ux-steps" aria-label={t('common:ux.install.stepsLabel')}>
         {STEPS.map((s, i) => (
-          <li key={s.key}>
+          <li key={s.key} className="ux-steps__item">
             <span className="ux-steps__glyph" aria-hidden="true">
               {s.glyph}
             </span>
