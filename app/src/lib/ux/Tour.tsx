@@ -169,7 +169,8 @@ export function Tour({
             <Button variant="ghost" size="sm" onClick={() => setIndex(index - 1)}>
               {t('ux:tour.back')}
             </Button>
-          ) : (
+          ) : null}
+          {last ? null : (
             <Button variant="ghost" size="sm" onClick={onClose}>
               {t('ux:tour.skip')}
             </Button>
