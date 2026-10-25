@@ -65,6 +65,8 @@ test.describe('SPLIT-5 owner devices in Settings, Security', () => {
     await rename.getByRole('button', { name: 'Save' }).click();
     await expect(row('Old laptop')).toBeVisible();
     await shot(page, 'owner-security-devices');
+    // The "Saved." toast sits over the tab bar for 5 s; axe flags the covered More link, so scan after it goes.
+    await expect(page.getByText('Saved.', { exact: true })).toBeHidden({ timeout: 10_000 });
     await checkA11y(page);
 
     // Remove it: the fingerprint on the phone (the PIN from the approval still counts, 10 minutes).
