@@ -11,6 +11,8 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { saveLang } from '../../../app/i18n';
 import { VIBRATE_KEY } from '../../../lib/haptics';
+import { openGuide } from '../../../lib/ux/bus';
+import { NotificationSheet } from '../../../lib/ux/NotificationSheet';
 import { usePush } from '../../../pwa/push';
 import { useQueue } from '../../../pwa/queue';
 import { useLanguageSave, useOwnerName, useSignOut, useStaffMe } from '../api';
@@ -27,6 +29,7 @@ export function MeScreen() {
   const signOut = useSignOut();
   const queue = useQueue();
   const push = usePush();
+  const [askAlerts, setAskAlerts] = useState(false);
   const lang: AppLang = i18n.language === 'gu' ? 'gu' : 'en';
 
   const switchTo = (next: AppLang) => {
@@ -112,11 +115,7 @@ export function MeScreen() {
                 variant="secondary"
                 icon="bell"
                 loading={push.busy}
-                onClick={() =>
-                  void push
-                    .enable()
-                    .catch(() => toast({ tone: 'error', title: t('errors:generic') }))
-                }
+                onClick={() => setAskAlerts(true)}
               >
                 {t('staff:me.notifTurnOn')}
               </Button>
@@ -124,8 +123,8 @@ export function MeScreen() {
           ) : push.state === 'denied' ? (
             <div className="flex flex-col gap-3">
               <p className="text-sm">{t('staff:me.notifBlocked')}</p>
-              <Button variant="secondary" icon="bell" asChild>
-                <Link to="/fix/notifications">{t('staff:me.notifHowTo')}</Link>
+              <Button variant="secondary" icon="bell" onClick={() => setAskAlerts(true)}>
+                {t('staff:me.notifHowTo')}
               </Button>
             </div>
           ) : push.state === 'granted-subscribed' ? (
@@ -136,6 +135,8 @@ export function MeScreen() {
         </Card>
 
         <VibrationCard />
+
+        <NotificationSheet push={push} open={askAlerts} onOpenChange={setAskAlerts} />
 
         {me.device ? (
           <Card title={t('staff:me.phoneSection')}>
@@ -155,6 +156,11 @@ export function MeScreen() {
           <ListRow asChild title={t('staff:me.privacy')}>
             <Link to="/me/privacy" />
           </ListRow>
+          <ListRow
+            title={t('common:ux.tour.replay')}
+            subtitle={t('common:ux.tour.replayHint')}
+            onClick={() => openGuide('tour')}
+          />
         </List>
 
         <Button

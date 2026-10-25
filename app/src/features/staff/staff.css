@@ -12,6 +12,7 @@
   }
 
   .staff-main {
+    animation: fs-route-in var(--dur-sheet) var(--ease-sheet) both;
     padding-inline: var(--gutter);
     padding-top: var(--space-2);
     /* Room for the floating action buttons and the tab bar, plus the home indicator. */
@@ -21,6 +22,12 @@
       env(safe-area-inset-bottom) +
       var(--space-5)
     );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .staff-main {
+      animation: fs-fade-in var(--dur-reduced) var(--ease-out) both;
+    }
   }
 
   /* The iOS navigation bar: clear over the page at the top, the material and a hairline once the
@@ -222,6 +229,86 @@
     z-index: 30;
     max-width: 30rem;
     margin-inline: auto;
+  }
+
+  /* Tablets: a wider column and action bar; the tab bar stays a centred capsule. */
+  @media (min-width: 48rem) {
+    .staff-frame {
+      max-width: 40rem;
+    }
+
+    .staff-actionbar__inner {
+      max-width: 40rem;
+    }
+  }
+
+  /* Desktop (from 64rem): the tab bar becomes a left rail like the owner's, the content is a
+     centred reading column beside it, and the action button floats at the foot of that column. */
+  @media (min-width: 64rem) {
+    .staff-frame {
+      max-width: none;
+      margin-inline: 15rem 0;
+    }
+
+    .staff-header > *,
+    .staff-large-title,
+    .staff-main {
+      max-width: 44rem;
+      margin-inline: auto;
+    }
+
+    .staff-main {
+      padding-bottom: calc(var(--app-bar-h) + env(safe-area-inset-bottom) + var(--space-5));
+    }
+
+    .staff-actionbar {
+      inset-inline: 15rem 0;
+      bottom: var(--space-4);
+    }
+
+    .staff-actionbar__inner {
+      max-width: 44rem;
+    }
+
+    .staff-tabbar {
+      inset: 0 auto 0 0;
+      width: 15rem;
+      max-width: none;
+      margin: 0;
+      padding: var(--space-6) var(--space-3);
+      border-right: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .staff-tabbar .fs-tabbar__list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      max-width: none;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+
+    .staff-tabbar .fs-tab {
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: var(--space-3);
+      padding: 0.5rem 0.875rem;
+      border-radius: 0.75rem;
+    }
+
+    .staff-tabbar .fs-tab__label {
+      font-size: var(--text-base);
+      text-align: left;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+    }
   }
 
   /* The live hours and big times: 800, tabular, the full 56 px on phones (PRD 12.4, WP-10). */

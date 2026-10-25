@@ -41,5 +41,144 @@
     "bell": "Inbox",
     "bellUnread_one": "Inbox, {{count}} unread",
     "bellUnread_other": "Inbox, {{count}} unread"
+  },
+  "ux": {
+    "install": {
+      "title": "Add Feelings to your Home Screen",
+      "lead": "It opens full screen like any app and can send you alerts.",
+      "stepsLabel": "Three steps",
+      "iosShare": "Tap the Share button",
+      "iosShareHint": "It is in Safari's bottom bar. On iPad it is at the top.",
+      "iosAdd": "Choose Add to Home Screen",
+      "iosAddHint": "Scroll the list down a little if you do not see it.",
+      "iosOpen": "Tap Add, then open Feelings",
+      "iosOpenHint": "The new icon is on your Home Screen. Open it from there.",
+      "androidButton": "Install the app",
+      "androidMenu": "Open the browser menu and choose Install app or Add to Home screen.",
+      "gotIt": "Got it",
+      "later": "Remind me later",
+      "never": "Don't show this again",
+      "row": "Add to Home Screen",
+      "rowHint": "Full screen, and alerts on iPhone",
+      "mockSafari": "Safari",
+      "mockShare": "Share"
+    },
+    "permission": {
+      "later": "Not now",
+      "tryAgain": "I turned it on, try again",
+      "stillOff": "It still looks off. Check the steps and try once more.",
+      "next": "Your phone will ask next. Choose Allow.",
+      "location": {
+        "title": "Share your location to check in",
+        "lead": "Feelings looks at where you are only when you tap Check in or Check out.",
+        "r1": "Confirms you are at the salon when you check in",
+        "r2": "Only when you tap, never in the background",
+        "r3": "Exact places are deleted after 90 days",
+        "allow": "Allow location",
+        "deniedTitle": "Location is off for Feelings",
+        "deniedLead": "Turn it back on in your phone's settings, then come back here.",
+        "iosSteps": {
+          "1": "Open Settings on your iPhone.",
+          "2": "Tap Privacy & Security, then Location Services.",
+          "3": "Find Feelings and choose While Using the App."
+        },
+        "androidSteps": {
+          "1": "Press and hold the Feelings icon, then tap App info.",
+          "2": "Tap Permissions, then Location.",
+          "3": "Choose Allow only while using the app."
+        },
+        "otherSteps": {
+          "1": "Open your browser's site settings for this page.",
+          "2": "Set Location to Allow.",
+          "3": "Come back and try again."
+        }
+      },
+      "notifications": {
+        "title": "Get alerts on this phone",
+        "lead": "Know straight away when something needs you or a request is answered.",
+        "r1": "Approvals and replies show up as they happen",
+        "r2": "Only things that matter, no marketing",
+        "r3": "Turn them off any time in the app",
+        "allow": "Turn on alerts",
+        "deniedTitle": "Alerts are off for Feelings",
+        "deniedLead": "Turn them back on in your phone's settings, then come back here.",
+        "iosSteps": {
+          "1": "Open Settings on your iPhone.",
+          "2": "Tap Notifications and find Feelings.",
+          "3": "Turn on Allow Notifications."
+        },
+        "androidSteps": {
+          "1": "Press and hold the Feelings icon, then tap App info.",
+          "2": "Tap Notifications.",
+          "3": "Turn on All Feelings notifications."
+        },
+        "otherSteps": {
+          "1": "Open your browser's site settings for this page.",
+          "2": "Set Notifications to Allow.",
+          "3": "Come back and try again."
+        },
+        "installTitle": "Add Feelings to your Home Screen first",
+        "installLead": "iPhone only sends alerts to apps on the Home Screen. Add it, open it from there, then turn alerts on.",
+        "installAction": "Show me how",
+        "unsupportedTitle": "This browser can't show alerts",
+        "unsupportedLead": "Open Feelings in Chrome on Android or from the Home Screen on iPhone."
+      }
+    },
+    "tour": {
+      "welcomeTitle": "Welcome to Feelings",
+      "welcomeBody": "A quick look at what is where. It takes about 20 seconds.",
+      "step": "Step {{current}} of {{total}}",
+      "next": "Next",
+      "back": "Back",
+      "skip": "Skip tour",
+      "done": "Got it",
+      "start": "Show me around",
+      "replay": "Replay the tour",
+      "replayHint": "A quick look at what each tab does",
+      "staff": {
+        "today": {
+          "title": "Today",
+          "body": "Check in when you arrive and check out when you leave. Your phone asks for your location only then."
+        },
+        "month": {
+          "title": "Your month",
+          "body": "Every day with late minutes and overtime. Tap a day to see it or ask for a fix."
+        },
+        "requests": {
+          "title": "Requests",
+          "body": "Ask for leave or fix a missed check-in. The answer shows up here."
+        },
+        "payslips": {
+          "title": "Payslips",
+          "body": "Your pay for each month, once it is paid."
+        },
+        "me": {
+          "title": "Me",
+          "body": "Language, alerts and your data. You can replay this tour from here."
+        }
+      },
+      "owner": {
+        "today": {
+          "title": "Today",
+          "body": "Who is in, who is late and what needs your OK, at a glance."
+        },
+        "actions": {
+          "title": "Needs action",
+          "body": "New phones, leave and fixes wait here for you to approve."
+        },
+        "register": {
+          "title": "Register",
+          "body": "The month grid for everyone. Tap a day to look closer or fix a mark."
+        },
+        "staff": {
+          "title": "Staff",
+          "body": "Add people, send invites and open anyone's profile."
+        },
+        "more": {
+          "title": "More",
+          "body": "Payroll, credits, roster, roll-call and settings. You can replay this tour from here."
+        }
+      }
+    }
   }
 }

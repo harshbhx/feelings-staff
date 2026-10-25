@@ -22,12 +22,14 @@ import {
   ToastProvider,
 } from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { useMe } from '../../../api/hooks';
 import { LOGO_MASK } from '../../../lib/brand';
 import { useUnderBar } from '../../../lib/use-under-bar';
+import { LazyUx } from '../../../lib/ux/LazyUx';
+import { OWNER_STEPS } from '../../../lib/ux/steps-owner';
 import { StepUpProvider } from '../../auth/step-up';
 import { InboxBell } from '../../inbox';
 import { openActionCount } from '../actions/actions-model';
@@ -37,9 +39,6 @@ import { clock } from '../lib/format';
 import { ChromeProvider, useScreenChrome } from './chrome';
 import './shell.css';
 import {
-  iosBannerSeen,
-  isIosBrowserTab,
-  markIosBannerSeen,
   useAppBadge,
   useOnline,
   usePushRefetch,
@@ -60,6 +59,7 @@ const SHELL_VARS = {
 } as CSSProperties;
 
 export function OwnerShell() {
+  const { pathname } = useLocation();
   const actions = useActions();
   const count = actions.data ? openActionCount(actions.data) : null;
   usePushRefetch();
@@ -90,17 +90,25 @@ export function OwnerShell() {
             <Banners />
             <main
               id="owner-main"
+              key={pathname}
               tabIndex={-1}
-              className="mx-auto w-full max-w-(--container-page) px-(--gutter) pt-2 pb-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+2.5rem)] outline-none xl:pt-4 xl:pb-16"
+              className="fs-route mx-auto w-full max-w-(--container-page) px-(--gutter) pt-2 pb-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+2.5rem)] outline-none xl:pt-4 xl:pb-16"
             >
               <Outlet />
             </main>
             <Tabs count={count ?? 0} />
+            <OwnerGuides />
           </div>
         </ChromeProvider>
       </StepUpProvider>
     </ToastProvider>
   );
+}
+
+/** The first-login tour and the install guide (lazy, after first paint). */
+function OwnerGuides() {
+  const me = useMe();
+  return <LazyUx role="owner" userId={me.data?.user.id} steps={OWNER_STEPS} />;
 }
 
 /** Pull to refresh (iOS layer): refetches what is on screen; its own small chunk. */
@@ -193,7 +201,6 @@ function Banners() {
   const qc = useQueryClient();
   const me = useMe();
   const { pathname } = useLocation();
-  const [iosHidden, setIosHidden] = useState(() => iosBannerSeen() || !isIosBrowserTab());
 
   let lastUpdate = 0;
   if (!online) {
@@ -210,25 +217,6 @@ function Banners() {
           {lastUpdate > 0
             ? t('owner:shell.offline', { time: clock(lastUpdate) })
             : t('owner:shell.offlineNoData')}
-        </Banner>
-      ) : null}
-      {!iosHidden ? (
-        <Banner
-          icon="bell"
-          action={
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                markIosBannerSeen();
-                setIosHidden(true);
-              }}
-            >
-              {t('owner:shell.dismiss')}
-            </Button>
-          }
-        >
-          {t('owner:shell.iosBanner')} {t('owner:shell.iosBannerHow')}
         </Banner>
       ) : null}
       {showSetup ? (

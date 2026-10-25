@@ -32,6 +32,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { success as hapticSuccess, tick as hapticTick } from '../../../lib/haptics';
+import { PermissionCard } from '../../../lib/ux/PermissionCard';
 import { applyUpdate, setUpdateBlocker } from '../../../pwa/register';
 import { useOwnerName, useStaffMe } from '../api';
 import { FixItGuide, type FixItTopic } from '../fixit/FixItGuide';
@@ -298,20 +299,15 @@ function FlowView({ a }: { a: StepArgs }) {
       return <Words>{t('staff:punch.locating')}</Words>;
     case 'permission':
       return (
-        <>
-          <p className="text-lg font-bold text-text">{t('staff:punch.permission.title')}</p>
-          <Lead icon="map-pin">{t('staff:punch.permission.body')}</Lead>
-          <Footer>
-            <Button
-              variant="primary"
-              block
-              icon="navigation"
-              onClick={a.flow.actions.allowLocation}
-            >
-              {t('staff:punch.permission.allow')}
-            </Button>
-          </Footer>
-        </>
+        <PermissionCard
+          kind="location"
+          view="ask"
+          title={t('staff:punch.permission.title')}
+          lead={t('staff:punch.permission.body')}
+          allowLabel={t('staff:punch.permission.allow')}
+          onAllow={a.flow.actions.allowLocation}
+          onLater={a.close}
+        />
       );
     case 'locating':
       return (

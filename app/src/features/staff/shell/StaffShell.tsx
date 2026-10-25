@@ -17,6 +17,8 @@ import { staffKeys, useStaffMe } from '../api';
 import { browserAllowed } from '../install/allow-browser';
 // Catches `beforeinstallprompt` from the first moment, before the lazy gate chunk arrives.
 import '../install/prompt';
+import { LazyUx } from '../../../lib/ux/LazyUx';
+import { STAFF_STEPS } from '../../../lib/ux/steps-staff';
 import { currentInstallContext } from '../install/platform';
 import '../staff.css';
 import { ScreenFallback } from './ScreenFallback';
@@ -42,6 +44,7 @@ export function StaffShell() {
 
 function StaffApp({ standalone }: { standalone: boolean }) {
   useStaffBoot(standalone);
+  const me = useStaffMe();
   return (
     <ToastProvider bottomOffset="calc(var(--tabbar-h) + var(--app-bar-h) + env(safe-area-inset-bottom) + 0.5rem)">
       <div className="staff-frame">
@@ -52,6 +55,7 @@ function StaffApp({ standalone }: { standalone: boolean }) {
       <StaffTabBar />
       <UpdateToast />
       <UpgradeOverlay />
+      <LazyUx role="staff" userId={me.user.id} steps={STAFF_STEPS} />
     </ToastProvider>
   );
 }

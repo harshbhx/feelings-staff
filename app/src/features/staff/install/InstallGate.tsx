@@ -11,6 +11,7 @@ import { Bindi, Button, Icon } from '@fs/ui';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMe } from '../../../api/hooks';
+import { InstallSteps } from '../../../lib/ux/InstallSteps';
 
 import type { InstallContext } from './platform';
 import { promptInstall, useInstallPrompt } from './prompt';
@@ -106,56 +107,10 @@ function AndroidInstall() {
 
 function IosSteps() {
   const { t } = useTranslation();
-  const steps: { text: string; mock: ReactNode }[] = [
-    {
-      text: t('staff:install.iosStep1'),
-      mock: (
-        <span className="staff-mock-row">
-          <span className="text-text-muted">{t('staff:install.safariLabel')}</span>
-          <span className="staff-mock-row__value inline-flex items-center gap-1">
-            <Icon name="export" className="size-5" />
-            {t('staff:install.iosShareLabel')}
-          </span>
-        </span>
-      ),
-    },
-    {
-      text: t('staff:install.iosStep2'),
-      mock: (
-        <span className="staff-mock-row">
-          <span className="staff-mock-row__value">{t('staff:install.iosAddLabel')}</span>
-          <Icon name="plus-square" className="size-5 text-text" />
-        </span>
-      ),
-    },
-    {
-      text: t('staff:install.iosStep3'),
-      mock: (
-        <span className="flex items-center gap-3">
-          <span className="grid size-12 place-items-center rounded-md border border-border-strong bg-bg">
-            <Bindi size="success" />
-          </span>
-          <span className="text-sm font-semibold text-text">{t('staff:install.iosOpenLabel')}</span>
-        </span>
-      ),
-    },
-  ];
   return (
     <section aria-labelledby="ios-steps" className="flex flex-col gap-3">
       <h2 id="ios-steps">{t('staff:install.iosStepsTitle')}</h2>
-      <ol className="flex flex-col gap-4">
-        {steps.map((s, i) => (
-          <li key={s.text} className="flex gap-3">
-            <span className="staff-step-num" aria-hidden="true">
-              {i + 1}
-            </span>
-            <span className="flex min-w-0 flex-1 flex-col gap-2">
-              <span>{s.text}</span>
-              <span aria-hidden="true">{s.mock}</span>
-            </span>
-          </li>
-        ))}
-      </ol>
+      <InstallSteps />
     </section>
   );
 }

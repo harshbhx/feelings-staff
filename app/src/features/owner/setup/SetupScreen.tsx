@@ -6,9 +6,10 @@
  */
 import type { SetupStep } from '@fs/contracts';
 import { Button, Card, Icon, List, ListRow, useToast } from '@fs/ui';
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
+import { NotificationSheet } from '../../../lib/ux/NotificationSheet';
 import { usePush } from '../../../pwa/push';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { useSites } from '../api/schedule';
@@ -248,16 +249,18 @@ function FirstStaff() {
 function Install() {
   const { t } = useTranslation();
   const push = usePush();
+  const [ask, setAsk] = useState(false);
   return (
     <div className="grid gap-4">
       <Meta>{t(`owner:setup.install.state.${push.state}`)}</Meta>
+      <NotificationSheet push={push} open={ask} onOpenChange={setAsk} />
       {push.state === 'default' || push.state === 'granted-unsubscribed' ? (
         <div>
           <Button
             variant="secondary"
             icon="bell"
             disabled={push.busy}
-            onClick={() => void push.enable()}
+            onClick={() => setAsk(true)}
           >
             {t('owner:setup.install.enable')}
           </Button>
