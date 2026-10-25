@@ -9,6 +9,7 @@ import { currentInstallContext } from '../../features/staff/install/platform';
 import { useInstallPrompt } from '../../features/staff/install/prompt';
 import { onGuide } from './bus';
 import { InstallSheet } from './InstallSheet';
+import { WithUx } from './ns';
 import { guidanceSuppressed, readKey, writeKey } from './storage';
 import { Tour, type TourStep } from './Tour';
 
@@ -28,7 +29,11 @@ function installBlocked(now: number): boolean {
 
 /** Nothing unprompted in an automated browser (see storage.ts); the work is in `Guides`. */
 export function UxLayer(props: GuidesProps) {
-  return guidanceSuppressed() ? null : <Guides {...props} />;
+  return guidanceSuppressed() ? null : (
+    <WithUx>
+      <Guides {...props} />
+    </WithUx>
+  );
 }
 
 interface GuidesProps {

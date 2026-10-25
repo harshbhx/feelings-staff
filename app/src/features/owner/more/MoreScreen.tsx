@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useMe } from '../../../api/hooks';
 import { LOGO_MASK } from '../../../lib/brand';
-import { openGuide } from '../../../lib/ux/bus';
+import { InstallRow, TourRow } from '../../../lib/ux/GuideRows';
 import { currentInstallContext } from '../../staff/install/platform';
 import { Section } from '../components/layout';
 import { allowed, MORE, type NavItem } from '../shell/nav';
@@ -40,30 +40,10 @@ export function MoreScreen() {
           </Section>
         );
       })}
-      <Section title={t('common:ux.tour.replay')}>
+      <Section title={t('owner:more.groups.app')}>
         <List>
-          <ListRow
-            leading={
-              <span className="fs-tile" data-tone="academy">
-                <Icon name="navigation" />
-              </span>
-            }
-            title={t('common:ux.tour.replay')}
-            subtitle={t('common:ux.tour.replayHint')}
-            onClick={() => openGuide('tour')}
-          />
-          {canInstall ? (
-            <ListRow
-              leading={
-                <span className="fs-tile" data-tone="bridal">
-                  <Icon name="plus-square" />
-                </span>
-              }
-              title={t('common:ux.install.row')}
-              subtitle={t('common:ux.install.rowHint')}
-              onClick={() => openGuide('install')}
-            />
-          ) : null}
+          <TourRow tile />
+          {canInstall ? <InstallRow /> : null}
         </List>
       </Section>
       <div className="grid gap-4 rounded-md bg-bg p-4 xl:hidden">

@@ -5,6 +5,7 @@
 import { Bindi, Icon, type IconName } from '@fs/ui';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { WithUx } from './ns';
 import './ux.css';
 
 interface Step {
@@ -24,17 +25,17 @@ const STEPS: readonly Step[] = [
   { key: 'iosOpen', glyph: <Bindi size="success" /> },
 ];
 
-export function InstallSteps() {
+function InstallStepsView() {
   const { t } = useTranslation();
   return (
     <div className="ux-install">
       <div className="ux-safari" aria-hidden="true">
-        <span className="ux-safari__url">{t('common:ux.install.mockSafari')}</span>
+        <span className="ux-safari__url">{t('ux:install.mockSafari')}</span>
         <span className="ux-safari__share">
           <Icon name="export" className="ux-safari__icon" />
         </span>
       </div>
-      <ol className="ux-steps" aria-label={t('common:ux.install.stepsLabel')}>
+      <ol className="ux-steps" aria-label={t('ux:install.stepsLabel')}>
         {STEPS.map((s, i) => (
           <li key={s.key} className="ux-steps__item">
             <span className="ux-steps__glyph" aria-hidden="true">
@@ -45,13 +46,21 @@ export function InstallSteps() {
                 <span className="ux-steps__num" aria-hidden="true">
                   {i + 1}
                 </span>
-                {t(`common:ux.install.${s.key}`)}
+                {t(`ux:install.${s.key}`)}
               </span>
-              <span className="ux-steps__hint">{t(`common:ux.install.${s.key}Hint`)}</span>
+              <span className="ux-steps__hint">{t(`ux:install.${s.key}Hint`)}</span>
             </span>
           </li>
         ))}
       </ol>
     </div>
+  );
+}
+
+export function InstallSteps() {
+  return (
+    <WithUx>
+      <InstallStepsView />
+    </WithUx>
   );
 }

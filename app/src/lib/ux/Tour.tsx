@@ -129,9 +129,9 @@ export function Tour({
         tabIndex={-1}
       >
         <h2 id="ux-tour-title" className="ux-tour__title">
-          {step ? t(step.title) : t('common:ux.tour.welcomeTitle')}
+          {step ? t(step.title) : t('ux:tour.welcomeTitle')}
         </h2>
-        <p className="ux-tour__body">{step ? t(step.body) : t('common:ux.tour.welcomeBody')}</p>
+        <p className="ux-tour__body">{step ? t(step.body) : t('ux:tour.welcomeBody')}</p>
         <div className="ux-tour__meta">
           <span className="ux-tour__dots" aria-hidden="true">
             {steps.map((s, i) => (
@@ -140,26 +140,22 @@ export function Tour({
           </span>
           {step ? (
             <span className="ux-tour__count">
-              {t('common:ux.tour.step', { current: index + 1, total: steps.length })}
+              {t('ux:tour.step', { current: index + 1, total: steps.length })}
             </span>
           ) : null}
         </div>
         <div className="ux-tour__actions">
           {index > 0 ? (
             <Button variant="ghost" size="sm" onClick={() => setIndex(index - 1)}>
-              {t('common:ux.tour.back')}
+              {t('ux:tour.back')}
             </Button>
           ) : (
             <Button variant="ghost" size="sm" onClick={onClose}>
-              {t('common:ux.tour.skip')}
+              {t('ux:tour.skip')}
             </Button>
           )}
           <Button variant="primary" onClick={() => (last ? onClose() : setIndex(index + 1))}>
-            {index < 0
-              ? t('common:ux.tour.start')
-              : last
-                ? t('common:ux.tour.done')
-                : t('common:ux.tour.next')}
+            {index < 0 ? t('ux:tour.start') : last ? t('ux:tour.done') : t('ux:tour.next')}
           </Button>
         </div>
       </div>

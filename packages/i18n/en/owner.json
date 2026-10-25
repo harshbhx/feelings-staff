@@ -1651,7 +1651,8 @@
     "groups": {
       "money": "Money",
       "people": "People and days",
-      "salon": "Salon"
+      "salon": "Salon",
+      "app": "This app"
     },
     "hints": {
       "payroll": "Month-end salaries and payslips",

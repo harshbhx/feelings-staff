@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { saveLang } from '../../../app/i18n';
 import { VIBRATE_KEY } from '../../../lib/haptics';
-import { openGuide } from '../../../lib/ux/bus';
+import { TourRow } from '../../../lib/ux/GuideRows';
 import { usePush } from '../../../pwa/push';
 import { useQueue } from '../../../pwa/queue';
 import { useLanguageSave, useOwnerName, useSignOut, useStaffMe } from '../api';
@@ -166,11 +166,7 @@ export function MeScreen() {
           <ListRow asChild title={t('staff:me.privacy')}>
             <Link to="/me/privacy" />
           </ListRow>
-          <ListRow
-            title={t('common:ux.tour.replay')}
-            subtitle={t('common:ux.tour.replayHint')}
-            onClick={() => openGuide('tour')}
-          />
+          <TourRow />
         </List>
 
         <Button

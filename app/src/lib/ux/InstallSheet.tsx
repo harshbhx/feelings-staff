@@ -28,7 +28,7 @@ export function InstallSheet({
       onOpenChange={(o) => {
         if (!o) onClose('later');
       }}
-      title={t('common:ux.install.title')}
+      title={t('ux:install.title')}
       titleHidden
       footer={
         <>
@@ -48,29 +48,29 @@ export function InstallSheet({
                 }
               }}
             >
-              {t('common:ux.install.androidButton')}
+              {t('ux:install.androidButton')}
             </Button>
           ) : (
             <Button variant="primary" block onClick={() => onClose('done')}>
-              {t('common:ux.install.gotIt')}
+              {t('ux:install.gotIt')}
             </Button>
           )}
           <Button variant="ghost" block onClick={() => onClose('later')}>
-            {t('common:ux.install.later')}
+            {t('ux:install.later')}
           </Button>
           <button type="button" className="ux-link" onClick={() => onClose('never')}>
-            {t('common:ux.install.never')}
+            {t('ux:install.never')}
           </button>
         </>
       }
     >
       <div className="ux-perm">
-        <h2 className="ux-perm__title">{t('common:ux.install.title')}</h2>
-        <p className="ux-perm__lead">{t('common:ux.install.lead')}</p>
+        <h2 className="ux-perm__title">{t('ux:install.title')}</h2>
+        <p className="ux-perm__lead">{t('ux:install.lead')}</p>
         {platform === 'ios' ? (
           <InstallSteps />
         ) : prompt.available ? null : (
-          <p className="ux-perm__note">{t('common:ux.install.androidMenu')}</p>
+          <p className="ux-perm__note">{t('ux:install.androidMenu')}</p>
         )}
       </div>
     </Sheet>

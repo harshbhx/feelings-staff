@@ -7,6 +7,7 @@ import { Button, Icon, type IconName, Sheet } from '@fs/ui';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { currentPlatform } from '../../pwa/push';
+import { WithUx } from './ns';
 import './ux.css';
 
 export type PermissionKind = 'location' | 'notifications';
@@ -32,7 +33,7 @@ export interface PermissionCardProps {
 
 const ICON: Record<PermissionKind, IconName> = { location: 'map-pin', notifications: 'bell' };
 
-export function PermissionCard({
+function PermissionCardView({
   kind,
   view,
   onAllow,
@@ -46,7 +47,7 @@ export function PermissionCard({
 }: PermissionCardProps) {
   const { t } = useTranslation();
   const [retried, setRetried] = useState(false);
-  const base = `common:ux.permission.${kind}`;
+  const base = `ux:permission.${kind}`;
   const platform = currentPlatform();
   const steps =
     platform === 'ios' ? 'iosSteps' : platform === 'android' ? 'androidSteps' : 'otherSteps';
@@ -79,11 +80,11 @@ export function PermissionCard({
           </Button>
           {onLater ? (
             <Button variant="ghost" block onClick={onLater}>
-              {t('common:ux.permission.later')}
+              {t('ux:permission.later')}
             </Button>
           ) : null}
         </div>
-        <p className="ux-perm__note">{t('common:ux.permission.next')}</p>
+        <p className="ux-perm__note">{t('ux:permission.next')}</p>
       </div>
     );
   }
@@ -108,7 +109,7 @@ export function PermissionCard({
         </ol>
         {retried ? (
           <p className="ux-perm__note" role="status">
-            {t('common:ux.permission.stillOff')}
+            {t('ux:permission.stillOff')}
           </p>
         ) : null}
         <div className="ux-perm__actions">
@@ -121,7 +122,7 @@ export function PermissionCard({
               await (onRetry ?? onAllow)();
             }}
           >
-            {t('common:ux.permission.tryAgain')}
+            {t('ux:permission.tryAgain')}
           </Button>
           {onLater ? (
             <Button variant="ghost" block onClick={onLater}>
@@ -139,12 +140,12 @@ export function PermissionCard({
         <span className="ux-perm__disc" data-tone="warn" aria-hidden="true">
           <Icon name="plus-square" />
         </span>
-        <h2 className="ux-perm__title">{t('common:ux.permission.notifications.installTitle')}</h2>
-        <p className="ux-perm__lead">{t('common:ux.permission.notifications.installLead')}</p>
+        <h2 className="ux-perm__title">{t('ux:permission.notifications.installTitle')}</h2>
+        <p className="ux-perm__lead">{t('ux:permission.notifications.installLead')}</p>
         <div className="ux-perm__actions">
           {onShowInstall ? (
             <Button variant="primary" block onClick={onShowInstall}>
-              {t('common:ux.permission.notifications.installAction')}
+              {t('ux:permission.notifications.installAction')}
             </Button>
           ) : null}
           {onLater ? (
@@ -162,8 +163,8 @@ export function PermissionCard({
       <span className="ux-perm__disc" data-tone="warn" aria-hidden="true">
         <Icon name="warning-circle" />
       </span>
-      <h2 className="ux-perm__title">{t('common:ux.permission.notifications.unsupportedTitle')}</h2>
-      <p className="ux-perm__lead">{t('common:ux.permission.notifications.unsupportedLead')}</p>
+      <h2 className="ux-perm__title">{t('ux:permission.notifications.unsupportedTitle')}</h2>
+      <p className="ux-perm__lead">{t('ux:permission.notifications.unsupportedLead')}</p>
       {onLater ? (
         <div className="ux-perm__actions">
           <Button variant="ghost" block onClick={onLater}>
@@ -172,6 +173,14 @@ export function PermissionCard({
         </div>
       ) : null}
     </div>
+  );
+}
+
+export function PermissionCard(props: PermissionCardProps) {
+  return (
+    <WithUx>
+      <PermissionCardView {...props} />
+    </WithUx>
   );
 }
 
@@ -187,7 +196,7 @@ export function PermissionSheet({ open, onOpenChange, ...card }: PermissionSheet
     <Sheet
       open={open}
       onOpenChange={onOpenChange}
-      title={t(`common:ux.permission.${card.kind}.title`)}
+      title={t(`ux:permission.${card.kind}.title`)}
       titleHidden
     >
       <PermissionCard {...card} onLater={() => onOpenChange(false)} />
