@@ -166,7 +166,8 @@ test.describe('owner presence', () => {
     const sheet = page.getByRole('dialog');
     await expect(sheet.getByLabel('Out from')).toHaveValue('10:04');
     await expect(sheet.getByLabel('Back at')).toHaveValue('10:20');
-    await expect(page).toHaveScreenshot('owner-away-edit.png');
+    // The sheet only: the page scrolled behind it sits at a different offset from run to run.
+    await expect(sheet).toHaveScreenshot('owner-away-edit.png');
     await checkA11y();
     await sheet.getByRole('button', { name: 'Save change' }).click();
     await expect(sheet.getByText('Say why, in a few words.')).toBeVisible();
