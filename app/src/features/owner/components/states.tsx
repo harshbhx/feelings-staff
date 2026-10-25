@@ -99,7 +99,7 @@ export function QueryView<T>({
 
 export function Empty({ children, action }: { children: ReactNode; action?: ReactNode }) {
   return (
-    <EmptyState action={action} data-testid="owner-empty">
+    <EmptyState icon="check-circle" action={action} data-testid="owner-empty">
       {children}
     </EmptyState>
   );

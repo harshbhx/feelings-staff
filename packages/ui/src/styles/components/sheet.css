@@ -101,8 +101,17 @@
     padding: var(--space-3) 0 var(--space-4);
   }
 
+  /* The skirt: the sheet settles with a small overshoot, so something fills the gap under it. */
+  .fs-sheet::after {
+    content: "";
+    position: absolute;
+    inset: 100% 0 auto;
+    height: 2rem;
+    background: var(--sheet-bg);
+  }
+
   .fs-sheet[data-state="open"] {
-    animation: fs-slide-up var(--dur-base) var(--ease-soft);
+    animation: fs-slide-up var(--dur-sheet) var(--ease-settle);
   }
 
   .fs-sheet[data-state="closed"] {
@@ -131,8 +140,12 @@
       display: none;
     }
 
+    .fs-sheet::after {
+      display: none;
+    }
+
     .fs-sheet[data-state="open"] {
-      animation: fs-enter var(--dur-base) var(--ease-soft);
+      animation: fs-enter var(--dur-sheet) var(--ease-sheet);
     }
 
     .fs-sheet[data-state="closed"] {

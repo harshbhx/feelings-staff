@@ -31,16 +31,24 @@
     pointer-events: auto;
   }
 
+  /* The tone glyph sits in a small tinted disc, like an iOS notification's app icon. */
   .fs-toast__icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    box-sizing: content-box;
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    padding: 0.3125rem;
+    border-radius: 50%;
+    background: var(--fill);
   }
 
   .fs-toast[data-tone="success"] .fs-toast__icon {
+    background: var(--status-present-bg);
     color: var(--status-present);
   }
 
   .fs-toast[data-tone="error"] .fs-toast__icon {
+    background: var(--status-absent-bg);
     color: var(--status-absent);
   }
 
@@ -69,7 +77,7 @@
   }
 
   .fs-toast[data-state="open"] {
-    animation: fs-fade-in var(--dur-fast) var(--ease-out);
+    animation: fs-toast-in var(--dur-sheet) var(--ease-settle);
   }
 
   .fs-toast[data-state="closed"] {

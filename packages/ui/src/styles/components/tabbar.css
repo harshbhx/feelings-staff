@@ -111,6 +111,10 @@
     color: var(--accent);
   }
 
+  .fs-tab[aria-current="page"] .fs-tab__icon {
+    animation: fs-tab-pop var(--dur-sheet) var(--ease-settle);
+  }
+
   .fs-tab[aria-current="page"] .fs-tab__label {
     font-weight: var(--weight-strong);
   }

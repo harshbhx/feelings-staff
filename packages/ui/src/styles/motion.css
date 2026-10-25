@@ -22,6 +22,9 @@
   --dur-breathe: 1.6s; /* a skeleton's breath, at most six times */
   --dur-spin: 720ms; /* one turn of the pending ring, the one looping motion (inline, while pending) */
   --ease-spring: cubic-bezier(0.34, 1.5, 0.5, 1);
+  --dur-sheet: 380ms; /* a sheet or a pushed screen settling */
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1); /* the iOS sheet curve: fast out, long settle */
+  --ease-settle: cubic-bezier(0.34, 1.25, 0.64, 1); /* a small overshoot, covered by the sheet's skirt */
 }
 
 /*
@@ -67,6 +70,29 @@
   }
 }
 
+/* A screen pushed onto the stack: a short slide from the right under a fade. */
+@keyframes fs-route-in {
+  from {
+    opacity: 0;
+    transform: translate3d(1.25rem, 0, 0);
+  }
+}
+
+/* Toasts drop in from below with a small settle. */
+@keyframes fs-toast-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.75rem, 0) scale(0.96);
+  }
+}
+
+/* The selected tab's icon bounces once when it becomes current. */
+@keyframes fs-tab-pop {
+  40% {
+    transform: scale(1.14);
+  }
+}
+
 @keyframes fs-slide-down {
   to {
     transform: translate3d(0, 100%, 0);
@@ -92,6 +118,11 @@
     animation: fs-enter var(--dur-base) var(--ease-soft) both;
   }
 
+  /* The routed screen: keyed by path in each shell, so a new path plays it once. */
+  .fs-route {
+    animation: fs-route-in var(--dur-sheet) var(--ease-sheet) both;
+  }
+
   /* Tappable cards and chips dip while held: 80 ms in, 140 ms out (docs/ui-redesign-plan.md 5a). */
   [data-press] {
     transition: scale var(--dur-fast) var(--ease-out);
@@ -109,7 +140,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     /* Tier 2: enters become a short fade. */
-    .fs-enter {
+    .fs-enter,
+    .fs-route {
       animation: fs-fade-in var(--dur-reduced) var(--ease-out) both;
     }
 
@@ -122,6 +154,14 @@
     [data-press]:active {
       scale: none;
       transition: none;
+    }
+
+    .fs-tab[aria-current="page"] .fs-tab__icon {
+      animation: none;
+    }
+
+    .fs-toast[data-state="open"] {
+      animation: fs-fade-in var(--dur-reduced) var(--ease-out);
     }
   }
 }

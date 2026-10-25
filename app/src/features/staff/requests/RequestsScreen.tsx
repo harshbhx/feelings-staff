@@ -147,7 +147,7 @@ function LeaveTab() {
             ))}
           </List>
         ) : (
-          <EmptyState>{t('staff:requests.empty')}</EmptyState>
+          <EmptyState icon="calendar-check">{t('staff:requests.empty')}</EmptyState>
         )}
       </section>
       <LeaveSheet request={open} onClose={() => setOpen(null)} />
@@ -289,7 +289,7 @@ function FixesTab() {
           ))}
         </List>
       ) : (
-        <EmptyState>{t('staff:requests.emptyFixes')}</EmptyState>
+        <EmptyState icon="clock">{t('staff:requests.emptyFixes')}</EmptyState>
       )}
       {open ? (
         <Sheet
