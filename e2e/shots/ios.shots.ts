@@ -76,6 +76,33 @@ const SHOTS: Shot[] = [
   { name: 'owner-more', path: '/o/more', owner: true, full: true },
   { name: 'owner-settings', path: '/o/settings', owner: true, full: true },
   { name: 'owner-signin', path: '/auth/owner' },
+
+  // Second pass: the screens behind the main tabs.
+  { name: 'staff-fix-form', path: '/requests/fix', staff: true, full: true },
+  { name: 'staff-my-data', path: '/me/data', staff: true, full: true },
+  { name: 'staff-presence-history', path: '/me/data/presence', staff: true, full: true },
+  { name: 'staff-privacy', path: '/me/privacy', staff: true, full: true },
+  { name: 'staff-inbox', path: '/inbox', staff: true, full: true },
+  { name: 'staff-fixit', path: '/fix/notifications', staff: true, full: true },
+  { name: 'staff-join', path: '/join', staff: true },
+  { name: 'staff-waiting', path: '/waiting', staff: true },
+  { name: 'owner-setup', path: '/o/setup', owner: true, full: true },
+  { name: 'owner-staff-new', path: '/o/staff/new', owner: true, full: true },
+  { name: 'owner-duty-new', path: '/o/duties/new', owner: true, full: true },
+  { name: 'owner-roll-call', path: '/o/roll-call', owner: true, full: true },
+  { name: 'owner-credits', path: '/o/credits', owner: true, full: true },
+  { name: 'owner-advances', path: '/o/advances', owner: true, full: true },
+  { name: 'owner-reports', path: '/o/reports', owner: true, full: true },
+  { name: 'owner-door-code', path: '/o/door-code', owner: true, full: true },
+  { name: 'owner-inbox', path: '/o/inbox', owner: true, full: true },
+  { name: 'owner-set-salon', path: '/o/settings/salon', owner: true, full: true },
+  { name: 'owner-set-attendance', path: '/o/settings/attendance', owner: true, full: true },
+  { name: 'owner-set-pay', path: '/o/settings/pay', owner: true, full: true },
+  { name: 'owner-set-security', path: '/o/settings/security', owner: true, full: true },
+  { name: 'owner-set-people', path: '/o/settings/people', owner: true, full: true },
+  { name: 'owner-set-audit', path: '/o/settings/audit', owner: true, full: true },
+  { name: 'owner-auth-add', path: '/auth/owner/add' },
+  { name: 'owner-auth-recovery', path: '/auth/owner/recovery' },
 ];
 
 /** Component kit sections, each saved on its own (the whole kit is taller than a PNG allows). */

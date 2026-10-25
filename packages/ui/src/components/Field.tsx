@@ -126,8 +126,33 @@ export interface InputProps extends ComponentProps<'input'> {
 }
 
 /** Text input: 16 px or more so iOS never zooms, 3.25 rem tall (PRD 11.3, 12.6). */
+/** The iOS search bar's magnifier: inline, so the icon set stays as it is. */
+function SearchGlass() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true" focusable="false">
+      <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" strokeWidth="2" />
+      <path d="m15.5 15.5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function Input({ start, end, className, ...props }: InputProps) {
   const merged = useControlProps(props);
+  if (props.type === 'search' && start === undefined) {
+    return (
+      <div
+        className={cx('fs-input-wrap', 'fs-input-wrap--search', className)}
+        data-invalid={merged['aria-invalid'] ? '' : undefined}
+        data-disabled={merged.disabled ? '' : undefined}
+      >
+        <span className="fs-input-wrap__start fs-input-wrap__glass">
+          <SearchGlass />
+        </span>
+        <input className="fs-input" {...merged} />
+        {end !== undefined ? <span className="fs-input-wrap__end">{end}</span> : null}
+      </div>
+    );
+  }
   if (start === undefined && end === undefined) {
     return <input className={cx('fs-input', className)} {...merged} />;
   }

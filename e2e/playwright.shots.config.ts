@@ -30,7 +30,8 @@ export default defineConfig({
     locale: 'en-IN',
     timezoneId: 'Asia/Kolkata',
   },
-  projects: SIZES.flatMap((size) =>
+  projects: [
+    ...SIZES.flatMap((size) =>
     SCHEMES.map((colorScheme) => ({
       name: `i${size.id}-${colorScheme}`,
       use: {
@@ -44,7 +45,36 @@ export default defineConfig({
         colorScheme,
       },
     })),
-  ),
+    ),
+    /* The shared kit is not an iPhone thing: a tablet (Safari engine) and a desktop (Chromium) too. */
+    {
+      name: 'tablet-820-light',
+      use: {
+        ...devices['iPad (gen 7)'],
+        browserName: 'webkit' as const,
+        viewport: { width: 820, height: 1180 },
+        deviceScaleFactor: 2,
+        colorScheme: 'light' as const,
+      },
+    },
+    {
+      name: 'desktop-1280-light',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+        colorScheme: 'light' as const,
+      },
+    },
+    {
+      name: 'desktop-1280-dark',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+        colorScheme: 'dark' as const,
+      },
+    },
+  ],
+
   webServer: {
     command: 'pnpm --filter @fs/app exec vite preview --port 8787 --strictPort',
     cwd: '..',

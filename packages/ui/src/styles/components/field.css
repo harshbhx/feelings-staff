@@ -159,4 +159,39 @@
   .fs-input-wrap:has(> .fs-input-wrap__end) > .fs-input {
     padding-right: 0.25rem;
   }
+
+  /* Search: the iOS search bar. A filled pill-cornered capsule with a magnifier, no outline at rest
+     (the icon and the placeholder name it); the focus ring and the clear button stay. */
+  .fs-input-wrap--search {
+    min-height: 2.75rem;
+    border-color: transparent;
+    border-radius: 0.75rem;
+    background: var(--fill-2);
+  }
+
+  .fs-input-wrap--search > .fs-input-wrap__glass {
+    display: grid;
+    place-items: center;
+    padding-left: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .fs-input-wrap--search > .fs-input-wrap__glass + .fs-input {
+    padding-left: 0.5rem;
+  }
+
+  .fs-input-wrap--search > .fs-input {
+    min-height: calc(2.75rem - 2px);
+    padding-block: 0.5rem;
+  }
+
+  .fs-input-wrap--search > .fs-input::-webkit-search-cancel-button {
+    margin-right: 0.5rem;
+  }
+
+  @media (hover: hover) {
+    .fs-input-wrap--search:hover:not([data-disabled]) {
+      border-color: transparent;
+    }
+  }
 }

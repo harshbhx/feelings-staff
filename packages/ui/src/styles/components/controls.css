@@ -154,8 +154,86 @@
     cursor: not-allowed;
   }
 
+  /* A radio group reads as the iOS selection list: one inset white group, hairlines between rows,
+     the label on the left and a tint check on the right. The whole row is the target (the label's
+     ::after covers it); the native radio stays the control, so arrows and Space still work. */
   .fs-radio-group {
     display: grid;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: var(--bg);
+  }
+
+  .fs-radio-group > .fs-choice {
+    position: relative;
+    align-items: center;
+    min-height: 3.25rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .fs-radio-group > .fs-choice + .fs-choice::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 1rem;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .fs-radio-group .fs-choice__label::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .fs-radio-group .fs-radio {
+    order: 2;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0 0 0 auto;
+    border: 0;
+    background: transparent;
+  }
+
+  .fs-radio-group .fs-radio::after {
+    inset: -0.9375rem;
+  }
+
+  .fs-radio-group .fs-radio[data-state="checked"] {
+    background: transparent;
+  }
+
+  .fs-radio-group .fs-radio__dot {
+    width: 0.5625rem;
+    height: 1rem;
+    margin-top: -0.25rem;
+    border: solid var(--accent);
+    border-width: 0 2.5px 2.5px 0;
+    border-radius: 0.5px;
+    background: transparent;
+    transform: rotate(45deg);
+  }
+
+  /* Inside a card the card is already the group: no second plate, rows run to the card's padding. */
+  .fs-card .fs-radio-group {
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .fs-card .fs-radio-group > .fs-choice {
+    padding-inline: 0;
+  }
+
+  .fs-card .fs-radio-group > .fs-choice + .fs-choice::before {
+    inset-inline-start: 0;
+  }
+
+  .fs-radio-group > .fs-choice:has(.fs-radio:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
+
+  .fs-radio-group .fs-radio:focus-visible {
+    outline: none;
   }
 
   /* Switch row: label left, the iOS switch right. */
