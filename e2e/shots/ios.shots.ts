@@ -25,8 +25,10 @@ interface Shot {
   /** Owner screens sign in as the owner through the mock (`variant=me:owner`). */
   owner?: boolean;
   variant?: string;
-  /** Guidance shots: the first-login tour (welcome, then the first lit step) or the install sheet. */
-  guide?: 'tour' | 'tour-step' | 'install';
+  /** Guidance shots: the first-login tour (welcome, then the first lit step). */
+  guide?: 'tour' | 'tour-step';
+  /** The install gate (also a slim hint on a computer): `installGate=1` turns it on for automation. */
+  gate?: boolean;
 }
 
 const PROFILE = '/o/staff/01K86AFQDXWDHQ8238N67SVDDK';
@@ -65,7 +67,14 @@ const SHOTS: Shot[] = [
   { name: 'staff-sheet-pin', path: '/?sheet=pin', staff: true },
   { name: 'staff-sheet-success-in', path: '/?sheet=success-in', staff: true },
   { name: 'staff-sheet-outside', path: '/?sheet=outside', staff: true },
-  { name: 'staff-install-ios', path: '/', ready: 'Add Feelings to your home screen' },
+  { name: 'gate-staff', path: '/', gate: true, ready: 'Install Feelings to continue' },
+  {
+    name: 'gate-owner',
+    path: '/o/today',
+    owner: true,
+    gate: true,
+    ready: 'Install Feelings to continue',
+  },
   { name: 'staff-signin', path: '/signin', staff: true },
   // Owner
   { name: 'owner-today', path: '/o/today', owner: true, full: true },
@@ -135,7 +144,6 @@ const SHOTS: Shot[] = [
     guide: 'tour-step',
     ready: 'Welcome to Feelings',
   },
-  { name: 'owner-install-sheet', path: '/o/today', owner: true, guide: 'install' },
 ];
 
 /** Component kit sections, each saved on its own (the whole kit is taller than a PNG allows). */
@@ -160,6 +168,7 @@ function url(s: Shot): string {
   q.set('mock', '1');
   if (s.staff) q.set('allowBrowser', '1');
   if (s.guide) q.set('guide', '1');
+  if (s.gate) q.set('installGate', '1');
   const variants = [s.owner ? 'me:owner' : '', s.variant ?? ''].filter(Boolean);
   if (variants.length > 0) q.set('variant', variants.join(','));
   return `${base}?${q}`;
@@ -167,15 +176,6 @@ function url(s: Shot): string {
 
 async function open(page: Page, s: Shot): Promise<void> {
   await page.clock.setFixedTime(VISUAL_NOW);
-  if (s.guide === 'install') {
-    // The tour is "already seen" for whoever signs in, so only the install sheet shows.
-    await page.addInitScript(() => {
-      const get = Storage.prototype.getItem;
-      Storage.prototype.getItem = function (key: string) {
-        return key.startsWith('fs.ux.tour.') ? '1' : get.call(this, key);
-      };
-    });
-  }
   await page.route('https://tile.openstreetmap.org/**', (route) => route.abort());
   await page.goto(url(s));
   const soft = { timeout: 10_000 };
@@ -191,17 +191,6 @@ async function open(page: Page, s: Shot): Promise<void> {
       .getByRole('button', { name: 'Show me around' })
       .click({ timeout: 5000 })
       .catch(() => {});
-  if (s.guide === 'install') {
-    await page.waitForTimeout(3000);
-    await page.evaluate(() =>
-      window.dispatchEvent(new CustomEvent('fs:guide', { detail: 'install' })),
-    );
-    await page
-      .getByText('Add Feelings to your Home Screen')
-      .first()
-      .waitFor({ timeout: 8000 })
-      .catch(() => {});
-  }
   await page.evaluate(() => document.fonts.ready);
   // Let late queries (presence, notifications) land and the sheet finish opening.
   await page.waitForTimeout(800);
@@ -234,3 +223,45 @@ test('shot kit sections', async ({ page }, info) => {
     });
   }
 });
+
+const UAS = {
+  android:
+    'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36',
+  iosChrome:
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0.6723.90 Mobile/15E148 Safari/604.1',
+  androidWhatsApp:
+    'Mozilla/5.0 (Linux; Android 14; Pixel 8; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.0.0 Mobile Safari/537.36 WhatsApp/2.24.21.80',
+} as const;
+
+/** The gate on the other phone browsers it speaks to: Android with and without the install prompt. */
+for (const [name, ua, prompt] of [
+  ['gate-android-menu', UAS.android, false],
+  ['gate-android-install', UAS.android, true],
+  ['gate-ios-other-browser', UAS.iosChrome, false],
+  ['gate-android-in-app', UAS.androidWhatsApp, false],
+] as const) {
+  test.describe(name, () => {
+    test.use({ userAgent: ua });
+    test(`shot ${name}`, async ({ page }, info) => {
+      const dir = join(OUT, info.project.name);
+      mkdirSync(dir, { recursive: true });
+      await open(page, { name, path: '/', gate: true, ready: 'Install Feelings to continue' });
+      if (prompt) {
+        await page.evaluate(() => {
+          window.dispatchEvent(
+            Object.assign(new Event('beforeinstallprompt', { cancelable: true }), {
+              prompt: async () => {},
+              userChoice: Promise.resolve({ outcome: 'dismissed', platform: 'web' }),
+            }),
+          );
+        });
+        await page.waitForTimeout(500);
+      }
+      await page.screenshot({
+        animations: 'disabled',
+        caret: 'hide',
+        path: join(dir, `${name}.png`),
+      });
+    });
+  });
+}

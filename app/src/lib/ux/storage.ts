@@ -29,10 +29,14 @@ export function removeKey(key: string): void {
  */
 export function guidanceSuppressed(): boolean {
   if (typeof window === 'undefined') return true;
+  return !guidanceForced() && navigator.webdriver === true;
+}
+
+/** `?guide=1`: show the tour even in a browser tab (previews, screenshots). */
+export function guidanceForced(): boolean {
   try {
-    if (new URLSearchParams(window.location.search).get('guide') === '1') return false;
+    return new URLSearchParams(window.location.search).get('guide') === '1';
   } catch {
-    // fall through
+    return false;
   }
-  return navigator.webdriver === true;
 }

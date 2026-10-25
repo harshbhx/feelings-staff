@@ -1,7 +1,6 @@
 /** The alerts pre-permission sheet, driven by `usePush()`: ask, denied, needs install, unsupported. */
 import { useEffect } from 'react';
 import type { usePush } from '../../pwa/push';
-import { openGuide } from './bus';
 import { WithUx } from './ns';
 import { PermissionSheet, type PermissionView } from './PermissionCard';
 
@@ -36,10 +35,6 @@ export function NotificationSheet({
         onOpenChange={onOpenChange}
         busy={push.busy}
         onAllow={() => push.enable().catch(() => undefined)}
-        onShowInstall={() => {
-          onOpenChange(false);
-          openGuide('install');
-        }}
       />
     </WithUx>
   );

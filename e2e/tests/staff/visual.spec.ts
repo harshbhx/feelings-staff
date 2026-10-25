@@ -245,9 +245,10 @@ const UA = {
 
 async function openGate(page: Page): Promise<void> {
   await freeze(page);
-  await page.goto('/?mock=1');
+  // `installGate=1` turns the gate on for an automated browser (it is left alone otherwise).
+  await page.goto('/?mock=1&installGate=1');
   await expect(
-    page.getByRole('heading', { level: 1, name: 'Add Feelings to your home screen' }),
+    page.getByRole('heading', { level: 1, name: 'Install Feelings to continue' }),
   ).toBeVisible();
   await settle(page);
 }
@@ -259,8 +260,9 @@ test.describe('install gate', () => {
   }, info) => {
     baselineOnly(info);
     await openGate(page);
-    const install = page.getByRole('button', { name: 'Install the app' });
+    const install = page.getByRole('button', { name: 'Install Feelings' });
     await expect(install).toHaveCount(0);
+    await expect(page.getByText('Install from the browser menu')).toBeVisible();
     await expect(page).toHaveScreenshot('staff-install-android.png');
     await checkA11y();
     await page.evaluate(() => {
@@ -276,10 +278,10 @@ test.describe('install gate', () => {
 
   test.describe('iPhone Safari', () => {
     test.use({ userAgent: UA.iosSafari });
-    test('S-03.2 iOS Safari shows the 3-step sheet', async ({ page, checkA11y }, info) => {
+    test('S-03.2 iOS Safari shows the 3-step guide', async ({ page, checkA11y }, info) => {
       baselineOnly(info);
       await openGate(page);
-      await expect(page.getByText('Three steps in Safari')).toBeVisible();
+      await expect(page.getByText('Tap the Share button')).toBeVisible();
       await expect(page).toHaveScreenshot('staff-install-ios.png');
       await checkA11y();
     });
@@ -290,7 +292,7 @@ test.describe('install gate', () => {
     test('S-03.2 other iOS browsers say open in Safari', async ({ page }, info) => {
       baselineOnly(info);
       await openGate(page);
-      await expect(page.getByText('Open this link in Safari to install the app.')).toBeVisible();
+      await expect(page.getByText('Open this link in Safari')).toBeVisible();
       await expect(page).toHaveScreenshot('staff-install-ios-other.png');
     });
   });
@@ -300,7 +302,7 @@ test.describe('install gate', () => {
     test('S-03.3 an in-app browser says open in Chrome', async ({ page }, info) => {
       baselineOnly(info);
       await openGate(page);
-      await expect(page.getByText('Open this link in Chrome to install the app.')).toBeVisible();
+      await expect(page.getByText('Open this link in Chrome')).toBeVisible();
       await expect(page).toHaveScreenshot('staff-install-android-inapp.png');
     });
   });
@@ -312,13 +314,18 @@ test.describe('install gate', () => {
       isMobile: false,
       hasTouch: false,
     });
-    test('S-03.3 a computer shows "Open this link on your phone" with a QR', async ({
+    test('a computer is not blocked: the app shows with a slim hint', async ({
       page,
       checkA11y,
     }, info) => {
       baselineOnly(info);
-      await openGate(page);
-      await expect(page.getByText('Open this link on your phone.')).toBeVisible();
+      await freeze(page);
+      await page.goto('/?mock=1&installGate=1');
+      await expect(page.getByText('Feelings is made for phones.')).toBeVisible();
+      await expect(
+        page.getByRole('heading', { level: 1, name: /Good morning, Priya/ }),
+      ).toBeVisible();
+      await settle(page);
       await expect(page).toHaveScreenshot('staff-install-desktop.png');
       await checkA11y();
     });
@@ -341,11 +348,11 @@ test.describe('install gate', () => {
         });
       };
     });
-    await page.goto('/?mock=1');
+    await page.goto('/?mock=1&installGate=1');
     await expect(
       page.getByRole('heading', { level: 1, name: /Good morning, Priya/ }),
     ).toBeVisible();
-    await expect(page.getByText('Add Feelings to your home screen')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Install the app' })).toHaveCount(0);
+    await expect(page.getByText('Install Feelings to continue')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Install Feelings' })).toHaveCount(0);
   });
 });

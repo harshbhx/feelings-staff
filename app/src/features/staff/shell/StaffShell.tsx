@@ -1,6 +1,6 @@
 /**
- * The staff shell (PRD 5.1, 12.5): install gate in a browser tab, otherwise the app with its tab
- * bar, update toast and upgrade screen. Each screen renders its own `ScreenHeader` (title, bell,
+ * The staff shell (PRD 5.1, 12.5): the app with its tab bar, update toast and upgrade screen. The
+ * install gate (lib/ux/InstallRequired) stands in front of it in a browser tab. Each screen renders its own `ScreenHeader` (title, bell,
  * banners) and, when it has one, its `ActionBar` with the one sindoor button.
  */
 import { applyDocumentLang } from '@fs/i18n/fonts';
@@ -14,16 +14,13 @@ import { saveLang } from '../../../app/i18n';
 import { onQueueEvent, setResigner, startQueue } from '../../../pwa/queue';
 import { ensurePersisted } from '../../../pwa/storage';
 import { staffKeys, useStaffMe } from '../api';
-import { browserAllowed } from '../install/allow-browser';
-// Catches `beforeinstallprompt` from the first moment, before the lazy gate chunk arrives.
-import '../install/prompt';
 import { currentInstallContext } from '../install/platform';
 import '../staff.css';
 import { ScreenFallback } from './ScreenFallback';
 import { StaffTabBar } from './StaffTabBar';
 import { UpdateToast, UpgradeOverlay } from './UpdatePrompts';
 
-/** The first-login tour and install guide: after first paint, never in the first chunk. */
+/** The first-login tour: after first paint, never in the first chunk. */
 const StaffGuides = lazy(
   () =>
     new Promise<typeof import('../../../lib/ux/staff-layer')>((done) =>
@@ -31,21 +28,9 @@ const StaffGuides = lazy(
     ),
 );
 
-/** Only a browser tab ever shows it (with the QR encoder for computers), so it is its own chunk. */
-const InstallGate = lazy(() =>
-  import('../install/InstallGate').then((m) => ({ default: m.InstallGate })),
-);
-
 export function StaffShell() {
-  const context = useMemo(currentInstallContext, []);
-  const allowed = context === 'standalone' || browserAllowed();
-  if (!allowed)
-    return (
-      <Suspense fallback={null}>
-        <InstallGate context={context} url={`${window.location.origin}/`} />
-      </Suspense>
-    );
-  return <StaffApp standalone={context === 'standalone'} />;
+  const standalone = useMemo(() => currentInstallContext() === 'standalone', []);
+  return <StaffApp standalone={standalone} />;
 }
 
 function StaffApp({ standalone }: { standalone: boolean }) {

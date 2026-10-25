@@ -1,7 +1,5 @@
 {
   "install": {
-    "title": "Add Feelings to your Home Screen",
-    "lead": "It opens full screen like any app and can send you alerts.",
     "stepsLabel": "Three steps",
     "iosShare": "Tap the Share button",
     "iosShareHint": "It is in Safari's bottom bar. On iPad it is at the top.",
@@ -9,13 +7,6 @@
     "iosAddHint": "Scroll the list down a little if you do not see it.",
     "iosOpen": "Tap Add, then open Feelings",
     "iosOpenHint": "The new icon is on your Home Screen. Open it from there.",
-    "androidButton": "Install the app",
-    "androidMenu": "Open the browser menu and choose Install app or Add to Home screen.",
-    "gotIt": "Got it",
-    "later": "Remind me later",
-    "never": "Don't show this again",
-    "row": "Add to Home Screen",
-    "rowHint": "Full screen, and alerts on iPhone",
     "mockSafari": "Safari",
     "mockShare": "Share"
   },
@@ -73,9 +64,8 @@
         "2": "Set Notifications to Allow.",
         "3": "Come back and try again."
       },
-      "installTitle": "Add Feelings to your Home Screen first",
-      "installLead": "iPhone only sends alerts to apps on the Home Screen. Add it, open it from there, then turn alerts on.",
-      "installAction": "Show me how",
+      "installTitle": "Open Feelings from your Home Screen",
+      "installLead": "iPhone only sends alerts to the installed app. Open Feelings from its Home Screen icon, then turn alerts on.",
       "unsupportedTitle": "This browser can't show alerts",
       "unsupportedLead": "Open Feelings in Chrome on Android or from the Home Screen on iPhone."
     }
@@ -135,5 +125,32 @@
         "body": "Payroll, credits, roster, roll-call and settings. You can replay this tour from here."
       }
     }
+  },
+  "gate": {
+    "title": "Install Feelings to continue",
+    "lead": "Feelings runs as an app on your phone. Add it to your Home Screen, then open it from there.",
+    "stays": "This page stays until you open Feelings from the Home Screen.",
+    "installButton": "Install Feelings",
+    "installing": "Installing…",
+    "done": "Installed. Open Feelings from your Home Screen to continue.",
+    "androidLead": "Tap Install. It takes a few seconds.",
+    "manualTitle": "Install from the browser menu",
+    "android1": "Open the browser menu",
+    "android1Hint": "The three dots at the top right of Chrome.",
+    "android2": "Tap Install app",
+    "android2Hint": "Or Add to Home screen, then Install.",
+    "android3": "Open Feelings",
+    "android3Hint": "Find the new icon on your Home Screen.",
+    "openSafari": "Open this link in Safari",
+    "openSafariHint": "Only Safari can add Feelings to the Home Screen. Copy the link, open Safari and paste it.",
+    "openChrome": "Open this link in Chrome",
+    "openChromeHint": "This browser cannot install apps. Copy the link and open it in Chrome.",
+    "copyLink": "Copy link",
+    "copied": "Link copied"
+  },
+  "hint": {
+    "text": "Feelings is made for phones. Open this link on your phone to install it.",
+    "copy": "Copy link",
+    "close": "Hide"
   }
 }

@@ -1,14 +1,11 @@
-/** Lets a row in More or Me ask the guidance layer to open a guide on demand. */
-export type GuideKind = 'tour' | 'install';
-
+/** Lets a row in More or Me ask the guidance layer to replay the tour. */
 const EVENT = 'fs:guide';
 
-export function openGuide(kind: GuideKind): void {
-  window.dispatchEvent(new CustomEvent<GuideKind>(EVENT, { detail: kind }));
+export function openGuide(): void {
+  window.dispatchEvent(new CustomEvent(EVENT));
 }
 
-export function onGuide(cb: (kind: GuideKind) => void): () => void {
-  const handler = (e: Event) => cb((e as CustomEvent<GuideKind>).detail);
-  window.addEventListener(EVENT, handler);
-  return () => window.removeEventListener(EVENT, handler);
+export function onGuide(cb: () => void): () => void {
+  window.addEventListener(EVENT, cb);
+  return () => window.removeEventListener(EVENT, cb);
 }

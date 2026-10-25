@@ -10,8 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useMe } from '../../../api/hooks';
 import { LOGO_MASK } from '../../../lib/brand';
-import { InstallRow, TourRow } from '../../../lib/ux/GuideRows';
-import { currentInstallContext } from '../../staff/install/platform';
+import { TourRow } from '../../../lib/ux/GuideRows';
 import { Section } from '../components/layout';
 import { allowed, MORE, type NavItem } from '../shell/nav';
 
@@ -23,8 +22,6 @@ export function MoreScreen() {
   const { t } = useTranslation();
   const me = useMe();
   const items = MORE.filter((i) => allowed(i, me.data));
-  const context = currentInstallContext();
-  const canInstall = context === 'ios-safari' || context === 'android';
   return (
     <div className="grid max-w-(--container-narrow) grid-cols-[minmax(0,1fr)] gap-8">
       {GROUPS.map((group) => {
@@ -43,7 +40,6 @@ export function MoreScreen() {
       <Section title={t('owner:more.groups.app')}>
         <List>
           <TourRow tile />
-          {canInstall ? <InstallRow /> : null}
         </List>
       </Section>
       <div className="grid gap-4 rounded-md bg-bg p-4 xl:hidden">

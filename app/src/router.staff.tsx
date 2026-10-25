@@ -10,6 +10,7 @@ import { staffAuthRoutes } from './features/auth/routes.staff';
 import { doorRoutes } from './features/door/routes';
 import { publicRoutes } from './features/public/routes';
 import { StaffShell, staffRoutes } from './features/staff/routes';
+import { InstallRequired } from './lib/ux/InstallRequired';
 
 const DOOR_NS = ['door'] as const;
 const PUBLIC_NS = ['payslip'] as const;
@@ -31,5 +32,7 @@ export const routes: RouteObject[] = [
 ];
 
 export function createRouter() {
-  return createBrowserRouter([{ lazy: () => import('./app/RouteErrorPage'), children: routes }]);
+  return createBrowserRouter([
+    { element: <InstallRequired />, lazy: () => import('./app/RouteErrorPage'), children: routes },
+  ]);
 }

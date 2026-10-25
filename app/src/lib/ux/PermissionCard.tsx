@@ -22,8 +22,6 @@ export interface PermissionCardProps {
   onLater?: (() => void) | undefined;
   /** After the person fixed it in settings ("I turned it on"). Defaults to `onAllow`. */
   onRetry?: (() => unknown) | undefined;
-  /** For `needs-install`: open the install guide. */
-  onShowInstall?: (() => void) | undefined;
   busy?: boolean | undefined;
   /** Screens with their own wording (the punch sheet) pass it; the shared copy is the default. */
   title?: ReactNode;
@@ -39,7 +37,6 @@ function PermissionCardView({
   onAllow,
   onLater,
   onRetry,
-  onShowInstall,
   busy,
   title,
   lead,
@@ -143,11 +140,6 @@ function PermissionCardView({
         <h2 className="ux-perm__title">{t('ux:permission.notifications.installTitle')}</h2>
         <p className="ux-perm__lead">{t('ux:permission.notifications.installLead')}</p>
         <div className="ux-perm__actions">
-          {onShowInstall ? (
-            <Button variant="primary" block onClick={onShowInstall}>
-              {t('ux:permission.notifications.installAction')}
-            </Button>
-          ) : null}
           {onLater ? (
             <Button variant="ghost" block onClick={onLater}>
               {t('common:actions.close')}

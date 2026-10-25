@@ -338,3 +338,98 @@
     }
   }
 }
+
+@layer components {
+  /* The install gate: the whole screen, blush page, one centred column. */
+  .ux-gate {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    min-height: 100dvh;
+    padding: max(env(safe-area-inset-top), var(--space-6)) var(--gutter)
+      max(env(safe-area-inset-bottom), var(--space-6));
+    background: var(--app-page);
+    color: var(--text-body);
+  }
+
+  .ux-gate__inner {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: center;
+    width: min(100%, 28rem);
+    text-align: center;
+    animation: fs-enter var(--dur-sheet) var(--ease-sheet) both;
+  }
+
+  .ux-gate__block {
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+    justify-items: center;
+  }
+
+  .ux-gate__h2 {
+    font-size: var(--text-base);
+    font-weight: var(--weight-strong);
+    color: var(--text);
+  }
+
+  .ux-gate__link {
+    width: 100%;
+    padding: 0.75rem var(--space-4);
+    overflow-wrap: anywhere;
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    font-size: var(--text-sm);
+    color: var(--text);
+  }
+
+  .ux-gate__done {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    font-weight: var(--weight-strong);
+    text-align: left;
+    color: var(--text);
+  }
+
+  .ux-gate__done > .fs-icon {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--status-present);
+  }
+
+  /* On a computer: one slim, non-blocking line above the app. */
+  .ux-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    padding: 0.375rem var(--gutter);
+    background: var(--bg-tint);
+    color: var(--on-tint);
+    font-size: var(--text-sm);
+  }
+
+  .ux-hint__icon {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .ux-hint__text {
+    margin: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ux-gate__inner {
+      animation: fs-fade-in var(--dur-reduced) var(--ease-out) both;
+    }
+  }
+}
