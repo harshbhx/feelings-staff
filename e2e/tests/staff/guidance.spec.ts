@@ -185,7 +185,7 @@ test.describe('first-login tour', () => {
     ).toBeVisible();
     await page.getByRole('button', { name: 'Skip tour' }).click();
     await expect(page.getByTestId('tour')).toHaveCount(0);
-    await page.goto('/o/more?mock=1&variant=me:owner');
+    await page.goto('/o/more?mock=1&variant=me:owner&guide=1');
     await page.getByRole('button', { name: /Replay the tour/ }).click();
     await expect(page.getByRole('dialog', { name: 'Welcome to Feelings' })).toBeVisible();
   });
