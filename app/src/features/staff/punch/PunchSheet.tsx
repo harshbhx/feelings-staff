@@ -21,7 +21,9 @@ import {
 } from '@fs/ui';
 import {
   createContext,
+  lazy,
   type ReactNode,
+  Suspense,
   useContext,
   useEffect,
   useMemo,
@@ -32,7 +34,6 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { success as hapticSuccess, tick as hapticTick } from '../../../lib/haptics';
-import { PermissionCard } from '../../../lib/ux/PermissionCard';
 import { applyUpdate, setUpdateBlocker } from '../../../pwa/register';
 import { useOwnerName, useStaffMe } from '../api';
 import { FixItGuide, type FixItTopic } from '../fixit/FixItGuide';
@@ -291,6 +292,11 @@ function ConfirmView({ a, reason }: { a: StepArgs; reason: PunchConfirm }) {
   );
 }
 
+/** The pre-permission card: its code and styles load when the first check-in needs them. */
+const PermissionCard = lazy(() =>
+  import('../../../lib/ux/PermissionCard').then((m) => ({ default: m.PermissionCard })),
+);
+
 function FlowView({ a }: { a: StepArgs }) {
   const { t } = useTranslation();
   const s = a.state;
@@ -299,15 +305,17 @@ function FlowView({ a }: { a: StepArgs }) {
       return <Words>{t('staff:punch.locating')}</Words>;
     case 'permission':
       return (
-        <PermissionCard
-          kind="location"
-          view="ask"
-          title={t('staff:punch.permission.title')}
-          lead={t('staff:punch.permission.body')}
-          allowLabel={t('staff:punch.permission.allow')}
-          onAllow={a.flow.actions.allowLocation}
-          onLater={a.close}
-        />
+        <Suspense fallback={null}>
+          <PermissionCard
+            kind="location"
+            view="ask"
+            title={t('staff:punch.permission.title')}
+            lead={t('staff:punch.permission.body')}
+            allowLabel={t('staff:punch.permission.allow')}
+            onAllow={a.flow.actions.allowLocation}
+            onLater={a.close}
+          />
+        </Suspense>
       );
     case 'locating':
       return (

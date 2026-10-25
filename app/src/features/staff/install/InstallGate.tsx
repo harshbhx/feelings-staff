@@ -8,14 +8,18 @@
  * content (the join code with its Copy button) as children.
  */
 import { Bindi, Button, Icon } from '@fs/ui';
-import { type ReactNode, useState } from 'react';
+import { lazy, type ReactNode, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMe } from '../../../api/hooks';
-import { InstallSteps } from '../../../lib/ux/InstallSteps';
 
 import type { InstallContext } from './platform';
 import { promptInstall, useInstallPrompt } from './prompt';
 import { QrCode } from './QrCode';
+
+/** The step guide's styles are loaded with it, not with the gate. */
+const InstallSteps = lazy(() =>
+  import('../../../lib/ux/InstallSteps').then((m) => ({ default: m.InstallSteps })),
+);
 
 export interface InstallGateProps {
   context: Exclude<InstallContext, 'standalone'> | InstallContext;
@@ -110,7 +114,9 @@ function IosSteps() {
   return (
     <section aria-labelledby="ios-steps" className="flex flex-col gap-3">
       <h2 id="ios-steps">{t('staff:install.iosStepsTitle')}</h2>
-      <InstallSteps />
+      <Suspense fallback={null}>
+        <InstallSteps />
+      </Suspense>
     </section>
   );
 }

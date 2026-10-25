@@ -6,10 +6,9 @@
  */
 import type { SetupStep } from '@fs/contracts';
 import { Button, Card, Icon, List, ListRow, useToast } from '@fs/ui';
-import { type ReactNode, useState } from 'react';
+import { lazy, type ReactNode, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
-import { NotificationSheet } from '../../../lib/ux/NotificationSheet';
 import { usePush } from '../../../pwa/push';
 import { isStepUpCancelled } from '../../auth/step-up';
 import { useSites } from '../api/schedule';
@@ -246,14 +245,25 @@ function FirstStaff() {
   );
 }
 
+/** Opened from a button only, so its code and styles load on the tap. */
+const NotificationSheet = lazy(() =>
+  import('../../../lib/ux/NotificationSheet').then((m) => ({ default: m.NotificationSheet })),
+);
+
 function Install() {
   const { t } = useTranslation();
   const push = usePush();
   const [ask, setAsk] = useState(false);
+  const [asked, setAsked] = useState(false);
+  if (ask && !asked) setAsked(true);
   return (
     <div className="grid gap-4">
       <Meta>{t(`owner:setup.install.state.${push.state}`)}</Meta>
-      <NotificationSheet push={push} open={ask} onOpenChange={setAsk} />
+      {asked ? (
+        <Suspense fallback={null}>
+          <NotificationSheet push={push} open={ask} onOpenChange={setAsk} />
+        </Suspense>
+      ) : null}
       {push.state === 'default' || push.state === 'granted-unsubscribed' ? (
         <div>
           <Button variant="secondary" icon="bell" disabled={push.busy} onClick={() => setAsk(true)}>

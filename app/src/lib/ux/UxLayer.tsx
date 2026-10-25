@@ -27,13 +27,16 @@ function installBlocked(now: number): boolean {
 }
 
 export function UxLayer({
-  role,
+  audience: role,
   userId,
   steps,
+  skip,
 }: {
-  role: Role;
+  audience: Role;
   userId: string;
   steps: readonly TourStep[];
+  /** Path prefixes where the tour waits (a wizard with its own guidance). */
+  skip: readonly string[];
 }) {
   const { pathname } = useLocation();
   const [tour, setTour] = useState(false);
@@ -52,12 +55,12 @@ export function UxLayer({
   // First login: the tour, once per person, a moment after the screen has settled.
   useEffect(() => {
     if (guidanceSuppressed() || readKey(tourKey(role, userId)) === '1') return;
-    if (pathname.startsWith('/o/setup') || pathname.startsWith('/auth')) return;
+    if (skip.some((p) => pathname.startsWith(p)) || pathname.startsWith('/auth')) return;
     const id = window.setTimeout(() => {
       if (!document.querySelector('[role="dialog"]')) setTour(true);
     }, 1500);
     return () => window.clearTimeout(id);
-  }, [role, userId, pathname]);
+  }, [role, userId, pathname, skip]);
 
   // The install guide: browser tab only, after the tour, once the person has moved around a little.
   useEffect(() => {

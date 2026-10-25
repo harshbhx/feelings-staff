@@ -22,14 +22,13 @@ import {
   ToastProvider,
 } from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { type CSSProperties, useEffect, useRef } from 'react';
+import { type CSSProperties, lazy, Suspense, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { useMe } from '../../../api/hooks';
 import { LOGO_MASK } from '../../../lib/brand';
 import { useUnderBar } from '../../../lib/use-under-bar';
-import { LazyUx } from '../../../lib/ux/LazyUx';
-import { OWNER_STEPS } from '../../../lib/ux/steps-owner';
+import { Delayed } from '../../../lib/ux/Delayed';
 import { StepUpProvider } from '../../auth/step-up';
 import { InboxBell } from '../../inbox';
 import { openActionCount } from '../actions/actions-model';
@@ -101,10 +100,20 @@ export function OwnerShell() {
   );
 }
 
+const Guides = lazy(() => import('../../../lib/ux/owner-layer'));
+
 /** The first-login tour and the install guide (lazy, after first paint). */
 function OwnerGuides() {
   const me = useMe();
-  return <LazyUx audience="owner" userId={me.data?.user.id} steps={OWNER_STEPS} />;
+  const id = me.data?.user.id;
+  if (!id) return null;
+  return (
+    <Delayed>
+      <Suspense fallback={null}>
+        <Guides userId={id} />
+      </Suspense>
+    </Delayed>
+  );
 }
 
 /** Pull to refresh (iOS layer): refetches what is on screen; its own small chunk. */
