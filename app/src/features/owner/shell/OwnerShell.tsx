@@ -28,7 +28,6 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { useMe } from '../../../api/hooks';
 import { LOGO_MASK } from '../../../lib/brand';
 import { useUnderBar } from '../../../lib/use-under-bar';
-import { Delayed } from '../../../lib/ux/Delayed';
 import { StepUpProvider } from '../../auth/step-up';
 import { InboxBell } from '../../inbox';
 import { openActionCount } from '../actions/actions-model';
@@ -100,7 +99,12 @@ export function OwnerShell() {
   );
 }
 
-const Guides = lazy(() => import('../../../lib/ux/owner-layer'));
+const Guides = lazy(
+  () =>
+    new Promise<typeof import('../../../lib/ux/owner-layer')>((done) =>
+      setTimeout(() => done(import('../../../lib/ux/owner-layer')), 2000),
+    ),
+);
 
 /** The first-login tour and the install guide (lazy, after first paint). */
 function OwnerGuides() {
@@ -108,11 +112,9 @@ function OwnerGuides() {
   const id = me.data?.user.id;
   if (!id) return null;
   return (
-    <Delayed>
-      <Suspense fallback={null}>
-        <Guides userId={id} />
-      </Suspense>
-    </Delayed>
+    <Suspense fallback={null}>
+      <Guides userId={id} />
+    </Suspense>
   );
 }
 

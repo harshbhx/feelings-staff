@@ -26,18 +26,20 @@ function installBlocked(now: number): boolean {
   return Number.isFinite(until) && until > now;
 }
 
-export function UxLayer({
-  audience: role,
-  userId,
-  steps,
-  skip,
-}: {
+/** Nothing unprompted in an automated browser (see storage.ts); the work is in `Guides`. */
+export function UxLayer(props: GuidesProps) {
+  return guidanceSuppressed() ? null : <Guides {...props} />;
+}
+
+interface GuidesProps {
   audience: Role;
   userId: string;
   steps: readonly TourStep[];
   /** Path prefixes where the tour waits (a wizard with its own guidance). */
   skip: readonly string[];
-}) {
+}
+
+function Guides({ audience: role, userId, steps, skip }: GuidesProps) {
   const { pathname } = useLocation();
   const [tour, setTour] = useState(false);
   const [install, setInstall] = useState(false);

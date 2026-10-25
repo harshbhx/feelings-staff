@@ -17,7 +17,6 @@ import { staffKeys, useStaffMe } from '../api';
 import { browserAllowed } from '../install/allow-browser';
 // Catches `beforeinstallprompt` from the first moment, before the lazy gate chunk arrives.
 import '../install/prompt';
-import { Delayed } from '../../../lib/ux/Delayed';
 import { currentInstallContext } from '../install/platform';
 import '../staff.css';
 import { ScreenFallback } from './ScreenFallback';
@@ -25,7 +24,12 @@ import { StaffTabBar } from './StaffTabBar';
 import { UpdateToast, UpgradeOverlay } from './UpdatePrompts';
 
 /** The first-login tour and install guide: after first paint, never in the first chunk. */
-const StaffGuides = lazy(() => import('../../../lib/ux/staff-layer'));
+const StaffGuides = lazy(
+  () =>
+    new Promise<typeof import('../../../lib/ux/staff-layer')>((done) =>
+      setTimeout(() => done(import('../../../lib/ux/staff-layer')), 2000),
+    ),
+);
 
 /** Only a browser tab ever shows it (with the QR encoder for computers), so it is its own chunk. */
 const InstallGate = lazy(() =>
@@ -57,11 +61,9 @@ function StaffApp({ standalone }: { standalone: boolean }) {
       <StaffTabBar />
       <UpdateToast />
       <UpgradeOverlay />
-      <Delayed>
-        <Suspense fallback={null}>
-          <StaffGuides userId={me.user.id} />
-        </Suspense>
-      </Delayed>
+      <Suspense fallback={null}>
+        <StaffGuides userId={me.user.id} />
+      </Suspense>
     </ToastProvider>
   );
 }
