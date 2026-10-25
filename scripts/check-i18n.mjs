@@ -18,6 +18,7 @@ const NS = [
   'door',
   'presence',
   'ui',
+  'ux',
 ];
 const KEY = new RegExp(`['"\`](${NS.join('|')}):([A-Za-z0-9_.]+)['"\`]`, 'g');
 

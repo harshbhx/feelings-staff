@@ -2,6 +2,7 @@
 import type { NotificationView } from '@fs/contracts';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
+import { SwipeRow } from '../../lib/swipe-row';
 import { groupByDay, useInbox, useMarkRead, useRefetchOnPush } from './hooks';
 
 const IST = 'Asia/Kolkata';
@@ -17,20 +18,25 @@ function Row({
   n,
   today,
   onOpen,
+  onRead,
 }: {
   n: NotificationView;
   today: boolean;
   onOpen: (n: NotificationView) => void;
+  onRead: (n: NotificationView) => void;
 }) {
   const { t } = useTranslation('notify');
   const unread = n.readAt === null;
   return (
-    <li className="border-b border-[var(--border)] last:border-b-0">
+    <SwipeRow
+      className="border-[var(--border)] border-b last:border-b-0"
+      action={unread ? { label: t('inbox.markRead'), onPress: () => onRead(n) } : undefined}
+    >
       <button
         type="button"
         onClick={() => onOpen(n)}
         data-unread={unread}
-        className="flex min-h-11 w-full items-start gap-3 px-4 py-3 text-left"
+        className="flex min-h-14 w-full items-start gap-3 px-4 py-3 text-left transition-colors active:bg-(--row-press-bg)"
       >
         <span
           className="mt-2 flex size-3 shrink-0 items-center justify-center"
@@ -62,7 +68,7 @@ function Row({
           {formatWhen(n.createdAt, today)}
         </time>
       </button>
-    </li>
+    </SwipeRow>
   );
 }
 
@@ -71,21 +77,23 @@ function Group({
   items,
   today,
   onOpen,
+  onRead,
 }: {
   label: string;
   items: NotificationView[];
   today: boolean;
   onOpen: (n: NotificationView) => void;
+  onRead: (n: NotificationView) => void;
 }) {
   if (items.length === 0) return null;
   return (
     <section aria-label={label} className="mb-5">
-      <h2 className="px-4 pb-2 text-[length:var(--text-xs)] font-semibold text-[var(--text-muted)]">
+      <h2 className="px-4 pb-1.5 font-semibold text-[length:var(--text-xs)] text-[var(--text-muted)]">
         {label}
       </h2>
-      <ul className="border-y border-[var(--border)]">
+      <ul className="overflow-hidden rounded-md bg-bg">
         {items.map((n) => (
-          <Row key={n.id} n={n} today={today} onOpen={onOpen} />
+          <Row key={n.id} n={n} today={today} onOpen={onOpen} onRead={onRead} />
         ))}
       </ul>
     </section>
@@ -107,11 +115,12 @@ export function InboxScreen() {
     if (n.readAt === null) markRead.mutate({ ids: [n.id] });
     void navigate(n.url);
   };
+  const read = (n: NotificationView) => markRead.mutate({ ids: [n.id] });
 
   return (
-    <main className="mx-auto max-w-[30rem] py-4">
-      <header className="flex items-center justify-between gap-3 px-4 pb-4">
-        <h1 className="text-[length:var(--text-lg)] font-extrabold text-[var(--text)]">
+    <main className="mx-auto max-w-[30rem] px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+2rem)] in-[#owner-main]:px-0 in-[#owner-main]:pt-0">
+      <header className="flex items-end justify-between gap-3 pb-4">
+        <h1 className="fs-large-title font-extrabold text-[var(--text)]">
           {t('notify:inbox.title')}
         </h1>
         {unread > 0 ? (
@@ -119,7 +128,7 @@ export function InboxScreen() {
             type="button"
             onClick={() => markRead.mutate({ all: true })}
             disabled={markRead.isPending}
-            className="min-h-11 px-2 text-[length:var(--text-sm)] font-semibold text-[var(--text-body)] underline"
+            className="min-h-11 px-2 font-semibold text-[length:var(--text-base)] text-accent active:opacity-60"
           >
             {t('notify:inbox.markAllRead')}
           </button>
@@ -157,20 +166,27 @@ export function InboxScreen() {
         </div>
       ) : (
         <>
-          <Group label={t('notify:inbox.today')} items={groups.today} today onOpen={open} />
+          <Group
+            label={t('notify:inbox.today')}
+            items={groups.today}
+            today
+            onOpen={open}
+            onRead={read}
+          />
           <Group
             label={t('notify:inbox.earlier')}
             items={groups.earlier}
             today={false}
             onOpen={open}
+            onRead={read}
           />
           {inbox.hasNextPage ? (
-            <div className="px-4">
+            <div>
               <button
                 type="button"
                 onClick={() => void inbox.fetchNextPage()}
                 disabled={inbox.isFetchingNextPage}
-                className="min-h-11 w-full border border-[var(--border)] text-[length:var(--text-sm)] font-semibold text-[var(--text)]"
+                className="min-h-11 w-full rounded-full bg-fill font-semibold text-[length:var(--text-sm)] text-[var(--text)] active:bg-(--fill-2)"
               >
                 {t('notify:inbox.loadMore')}
               </button>

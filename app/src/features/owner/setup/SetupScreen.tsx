@@ -6,7 +6,7 @@
  */
 import type { SetupStep } from '@fs/contracts';
 import { Button, Card, Icon, List, ListRow, useToast } from '@fs/ui';
-import type { ReactNode } from 'react';
+import { lazy, type ReactNode, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
 import { usePush } from '../../../pwa/push';
@@ -94,7 +94,7 @@ function Checklist() {
                       key={s}
                       asChild
                       leading={
-                        <span className="grid size-10 place-items-center rounded-full bg-bg-tint font-bold text-maroon-800 tabular-nums">
+                        <span className="grid size-10 place-items-center rounded-full bg-bg-tint font-bold text-on-tint tabular-nums">
                           {STEPS.indexOf(s) + 1}
                         </span>
                       }
@@ -115,7 +115,7 @@ function Checklist() {
               </section>
             ) : null}
             {layout.done.length > 0 ? (
-              <details className="group rounded-md border border-border bg-white">
+              <details className="group rounded-md bg-bg">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 px-4 py-2 font-semibold text-sm text-text [&::-webkit-details-marker]:hidden">
                   <Icon name="check-circle" className="size-5 text-[var(--status-present)]" />
                   <span className="flex-1">
@@ -245,20 +245,28 @@ function FirstStaff() {
   );
 }
 
+/** Opened from a button only, so its code and styles load on the tap. */
+const NotificationSheet = lazy(() =>
+  import('../../../lib/ux/NotificationSheet').then((m) => ({ default: m.NotificationSheet })),
+);
+
 function Install() {
   const { t } = useTranslation();
   const push = usePush();
+  const [ask, setAsk] = useState(false);
+  const [asked, setAsked] = useState(false);
+  if (ask && !asked) setAsked(true);
   return (
     <div className="grid gap-4">
       <Meta>{t(`owner:setup.install.state.${push.state}`)}</Meta>
+      {asked ? (
+        <Suspense fallback={null}>
+          <NotificationSheet push={push} open={ask} onOpenChange={setAsk} />
+        </Suspense>
+      ) : null}
       {push.state === 'default' || push.state === 'granted-unsubscribed' ? (
         <div>
-          <Button
-            variant="secondary"
-            icon="bell"
-            disabled={push.busy}
-            onClick={() => void push.enable()}
-          >
+          <Button variant="secondary" icon="bell" disabled={push.busy} onClick={() => setAsk(true)}>
             {t('owner:setup.install.enable')}
           </Button>
         </div>

@@ -42,6 +42,8 @@ import {
   useToast,
 } from '@fs/ui';
 import { type ReactNode, useEffect, useState } from 'react';
+import { InstallSteps } from '../../lib/ux/InstallSteps';
+import { PermissionCard } from '../../lib/ux/PermissionCard';
 import { ControlStates } from './ControlStates';
 
 const STATUSES: DayStatus[] = [
@@ -199,7 +201,7 @@ function Foundations() {
       </Specimen>
       <div className="grid gap-8 lg:grid-cols-2">
         <Specimen label="Logo: staff header 20 px, owner header 24 px, rail 28 px">
-          <div className="flex flex-wrap items-end gap-8 rounded-md border border-border bg-bg p-4">
+          <div className="flex flex-wrap items-end gap-8 rounded-md bg-bg p-4">
             <Logo name="Feelings" size="sm" />
             <Logo name="Feelings" />
             <Logo name="Feelings" size="lg" />
@@ -235,7 +237,7 @@ function Buttons() {
     <Section
       id="buttons"
       title="Buttons"
-      intro="One sindoor button per view. Secondary is a white pill, destructive is a secondary pill with absent-red text and a confirm step."
+      intro="One filled sindoor button per view. Secondary is the gray fill, tertiary a plain tinted label, destructive the tinted red capsule with a confirm step."
     >
       <div className="grid gap-8 lg:grid-cols-2">
         <Specimen label="Variants, 48 px">
@@ -689,10 +691,12 @@ function States() {
         </Specimen>
         <div className="grid content-start gap-6">
           <Specimen label="Empty">
-            <EmptyState>All clear. Nothing waiting.</EmptyState>
+            <EmptyState icon="check-circle">All clear. Nothing waiting.</EmptyState>
           </Specimen>
           <Specimen label="Empty with one action">
             <EmptyState
+              icon="calendar-check"
+              title="No requests yet"
               action={
                 <Button variant="secondary" size="sm" icon="plus">
                   Ask for leave
@@ -904,6 +908,32 @@ function Navigation() {
   );
 }
 
+function Guides() {
+  const noop = () => undefined;
+  return (
+    <Section
+      id="guides"
+      title="Guides"
+      intro="Asking for a permission, turning it back on, adding the app to the Home Screen. Each is a card that sits in a sheet on phones; nothing asks until the person taps Allow."
+    >
+      <div className="grid gap-8 lg:grid-cols-3">
+        <Specimen label="Before the location prompt">
+          <PermissionCard kind="location" view="ask" onAllow={noop} onLater={noop} />
+        </Specimen>
+        <Specimen label="Alerts, refused">
+          <PermissionCard kind="notifications" view="denied" onAllow={noop} onLater={noop} />
+        </Specimen>
+        <Specimen label="Add to Home Screen (iPhone)">
+          <div className="ux-perm">
+            <h3 className="ux-perm__title">Add Feelings to your Home Screen</h3>
+            <InstallSteps />
+          </div>
+        </Specimen>
+      </div>
+    </Section>
+  );
+}
+
 export function KitPage() {
   useEffect(() => {
     document.title = 'Kit · Feelings Staff';
@@ -943,6 +973,7 @@ export function KitPage() {
         <Overlays />
         <PinPads />
         <Navigation />
+        <Guides />
       </main>
     </ToastProvider>
   );

@@ -58,31 +58,3 @@ export function useOnline(): boolean {
     () => true,
   );
 }
-
-/** iOS Safari in a browser tab (not installed): push needs the Home Screen app (PRD 11.8). */
-export function isIosBrowserTab(): boolean {
-  if (typeof navigator === 'undefined' || typeof window === 'undefined') return false;
-  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
-  const standalone =
-    window.matchMedia?.('(display-mode: standalone)').matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true;
-  return ios && !standalone;
-}
-
-const IOS_BANNER_KEY = 'fs.owner.iosBanner';
-
-export function iosBannerSeen(): boolean {
-  try {
-    return localStorage.getItem(IOS_BANNER_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-export function markIosBannerSeen(): void {
-  try {
-    localStorage.setItem(IOS_BANNER_KEY, '1');
-  } catch {
-    // storage unavailable: the banner may show again next time, which is harmless
-  }
-}

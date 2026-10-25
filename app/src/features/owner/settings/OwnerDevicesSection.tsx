@@ -65,7 +65,7 @@ function DeviceRow({
       leading={
         <span
           aria-hidden="true"
-          className="grid size-10 place-items-center rounded-full bg-bg-tint text-maroon-800"
+          className="grid size-10 place-items-center rounded-full bg-bg-tint text-on-tint"
         >
           <Icon name={PLATFORM_ICON[device.platform]} className="size-5" />
         </span>

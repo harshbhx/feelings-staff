@@ -1,32 +1,41 @@
-/* Button and IconButton (PRD 12.6), from the website's .btn (global.css, motion.css). */
+/*
+ * Button and IconButton (PRD 12.6, docs/ui-redesign-plan.md 5a), drawn as iOS buttons:
+ *   primary            filled: the sindoor capsule, white label (one per view)
+ *   secondary          gray: the iOS fill, ink label (common alternatives)
+ *   ghost / tertiary   plain: a tint-coloured label, no box; dims while held
+ *   danger-secondary   tinted red: the absent tint with a red label (destructive at rest)
+ *   danger             filled red (destructive, armed)
+ * Held: the capsule dips to 0.97 at once (80 ms in, 140 ms out) and its fill steps down, so a tap
+ * feels like a haptic click even where the phone cannot vibrate.
+ */
 @layer components {
   .fs-btn {
+    --fs-btn-px: 1.375rem;
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.55em;
-    --fs-btn-px: 1.4rem;
+    gap: 0.5em;
     min-height: 3rem;
-    padding: 0.75rem var(--fs-btn-px);
-    border: 1px solid transparent;
+    padding: 0.7rem var(--fs-btn-px);
+    border: 0;
     border-radius: var(--radius-pill);
     background: transparent;
     color: var(--text);
     font: inherit;
     font-size: var(--text-base);
-    font-weight: var(--weight-strong);
-    line-height: 1.1;
+    font-weight: var(--weight-ui);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
     text-decoration: none;
     white-space: nowrap;
-    cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
     transition:
       background-color var(--dur-fast) var(--ease-soft),
-      border-color var(--dur-fast) var(--ease-soft),
       color var(--dur-fast) var(--ease-soft),
+      opacity var(--dur-fast) var(--ease-soft),
       text-decoration-color var(--dur-fast) var(--ease-soft),
       transform var(--dur-fast) var(--ease-out);
   }
@@ -37,22 +46,20 @@
     flex: none;
   }
 
-  /* The hero: 56 px and a step up in type (the 1.2em icon grows with it). */
   .fs-btn[data-size="lg"] {
     --fs-btn-px: 1.6rem;
     min-height: 3.5rem;
-    padding: 0.9rem var(--fs-btn-px);
     font-size: var(--text-lg);
   }
 
   .fs-btn[data-size="sm"] {
-    --fs-btn-px: 1.05rem;
+    --fs-btn-px: 1rem;
     min-height: 2.5rem;
-    padding: 0.55rem var(--fs-btn-px);
+    padding-block: 0.5rem;
     font-size: var(--text-sm);
   }
 
-  /* 40px to the eye, 44px to the thumb. */
+  /* 40 px to the eye, 44 px to the thumb. */
   .fs-btn[data-size="sm"]::after {
     content: "";
     position: absolute;
@@ -63,69 +70,47 @@
     width: 100%;
   }
 
-  /* Primary: solid sindoor, raised edges, white label. Hover lifts the tone, press sinks it. */
   .fs-btn[data-variant="primary"] {
-    background: var(--accent);
+    background: var(--accent-fill);
     color: var(--on-accent);
-    box-shadow: var(--raised);
+    font-weight: var(--weight-strong);
   }
 
-  /* Secondary: a cream pill with a hairline and soft raised edges, never an outline on white. */
   .fs-btn[data-variant="secondary"] {
-    background: var(--bg-soft);
-    border-color: var(--border-strong);
-    color: var(--text);
-    box-shadow: var(--raised-soft);
+    background: var(--fill);
   }
 
-  /* Tertiary (ghost): a text button; the underline comes with hover and focus. */
   .fs-btn:is([data-variant="ghost"], [data-variant="tertiary"]) {
     --fs-btn-px: 0.75rem;
-    padding-inline: var(--fs-btn-px);
-    color: var(--text);
-    text-decoration-line: underline;
-    text-decoration-color: transparent;
-    text-decoration-thickness: 1px;
+    color: var(--accent);
+    text-decoration: underline 1px transparent;
     text-underline-offset: 0.25em;
   }
 
-  /* Destructive at rest: the secondary pill with a red label and icon. Never the default focus. */
   .fs-btn[data-variant="danger-secondary"] {
-    background: var(--bg-soft);
-    border-color: var(--border-strong);
+    background: var(--status-absent-bg);
     color: var(--status-absent);
-    box-shadow: var(--raised-soft);
   }
 
-  /* Destructive, armed (the last step of a confirm sheet): solid red, still one tap. */
   .fs-btn[data-variant="danger"] {
-    background: var(--status-absent);
+    background: var(--red-700);
     color: var(--on-accent);
-    box-shadow: var(--raised);
   }
 
   @media (hover: hover) {
     .fs-btn[data-variant="primary"]:hover:not(:disabled, [aria-disabled="true"]) {
-      background: color-mix(in oklab, var(--red-600) 80%, var(--red-400));
+      background: color-mix(in oklab, var(--accent-fill) 85%, var(--white));
     }
 
     .fs-btn:is([data-variant="secondary"], [data-variant="danger-secondary"]):hover:not(
         :disabled,
         [aria-disabled="true"]
       ) {
-      background: var(--bg);
-      border-color: var(--border-control);
+      background: var(--fill-2);
     }
 
-    .fs-btn:is([data-variant="ghost"], [data-variant="tertiary"]):hover:not(
-        :disabled,
-        [aria-disabled="true"]
-      ) {
+    .fs-btn:is([data-variant="ghost"], [data-variant="tertiary"]):hover {
       text-decoration-color: currentColor;
-    }
-
-    .fs-btn[data-variant="danger"]:hover:not(:disabled, [aria-disabled="true"]) {
-      background: var(--accent);
     }
   }
 
@@ -133,29 +118,27 @@
     text-decoration-color: currentColor;
   }
 
-  /* Pressed: scale 0.97, the tone steps down 6 percent, the raised edges go. 80 ms in, 140 ms out. */
   .fs-btn:active:not(:disabled, [aria-disabled="true"]) {
     transform: scale(0.97);
-    box-shadow: none;
     transition-duration: var(--dur-press);
   }
 
   .fs-btn[data-variant="primary"]:active:not(:disabled, [aria-disabled="true"]) {
-    background: var(--accent-hover);
+    background: var(--red-700);
   }
 
   .fs-btn:is([data-variant="secondary"], [data-variant="danger-secondary"]):active:not(
     :disabled,
     [aria-disabled="true"]
   ) {
-    background: color-mix(in oklab, var(--bg-soft) 94%, var(--ink-900));
+    background: var(--fill-2);
   }
 
   .fs-btn:is([data-variant="ghost"], [data-variant="tertiary"]):active:not(
     :disabled,
     [aria-disabled="true"]
   ) {
-    background: var(--bg-tint);
+    opacity: 0.55;
   }
 
   .fs-btn[data-variant="danger"]:active:not(:disabled, [aria-disabled="true"]) {
@@ -166,13 +149,11 @@
     cursor: progress;
   }
 
-  /* Pending (5a): the ring takes the leading icon's place; with no icon the padding gives up the
-     ring's room, so the width never jumps. */
+  /* Pending (5a): the ring takes the leading icon's place; the width never jumps. */
   .fs-btn__ring {
     flex: none;
     width: 1.2em;
     height: 1.2em;
-    /* A faint full circle with one strong arc, so a still frame never reads as a letter. */
     border: 2px solid color-mix(in oklab, currentColor 28%, transparent);
     border-top-color: currentColor;
     border-radius: 50%;
@@ -184,13 +165,10 @@
     padding-inline: max(0px, calc(var(--fs-btn-px) - 0.875em));
   }
 
-  /* Disabled (5a): a quieter tone, never faded text; the label keeps 3:1 or more. A disabled
-     primary says why in a line under it (disabledReason). */
+  /* Disabled (5a): the gray fill and the muted label (4.5:1), never faded; a primary says why. */
   .fs-btn:is(:disabled, [aria-disabled="true"]:not([aria-busy="true"])) {
-    background: var(--bg-tint);
-    border-color: transparent;
+    background: var(--fill);
     color: var(--text-muted);
-    box-shadow: none;
     cursor: not-allowed;
   }
 
@@ -205,19 +183,19 @@
     display: block;
     margin-top: var(--space-2);
     font-size: var(--text-sm);
-    line-height: 1.45;
+    line-height: 1.4;
     color: var(--text-body);
   }
 
   /* On the maroon band (door screen header), primary turns white with red text. */
   .fs-on-deep .fs-btn[data-variant="primary"] {
     background: var(--white);
-    color: var(--accent);
+    color: var(--red-600);
   }
 
   .fs-on-deep .fs-btn[data-variant="secondary"] {
     background: transparent;
-    border-color: var(--border-on-deep);
+    box-shadow: inset 0 0 0 1px var(--border-on-deep);
     color: var(--text-on-deep);
   }
 
@@ -225,17 +203,7 @@
     outline-color: var(--white);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .fs-btn:active:not(:disabled, [aria-disabled="true"]) {
-      transform: none;
-    }
-
-    .fs-btn__ring {
-      animation: none;
-    }
-  }
-
-  /* IconButton: a 44px circle. */
+  /* IconButton: a 44 px circle; the fill shows while held. */
   .fs-icon-btn {
     position: relative;
     display: inline-grid;
@@ -244,56 +212,60 @@
     width: 2.75rem;
     height: 2.75rem;
     padding: 0;
-    border: 1px solid transparent;
+    border: 0;
     border-radius: 50%;
     background: transparent;
     color: var(--text);
-    cursor: pointer;
     touch-action: manipulation;
     transition:
       background-color var(--dur-fast) var(--ease-soft),
-      border-color var(--dur-fast) var(--ease-soft),
       transform var(--dur-fast) var(--ease-out);
   }
 
   .fs-icon-btn > .fs-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.375rem;
+    height: 1.375rem;
   }
 
   .fs-icon-btn[data-variant="outline"] {
-    border-color: var(--border-control);
-    background: var(--bg);
+    background: var(--fill);
   }
 
   @media (hover: hover) {
     .fs-icon-btn:hover:not(:disabled) {
-      background: var(--bg-tint);
-    }
-
-    .fs-icon-btn[data-variant="outline"]:hover:not(:disabled) {
-      border-color: var(--text);
-      background: var(--bg);
+      background: var(--fill);
     }
   }
 
   .fs-icon-btn:active:not(:disabled) {
-    background: var(--bg-tint);
-    transform: scale(0.94);
+    background: var(--fill-2);
+    transform: scale(0.92);
     transition-duration: var(--dur-press);
   }
 
-  /* Disabled: the icon in the control-outline ink (3.3:1), not a faded whole. */
   .fs-icon-btn:disabled {
-    border-color: var(--border);
     color: var(--border-control);
     cursor: not-allowed;
   }
 
+  /* Navigation bar buttons (back, bell): the iOS 26 round bar button on the gray fill. */
+  .fs-bar-btn {
+    background: var(--fill);
+    transition:
+      background-color var(--dur-fast) var(--ease-soft),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .fs-bar-btn:active {
+    background: var(--fill-2);
+    transform: scale(0.92);
+    transition-duration: var(--dur-press);
+  }
+
   .fs-icon-btn__dot {
     position: absolute;
-    top: 0.6rem;
-    right: 0.6rem;
+    top: 0.55rem;
+    right: 0.55rem;
     width: 0.5rem;
     height: 0.5rem;
     border-radius: 50%;
@@ -302,7 +274,11 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .fs-icon-btn:active:not(:disabled) {
+    .fs-btn__ring {
+      animation: none;
+    }
+
+    :is(.fs-btn, .fs-icon-btn, .fs-bar-btn):active:not(:disabled) {
       transform: none;
     }
   }

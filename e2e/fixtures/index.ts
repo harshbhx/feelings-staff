@@ -101,7 +101,15 @@ export const test = base.extend<Fixtures>({
       const bad = results.violations.filter(
         (v) => v.impact === 'serious' || v.impact === 'critical',
       );
-      expect(bad.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
+      expect(
+        bad.map(
+          (v) =>
+            `${v.id}: ${v.help} (${v.nodes.length}) ${v.nodes
+              .slice(0, 3)
+              .map((n) => `${n.target.join(' ')} [${n.any[0]?.message ?? n.html.slice(0, 80)}]`)
+              .join(' | ')}`,
+        ),
+      ).toEqual([]);
     });
   },
 });

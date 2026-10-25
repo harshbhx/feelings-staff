@@ -21,7 +21,9 @@ import {
 } from '@fs/ui';
 import {
   createContext,
+  lazy,
   type ReactNode,
+  Suspense,
   useContext,
   useEffect,
   useMemo,
@@ -290,6 +292,11 @@ function ConfirmView({ a, reason }: { a: StepArgs; reason: PunchConfirm }) {
   );
 }
 
+/** The pre-permission card: its code and styles load when the first check-in needs them. */
+const PermissionCard = lazy(() =>
+  import('../../../lib/ux/PermissionCard').then((m) => ({ default: m.PermissionCard })),
+);
+
 function FlowView({ a }: { a: StepArgs }) {
   const { t } = useTranslation();
   const s = a.state;
@@ -298,20 +305,17 @@ function FlowView({ a }: { a: StepArgs }) {
       return <Words>{t('staff:punch.locating')}</Words>;
     case 'permission':
       return (
-        <>
-          <p className="text-lg font-bold text-text">{t('staff:punch.permission.title')}</p>
-          <Lead icon="map-pin">{t('staff:punch.permission.body')}</Lead>
-          <Footer>
-            <Button
-              variant="primary"
-              block
-              icon="navigation"
-              onClick={a.flow.actions.allowLocation}
-            >
-              {t('staff:punch.permission.allow')}
-            </Button>
-          </Footer>
-        </>
+        <Suspense fallback={null}>
+          <PermissionCard
+            kind="location"
+            view="ask"
+            title={t('staff:punch.permission.title')}
+            lead={t('staff:punch.permission.body')}
+            allowLabel={t('staff:punch.permission.allow')}
+            onAllow={a.flow.actions.allowLocation}
+            onLater={a.close}
+          />
+        </Suspense>
       );
     case 'locating':
       return (

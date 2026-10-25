@@ -51,8 +51,6 @@
     "offline": "You're offline. Showing what we had at {{time}}.",
     "offlineNoData": "You're offline. Some things need the internet.",
     "needsInternet": "This needs the internet.",
-    "iosBanner": "Add this app to your Home Screen to get alerts.",
-    "iosBannerHow": "Tap Share, then Add to Home Screen.",
     "dismiss": "Dismiss",
     "setupBanner": "Setup isn't finished yet.",
     "setupBannerAction": "Finish setup"
@@ -1651,7 +1649,8 @@
     "groups": {
       "money": "Money",
       "people": "People and days",
-      "salon": "Salon"
+      "salon": "Salon",
+      "app": "This app"
     },
     "hints": {
       "payroll": "Month-end salaries and payslips",

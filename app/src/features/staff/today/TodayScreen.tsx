@@ -191,7 +191,7 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
         : t('staff:today.greeting.evening', { name });
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <div className="staff-band flex flex-col gap-1">
         <h1 className="staff-band__greeting">
           {greeting}
@@ -200,7 +200,7 @@ function TodayBody({ view, model, now }: { view: TodayView; model: TodayModel; n
         <ShiftLine view={view} />
       </div>
 
-      <section aria-labelledby="today-status" className="flex flex-col gap-3">
+      <section aria-labelledby="today-status" className="staff-card flex flex-col gap-3">
         <h2 id="today-status" className="sr-only">
           {t('staff:today.hoursLabel')}
         </h2>
@@ -565,7 +565,7 @@ function RecentPunches({ punches }: { punches: readonly PunchView[] }) {
   const { t } = useTranslation();
   return (
     <section aria-labelledby="today-last" className="flex flex-col gap-2">
-      <h2 id="today-last" className="text-sm font-semibold text-text-muted">
+      <h2 id="today-last" className="px-4 text-sm font-semibold text-text-muted">
         {t('staff:today.recent')}
       </h2>
       <List framed>

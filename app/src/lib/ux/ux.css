@@ -1,0 +1,435 @@
+/*
+ * The guidance layer's look (permission cards, install guide, coach marks). Loaded with the first
+ * component that uses it, never with the shell. Brand tokens only; motion from the shared tokens.
+ */
+@layer components {
+  .ux-perm {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  .ux-perm__disc {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 1.25rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .ux-perm__disc[data-tone="warn"] {
+    background: var(--status-late-bg);
+    color: var(--status-late);
+  }
+
+  .ux-perm__disc > .fs-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .ux-perm__title {
+    font-size: var(--text-title);
+    font-weight: var(--weight-display);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--text);
+    text-wrap: balance;
+  }
+
+  .ux-perm__lead {
+    max-width: 30em;
+    color: var(--text-body);
+    text-wrap: pretty;
+  }
+
+  .ux-perm__note {
+    max-width: 30em;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .ux-perm__actions {
+    display: grid;
+    gap: var(--space-2);
+    width: 100%;
+    margin-top: var(--space-2);
+  }
+
+  .ux-reasons {
+    display: grid;
+    width: 100%;
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    list-style: none;
+    text-align: left;
+  }
+
+  .ux-reasons__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: 0.75rem var(--space-4);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  .ux-reasons__item + .ux-reasons__item {
+    box-shadow: inset 0 1px 0 var(--border);
+  }
+
+  .ux-reasons__tick {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.05rem;
+    color: var(--status-present);
+  }
+
+  .ux-link {
+    min-height: 2.75rem;
+    border: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: var(--text-sm);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+
+  .ux-link:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* The numbered steps: a glyph tile, then the instruction and its hint, in one grouped plate. */
+  .ux-install {
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+  }
+
+  .ux-safari {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: var(--material-cell);
+    box-shadow: var(--shadow-float);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-ui);
+  }
+
+  .ux-safari__share {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    animation: fs-tab-pop var(--dur-hero) var(--ease-settle) var(--dur-hero) 2;
+  }
+
+  .ux-safari__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .ux-steps {
+    display: grid;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    list-style: none;
+    text-align: left;
+  }
+
+  .ux-steps__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0.875rem var(--space-4);
+  }
+
+  .ux-steps__item + .ux-steps__item {
+    box-shadow: inset 0 1px 0 var(--border);
+  }
+
+  .ux-steps__glyph {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.75rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .ux-steps__icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .ux-steps__text {
+    display: grid;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .ux-steps__title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    font-weight: var(--weight-strong);
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .ux-steps__num {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 50%;
+    background: var(--fill-2);
+    color: var(--text);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-strong);
+  }
+
+  .ux-steps__hint {
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    color: var(--text-muted);
+  }
+
+  /* Plain steps (how to turn a permission back on): the text only, with the number. */
+  .ux-steps--plain .ux-steps__item {
+    align-items: flex-start;
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--text);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ux-safari__share {
+      animation: none;
+    }
+  }
+
+  /* Coach marks: a dimmed page with one lit cut-out and a card beside it. */
+  .ux-tour {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+  }
+
+  .ux-tour__scrim {
+    position: absolute;
+    inset: 0;
+    background: var(--scrim-soft);
+    animation: fs-fade-in var(--dur-base) var(--ease-out);
+  }
+
+  .ux-tour__spot {
+    position: absolute;
+    border-radius: 1.5rem;
+    box-shadow: 0 0 0 100vmax var(--scrim-soft);
+    outline: 2px solid var(--bg);
+    pointer-events: none;
+    animation: fs-fade-in var(--dur-base) var(--ease-out);
+  }
+
+  .ux-tour__card {
+    position: absolute;
+    left: 50%;
+    display: grid;
+    gap: var(--space-2);
+    width: min(22rem, calc(100vw - 2rem));
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    box-shadow: var(--shadow-float);
+    color: var(--text-body);
+    outline: none;
+    translate: -50% 0;
+    animation: fs-enter var(--dur-sheet) var(--ease-settle) both;
+  }
+
+  .ux-tour__card[data-center] {
+    top: 50%;
+    translate: -50% -50%;
+    animation: fs-fade-in var(--dur-base) var(--ease-out) both;
+  }
+
+  .ux-tour__title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-display);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: var(--text);
+  }
+
+  .ux-tour__body {
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .ux-tour__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-1);
+  }
+
+  .ux-tour__dots {
+    display: flex;
+    gap: 0.375rem;
+  }
+
+  .ux-tour__dots > i {
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 50%;
+    background: var(--fill-2);
+  }
+
+  .ux-tour__dots > i[data-on] {
+    background: var(--accent);
+  }
+
+  .ux-tour__count {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .ux-tour__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+
+  .ux-tour__actions > .fs-btn[data-variant="primary"] {
+    flex: 1;
+    margin-left: var(--space-2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ux-tour__card {
+      animation: fs-fade-in var(--dur-reduced) var(--ease-out) both;
+    }
+  }
+}
+
+@layer components {
+  /* The install gate: the whole screen, blush page, one centred column. */
+  .ux-gate {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    min-height: 100dvh;
+    padding: max(env(safe-area-inset-top), var(--space-6)) var(--gutter)
+      max(env(safe-area-inset-bottom), var(--space-6));
+    background: var(--app-page);
+    color: var(--text-body);
+  }
+
+  .ux-gate__inner {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: center;
+    width: min(100%, 28rem);
+    text-align: center;
+    animation: fs-enter var(--dur-sheet) var(--ease-sheet) both;
+  }
+
+  .ux-gate__block {
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+    justify-items: center;
+  }
+
+  .ux-gate__h2 {
+    font-size: var(--text-base);
+    font-weight: var(--weight-strong);
+    color: var(--text);
+  }
+
+  .ux-gate__link {
+    width: 100%;
+    padding: 0.75rem var(--space-4);
+    overflow-wrap: anywhere;
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    font-size: var(--text-sm);
+    color: var(--text);
+  }
+
+  .ux-gate__done {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    font-weight: var(--weight-strong);
+    text-align: left;
+    color: var(--text);
+  }
+
+  .ux-gate__done > .fs-icon {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--status-present);
+  }
+
+  /* On a computer: one slim, non-blocking line above the app. */
+  .ux-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    padding: 0.375rem var(--gutter);
+    background: var(--bg-tint);
+    color: var(--on-tint);
+    font-size: var(--text-sm);
+  }
+
+  .ux-hint__icon {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .ux-hint__text {
+    margin: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ux-gate__inner {
+      animation: fs-fade-in var(--dur-reduced) var(--ease-out) both;
+    }
+  }
+}

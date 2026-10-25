@@ -1,7 +1,7 @@
 /**
  * i18n for Feelings Staff (PRD 11.9). Keys are semantic and namespaced: `t('staff:today.checkIn')`.
  * Namespaces and owners: common, staff, errors (WP-7); owner (WP-6); payslip (WP-5); auth (WP-3);
- * door (WP-4); notify (WP-8); presence (WP-9, step-out, away and notice copy); pages (not-found and offline screens, English only, lazy); ui (WP-2,
+ * door (WP-4); notify (WP-8); presence (WP-9, step-out, away and notice copy); pages (not-found and offline screens, English only, lazy); ux (the tour, install guide and permission cards, lazy); ui (WP-2,
  * component-level strings such as aria labels).
  * English is the source of truth; Gujarati falls back to English key by key.
  *
@@ -29,6 +29,7 @@ export const NAMESPACES = [
   'presence',
   'pages',
   'ui',
+  'ux',
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 export type AppLang = 'en' | 'gu';
@@ -75,6 +76,7 @@ const lazyCatalogs: Record<AppLang, Partial<Record<Namespace, Loader>>> = {
     payslip: () => import('../en/payslip.json'),
     presence: () => import('../en/presence.json'),
     pages: () => import('../en/pages.json'),
+    ux: () => import('../en/ux.json'),
   },
   gu: {
     common: () => import('../gu/common.json'),
@@ -88,6 +90,7 @@ const lazyCatalogs: Record<AppLang, Partial<Record<Namespace, Loader>>> = {
     auth: () => import('../gu/auth.json'),
     door: () => import('../gu/door.json'),
     ui: () => import('../gu/ui.json'),
+    ux: () => import('../gu/ux.json'),
   },
 };
 

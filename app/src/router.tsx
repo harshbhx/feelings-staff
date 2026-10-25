@@ -12,6 +12,7 @@ import { doorRoutes } from './features/door/routes';
 import { kitRoutes } from './features/kit/routes';
 import { publicRoutes } from './features/public/routes';
 import { StaffShell, staffRoutes } from './features/staff/routes';
+import { InstallRequired } from './lib/ux/InstallRequired';
 
 // The owner panel never loads for staff: its shell and its route table are separate chunks, and the
 // table is added to the router on the first visit under /o (see createRouter).
@@ -61,6 +62,7 @@ export function createRouter() {
   return createBrowserRouter(
     [
       {
+        element: <InstallRequired />,
         lazy: () => import('./app/RouteErrorPage'),
         children: routes,
       },

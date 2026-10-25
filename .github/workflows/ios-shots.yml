@@ -1,0 +1,53 @@
+# iPhone review shots for the iOS redesign: each key screen in mock mode at 393 x 852 and 375 x 667,
+# light and dark, in WebKit with an iPhone user agent (e2e/playwright.shots.config.ts). Nothing is
+# compared; the PNGs are uploaded as the `ios-shots` artifact for the PR and the contact sheets.
+# Runs on pushes to the redesign branches and by hand (gh workflow run ios-shots --ref <branch>).
+name: ios-shots
+
+on:
+  push:
+    branches: ['feat/ios-redesign', 'feat/ios-*']
+    paths-ignore: ['docs/**', '**/*.md']
+  workflow_dispatch:
+
+concurrency:
+  group: ios-shots-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  shots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      CI: 'true'
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Throwaway secrets for this run
+        run: |
+          token=$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")
+          echo "::add-mask::$token"
+          node scripts/gen-secrets.mjs --dev-vars app/.dev.vars --env local --e2e-token "$token"
+      - run: pnpm build
+      - run: |
+          for cfg in $(find app/dist -name wrangler.json -not -path '*/node_modules/*'); do cp app/.dev.vars "$(dirname "$cfg")/.dev.vars"; done
+      - name: Shots
+        run: pnpm --filter @fs/e2e exec playwright test -c playwright.shots.config.ts
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: ios-shots
+          retention-days: 14
+          path: e2e/shots-out

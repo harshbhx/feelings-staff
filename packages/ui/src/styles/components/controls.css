@@ -1,6 +1,10 @@
-/* Stepper, Checkbox, RadioGroup, Switch, Select, Popover, Tooltip, Tabs, code input (PRD 12.6). */
+/*
+ * Stepper, Checkbox, RadioGroup, Switch, Select, Popover, Tooltip, Tabs, code input (PRD 12.6),
+ * in the iOS idiom: a cell-shaped stepper with the gray −|+ capsule, round check circles, the
+ * 51 x 31 switch that turns the present green, menus on a material with 14 px corners, and tabs as
+ * scrolling capsules (the segmented look lives in chip-segmented.css).
+ */
 @layer components {
-  /* Stepper: the website's counter card with two 44px outline circles. */
   .fs-stepper {
     display: flex;
     min-inline-size: 0;
@@ -8,27 +12,31 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
+    min-height: 3.5rem;
     padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
-    border: 1px solid var(--border-control);
+    border: 0;
     border-radius: var(--radius-md);
     background: var(--bg);
   }
 
-  .fs-stepper__text {
+  .fs-stepper__text,
+  .fs-choice__text {
     display: grid;
-    gap: 0.1rem;
+    flex: 1;
+    gap: 0.0625rem;
     min-width: 0;
   }
 
   .fs-stepper__label {
-    font-weight: var(--weight-strong);
+    font-weight: var(--weight-ui);
     line-height: 1.3;
     color: var(--text);
   }
 
-  .fs-stepper__hint {
+  .fs-stepper__hint,
+  .fs-choice__desc {
     font-size: var(--text-sm);
-    line-height: 1.45;
+    line-height: 1.35;
     color: var(--text-muted);
   }
 
@@ -36,13 +44,14 @@
     display: flex;
     flex: none;
     align-items: center;
-    gap: var(--space-1);
+    border-radius: var(--radius-pill);
+    background: var(--fill);
   }
 
   .fs-stepper__value {
-    min-width: 3.5rem;
-    font-size: var(--text-lg);
-    font-weight: var(--weight-display);
+    min-width: 3rem;
+    font-size: var(--text-base);
+    font-weight: var(--weight-strong);
     line-height: 1.2;
     text-align: center;
     color: var(--text);
@@ -55,8 +64,12 @@
     color: var(--text-muted);
   }
 
+  .fs-stepper .fs-icon-btn {
+    background: transparent;
+  }
+
   .fs-stepper .fs-icon-btn[aria-disabled="true"] {
-    opacity: 0.4;
+    color: var(--border-control);
     cursor: not-allowed;
     transform: none;
   }
@@ -67,46 +80,36 @@
     align-items: flex-start;
     gap: var(--space-3);
     min-height: 2.75rem;
-    padding-block: 0.6rem;
-  }
-
-  .fs-choice__text {
-    display: grid;
-    flex: 1;
-    gap: 0.1rem;
-    min-width: 0;
+    padding-block: 0.625rem;
   }
 
   .fs-choice__label {
-    font-weight: var(--weight-ui);
+    font-weight: var(--weight-body);
     line-height: 1.4;
     color: var(--text);
     cursor: pointer;
   }
 
-  .fs-choice__desc {
-    font-size: var(--text-sm);
-    line-height: 1.45;
-    color: var(--text-muted);
-  }
-
-  .fs-choice[data-disabled] .fs-choice__label {
+  .fs-choice[data-disabled] .fs-choice__label,
+  .fs-switch-row[data-disabled] .fs-choice__label {
     color: var(--text-muted);
     cursor: not-allowed;
   }
 
+  /* iOS check circles: a ring at rest, the filled tint with a white mark when chosen. */
   .fs-checkbox,
   .fs-radio {
     position: relative;
     display: grid;
     place-items: center;
     flex: none;
-    width: 1.375rem;
-    height: 1.375rem;
-    margin-top: 0.05rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: -0.0625rem;
     padding: 0;
     border: 1.5px solid var(--border-control);
-    background: var(--bg);
+    border-radius: 50%;
+    background: transparent;
     color: var(--white);
     cursor: pointer;
     transition:
@@ -114,31 +117,21 @@
       border-color var(--dur-fast) var(--ease-out);
   }
 
-  /* The box is small; its target is not. */
+  .fs-checkbox {
+    border-radius: 0.4375rem;
+  }
+
   .fs-checkbox::after,
   .fs-radio::after {
     content: "";
     position: absolute;
-    inset: -0.7rem;
+    inset: -0.625rem;
   }
 
-  .fs-checkbox {
-    border-radius: var(--radius-sm);
-  }
-
-  .fs-radio {
-    border-radius: 50%;
-  }
-
-  .fs-checkbox:hover:not(:disabled),
-  .fs-radio:hover:not(:disabled) {
-    border-color: var(--text);
-  }
-
-  .fs-checkbox[data-state="checked"],
-  .fs-checkbox[data-state="indeterminate"] {
-    border-color: var(--text);
-    background: var(--text);
+  .fs-checkbox:is([data-state="checked"], [data-state="indeterminate"]),
+  .fs-radio[data-state="checked"] {
+    border-color: var(--accent-fill);
+    background: var(--accent-fill);
   }
 
   .fs-checkbox__mark > .fs-icon {
@@ -146,112 +139,170 @@
     height: 1rem;
   }
 
-  .fs-radio[data-state="checked"] {
-    border-color: var(--text);
-  }
-
   .fs-radio__dot {
     display: block;
-    width: 0.625rem;
-    height: 0.625rem;
+    width: 0.5rem;
+    height: 0.5rem;
     border-radius: 50%;
-    background: var(--text);
+    background: var(--white);
   }
 
   .fs-checkbox:disabled,
   .fs-radio:disabled {
     border-color: var(--border);
-    background: var(--bg-soft);
+    background: var(--fill);
     cursor: not-allowed;
   }
 
+  /* A radio group reads as the iOS selection list: one inset white group, hairlines between rows,
+     the label on the left and a tint check on the right. The whole row is the target (the label's
+     ::after covers it); the native radio stays the control, so arrows and Space still work. */
   .fs-radio-group {
     display: grid;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: var(--bg);
   }
 
-  /* Switch row: label left, switch right, hairline-friendly. */
+  .fs-radio-group > .fs-choice {
+    position: relative;
+    align-items: center;
+    min-height: 3.25rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .fs-radio-group > .fs-choice + .fs-choice::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 1rem;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .fs-radio-group .fs-choice__label::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .fs-radio-group .fs-radio {
+    order: 2;
+    z-index: 1;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0 0 0 auto;
+    border: 0;
+    background: transparent;
+  }
+
+  .fs-radio-group .fs-radio::after {
+    inset: -0.9375rem;
+  }
+
+  .fs-radio-group .fs-radio[data-state="checked"] {
+    background: transparent;
+  }
+
+  .fs-radio-group .fs-radio__dot {
+    width: 0.5625rem;
+    height: 1rem;
+    margin-top: -0.25rem;
+    border: solid var(--accent);
+    border-width: 0 2.5px 2.5px 0;
+    border-radius: 0.5px;
+    background: transparent;
+    transform: rotate(45deg);
+  }
+
+  /* Inside a card the card is already the group: no second plate, rows run to the card's padding. */
+  .fs-card .fs-radio-group {
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .fs-card .fs-radio-group > .fs-choice {
+    padding-inline: 0;
+  }
+
+  .fs-card .fs-radio-group > .fs-choice + .fs-choice::before {
+    inset-inline-start: 0;
+  }
+
+  .fs-radio-group > .fs-choice:has(.fs-radio:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
+
+  .fs-radio-group .fs-radio:focus-visible {
+    outline: none;
+  }
+
+  /* Switch row: label left, the iOS switch right. */
   .fs-switch-row {
     display: flex;
     align-items: center;
     gap: var(--space-4);
     min-height: 3.5rem;
-    padding-block: 0.6rem;
+    padding-block: 0.5rem;
   }
 
   .fs-switch {
     position: relative;
     flex: none;
-    width: 2.875rem;
-    height: 1.75rem;
+    width: 3.1875rem;
+    height: 1.9375rem;
     padding: 0;
-    border: 1.5px solid var(--border-control);
+    border: 0;
     border-radius: var(--radius-pill);
-    background: var(--bg-tint);
+    background: var(--fill-2);
+    box-shadow: inset 0 0 0 1px var(--border-control);
     cursor: pointer;
-    transition:
-      background-color var(--dur-fast) var(--ease-soft),
-      border-color var(--dur-fast) var(--ease-soft);
-  }
-
-  @media (hover: hover) {
-    .fs-switch:hover:not(:disabled) {
-      border-color: var(--text);
-    }
+    transition: background-color var(--dur-base) var(--ease-soft);
   }
 
   .fs-switch::after {
     content: "";
     position: absolute;
-    inset: -0.5rem -0.125rem;
+    inset: -0.375rem -0.125rem;
   }
 
   .fs-switch[data-state="checked"] {
-    border-color: var(--text);
-    background: var(--text);
+    background: var(--status-present);
+    box-shadow: none;
   }
 
   .fs-switch__thumb {
     display: block;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.6875rem;
+    height: 1.6875rem;
     border-radius: 50%;
     background: var(--white);
-    box-shadow: 0 0 0 1px var(--border-control);
+    box-shadow:
+      0 3px 8px rgb(0 0 0 / 0.15),
+      0 1px 1px rgb(0 0 0 / 0.16);
     transform: translateX(0.125rem);
     transition:
-      transform var(--dur-fast) var(--ease-out),
+      transform var(--dur-base) var(--ease-spring),
       scale var(--dur-fast) var(--ease-out);
   }
 
   .fs-switch[data-state="checked"] .fs-switch__thumb {
-    box-shadow: none;
-    transform: translateX(1.25rem);
+    transform: translateX(1.375rem);
   }
 
-  /* Disabled: a quieter track, not faded; the label row says why (5a). */
+  /* Held: the thumb gives under the finger. */
+  .fs-switch:active:not(:disabled) .fs-switch__thumb {
+    scale: 1.08 0.94;
+    transition-duration: var(--dur-press);
+  }
+
   .fs-switch:disabled {
-    border-color: var(--border-strong);
-    background: var(--bg-soft);
+    background: var(--fill);
     cursor: not-allowed;
   }
 
   .fs-switch:disabled[data-state="checked"] {
-    border-color: var(--border-control);
     background: var(--border-control);
-  }
-
-  .fs-switch:disabled .fs-switch__thumb {
-    box-shadow: 0 0 0 1px var(--border-strong);
-  }
-
-  /* Pressed: the thumb gives a little under the finger (scale composes with its slide). */
-  .fs-switch:active:not(:disabled) .fs-switch__thumb {
-    scale: 0.88;
-    transition-duration: var(--dur-press);
-  }
-
-  .fs-switch-row[data-disabled] .fs-choice__label {
-    color: var(--text-muted);
   }
 
   /* Select: an input-shaped trigger. */
@@ -275,20 +326,23 @@
   }
 
   .fs-select:focus-visible {
-    border-color: var(--accent);
-    outline: 2px solid var(--accent);
+    border-color: var(--focus);
+    outline: 2px solid var(--focus);
     outline-offset: 1px;
   }
 
-  /* Floating panels: Select list and Popover. */
+  /* Menus and popovers: the iOS context-menu material. */
   .fs-popover {
     z-index: 55;
     min-width: var(--radix-select-trigger-width, 12rem);
     max-width: min(24rem, calc(100vw - 1.5rem));
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-md);
-    background: var(--bg);
-    box-shadow: var(--shadow-md);
+    border-radius: 0.875rem;
+    background: var(--material-cell);
+    -webkit-backdrop-filter: var(--blur);
+    backdrop-filter: var(--blur);
+    box-shadow:
+      var(--shadow-md),
+      0 0 0 0.5px var(--border-strong);
     color: var(--text-body);
     animation: fs-fade-in var(--dur-fast) var(--ease-out);
   }
@@ -302,26 +356,25 @@
     overflow: hidden;
   }
 
-  .fs-select__viewport {
-    padding: var(--space-1);
-  }
-
   .fs-select__item {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
     min-height: 2.75rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--radius-sm);
+    padding: 0.5rem 1rem;
     color: var(--text);
     cursor: pointer;
     outline: none;
     user-select: none;
   }
 
+  .fs-select__item + .fs-select__item {
+    box-shadow: inset 0 1px 0 var(--border);
+  }
+
   .fs-select__item[data-highlighted] {
-    background: var(--bg-soft);
+    background: var(--fill);
   }
 
   .fs-select__item[data-state="checked"] {
@@ -336,15 +389,16 @@
   .fs-select__check > .fs-icon {
     width: 1.1rem;
     height: 1.1rem;
+    color: var(--accent);
   }
 
   .fs-tooltip {
     z-index: 70;
     max-width: 18rem;
-    padding: 0.4rem 0.65rem;
+    padding: 0.4rem 0.7rem;
     border-radius: var(--radius-sm);
     background: var(--text);
-    color: var(--white);
+    color: var(--bg);
     font-size: var(--text-xs);
     font-weight: var(--weight-ui);
     line-height: 1.4;
@@ -352,7 +406,7 @@
     animation: fs-fade-in var(--dur-fast) var(--ease-out);
   }
 
-  /* Tabs */
+  /* Tabs: scrolling capsules; the current one is the ink capsule. */
   .fs-tabs {
     display: grid;
     gap: var(--space-4);
@@ -360,19 +414,24 @@
 
   .fs-tabs__list {
     display: flex;
+    gap: var(--space-2);
+    padding-block: 0.25rem;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
 
   .fs-tabs__trigger {
     display: inline-flex;
-    flex: 1;
+    flex: none;
     align-items: center;
     justify-content: center;
     gap: 0.4em;
     min-height: 2.75rem;
-    padding: 0.4rem 0.9rem;
+    padding: 0.4rem 1rem;
     border: 0;
-    background: transparent;
-    color: var(--text-muted);
+    border-radius: var(--radius-pill);
+    background: var(--fill);
+    color: var(--text);
     font: inherit;
     font-size: var(--text-sm);
     font-weight: var(--weight-ui);
@@ -383,81 +442,42 @@
       color var(--dur-fast) var(--ease-out);
   }
 
-  .fs-tabs__trigger:hover {
-    color: var(--text);
+  .fs-tabs__trigger:active {
+    background: var(--fill-2);
   }
 
   .fs-tabs__trigger[data-state="active"] {
-    color: var(--text);
+    background: var(--text);
+    color: var(--bg);
     font-weight: var(--weight-strong);
   }
 
   .fs-tabs__trigger:disabled {
     color: var(--text-muted);
-    opacity: 0.6;
     cursor: not-allowed;
   }
 
   .fs-tabs__count {
-    color: var(--text-muted);
+    opacity: 0.72;
     font-variant-numeric: tabular-nums;
   }
 
-  .fs-tabs[data-variant="segmented"] .fs-tabs__list {
-    gap: 0.25rem;
-    padding: 0.25rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-pill);
-    background: var(--bg-soft);
-  }
-
-  .fs-tabs[data-variant="segmented"] .fs-tabs__trigger {
-    min-height: 2.5rem;
-    border-radius: var(--radius-pill);
-  }
-
-  .fs-tabs[data-variant="segmented"] .fs-tabs__trigger[data-state="active"] {
-    background: var(--bg);
-    box-shadow: 0 0 0 1px var(--border-strong);
-  }
-
-  .fs-tabs[data-variant="underline"] .fs-tabs__list {
-    gap: var(--space-5);
-    overflow-x: auto;
-    border-bottom: 1px solid var(--border);
-    scrollbar-width: none;
-  }
-
-  /* Phones: the row runs to the screen edge, so a tab cut by the edge reads as "swipe for more". */
   @media (max-width: 47.99rem) {
     .fs-tabs[data-variant="underline"] .fs-tabs__list {
-      gap: var(--space-4);
       margin-inline: calc(var(--gutter) * -1);
       padding-inline: var(--gutter);
       scroll-padding-inline: var(--gutter);
     }
   }
 
-  .fs-tabs[data-variant="underline"] .fs-tabs__trigger {
-    flex: none;
-    margin-bottom: -1px;
-    padding-inline: 0;
-    border-bottom: 2px solid transparent;
-  }
-
-  .fs-tabs[data-variant="underline"] .fs-tabs__trigger[data-state="active"] {
-    border-bottom-color: var(--text);
-  }
-
   .fs-tabs__trigger:focus-visible {
-    outline-offset: -2px;
+    outline-offset: 2px;
   }
 
   .fs-tabs__panel:focus-visible {
     outline-offset: 4px;
   }
 
-  /* Codes are read character by character. */
   .fs-code-input {
     font-weight: var(--weight-strong);
     letter-spacing: 0.12em;

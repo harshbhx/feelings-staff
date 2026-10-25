@@ -299,6 +299,23 @@ Decision: [ADR-19](decisions/0019-owner-access-on-its-own-host-behind-cloudflare
 
 Constraints: owner screens are lazy owner-entry code (no staff budget impact); no owner screen or string may appear in the staff entry; the owner host name never appears in design files, screenshots committed to the repo or docs for staff.
 
+## 5c. iOS layer (24 Oct 2026, PR #127, draft)
+
+Harsh asked for the whole app in Apple's iOS design language, keeping the brand. The layer lives in `packages/ui/src/styles/ios.css` plus the kit component files; `tokens.css` and `app-tokens.css` are unchanged, and every new value is a brand token, a mix of two brand tokens in oklab, or a brand colour at an alpha.
+
+| Area | Decision |
+|---|---|
+| Type | The SF ramp on Plus Jakarta Sans: large title 34, title 28, headline and body 17, subhead 15, footnote 13 (13 stays the floor). rem throughout, so text zoom scales it. |
+| Surfaces | Grouped page (`--rose-50` mixed 55 percent toward `--rose-100`), white cells with 12 px corners and no border, separators inset to the text, iOS fills (ink at 7 and 12 percent), materials (page or cell at about 86 percent, blurred). |
+| Navigation | A bar that is clear at the top and turns to the material with a hairline once content runs under it; tab-level screens show a large title on the page (the h1) and its small twin fades into the bar; detail screens carry the h1 in the bar. Round bar buttons (back, bell). |
+| Tab bar | A floating material capsule above the home indicator; the current tab is the sindoor tint on a soft tinted capsule. Replaces WP-10's solid bar (its test now checks the material). |
+| Controls | Filled, gray, plain and tinted-red buttons; segmented control with a raised thumb; the 51 x 31 switch in the present green; check circles; passcode keys; sheets with a grabber, centred title and gray close circle on the grouped background; filter chips as capsules; menus on a material. |
+| Gestures | Pull to refresh in both shells (refetches what is on screen; a lazy chunk after first paint). Swipe left on an inbox row to mark it read (a shortcut beside opening the row and Mark all read). |
+| Dark | Follows the system (`prefers-color-scheme`), no in-app switch. Cells `--ink-900`, page `--ink-900` toward black, text `--rose-50` at iOS label alphas, tint `--red-400`, filled buttons stay `--red-600`, statuses mixed 55 percent toward `--rose-50` on a 28 percent tint (4.9:1 or more). QR codes stay dark on white. |
+| Shadows | Soft shadows are allowed on floating chrome (tab bar, floating action capsules, toasts, the segmented thumb, the switch thumb) besides sheets: an amendment to PRD 12.11 for the iOS layer. |
+
+PRD amendments this needs, for the lead: 12.11 (soft shadows on floating chrome), the non-goal "Dark mode (the brand is light only)" in section 1, and the route CSS budget (25 to 27 KB gzip in `scripts/size-budgets.mjs`).
+
 ## 6. CI, baselines and review process
 
 - Branch off `origin/main` in a fresh worktree, push, open a draft PR into `main`, label it `wp` through REST (`gh api -X POST repos/harshbhx/feelings-staff/issues/<n>/labels -f "labels[]=wp"`; `gh pr edit` is broken). Edit bodies with `gh api -X PATCH repos/harshbhx/feelings-staff/pulls/<n> -F body=@file.md`.
@@ -308,6 +325,18 @@ Constraints: owner screens are lazy owner-entry code (no staff budget impact); n
 - `gh pr ready <n>` runs the `e2e` workflow (Playwright in Docker, four projects, axe, visual). Needs `ci` and `e2e` green, with 0 serious or critical axe violations, before the lead merges.
 - Docs links: `node scripts/check-docs-links.mjs` (light, allowed locally).
 - **Deploy to production only from a green `main`**, using the redeploy recipe in `STATUS.md` (LEAD 5 21 Oct 06:55 UTC entry): download the `app-dist` artifact of a green `main` `ci` run and run `wrangler deploy -c dist/feelings_staff/wrangler.json --secrets-file deploy/prod-secrets.json` from the dist directory with the account id in `STATUS.md`. The lead or the deployer agent does this, not the designer, and not after every slice: batch slices, redeploy once, and check sign-in and check-in on the live site right after. The preview (https://demo-feelings-staff.creharsh.workers.dev, seeded demo data) is redeployed with `deploy/redeploy.sh <green main ci run id> --seed` and is where the owner reviews a slice first.
+
+## 6b. Round 2 of the iOS layer: fields, guidance, motion (PR #127)
+
+Decisions taken in this round. Each needs an amendment to PRD 12 when the PR is accepted.
+
+- **Fields.** Inputs, date and time fields and textareas are iOS filled fields: the tertiary fill (`--fill`) with a hairline edge in `--border-strong`, lifting to the cell colour under the 2 px sindoor ring on focus. The edge stays so the control is visible against the page in light and dark (WCAG 1.4.11 asks for it where the fill alone is faint); label, hint and placeholder still name it. Search is the iOS search bar: filled capsule, magnifier, no edge at rest.
+- **Guidance layer** (`app/src/lib/ux`). Nothing asks or interrupts on first paint. The layer mounts two seconds after the shell, as its own chunk, and never in an automated browser unless the URL has `?guide=1`.
+  - *Permissions.* A card says what the permission is for, in three lines, then the Allow tap triggers the browser prompt. Refused permissions get the how-to-fix steps for the phone's platform and a "try again" that re-reads the state. Alerts on iPhone outside the Home Screen send the person to the install guide first.
+  - *Install gate (compulsory).* Installing is not optional. On a phone or tablet in a browser tab, a full-screen gate replaces the whole app (staff and owner): no close button, no "later", back on every load until the page runs standalone (`display-mode: standalone` or `navigator.standalone`). iPhone Safari gets the three numbered steps with their glyphs and a drawn Safari bar; Android gets a real Install button once Chrome offers `beforeinstallprompt`, with the menu steps as the fallback; other iPhone browsers and in-app browsers are told to open the link in Safari or Chrome, with Copy link. Standalone is re-detected on `appinstalled`, display-mode changes and when the tab returns. Left alone: the installed app, the staff sign-in, invite and waiting pages (they teach the install themselves and carry the join code), the door display, the public verify page, the kit, automated browsers (`?installGate=1` switches the gate on for them) and `?allowBrowser=1` on a non-production host. On a computer nothing is blocked: a slim hint says the app is for phones, with the link to copy.
+  - *Tour.* Staff and owner each get a short coach-mark tour on first sign-in: a welcome card, then one lit tab per step. Skippable at every step, remembered per person and role in localStorage, replayable from Me (staff) and More (owner). The tour and the permission sheets only run inside the installed app.
+- **Motion.** One sheet curve (`--ease-sheet`, 380 ms) and one settle (`--ease-settle`, a small overshoot covered by the sheet's skirt). Screens enter with a short slide and fade (`.fs-route`, owner main keyed by path; `.staff-main`); toasts settle in; the selected tab's icon bounces once. Reduced motion turns every slide and bounce into a 160 ms fade or nothing.
+- **Desktop for staff.** From 48rem the column is 40rem. From 64rem the tab bar becomes a left rail like the owner's and the content a 44rem reading column with the action button floating at its foot.
 
 ## 7. Risks and rules
 

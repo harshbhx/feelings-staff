@@ -8,14 +8,14 @@ import { useTranslation } from 'react-i18next';
 
 /** The app icon as on the home screen: the bindi on white (PRD 11.2, 12.9). Decorative. */
 export function AppMark({ size = 'md' }: { size?: 'md' | 'lg' }) {
-  const box = size === 'lg' ? 'size-14 rounded-md' : 'size-10 rounded-md';
-  const dot = size === 'lg' ? 'size-[35px]' : 'size-[25px]';
+  const box = size === 'lg' ? 'size-16 rounded-[22%]' : 'size-12 rounded-[22%]';
+  const dot = size === 'lg' ? 'size-[38px]' : 'size-[28px]';
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex shrink-0 items-center justify-center border border-border bg-bg ${box}`}
+      className={`inline-flex shrink-0 items-center justify-center bg-white shadow-sm ${box}`}
     >
-      <span className={`rounded-full bg-accent ${dot}`} />
+      <span className={`rounded-full bg-sindoor ${dot}`} />
     </span>
   );
 }
@@ -31,15 +31,15 @@ export function AuthScreen({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="min-h-dvh bg-bg text-text-body">
+    <div className="min-h-dvh bg-page text-text-body">
       <main
         aria-busy={busy || undefined}
-        className="mx-auto flex min-h-dvh w-full max-w-[30rem] flex-col px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] md:min-h-0 md:pt-16"
+        className="mx-auto flex min-h-dvh w-full max-w-[30rem] flex-col px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] md:min-h-0 md:pt-16"
       >
-        <div className="flex flex-1 flex-col md:flex-none md:rounded-md md:border md:border-border md:px-8 md:pt-8 md:pb-6">
+        <div className="flex flex-1 flex-col md:flex-none md:rounded-lg md:bg-bg md:px-8 md:pt-8 md:pb-6">
           <header className="mb-8 flex items-center gap-3">
             <AppMark />
-            <span className="text-sm font-bold text-text">{t('common:app.name')}</span>
+            <span className="font-semibold text-text">{t('common:app.name')}</span>
           </header>
           <div className="flex flex-1 flex-col">{children}</div>
           {footer ? (

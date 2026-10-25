@@ -1,0 +1,197 @@
+/**
+ * Pre-permission guidance (iOS style): say what a permission is for before the browser asks, then
+ * ask on the tap; when it has been refused, say how to turn it back on. Nothing here asks on first
+ * paint: the browser prompt only ever follows the "Allow" tap in `onAllow`.
+ */
+import { Button, Icon, type IconName, Sheet } from '@fs/ui';
+import { type ReactNode, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { currentPlatform } from '../../pwa/push';
+import { WithUx } from './ns';
+import './ux.css';
+
+export type PermissionKind = 'location' | 'notifications';
+export type PermissionView = 'ask' | 'denied' | 'needs-install' | 'unsupported';
+
+export interface PermissionCardProps {
+  kind: PermissionKind;
+  view: PermissionView;
+  /** The tap that triggers the browser prompt. */
+  onAllow: () => unknown;
+  /** "Not now". Omit to hide it. */
+  onLater?: (() => void) | undefined;
+  /** After the person fixed it in settings ("I turned it on"). Defaults to `onAllow`. */
+  onRetry?: (() => unknown) | undefined;
+  busy?: boolean | undefined;
+  /** Screens with their own wording (the punch sheet) pass it; the shared copy is the default. */
+  title?: ReactNode;
+  lead?: ReactNode;
+  allowLabel?: ReactNode;
+}
+
+const ICON: Record<PermissionKind, IconName> = { location: 'map-pin', notifications: 'bell' };
+
+function PermissionCardView({
+  kind,
+  view,
+  onAllow,
+  onLater,
+  onRetry,
+  busy,
+  title,
+  lead,
+  allowLabel,
+}: PermissionCardProps) {
+  const { t } = useTranslation();
+  const [retried, setRetried] = useState(false);
+  const base = `ux:permission.${kind}`;
+  const platform = currentPlatform();
+  const steps =
+    platform === 'ios' ? 'iosSteps' : platform === 'android' ? 'androidSteps' : 'otherSteps';
+
+  if (view === 'ask') {
+    return (
+      <div className="ux-perm">
+        <span className="ux-perm__disc" aria-hidden="true">
+          <Icon name={ICON[kind]} />
+        </span>
+        <h2 className="ux-perm__title">{title ?? t(`${base}.title`)}</h2>
+        <p className="ux-perm__lead">{lead ?? t(`${base}.lead`)}</p>
+        <ul className="ux-reasons">
+          {(['r1', 'r2', 'r3'] as const).map((r) => (
+            <li key={r} className="ux-reasons__item">
+              <Icon name="check-circle" className="ux-reasons__tick" />
+              <span>{t(`${base}.${r}`)}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="ux-perm__actions">
+          <Button
+            variant="primary"
+            block
+            icon={ICON[kind]}
+            loading={busy}
+            onClick={() => void onAllow()}
+          >
+            {allowLabel ?? t(`${base}.allow`)}
+          </Button>
+          {onLater ? (
+            <Button variant="ghost" block onClick={onLater}>
+              {t('ux:permission.later')}
+            </Button>
+          ) : null}
+        </div>
+        <p className="ux-perm__note">{t('ux:permission.next')}</p>
+      </div>
+    );
+  }
+
+  if (view === 'denied') {
+    return (
+      <div className="ux-perm">
+        <span className="ux-perm__disc" data-tone="warn" aria-hidden="true">
+          <Icon name="lock" />
+        </span>
+        <h2 className="ux-perm__title">{t(`${base}.deniedTitle`)}</h2>
+        <p className="ux-perm__lead">{t(`${base}.deniedLead`)}</p>
+        <ol className="ux-steps ux-steps--plain">
+          {(['1', '2', '3'] as const).map((n) => (
+            <li key={n} className="ux-steps__item">
+              <span className="ux-steps__num" aria-hidden="true">
+                {n}
+              </span>
+              <span>{t(`${base}.${steps}.${n}`)}</span>
+            </li>
+          ))}
+        </ol>
+        {retried ? (
+          <p className="ux-perm__note" role="status">
+            {t('ux:permission.stillOff')}
+          </p>
+        ) : null}
+        <div className="ux-perm__actions">
+          <Button
+            variant="primary"
+            block
+            loading={busy}
+            onClick={async () => {
+              setRetried(true);
+              await (onRetry ?? onAllow)();
+            }}
+          >
+            {t('ux:permission.tryAgain')}
+          </Button>
+          {onLater ? (
+            <Button variant="ghost" block onClick={onLater}>
+              {t('common:actions.close')}
+            </Button>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'needs-install') {
+    return (
+      <div className="ux-perm">
+        <span className="ux-perm__disc" data-tone="warn" aria-hidden="true">
+          <Icon name="plus-square" />
+        </span>
+        <h2 className="ux-perm__title">{t('ux:permission.notifications.installTitle')}</h2>
+        <p className="ux-perm__lead">{t('ux:permission.notifications.installLead')}</p>
+        <div className="ux-perm__actions">
+          {onLater ? (
+            <Button variant="ghost" block onClick={onLater}>
+              {t('common:actions.close')}
+            </Button>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ux-perm">
+      <span className="ux-perm__disc" data-tone="warn" aria-hidden="true">
+        <Icon name="warning-circle" />
+      </span>
+      <h2 className="ux-perm__title">{t('ux:permission.notifications.unsupportedTitle')}</h2>
+      <p className="ux-perm__lead">{t('ux:permission.notifications.unsupportedLead')}</p>
+      {onLater ? (
+        <div className="ux-perm__actions">
+          <Button variant="ghost" block onClick={onLater}>
+            {t('common:actions.close')}
+          </Button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export function PermissionCard(props: PermissionCardProps) {
+  return (
+    <WithUx>
+      <PermissionCardView {...props} />
+    </WithUx>
+  );
+}
+
+export interface PermissionSheetProps extends Omit<PermissionCardProps, 'onLater'> {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+/** The card in an iOS sheet, for the places that ask from a button (Me, owner setup). */
+export function PermissionSheet({ open, onOpenChange, ...card }: PermissionSheetProps) {
+  const { t } = useTranslation();
+  return (
+    <Sheet
+      open={open}
+      onOpenChange={onOpenChange}
+      title={t(`ux:permission.${card.kind}.title`)}
+      titleHidden
+    >
+      <PermissionCard {...card} onLater={() => onOpenChange(false)} />
+    </Sheet>
+  );
+}

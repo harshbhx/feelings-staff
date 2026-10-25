@@ -22,7 +22,7 @@ export function PayslipsScreen() {
       <ScreenHeader title={t('staff:screens.payslips')} dataAt={list.dataUpdatedAt || undefined} />
       <main id="main" className="staff-main flex flex-col gap-4">
         {!me.flags.showPayslips ? (
-          <EmptyState>{t('staff:payslips.hidden', { owner })}</EmptyState>
+          <EmptyState icon="lock">{t('staff:payslips.hidden', { owner })}</EmptyState>
         ) : list.isError ? (
           <QueryError
             error={list.error}
@@ -32,7 +32,7 @@ export function PayslipsScreen() {
         ) : !list.data ? (
           <SkeletonList rows={4} label={t('common:states.loading')} />
         ) : list.data.length === 0 ? (
-          <EmptyState>{t('staff:payslips.empty')}</EmptyState>
+          <EmptyState icon="hourglass">{t('staff:payslips.empty')}</EmptyState>
         ) : (
           <PayslipList slips={sortPayslips(list.data)} />
         )}

@@ -1,6 +1,6 @@
 /**
- * The staff shell (PRD 5.1, 12.5): install gate in a browser tab, otherwise the app with its tab
- * bar, update toast and upgrade screen. Each screen renders its own `ScreenHeader` (title, bell,
+ * The staff shell (PRD 5.1, 12.5): the app with its tab bar, update toast and upgrade screen. The
+ * install gate (lib/ux/InstallRequired) stands in front of it in a browser tab. Each screen renders its own `ScreenHeader` (title, bell,
  * banners) and, when it has one, its `ActionBar` with the one sindoor button.
  */
 import { applyDocumentLang } from '@fs/i18n/fonts';
@@ -14,34 +14,28 @@ import { saveLang } from '../../../app/i18n';
 import { onQueueEvent, setResigner, startQueue } from '../../../pwa/queue';
 import { ensurePersisted } from '../../../pwa/storage';
 import { staffKeys, useStaffMe } from '../api';
-import { browserAllowed } from '../install/allow-browser';
-// Catches `beforeinstallprompt` from the first moment, before the lazy gate chunk arrives.
-import '../install/prompt';
 import { currentInstallContext } from '../install/platform';
 import '../staff.css';
 import { ScreenFallback } from './ScreenFallback';
 import { StaffTabBar } from './StaffTabBar';
 import { UpdateToast, UpgradeOverlay } from './UpdatePrompts';
 
-/** Only a browser tab ever shows it (with the QR encoder for computers), so it is its own chunk. */
-const InstallGate = lazy(() =>
-  import('../install/InstallGate').then((m) => ({ default: m.InstallGate })),
+/** The first-login tour: after first paint, never in the first chunk. */
+const StaffGuides = lazy(
+  () =>
+    new Promise<typeof import('../../../lib/ux/staff-layer')>((done) =>
+      setTimeout(() => done(import('../../../lib/ux/staff-layer')), 2000),
+    ),
 );
 
 export function StaffShell() {
-  const context = useMemo(currentInstallContext, []);
-  const allowed = context === 'standalone' || browserAllowed();
-  if (!allowed)
-    return (
-      <Suspense fallback={null}>
-        <InstallGate context={context} url={`${window.location.origin}/`} />
-      </Suspense>
-    );
-  return <StaffApp standalone={context === 'standalone'} />;
+  const standalone = useMemo(() => currentInstallContext() === 'standalone', []);
+  return <StaffApp standalone={standalone} />;
 }
 
 function StaffApp({ standalone }: { standalone: boolean }) {
   useStaffBoot(standalone);
+  const me = useStaffMe();
   return (
     <ToastProvider bottomOffset="calc(var(--tabbar-h) + var(--app-bar-h) + env(safe-area-inset-bottom) + 0.5rem)">
       <div className="staff-frame">
@@ -52,6 +46,9 @@ function StaffApp({ standalone }: { standalone: boolean }) {
       <StaffTabBar />
       <UpdateToast />
       <UpgradeOverlay />
+      <Suspense fallback={null}>
+        <StaffGuides userId={me.user.id} />
+      </Suspense>
     </ToastProvider>
   );
 }
@@ -114,6 +111,23 @@ function useStaffBoot(standalone: boolean) {
     document.addEventListener('visibilitychange', onVisible);
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [api]);
+
+  useEffect(() => {
+    // Pull to refresh (iOS layer): refetches what is on screen. Its own chunk, after first paint.
+    let off: (() => void) | undefined;
+    let gone = false;
+    void import('../../../lib/pull-refresh').then((m) => {
+      if (!gone)
+        off = m.attachPullRefresh(
+          () => qc.refetchQueries({ type: 'active' }),
+          i18n.t('common:states.refreshing'),
+        );
+    });
+    return () => {
+      gone = true;
+      off?.();
+    };
+  }, [qc, i18n]);
 
   useEffect(() => {
     // PRD 4.1.4, 11.8: persist storage once installed so the device key and queue survive.

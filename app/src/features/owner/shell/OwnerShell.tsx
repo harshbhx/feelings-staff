@@ -22,11 +22,12 @@ import {
   ToastProvider,
 } from '@fs/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { type CSSProperties, useState } from 'react';
+import { type CSSProperties, lazy, Suspense, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { useMe } from '../../../api/hooks';
 import { LOGO_MASK } from '../../../lib/brand';
+import { useUnderBar } from '../../../lib/use-under-bar';
 import { StepUpProvider } from '../../auth/step-up';
 import { InboxBell } from '../../inbox';
 import { openActionCount } from '../actions/actions-model';
@@ -34,14 +35,8 @@ import { useActions } from '../api/attendance';
 import { ownerKeys } from '../api/keys';
 import { clock } from '../lib/format';
 import { ChromeProvider, useScreenChrome } from './chrome';
-import {
-  iosBannerSeen,
-  isIosBrowserTab,
-  markIosBannerSeen,
-  useAppBadge,
-  useOnline,
-  usePushRefetch,
-} from './hooks';
+import './shell.css';
+import { useAppBadge, useOnline, usePushRefetch } from './hooks';
 import {
   activeItem,
   activeTab,
@@ -58,17 +53,19 @@ const SHELL_VARS = {
 } as CSSProperties;
 
 export function OwnerShell() {
+  const { pathname } = useLocation();
   const actions = useActions();
   const count = actions.data ? openActionCount(actions.data) : null;
   usePushRefetch();
   useAppBadge(count);
+  usePullRefresh();
   return (
     <ToastProvider bottomOffset="var(--owner-toast-offset)">
       <StepUpProvider>
         <ChromeProvider>
           <div
             style={SHELL_VARS}
-            className="relative min-h-dvh bg-(--app-page) [--owner-toast-offset:var(--tabbar-h)] xl:pl-(--owner-rail-w) xl:[--owner-toast-offset:0px]"
+            className="relative min-h-dvh overflow-x-clip bg-(--app-page) [--owner-toast-offset:var(--tabbar-h)] xl:pl-(--owner-rail-w) xl:[--owner-toast-offset:0px]"
           >
             <a
               href="#owner-main"
@@ -87,12 +84,14 @@ export function OwnerShell() {
             <Banners />
             <main
               id="owner-main"
+              key={pathname}
               tabIndex={-1}
-              className="mx-auto w-full max-w-(--container-page) px-(--gutter) pt-5 pb-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+2.5rem)] outline-none xl:pt-6 xl:pb-16"
+              className="fs-route mx-auto w-full max-w-(--container-page) px-(--gutter) pt-2 pb-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+2.5rem)] outline-none xl:pt-4 xl:pb-16"
             >
               <Outlet />
             </main>
             <Tabs count={count ?? 0} />
+            <OwnerGuides />
           </div>
         </ChromeProvider>
       </StepUpProvider>
@@ -100,48 +99,106 @@ export function OwnerShell() {
   );
 }
 
+const Guides = lazy(
+  () =>
+    new Promise<typeof import('../../../lib/ux/owner-layer')>((done) =>
+      setTimeout(() => done(import('../../../lib/ux/owner-layer')), 2000),
+    ),
+);
+
+/** The first-login tour and the install guide (lazy, after first paint). */
+function OwnerGuides() {
+  const me = useMe();
+  const id = me.data?.user.id;
+  if (!id) return null;
+  return (
+    <Suspense fallback={null}>
+      <Guides userId={id} />
+    </Suspense>
+  );
+}
+
+/** Pull to refresh (iOS layer): refetches what is on screen; its own small chunk. */
+function usePullRefresh() {
+  const qc = useQueryClient();
+  const { t } = useTranslation();
+  useEffect(() => {
+    let off: (() => void) | undefined;
+    let gone = false;
+    void import('../../../lib/pull-refresh').then((m) => {
+      if (!gone)
+        off = m.attachPullRefresh(
+          () => qc.refetchQueries({ type: 'active' }),
+          t('common:states.refreshing'),
+        );
+    });
+    return () => {
+      gone = true;
+      off?.();
+    };
+  }, [qc, t]);
+}
+
 function SkipLabel() {
   const { t } = useTranslation();
   return <>{t('owner:shell.skip')}</>;
 }
 
+/**
+ * The iOS navigation bar: back (on a detail screen) or the logo (Today, phones), the small centred
+ * title and the bell. A tab-level screen shows its title as the large title on the page (it is the
+ * h1), and the bar's small twin fades in once it has scrolled under; a detail screen carries its h1
+ * in the bar. The bar is clear at the top and the material with a hairline once content is under it.
+ */
 function Header() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { title, titleKey, back } = useScreenChrome();
-  // Today on a phone: the logo leads and the title is read, not shown (the rail has the logo on desktop).
+  const mark = useRef<HTMLDivElement>(null);
+  const under = useUnderBar(mark);
   const home = pathname === '/o/today';
+  // "Neha Parmar · Mon, 19 Oct": the dot stays on the first line when the title wraps.
+  const text = (title ?? t(titleKey)).replaceAll(' · ', '\u00a0· ');
   return (
-    <header className="sticky top-0 z-30 border-border border-b bg-(--bg-glass) backdrop-blur-[10px]">
-      <div className="mx-auto flex h-16 w-full max-w-(--container-page) items-center gap-2 px-(--gutter)">
-        {back ? (
-          <IconButton
-            icon="caret-left"
-            label={t('owner:shell.back')}
-            onClick={() => navigate(back)}
-            className="-ml-3"
-          />
-        ) : null}
-        {home ? (
-          <Logo
-            name={t('common:app.shortName')}
-            mask={LOGO_MASK}
-            className="mr-auto ml-0.5 xl:hidden"
-          />
-        ) : null}
-        <h1
-          className={`line-clamp-2 min-w-0 flex-1 text-balance font-extrabold text-text text-xl leading-snug tracking-display${home ? ' max-xl:sr-only' : ''}`}
-          data-testid="owner-title"
-        >
-          {/* "Neha Parmar · Mon, 19 Oct": the dot stays on the first line when the title wraps. */}
-          {(title ?? t(titleKey)).replaceAll(' · ', '\u00a0· ')}
-          {/* Tab-level screens end their title with the bindi on phones (PRD 12.4, 12.9). */}
-          {back ? null : <Bindi className="xl:hidden" />}
-        </h1>
-        <InboxBell />
+    <>
+      <header className="owner-bar" data-under={under ? '' : undefined}>
+        <div className="owner-bar__row">
+          {back ? (
+            <IconButton
+              icon="caret-left"
+              label={t('owner:shell.back')}
+              onClick={() => navigate(back)}
+              className="fs-bar-btn"
+            />
+          ) : home ? (
+            <Logo name={t('common:app.shortName')} mask={LOGO_MASK} className="xl:invisible" />
+          ) : (
+            <span />
+          )}
+          {back ? (
+            <h1 className="owner-bar__title" data-testid="owner-title">
+              {text}
+            </h1>
+          ) : (
+            <p className="owner-bar__title" data-twin={text} aria-hidden="true" />
+          )}
+          <InboxBell />
+        </div>
+      </header>
+      <div ref={mark} className="owner-large-title">
+        {back ? null : (
+          <h1
+            className="fs-large-title text-balance font-extrabold text-text"
+            data-testid="owner-title"
+          >
+            {text}
+            {/* Tab-level screens end their title with the bindi (PRD 12.4, 12.9). */}
+            <Bindi />
+          </h1>
+        )}
       </div>
-    </header>
+    </>
   );
 }
 
@@ -151,7 +208,6 @@ function Banners() {
   const qc = useQueryClient();
   const me = useMe();
   const { pathname } = useLocation();
-  const [iosHidden, setIosHidden] = useState(() => iosBannerSeen() || !isIosBrowserTab());
 
   let lastUpdate = 0;
   if (!online) {
@@ -162,31 +218,12 @@ function Banners() {
   const showSetup = me.data?.flags.setupIncomplete === true && !pathname.startsWith('/o/setup');
 
   return (
-    <div className="mx-auto w-full max-w-(--container-page)">
+    <div className="mx-auto grid w-full max-w-(--container-page) gap-2 px-(--gutter) empty:hidden">
       {!online ? (
         <Banner icon="wifi-slash" live data-testid="owner-offline">
           {lastUpdate > 0
             ? t('owner:shell.offline', { time: clock(lastUpdate) })
             : t('owner:shell.offlineNoData')}
-        </Banner>
-      ) : null}
-      {!iosHidden ? (
-        <Banner
-          icon="bell"
-          action={
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                markIosBannerSeen();
-                setIosHidden(true);
-              }}
-            >
-              {t('owner:shell.dismiss')}
-            </Button>
-          }
-        >
-          {t('owner:shell.iosBanner')} {t('owner:shell.iosBannerHow')}
         </Banner>
       ) : null}
       {showSetup ? (

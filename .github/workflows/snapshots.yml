@@ -63,7 +63,7 @@ jobs:
           retention-days: 7
           path: e2e/tests/__screenshots__
       - name: Commit baselines
-        if: ${{ inputs.commit }}
+        if: ${{ !cancelled() && inputs.commit }}
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "Harsh Bhanushali"

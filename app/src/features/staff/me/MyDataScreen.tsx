@@ -107,7 +107,7 @@ function Body({ data }: { data: MyData }) {
             ))}
           </List>
         ) : (
-          <EmptyState>{t('staff:myData.punchesNone')}</EmptyState>
+          <EmptyState icon="clock">{t('staff:myData.punchesNone')}</EmptyState>
         )}
       </section>
 

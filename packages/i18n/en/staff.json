@@ -59,31 +59,6 @@
     "sentToOwner": "We've told {{owner}}. She'll fix your time.",
     "waText": "{{item}}. {{reason}}"
   },
-  "install": {
-    "title": "Add Feelings to your home screen",
-    "lead": "The staff app works after you add it to your home screen.",
-    "why": "It keeps your phone's security key safe and lets {{owner}} reach you with alerts.",
-    "androidButton": "Install the app",
-    "androidDone": "Done. Open Feelings from your home screen.",
-    "androidSnoozed": "You can install it from Chrome's menu: tap the three dots at the top right, then Install app.",
-    "androidManual": "In Chrome, tap the three dots at the top right, then Install app (or Add to Home screen).",
-    "androidInApp": "Open this link in Chrome to install the app.",
-    "iosStepsTitle": "Three steps in Safari",
-    "iosStep1": "Tap Share at the bottom of the screen.",
-    "iosStep2": "Scroll down and tap Add to Home Screen, then Add.",
-    "iosStep3": "Open Feelings from your home screen.",
-    "iosShareLabel": "Share",
-    "iosAddLabel": "Add to Home Screen",
-    "iosOpenLabel": "Feelings",
-    "iosOther": "Open this link in Safari to install the app.",
-    "iosOtherHint": "Copy the link, open Safari, and paste it in the address bar.",
-    "desktop": "Open this link on your phone.",
-    "desktopHint": "Scan the code with your phone's camera.",
-    "qrLabel": "QR code for {{url}}",
-    "linkLabel": "Link",
-    "chromeLabel": "Chrome",
-    "safariLabel": "Safari"
-  },
   "today": {
     "greeting": {
       "morning": "Good morning, {{name}}",
