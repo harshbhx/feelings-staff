@@ -5,6 +5,8 @@
  */
 @layer components {
   .staff-frame {
+    /* The screen enter slides in from the right: clip it so the page never scrolls sideways. */
+    overflow-x: clip;
     max-width: 30rem;
     margin-inline: auto;
     min-height: 100dvh;

@@ -65,7 +65,7 @@ export function OwnerShell() {
         <ChromeProvider>
           <div
             style={SHELL_VARS}
-            className="relative min-h-dvh bg-(--app-page) [--owner-toast-offset:var(--tabbar-h)] xl:pl-(--owner-rail-w) xl:[--owner-toast-offset:0px]"
+            className="relative min-h-dvh overflow-x-clip bg-(--app-page) [--owner-toast-offset:var(--tabbar-h)] xl:pl-(--owner-rail-w) xl:[--owner-toast-offset:0px]"
           >
             <a
               href="#owner-main"

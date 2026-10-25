@@ -52,7 +52,7 @@
     margin-top: 0.05em;
   }
 
-  /* iOS filled field: the tertiary fill with a hairline edge in the strong border ink; on focus it
+  /* iOS filled field: a light fill (the ink at 4 percent on the cell) with a hairline edge in the strong border ink; on focus it
      lifts to the cell colour under the 2 px ring. Label, hint and placeholder name the control, and
      the edge stays visible against the page in light and dark. */
   .fs-input,
@@ -61,7 +61,7 @@
     min-height: 3rem;
     border: 1px solid var(--border-strong);
     border-radius: var(--radius-md);
-    background: var(--fill);
+    background: color-mix(in srgb, var(--text) 4%, var(--bg));
     color: var(--text);
     transition:
       background-color var(--dur-fast) var(--ease-out),
@@ -189,6 +189,11 @@
     border-color: transparent;
     border-radius: 0.75rem;
     background: var(--fill-2);
+  }
+
+  /* The gray capsule is darker than a cell: the placeholder takes the body ink to stay at 4.5:1. */
+  .fs-input-wrap--search > .fs-input::placeholder {
+    color: var(--text-body);
   }
 
   .fs-input-wrap--search > .fs-input-wrap__glass {
