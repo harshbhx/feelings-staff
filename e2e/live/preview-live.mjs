@@ -166,6 +166,9 @@ if (invite && lat !== undefined) {
     // Midday IST, inside the shift window, so the check-in tests the geofence and not the clock.
     const midday = Date.parse(`${today}T12:00:00+05:30`);
     record('fake clock set to 12:00 IST for the check-in test', (await setClock(midday)) === 200);
+    // The jump ages the sessions: sign the owner in again and step up.
+    await api(ownerCtx, 'POST', '/auth/owner/password', { email, password, pin });
+    await api(ownerCtx, 'POST', '/auth/step-up', { pin });
   }
   const phoneCtx = await browser.newContext({
     baseURL: base,
