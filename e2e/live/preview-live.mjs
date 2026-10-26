@@ -29,6 +29,15 @@ async function step(name, fn) {
   }
 }
 
+const e2eToken = process.env.PREVIEW_E2E_TOKEN ?? '';
+async function setClock(nowMs) {
+  const r = await fetch(`${base}/api/v1/__test/clock`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: new URL(base).origin, 'X-FS-Client': '0.1.0', 'X-E2E-Token': e2eToken },
+    body: JSON.stringify({ nowMs }),
+  });
+  return r.status;
+}
 const browser = await chromium.launch();
 const ownerCtx = await browser.newContext({
   baseURL: base,
@@ -153,6 +162,11 @@ await step('add a throwaway staff member', async () => {
 });
 
 if (invite && lat !== undefined) {
+  if (e2eToken) {
+    // Midday IST, inside the shift window, so the check-in tests the geofence and not the clock.
+    const midday = Date.parse(`${today}T12:00:00+05:30`);
+    record('fake clock set to 12:00 IST for the check-in test', (await setClock(midday)) === 200);
+  }
   const phoneCtx = await browser.newContext({
     baseURL: base,
     viewport: { width: 390, height: 844 },
@@ -246,7 +260,7 @@ if (invite && lat !== undefined) {
   });
   await step('staff Today after check-in', async () => {
     await page.waitForTimeout(3000);
-    await page.goto('/today', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'networkidle' });
     await page.screenshot({ path: `${out}/staff-today.png`, fullPage: true });
   });
   for (const [name, path] of [['me', '/me'], ['inbox', '/inbox']]) {
@@ -264,6 +278,7 @@ if (invite && lat !== undefined) {
     if (!/Preview Tester/.test(txt)) throw new Error('Preview Tester not on Today');
   });
   await phoneCtx.close();
+  if (e2eToken) record('fake clock cleared', (await setClock(null)) === 200);
 } else {
   record('staff phone flow', false, 'no salon coordinates or invite, skipped');
 }

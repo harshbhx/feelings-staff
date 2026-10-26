@@ -30,6 +30,7 @@ jobs:
       PREVIEW_OWNER_EMAIL: ${{ vars.PREVIEW_OWNER_EMAIL }}
       PREVIEW_OWNER_PASSWORD: ${{ secrets.PREVIEW_OWNER_PASSWORD }}
       PREVIEW_OWNER_PIN: ${{ secrets.PREVIEW_OWNER_PIN }}
+      PREVIEW_E2E_TOKEN: ${{ secrets.PREVIEW_E2E_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
