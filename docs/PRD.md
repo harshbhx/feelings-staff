@@ -2757,19 +2757,19 @@ There is no hidden admin or support login. Harsh operates the system only throug
 
 ### 11.2 Icons
 
-Built from the website's `public/favicon.svg` (the red bindi, `#b3121b`, circle r=20 in a 64 box: 62.5% of the canvas, inside the maskable safe zone).
+Built from the bold lowercase "f" of the Feelings logo (`app/public/brand/logo-mask.webp`), redrawn as a vector path (`F_PATH` in `app/build/pwa.ts`) so it stays crisp. The mark is black (`#000`) on white. (An earlier version used the red bindi; Harsh replaced it because the installed icon was just a red dot.)
 
 | File | Spec |
 |---|---|
-| `icons/icon.svg` | The bindi on white |
-| `icons/icon-192.png`, `icon-512.png` | Bindi on white, `purpose: any` |
-| `icons/maskable-192.png`, `maskable-512.png` | Bindi centred, diameter 50% of the canvas, white full-bleed background, `purpose: maskable` |
-| `icons/apple-touch-icon-180.png` | Bindi on white, no transparency |
-| `icons/badge-96.png` | Monochrome white bindi on transparent (Android notification badge) |
-| `favicon.svg`, `favicon-32.png` | As the website |
+| `icons/icon.svg` | The "f" on white |
+| `icons/icon-192.png`, `icon-512.png` | "f" on white, 62% of the canvas tall, `purpose: any` |
+| `icons/maskable-192.png`, `maskable-512.png` | "f" centred, 50% of the canvas tall, white full-bleed background (inside the 80% safe zone), `purpose: maskable` |
+| `icons/apple-touch-icon-180.png` | "f" on white, no transparency |
+| `icons/badge-96.png` | Monochrome white "f" on transparent (Android notification badge) |
+| `favicon.svg`, `favicon-32.png` | The "f" on a white rounded square |
 | `icons/sc-*.png` | Shortcut icons: Phosphor `sign-in` and `calendar-check` in sindoor on white |
 
-Generated in CI by `@vite-pwa/assets-generator` from `icon.svg`; the iOS splash images (`apple-touch-startup-image`) for current iPhone sizes come from the same step (white background, centred bindi).
+Generated at build time by `@vite-pwa/assets-generator` from SVG strings in `app/build/pwa.ts`; the iOS splash images (`apple-touch-startup-image`) for current iPhone sizes come from the same step (white background, the full wordmark centred at 50% of the screen width, from `app/build/splash-wordmark.png`).
 
 ### 11.3 HTML head
 

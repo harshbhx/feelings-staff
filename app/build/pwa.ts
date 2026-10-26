@@ -15,18 +15,34 @@
  *    @vite-pwa/assets-generator, emits them into the client build and injects the
  *    `apple-touch-startup-image` links into index.html. Nothing is committed but icons/icon.svg.
  */
+import { readFileSync } from 'node:fs';
 import type { HtmlTagDescriptor, Plugin, PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const SINDOOR = '#b3121b';
 const WHITE = '#ffffff';
+/** Brand black of the Feelings wordmark. */
+const INK = '#000000';
 
-/** The website's bindi: circle r=20 in a 64 box, so its diameter is 62.5% of the canvas. */
-const BINDI_ANY = 40 / 64;
-/** Maskable icons: diameter 50% of the canvas, well inside the 80% safe zone. */
-const BINDI_MASKABLE = 0.5;
-/** Splash screens: a bindi a quarter of the screen width, centred on white. */
-const BINDI_SPLASH = 0.25;
+/**
+ * The app mark: the bold lowercase "f" of the Feelings logo (public/brand/logo-mask.webp), redrawn
+ * as a vector so it stays crisp at every size. Coordinates are in the logo's own units.
+ */
+const F_PATH =
+  'M292 315V158H262V112H292V90C292 45 325 18 372 18C395 18 412 24 424 32L395 78C388 72 380 70 372 70C358 70 352 78 352 92V112H380V158H352V315Z';
+const F_BOX = { x: 262, y: 18, width: 162, height: 297 };
+/** Height of the "f" as a share of the canvas: normal icons, maskable (inside the 80% safe zone). */
+const F_ANY = 0.62;
+const F_MASKABLE = 0.5;
+/** The wordmark's share of the screen width on splash screens. */
+const WORDMARK_SPLASH = 0.5;
+const WORDMARK = { width: 1024, height: 292 };
+let wordmarkUri: string | null = null;
+/** The wordmark as a PNG data URI (black, transparent), read once from build/splash-wordmark.png. */
+function wordmark(): string {
+  wordmarkUri ??= `data:image/png;base64,${readFileSync(new URL('./splash-wordmark.png', import.meta.url)).toString('base64')}`;
+  return wordmarkUri;
+}
 
 /** Phosphor regular 2.1.1 path data (`@phosphor-icons/core` assets/regular, viewBox 0 0 256 256). */
 const PHOSPHOR = {
@@ -86,9 +102,19 @@ function svg({ width, height }: Size, body: string, background: string | null): 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${bg}${body}</svg>`;
 }
 
-function bindi(size: Size, diameterOfShortSide: number, fill: string): string {
-  const r = (Math.min(size.width, size.height) * diameterOfShortSide) / 2;
-  return `<circle cx="${size.width / 2}" cy="${size.height / 2}" r="${r}" fill="${fill}"/>`;
+/** The "f" mark, `heightShare` of the canvas tall, centred. */
+function fMark(size: Size, heightShare: number, fill: string): string {
+  const scale = (Math.min(size.width, size.height) * heightShare) / F_BOX.height;
+  const x = size.width / 2 - (F_BOX.x + F_BOX.width / 2) * scale;
+  const y = size.height / 2 - (F_BOX.y + F_BOX.height / 2) * scale;
+  return `<g transform="translate(${x} ${y}) scale(${scale})"><path d="${F_PATH}" fill="${fill}"/></g>`;
+}
+
+/** The full wordmark, centred, `widthShare` of the canvas width. */
+function wordmarkImage(size: Size, widthShare: number): string {
+  const w = size.width * widthShare;
+  const h = (w * WORDMARK.height) / WORDMARK.width;
+  return `<image href="${wordmark()}" x="${(size.width - w) / 2}" y="${(size.height - h) / 2}" width="${w}" height="${h}"/>`;
 }
 
 /** A Phosphor glyph in sindoor, its 256 box scaled to 70% of the canvas and centred. */
@@ -107,14 +133,14 @@ export function splashFileName(size: Size): string {
 function iconSpecs(): AssetSpec[] {
   const any = (n: number, fileName: string): AssetSpec => {
     const size = square(n);
-    return { fileName, size, svg: svg(size, bindi(size, BINDI_ANY, SINDOOR), WHITE), opaque: true };
+    return { fileName, size, svg: svg(size, fMark(size, F_ANY, INK), WHITE), opaque: true };
   };
   const maskable = (n: number): AssetSpec => {
     const size = square(n);
     return {
       fileName: `icons/maskable-${n}.png`,
       size,
-      svg: svg(size, bindi(size, BINDI_MASKABLE, SINDOOR), WHITE),
+      svg: svg(size, fMark(size, F_MASKABLE, INK), WHITE),
       opaque: true,
     };
   };
@@ -133,13 +159,13 @@ function iconSpecs(): AssetSpec[] {
     {
       fileName: 'icons/badge-96.png',
       size: badge,
-      svg: svg(badge, bindi(badge, BINDI_ANY, WHITE), null),
+      svg: svg(badge, fMark(badge, F_ANY, WHITE), null),
       opaque: false,
     },
     {
       fileName: 'favicon-32.png',
       size: favicon,
-      svg: svg(favicon, bindi(favicon, BINDI_ANY, SINDOOR), null),
+      svg: svg(favicon, fMark(favicon, 0.8, INK), WHITE),
       opaque: false,
     },
     shortcut('icons/sc-checkin-96.png', PHOSPHOR['sign-in']),
@@ -165,7 +191,7 @@ function splashSpec(size: SplashSize): AssetSpec {
   return {
     fileName: splashFileName(size),
     size,
-    svg: svg(size, bindi(size, BINDI_SPLASH, SINDOOR), WHITE),
+    svg: svg(size, wordmarkImage(size, WORDMARK_SPLASH), WHITE),
     opaque: true,
   };
 }

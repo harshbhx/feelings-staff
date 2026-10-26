@@ -61,7 +61,7 @@ const PRD_MANIFEST = {
 
 const APP = '/?mock=1&allowBrowser=1';
 const WHITE: Rgba = [255, 255, 255, 255];
-const SINDOOR: Rgba = [179, 18, 27, 255];
+const BLACK: Rgba = [0, 0, 0, 255];
 
 function onlyAndroid(info: TestInfo): void {
   test.skip(info.project.name !== 'staff-android', 'Chromium-only PWA checks run on staff-android');
@@ -251,23 +251,24 @@ test.describe('PWA', () => {
     expect(res.status()).toBe(200);
     expect(await res.json()).toEqual(PRD_MANIFEST);
 
-    // Manifest icons: any + maskable PNGs at their declared sizes, opaque white with the bindi.
+    // Manifest icons: any + maskable PNGs at their declared sizes, opaque white with the black "f" mark.
     for (const icon of PRD_MANIFEST.icons) {
       if (icon.type === 'image/svg+xml') {
         const svg = await request.get(icon.src);
         expect(svg.status(), icon.src).toBe(200);
         expect(svg.headers()['content-type'], icon.src).toContain('image/svg+xml');
-        expect(await svg.text()).toContain('<circle');
+        expect(await svg.text()).toContain('<path');
         continue;
       }
       const png = decodePng(await fetchPng(request, icon.src));
       expect({ width: png.width, height: png.height }, icon.src).toEqual(sizeOf(icon.sizes));
       expect(corners(png), `${icon.src} corners`).toEqual([WHITE, WHITE, WHITE, WHITE]);
-      expect(centre(png), `${icon.src} centre`).toEqual(SINDOOR);
+      // The "f" stem is black at the centre of the canvas (the mark is centred on its bounding box).
+      expect(centre(png), `${icon.src} centre`).toEqual(BLACK);
       if (icon.purpose === 'maskable') expectOpaque(png, icon.src);
     }
 
-    // Shortcut icons: 96 px, opaque, sindoor glyph on white.
+    // Shortcut icons: 96 px, opaque, sindoor glyph on white (shortcuts keep their own glyphs).
     for (const shortcut of PRD_MANIFEST.shortcuts) {
       for (const icon of shortcut.icons) {
         const png = decodePng(await fetchPng(request, icon.src));
@@ -303,7 +304,7 @@ test.describe('PWA', () => {
       });
     }
 
-    // Android badge: monochrome white bindi on transparent. Favicon: 32 px.
+    // Android badge: monochrome white "f" on transparent. Favicon: 32 px.
     const badge = decodePng(await fetchPng(request, '/icons/badge-96.png'));
     expect({ width: badge.width, height: badge.height }).toEqual({ width: 96, height: 96 });
     expect(corners(badge).map((p) => p[3])).toEqual([0, 0, 0, 0]);
