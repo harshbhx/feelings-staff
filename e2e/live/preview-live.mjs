@@ -38,6 +38,7 @@ async function setClock(nowMs) {
   });
   return r.status;
 }
+const today = new Date(Date.now() + 330 * 60_000).toISOString().slice(0, 10);
 const browser = await chromium.launch();
 const ownerCtx = await browser.newContext({
   baseURL: base,
@@ -124,6 +125,18 @@ await get('credits', '/owner/credits', (b) => `${(b.staff ?? []).length} people`
 await get('payroll runs', '/owner/payroll-runs', (b) => `${(b.runs ?? b.items ?? []).length} runs`);
 await get('staff list', '/owner/staff', (b) => `${(b.staff ?? b.items ?? b ?? []).length} rows`);
 await get('settings', '/owner/settings');
+async function cleanupTesters(label) {
+  await api(ownerCtx, 'POST', '/auth/owner/password', { email, password, pin });
+  await api(ownerCtx, 'POST', '/auth/step-up', { pin });
+  const list = await api(ownerCtx, 'GET', '/owner/staff');
+  const rows = list.body?.staff ?? list.body?.items ?? [];
+  let done = 0;
+  for (const r of rows.filter((x) => x.name === 'Preview Tester')) {
+    const e = await api(ownerCtx, 'POST', `/owner/staff/${r.id}/exit`, { lastDay: today, reason: 'Preview live check cleanup' });
+    if (e.status === 200) done += 1;
+  }
+  record(`cleanup throwaway staff (${label})`, true, `${done} marked as left`);
+}
 let site;
 await step('salon site', async () => {
   const r = await api(ownerCtx, 'GET', '/owner/sites');
@@ -139,7 +152,7 @@ const lat = site?.lat ?? site?.latitude;
 const lng = site?.lng ?? site?.longitude ?? site?.lon;
 const phoneNo = `98${String(Date.now()).slice(-8)}`;
 const staffPin = '739204';
-const today = new Date(Date.now() + 330 * 60_000).toISOString().slice(0, 10);
+await cleanupTesters('start');
 let invite;
 await step('add a throwaway staff member', async () => {
   const t = await api(ownerCtx, 'GET', '/owner/shift-templates');
@@ -286,6 +299,8 @@ if (invite && lat !== undefined) {
 } else {
   record('staff phone flow', false, 'no salon coordinates or invite, skipped');
 }
+
+await cleanupTesters('end');
 
 // A seeded person's time credits and payslip through the owner view.
 await step('owner opens a seeded person (credits + payslips)', async () => {
