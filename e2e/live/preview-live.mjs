@@ -237,7 +237,17 @@ if (invite && lat !== undefined) {
     await page.screenshot({ path: `${out}/staff-home.png`, fullPage: true });
   });
 
+  async function dismissNotice() {
+    const ok = page.getByRole('button', { name: 'OK, I understand' });
+    for (let i = 0; i < 6; i++) {
+      if (await ok.isVisible().catch(() => false)) {
+        await ok.click();
+        await page.waitForTimeout(500);
+      } else await page.waitForTimeout(500);
+    }
+  }
   async function openCheckIn(label) {
+    await dismissNotice();
     await page.getByRole('button', { name: label, exact: true }).click();
     const sheet = page.getByRole('dialog');
     const allow = sheet.getByRole('button', { name: 'Allow location' });
