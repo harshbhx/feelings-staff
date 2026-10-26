@@ -10,6 +10,7 @@ import { SESSION_COOKIE } from '../middleware/session';
 import { ORIGIN, resetScenario, sessionFor, testEnv } from './helpers';
 
 const app = createApp();
+const pending: Promise<unknown>[] = [];
 
 async function callAs(
   envName: string | undefined,
@@ -34,8 +35,13 @@ async function callAs(
     }),
     env as never,
     // finaliseRun queues the payslip PDFs with waitUntil, which needs an execution context.
-    { waitUntil: () => {}, passThroughOnException: () => {} } as unknown as ExecutionContext,
+    {
+      waitUntil: (p: Promise<unknown>) => void pending.push(p),
+      passThroughOnException: () => {},
+    } as unknown as ExecutionContext,
   );
+  // Let queued work (payslip PDFs) end before the next call wipes the data under it.
+  await Promise.allSettled(pending.splice(0));
   const text = await res.text();
   return { status: res.status, body: text ? JSON.parse(text) : {} };
 }
