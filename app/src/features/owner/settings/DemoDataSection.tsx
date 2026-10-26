@@ -130,7 +130,7 @@ function Status({ view, onRetry }: { view: View; onRetry: () => void }) {
             {
               key: 'done',
               value: p.done,
-              tone: view.kind === 'failed' ? 'A' : 'P',
+              tone: view.kind === 'failed' ? 'absent' : 'present',
               label: stepText(t, p),
             },
           ]}

@@ -33,6 +33,8 @@ async function callAs(
       ...(opts.body !== undefined ? { body: JSON.stringify(opts.body) } : {}),
     }),
     env as never,
+    // finaliseRun queues the payslip PDFs with waitUntil, which needs an execution context.
+    { waitUntil: () => {}, passThroughOnException: () => {} } as unknown as ExecutionContext,
   );
   const text = await res.text();
   return { status: res.status, body: text ? JSON.parse(text) : {} };
