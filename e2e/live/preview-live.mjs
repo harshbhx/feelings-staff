@@ -181,6 +181,7 @@ if (invite && lat !== undefined) {
     geolocation: { latitude: lat + 0.05, longitude: lng + 0.05, accuracy: 20 },
     permissions: ['geolocation'],
   });
+  if (e2eToken) await phoneCtx.clock.install({ time: Date.parse(`${today}T12:00:00+05:30`) });
   const page = await phoneCtx.newPage();
   await step('staff joins on a phone and waits for approval', async () => {
     await page.goto(`/join?code=${encodeURIComponent(invite.code)}&allowBrowser=1`);
