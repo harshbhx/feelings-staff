@@ -33,6 +33,7 @@ Contents: [Conventions](#conventions) · [Endpoints](#endpoints) · [Error shape
 
 - Manager permissions: `approve_attendance`, `approve_leave`, `approve_overtime`, `offsite`, `roster`, `door`, `payroll`, `staff`, `exports`, `rollcall`.
 - **Step-up** `yes` means the owner must have entered the PIN in the last 10 minutes (`POST /auth/step-up`). Without it the call fails with `STEP_UP_REQUIRED` (403); the client shows the PIN sheet and repeats the call.
+- **Preview only** endpoints (`/owner/demo/*`, summaries start with "Preview only") exist only when `ENV` is `preview`. In every other environment (production, local) they answer `NOT_FOUND` (404), the same as an unknown route, before a session is read or any database call is made. Flag: `previewOnly` in the endpoint table.
 - A wrong id, or an id from another organisation, always answers `NOT_FOUND` (404), never 403.
 
 ### CSRF and versioning
@@ -273,6 +274,9 @@ Organisation settings, the first-run checklist, the owner's own security, the au
 | PATCH | `/owner/settings` | owner | no | no | body `SettingsPatchRequest` | `SettingsView` | Change settings (step-up for strong mode and risk thresholds) |
 | GET | `/owner/setup` | owner | no | no | - | `SetupView` | Setup checklist |
 | POST | `/owner/setup/steps/:step` | owner | no | no | path `SetupStepParams`; body `SetupStepRequest` | `SetupView` | Mark a setup step done or skipped |
+| POST | `/owner/demo/seed` | owner | yes | no | body `DemoSeedRequest` | `DemoSeedResult` | Preview only: load or reset the synthetic demo salon (raw data), keeping the caller signed in |
+| POST | `/owner/demo/recompute` | owner | yes | no | body `DemoRecomputeRequest` | `DemoRecomputeResult` | Preview only: recompute a chunk of demo days (at most four) |
+| POST | `/owner/demo/finish` | owner | yes | no | body `DemoFinishRequest` | `DemoFinishResult` | Preview only: time credits start date, approve old overtime, finalise and pay last month |
 | GET | `/owner/security` | owner | no | no | - | `SecurityView` | Email, password/PIN state, sessions |
 | PUT | `/owner/security/password` | owner | yes | no | body `SetPasswordRequest` | `SecurityView` | Set or change the fallback password |
 | PUT | `/owner/security/pin` | owner | no | no | body `SetPinRequest` | `SecurityView` | Set the owner PIN (first time, or a forgotten one, within 15 min of an email sign-in) or change it |

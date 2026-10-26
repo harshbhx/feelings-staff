@@ -820,3 +820,32 @@ export const UserIdParams = z.object({ id: Id });
 export const DeviceIdParams = z.object({ id: Id });
 export const RevokeRequest = z.object({ reason: Reason });
 export const DayPayLines = z.array(DayPayLine);
+
+// ---- Demo data (preview only; the Worker answers 404 elsewhere) ------------------------
+
+/** Load = seed only when no staff exist (409 otherwise); reset = wipe and seed again. */
+export const DemoSeedRequest = z.object({ mode: z.enum(['load', 'reset']) });
+export const DemoSeedResult = z.object({
+  staff: z.number().int().min(0),
+  /** First and last day to recompute (the last 49 days, today included). */
+  from: WorkDate,
+  to: WorkDate,
+  /** False when the caller's session could not be carried over; the owner then signs in again. */
+  sessionKept: z.boolean(),
+});
+/** One chunk of days; the server refuses a range longer than four days. */
+export const DemoRecomputeRequest = z.object({ from: WorkDate, to: WorkDate });
+export const DemoRecomputeResult = z.object({
+  from: WorkDate,
+  to: WorkDate,
+  days: z.number().int().min(0),
+  people: z.number().int().min(0),
+});
+/** `from` is the first seeded day: the time credits start date. */
+export const DemoFinishRequest = z.object({ from: WorkDate });
+export const DemoFinishResult = z.object({
+  creditsStart: WorkDate,
+  overtimeApproved: z.number().int().min(0),
+  payrollMonth: YearMonth.nullable(),
+  payrollPaid: z.boolean(),
+});

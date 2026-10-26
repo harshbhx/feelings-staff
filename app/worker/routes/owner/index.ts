@@ -2,6 +2,7 @@
 import { mergeHandlers } from '../../lib/api';
 import { handlers as actions } from './actions';
 import { handlers as days } from './days';
+import { handlers as demo } from './demo';
 import { handlers as door } from './door';
 import { handlers as duties } from './duties';
 import { handlers as register } from './register';
@@ -20,4 +21,5 @@ export const handlers = mergeHandlers(
   duties,
   door,
   settings,
+  demo,
 );

@@ -20,7 +20,8 @@ export type SectionId =
   | 'privacy'
   | 'security'
   | 'app'
-  | 'audit';
+  | 'audit'
+  | 'demo';
 
 export interface SectionDef {
   id: SectionId;
@@ -289,9 +290,10 @@ export const SECTIONS: readonly SectionDef[] = [
   { id: 'security', icon: 'fingerprint' },
   { id: 'app', icon: 'phone', fields: APP },
   { id: 'audit', icon: 'chart-bar' },
+  { id: 'demo', icon: 'arrows-clockwise' },
 ];
 
-export type GroupId = 'salon' | 'peoplePay' | 'attendance' | 'account';
+export type GroupId = 'salon' | 'peoplePay' | 'attendance' | 'account' | 'developer';
 
 /** The four headings of the Settings index (redesign plan, Fix 5); every section sits in exactly one. */
 export const SECTION_GROUPS: readonly { id: GroupId; sections: readonly SectionId[] }[] = [
@@ -299,8 +301,15 @@ export const SECTION_GROUPS: readonly { id: GroupId; sections: readonly SectionI
   { id: 'peoplePay', sections: ['people', 'pay', 'credits', 'leave'] },
   { id: 'attendance', sections: ['attendance', 'presence', 'notifications'] },
   { id: 'account', sections: ['privacy', 'security', 'app', 'audit'] },
+  /** Shown only when the server says this is a preview (DemoDataSection, `useIsPreview`). */
+  { id: 'developer', sections: ['demo'] },
 ];
 
 export function sectionById(id: string | undefined): SectionDef | undefined {
   return SECTIONS.find((s) => s.id === id);
+}
+
+/** The Settings index groups; the preview tools group only when the server says this is a preview. */
+export function visibleGroups(isPreview: boolean): typeof SECTION_GROUPS {
+  return SECTION_GROUPS.filter((g) => g.id !== 'developer' || isPreview);
 }

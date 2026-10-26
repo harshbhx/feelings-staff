@@ -11,6 +11,7 @@ import advanceAck from './advanceAck.json';
 import advanceRequestCreate from './advanceRequestCreate.json';
 import authChallenge from './authChallenge.json';
 import config from './config.json';
+import config_preview from './config.preview.json';
 import consentGive from './consentGive.json';
 import consentWithdraw from './consentWithdraw.json';
 import doorPair from './doorPair.json';
@@ -85,6 +86,9 @@ import ownerCreditLedger from './ownerCreditLedger.json';
 import ownerCredits from './ownerCredits.json';
 import ownerDay from './ownerDay.json';
 import ownerDayOverride from './ownerDayOverride.json';
+import ownerDemoFinish from './ownerDemoFinish.json';
+import ownerDemoRecompute from './ownerDemoRecompute.json';
+import ownerDemoSeed from './ownerDemoSeed.json';
 import ownerDeviceDecide from './ownerDeviceDecide.json';
 import ownerDeviceList from './ownerDeviceList.json';
 import ownerDeviceList_oneDevice from './ownerDeviceList.one-device.json';
@@ -339,6 +343,9 @@ export const fixtures: Partial<Record<EndpointKey, unknown>> = {
   ownerSettingsPatch,
   ownerSetupGet,
   ownerSetupStep,
+  ownerDemoSeed,
+  ownerDemoRecompute,
+  ownerDemoFinish,
   ownerSecurityGet,
   ownerSetPassword,
   ownerSetPin,
@@ -369,6 +376,9 @@ export const fixtures: Partial<Record<EndpointKey, unknown>> = {
 };
 
 export const variants: Partial<Record<EndpointKey, Record<string, unknown>>> = {
+  config: {
+    preview: config_preview,
+  },
   joinLookup: {
     expired: joinLookup_expired,
   },

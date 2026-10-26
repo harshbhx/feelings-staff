@@ -70,7 +70,7 @@ function needsStepUp(before: OrgSettings, after: OrgSettings): boolean {
   );
 }
 
-async function saveSettings(
+export async function saveSettings(
   ctx: Ctx,
   org: OrgRow,
   before: OrgSettings,

@@ -24,6 +24,11 @@ export interface EndpointShape {
   readonly perm?: Permission;
   /** Owner PIN within the last 10 minutes (PRD 4.1.7). */
   readonly stepUp?: boolean;
+  /**
+   * Only exists when `ENV` is `preview`: any other environment answers 404 NOT_FOUND, like an
+   * unknown route, before a session is read or a handler runs (app/worker/lib/preview-gate.ts).
+   */
+  readonly previewOnly?: boolean;
   /** Accepts an `Idempotency-Key` header; a repeat returns the first response. */
   readonly idempotent?: boolean;
   /** Body is multipart: field `payload` holds the JSON, files are extra fields. */

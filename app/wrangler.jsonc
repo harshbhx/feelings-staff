@@ -61,7 +61,9 @@
       "EMAIL_FROM": "Feelings Staff <staff@feelingsbeautycare.in>",
       "VAPID_PUBLIC_KEY": "",
       "VAPID_SUBJECT": "mailto:staff@feelingsbeautycare.in",
-      "OWNER_BOOTSTRAP_EMAIL": ""
+      "OWNER_BOOTSTRAP_EMAIL": "",
+      // Owner of the demo seed; its PIN is the DEMO_OWNER_PIN secret (docs/deploy.md, Preview environment).
+      "DEMO_OWNER_EMAIL": "harsh@feelingsbeautycare.in"
     },
     "d1_databases": [
       {
