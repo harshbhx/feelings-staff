@@ -123,13 +123,13 @@ const get = async (name, path, check) =>
   });
 await get('credits', '/owner/credits', (b) => `${(b.staff ?? []).length} people`);
 await get('payroll runs', '/owner/payroll-runs', (b) => `${(b.runs ?? b.items ?? []).length} runs`);
-await get('staff list', '/owner/staff', (b) => `${(b.staff ?? b.items ?? b ?? []).length} rows`);
+await get('staff list', '/owner/staff', (b) => `${(Array.isArray(b) ? b : []).length} rows`);
 await get('settings', '/owner/settings');
 async function cleanupTesters(label) {
   await api(ownerCtx, 'POST', '/auth/owner/password', { email, password, pin });
   await api(ownerCtx, 'POST', '/auth/step-up', { pin });
   const list = await api(ownerCtx, 'GET', '/owner/staff');
-  const rows = list.body?.staff ?? list.body?.items ?? [];
+  const rows = Array.isArray(list.body) ? list.body : [];
   let done = 0;
   for (const r of rows.filter((x) => x.name === 'Preview Tester')) {
     const e = await api(ownerCtx, 'POST', `/owner/staff/${r.id}/exit`, { lastDay: today, reason: 'Preview live check cleanup' });
@@ -305,7 +305,7 @@ await cleanupTesters('end');
 // A seeded person's time credits and payslip through the owner view.
 await step('owner opens a seeded person (credits + payslips)', async () => {
   const list = await api(ownerCtx, 'GET', '/owner/staff');
-  const rows = list.body.staff ?? list.body.items ?? list.body;
+  const rows = Array.isArray(list.body) ? list.body : [];
   const p = rows.find((r) => /Priya/.test(r.name)) ?? rows[0];
   await ownerPage.goto(`/o/staff/${p.id}`, { waitUntil: 'networkidle' });
   await ownerPage.waitForTimeout(800);
