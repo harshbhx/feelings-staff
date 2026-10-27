@@ -61,7 +61,6 @@ const PRD_MANIFEST = {
 
 const APP = '/?mock=1&allowBrowser=1';
 const WHITE: Rgba = [255, 255, 255, 255];
-const SINDOOR: Rgba = [179, 18, 27, 255];
 
 function onlyAndroid(info: TestInfo): void {
   test.skip(info.project.name !== 'staff-android', 'Chromium-only PWA checks run on staff-android');
@@ -173,9 +172,19 @@ function corners(png: Png): Rgba[] {
   return [png.pixel(0, 0), png.pixel(r, 0), png.pixel(0, b), png.pixel(r, b)];
 }
 
-function centre(png: Png): Rgba {
-  return png.pixel(Math.floor(png.width / 2), Math.floor(png.height / 2));
+/** Share of pixels (on a coarse grid) that match `test`. */
+function share(png: Png, test: (p: Rgba) => boolean): number {
+  let hit = 0;
+  let total = 0;
+  for (let y = 0; y < png.height; y += 2)
+    for (let x = 0; x < png.width; x += 2) {
+      total++;
+      if (test(png.pixel(x, y))) hit++;
+    }
+  return hit / total;
 }
+const darkShare = (png: Png): number => share(png, (p) => p[0] < 80 && p[1] < 80 && p[2] < 80);
+const whiteShare = (png: Png): number => share(png, (p) => p[3] > 200 && p[0] > 200 && p[1] > 200);
 
 function expectOpaque(png: Png, name: string): void {
   for (let y = 0; y < png.height; y++)
@@ -251,23 +260,24 @@ test.describe('PWA', () => {
     expect(res.status()).toBe(200);
     expect(await res.json()).toEqual(PRD_MANIFEST);
 
-    // Manifest icons: any + maskable PNGs at their declared sizes, opaque white with the bindi.
+    // Manifest icons: any + maskable PNGs at their declared sizes, opaque white with the black logo mark.
     for (const icon of PRD_MANIFEST.icons) {
       if (icon.type === 'image/svg+xml') {
         const svg = await request.get(icon.src);
         expect(svg.status(), icon.src).toBe(200);
         expect(svg.headers()['content-type'], icon.src).toContain('image/svg+xml');
-        expect(await svg.text()).toContain('<circle');
+        expect(await svg.text()).toContain('<path');
         continue;
       }
       const png = decodePng(await fetchPng(request, icon.src));
       expect({ width: png.width, height: png.height }, icon.src).toEqual(sizeOf(icon.sizes));
       expect(corners(png), `${icon.src} corners`).toEqual([WHITE, WHITE, WHITE, WHITE]);
-      expect(centre(png), `${icon.src} centre`).toEqual(SINDOOR);
+      // The logo is drawn in black: a visible share of the pixels is dark, the edges stay white.
+      expect(darkShare(png), `${icon.src} dark pixels`).toBeGreaterThan(0.03);
       if (icon.purpose === 'maskable') expectOpaque(png, icon.src);
     }
 
-    // Shortcut icons: 96 px, opaque, sindoor glyph on white.
+    // Shortcut icons: 96 px, opaque, sindoor glyph on white (shortcuts keep their own glyphs).
     for (const shortcut of PRD_MANIFEST.shortcuts) {
       for (const icon of shortcut.icons) {
         const png = decodePng(await fetchPng(request, icon.src));
@@ -303,11 +313,11 @@ test.describe('PWA', () => {
       });
     }
 
-    // Android badge: monochrome white bindi on transparent. Favicon: 32 px.
+    // Android badge: monochrome white face line art on transparent. Favicon: 32 px.
     const badge = decodePng(await fetchPng(request, '/icons/badge-96.png'));
     expect({ width: badge.width, height: badge.height }).toEqual({ width: 96, height: 96 });
     expect(corners(badge).map((p) => p[3])).toEqual([0, 0, 0, 0]);
-    expect(centre(badge)).toEqual(WHITE);
+    expect(whiteShare(badge)).toBeGreaterThan(0.03);
     expect(pngSize(await fetchPng(request, '/favicon-32.png'))).toEqual({ width: 32, height: 32 });
   });
 });

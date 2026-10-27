@@ -2757,19 +2757,19 @@ There is no hidden admin or support login. Harsh operates the system only throug
 
 ### 11.2 Icons
 
-Built from the website's `public/favicon.svg` (the red bindi, `#b3121b`, circle r=20 in a 64 box: 62.5% of the canvas, inside the maskable safe zone).
+Built from the Feelings Beauty Care logo (`app/public/brand/logo-mask.webp`: face line art, lowercase "feelings" wordmark, "Beauty Care"), traced to vector paths in `app/build/brand-marks.ts` (the source is only 512x146, so the icons are never upscaled from it). Black on white. `ICON_VARIANT` in `app/build/pwa.ts` picks the layout: `stack` (face above the wordmark, the default), `wordmark` or `face` (larger face). An earlier version used the red bindi, then a bare "f" (too close to the Facebook logo); both were dropped.
 
 | File | Spec |
 |---|---|
-| `icons/icon.svg` | The bindi on white |
-| `icons/icon-192.png`, `icon-512.png` | Bindi on white, `purpose: any` |
-| `icons/maskable-192.png`, `maskable-512.png` | Bindi centred, diameter 50% of the canvas, white full-bleed background, `purpose: maskable` |
-| `icons/apple-touch-icon-180.png` | Bindi on white, no transparency |
-| `icons/badge-96.png` | Monochrome white bindi on transparent (Android notification badge) |
-| `favicon.svg`, `favicon-32.png` | As the website |
+| `icons/icon.svg` | The stacked logo on white |
+| `icons/icon-192.png`, `icon-512.png` | Stacked logo on white, `purpose: any` |
+| `icons/maskable-192.png`, `maskable-512.png` | Same artwork at 70% of the canvas (inside the 80% safe zone), white full-bleed background, `purpose: maskable` |
+| `icons/apple-touch-icon-180.png` | Stacked logo on white, no transparency |
+| `icons/badge-96.png` | Monochrome white face line art on transparent (Android notification badge) |
+| `favicon.svg`, `favicon-32.png` | Face line art, slightly thickened, on a white rounded square |
 | `icons/sc-*.png` | Shortcut icons: Phosphor `sign-in` and `calendar-check` in sindoor on white |
 
-Generated in CI by `@vite-pwa/assets-generator` from `icon.svg`; the iOS splash images (`apple-touch-startup-image`) for current iPhone sizes come from the same step (white background, centred bindi).
+Generated at build time by `@vite-pwa/assets-generator` from SVG strings in `app/build/pwa.ts`; the iOS splash images (`apple-touch-startup-image`) for current iPhone sizes come from the same step (white background, the full logo centred at 62% of the screen width).
 
 ### 11.3 HTML head
 

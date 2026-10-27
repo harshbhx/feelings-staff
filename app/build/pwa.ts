@@ -17,16 +17,19 @@
  */
 import type { HtmlTagDescriptor, Plugin, PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { faceMark, type IconVariant, iconBody, logoBody } from './brand-marks';
 
 const SINDOOR = '#b3121b';
 const WHITE = '#ffffff';
+/** Brand black of the Feelings wordmark. */
+const INK = '#000000';
 
-/** The website's bindi: circle r=20 in a 64 box, so its diameter is 62.5% of the canvas. */
-const BINDI_ANY = 40 / 64;
-/** Maskable icons: diameter 50% of the canvas, well inside the 80% safe zone. */
-const BINDI_MASKABLE = 0.5;
-/** Splash screens: a bindi a quarter of the screen width, centred on white. */
-const BINDI_SPLASH = 0.25;
+/** Which brand layout the app icon uses (see brand-marks.ts): 'wordmark', 'stack' or 'face'. */
+const ICON_VARIANT: IconVariant = 'stack';
+/** Maskable icons: artwork at 70% of the canvas, so it stays inside the 80% safe-zone circle. */
+const MASKABLE_SHARE = 0.7;
+/** Splash screens: the full logo at 62% of the screen width. */
+const LOGO_SPLASH = 0.62;
 
 /** Phosphor regular 2.1.1 path data (`@phosphor-icons/core` assets/regular, viewBox 0 0 256 256). */
 const PHOSPHOR = {
@@ -86,11 +89,6 @@ function svg({ width, height }: Size, body: string, background: string | null): 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${bg}${body}</svg>`;
 }
 
-function bindi(size: Size, diameterOfShortSide: number, fill: string): string {
-  const r = (Math.min(size.width, size.height) * diameterOfShortSide) / 2;
-  return `<circle cx="${size.width / 2}" cy="${size.height / 2}" r="${r}" fill="${fill}"/>`;
-}
-
 /** A Phosphor glyph in sindoor, its 256 box scaled to 70% of the canvas and centred. */
 function glyph(size: Size, path: string): string {
   const box = Math.min(size.width, size.height) * 0.7;
@@ -107,14 +105,19 @@ export function splashFileName(size: Size): string {
 function iconSpecs(): AssetSpec[] {
   const any = (n: number, fileName: string): AssetSpec => {
     const size = square(n);
-    return { fileName, size, svg: svg(size, bindi(size, BINDI_ANY, SINDOOR), WHITE), opaque: true };
+    return {
+      fileName,
+      size,
+      svg: svg(size, iconBody(ICON_VARIANT, n, 1, INK), WHITE),
+      opaque: true,
+    };
   };
   const maskable = (n: number): AssetSpec => {
     const size = square(n);
     return {
       fileName: `icons/maskable-${n}.png`,
       size,
-      svg: svg(size, bindi(size, BINDI_MASKABLE, SINDOOR), WHITE),
+      svg: svg(size, iconBody(ICON_VARIANT, n, MASKABLE_SHARE, INK), WHITE),
       opaque: true,
     };
   };
@@ -133,13 +136,13 @@ function iconSpecs(): AssetSpec[] {
     {
       fileName: 'icons/badge-96.png',
       size: badge,
-      svg: svg(badge, bindi(badge, BINDI_ANY, WHITE), null),
+      svg: svg(badge, faceMark(96, 0.8, WHITE), null),
       opaque: false,
     },
     {
       fileName: 'favicon-32.png',
       size: favicon,
-      svg: svg(favicon, bindi(favicon, BINDI_ANY, SINDOOR), null),
+      svg: svg(favicon, faceMark(32, 0.86, INK), WHITE),
       opaque: false,
     },
     shortcut('icons/sc-checkin-96.png', PHOSPHOR['sign-in']),
@@ -165,7 +168,7 @@ function splashSpec(size: SplashSize): AssetSpec {
   return {
     fileName: splashFileName(size),
     size,
-    svg: svg(size, bindi(size, BINDI_SPLASH, SINDOOR), WHITE),
+    svg: svg(size, logoBody(size.width, size.height, LOGO_SPLASH, INK), WHITE),
     opaque: true,
   };
 }
