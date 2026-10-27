@@ -2757,19 +2757,19 @@ There is no hidden admin or support login. Harsh operates the system only throug
 
 ### 11.2 Icons
 
-Built from the bold lowercase "f" of the Feelings logo (`app/public/brand/logo-mask.webp`), redrawn as a vector path (`F_PATH` in `app/build/pwa.ts`) so it stays crisp. The mark is black (`#000`) on white. (An earlier version used the red bindi; Harsh replaced it because the installed icon was just a red dot.)
+Built from the Feelings Beauty Care logo (`app/public/brand/logo-mask.webp`: face line art, lowercase "feelings" wordmark, "Beauty Care"), traced to vector paths in `app/build/brand-marks.ts` (the source is only 512x146, so the icons are never upscaled from it). Black on white. `ICON_VARIANT` in `app/build/pwa.ts` picks the layout: `stack` (face above the wordmark, the default), `wordmark` or `face` (larger face). An earlier version used the red bindi, then a bare "f" (too close to the Facebook logo); both were dropped.
 
 | File | Spec |
 |---|---|
-| `icons/icon.svg` | The "f" on white |
-| `icons/icon-192.png`, `icon-512.png` | "f" on white, 62% of the canvas tall, `purpose: any` |
-| `icons/maskable-192.png`, `maskable-512.png` | "f" centred, 50% of the canvas tall, white full-bleed background (inside the 80% safe zone), `purpose: maskable` |
-| `icons/apple-touch-icon-180.png` | "f" on white, no transparency |
-| `icons/badge-96.png` | Monochrome white "f" on transparent (Android notification badge) |
-| `favicon.svg`, `favicon-32.png` | The "f" on a white rounded square |
+| `icons/icon.svg` | The stacked logo on white |
+| `icons/icon-192.png`, `icon-512.png` | Stacked logo on white, `purpose: any` |
+| `icons/maskable-192.png`, `maskable-512.png` | Same artwork at 70% of the canvas (inside the 80% safe zone), white full-bleed background, `purpose: maskable` |
+| `icons/apple-touch-icon-180.png` | Stacked logo on white, no transparency |
+| `icons/badge-96.png` | Monochrome white face line art on transparent (Android notification badge) |
+| `favicon.svg`, `favicon-32.png` | Face line art, slightly thickened, on a white rounded square |
 | `icons/sc-*.png` | Shortcut icons: Phosphor `sign-in` and `calendar-check` in sindoor on white |
 
-Generated at build time by `@vite-pwa/assets-generator` from SVG strings in `app/build/pwa.ts`; the iOS splash images (`apple-touch-startup-image`) for current iPhone sizes come from the same step (white background, the full wordmark centred at 50% of the screen width, from `app/build/splash-wordmark.png`).
+Generated at build time by `@vite-pwa/assets-generator` from SVG strings in `app/build/pwa.ts`; the iOS splash images (`apple-touch-startup-image`) for current iPhone sizes come from the same step (white background, the full logo centred at 62% of the screen width).
 
 ### 11.3 HTML head
 
