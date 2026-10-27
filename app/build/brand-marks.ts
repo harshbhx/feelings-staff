@@ -29,7 +29,14 @@ interface Box {
 const num = (n: number): string => String(Math.round(n * 1000) / 1000);
 
 /** Draws `paths` so that `box` lands with its top-left at (x, y) and scaled by `scale`. */
-function place(paths: string[], box: Box, x: number, y: number, scale: number, fill: string): string {
+function place(
+  paths: string[],
+  box: Box,
+  x: number,
+  y: number,
+  scale: number,
+  fill: string,
+): string {
   const body = paths.map((d) => `<path d="${d}"/>`).join('');
   return `<g fill="${fill}" transform="translate(${num(x - box.x * scale)} ${num(y - box.y * scale)}) scale(${num(scale)})">${body}</g>`;
 }

@@ -17,7 +17,7 @@
  */
 import type { HtmlTagDescriptor, Plugin, PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import { faceMark, iconBody, logoBody, type IconVariant } from './brand-marks';
+import { faceMark, type IconVariant, iconBody, logoBody } from './brand-marks';
 
 const SINDOOR = '#b3121b';
 const WHITE = '#ffffff';
@@ -105,7 +105,12 @@ export function splashFileName(size: Size): string {
 function iconSpecs(): AssetSpec[] {
   const any = (n: number, fileName: string): AssetSpec => {
     const size = square(n);
-    return { fileName, size, svg: svg(size, iconBody(ICON_VARIANT, n, 1, INK), WHITE), opaque: true };
+    return {
+      fileName,
+      size,
+      svg: svg(size, iconBody(ICON_VARIANT, n, 1, INK), WHITE),
+      opaque: true,
+    };
   };
   const maskable = (n: number): AssetSpec => {
     const size = square(n);
