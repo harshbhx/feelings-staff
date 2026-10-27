@@ -9,8 +9,11 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { chromium } from '@playwright/test';
 
 const base = (process.env.PREVIEW_URL ?? '').replace(/\/$/, '');
-const { PREVIEW_OWNER_EMAIL: email, PREVIEW_OWNER_PASSWORD: password, PREVIEW_OWNER_PIN: pin } =
-  process.env;
+const {
+  PREVIEW_OWNER_EMAIL: email,
+  PREVIEW_OWNER_PASSWORD: password,
+  PREVIEW_OWNER_PIN: pin,
+} = process.env;
 if (!base || !email || !password || !pin) throw new Error('missing PREVIEW_* environment');
 if (/staff\.feelingsbeautycare\.in/.test(base)) throw new Error('refusing to run on production');
 const out = 'live-out';
@@ -18,14 +21,20 @@ mkdirSync(out, { recursive: true });
 const results = [];
 const record = (name, ok, note = '') => {
   results.push({ name, ok, note });
-  console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${note ? `  (${note})` : ''}`);
+  console.info(`${ok ? 'PASS' : 'FAIL'}  ${name}${note ? `  (${note})` : ''}`);
 };
 async function step(name, fn) {
   try {
     const note = await fn();
     record(name, true, typeof note === 'string' ? note : '');
   } catch (e) {
-    record(name, false, String(e?.message ?? e).split('\n')[0].slice(0, 200));
+    record(
+      name,
+      false,
+      String(e?.message ?? e)
+        .split('\n')[0]
+        .slice(0, 200),
+    );
   }
 }
 
@@ -33,7 +42,12 @@ const e2eToken = process.env.PREVIEW_E2E_TOKEN ?? '';
 async function setClock(nowMs) {
   const r = await fetch(`${base}/api/v1/__test/clock`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Origin: new URL(base).origin, 'X-FS-Client': '0.1.0', 'X-E2E-Token': e2eToken },
+    headers: {
+      'Content-Type': 'application/json',
+      Origin: new URL(base).origin,
+      'X-FS-Client': '0.1.0',
+      'X-E2E-Token': e2eToken,
+    },
     body: JSON.stringify({ nowMs }),
   });
   return r.status;
@@ -106,14 +120,19 @@ for (const [name, path] of screens) {
     await ownerPage.goto(path, { waitUntil: 'networkidle', timeout: 45_000 });
     await ownerPage.waitForTimeout(800);
     await ownerPage.screenshot({ path: `${out}/owner-${name}.png`, fullPage: true });
-    if ((await ownerPage.getByTestId('owner-route-error').count()) > 0) throw new Error('route error shown');
+    if ((await ownerPage.getByTestId('owner-route-error').count()) > 0)
+      throw new Error('route error shown');
     const url = ownerPage.url();
     if (/signin|auth\/owner/.test(url)) throw new Error(`bounced to ${url}`);
     const body = (await ownerPage.locator('body').innerText()).slice(0, 4000);
     if (/something went wrong|couldn.t load/i.test(body)) throw new Error('error text on page');
   });
 }
-record('uncaught page errors on owner screens', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '));
+record(
+  'uncaught page errors on owner screens',
+  consoleErrors.length === 0,
+  consoleErrors.slice(0, 3).join(' | '),
+);
 
 const get = async (name, path, check) =>
   step(`api ${name}`, async () => {
@@ -132,7 +151,10 @@ async function cleanupTesters(label) {
   const rows = Array.isArray(list.body) ? list.body : [];
   let done = 0;
   for (const r of rows.filter((x) => x.name === 'Preview Tester')) {
-    const e = await api(ownerCtx, 'POST', `/owner/staff/${r.id}/exit`, { lastDay: today, reason: 'Preview live check cleanup' });
+    const e = await api(ownerCtx, 'POST', `/owner/staff/${r.id}/exit`, {
+      lastDay: today,
+      reason: 'Preview live check cleanup',
+    });
     if (e.status === 200) done += 1;
   }
   record(`cleanup throwaway staff (${label})`, true, `${done} marked as left`);
@@ -170,7 +192,8 @@ await step('add a throwaway staff member', async () => {
     selfieRequired: false,
     adultConfirmed: true,
   });
-  if (r.status >= 300) throw new Error(`status ${r.status} ${JSON.stringify(r.body).slice(0, 120)}`);
+  if (r.status >= 300)
+    throw new Error(`status ${r.status} ${JSON.stringify(r.body).slice(0, 120)}`);
   invite = { id: r.body.staff.id, code: r.body.invite.code };
 });
 
@@ -224,13 +247,17 @@ if (invite && lat !== undefined) {
       if (!dev) await new Promise((r) => setTimeout(r, 1000));
     }
     if (!dev) throw new Error('no pending device');
-    const r = await api(ownerCtx, 'POST', `/owner/devices/${dev.id}/decide`, { decision: 'approve' });
+    const r = await api(ownerCtx, 'POST', `/owner/devices/${dev.id}/decide`, {
+      decision: 'approve',
+    });
     if (r.status >= 300) throw new Error(`status ${r.status}`);
   });
   await step('staff home shows', async () => {
-    await page.getByRole('heading', { level: 1, name: 'Preview' }).or(
-      page.getByRole('dialog', { name: 'When you are not at the salon' }),
-    ).first().waitFor({ timeout: 40_000 });
+    await page
+      .getByRole('heading', { level: 1, name: 'Preview' })
+      .or(page.getByRole('dialog', { name: 'When you are not at the salon' }))
+      .first()
+      .waitFor({ timeout: 40_000 });
     const ok = page.getByRole('button', { name: 'OK, I understand' });
     if (await ok.isVisible().catch(() => false)) await ok.click();
     await page.getByRole('heading', { level: 1, name: 'Preview' }).waitFor({ timeout: 20_000 });
@@ -252,7 +279,10 @@ if (invite && lat !== undefined) {
     const sheet = page.getByRole('dialog');
     const allow = sheet.getByRole('button', { name: 'Allow location' });
     for (let i = 0; i < 60; i++) {
-      const s = await sheet.locator('[data-punch-step]').getAttribute('data-punch-step').catch(() => null);
+      const s = await sheet
+        .locator('[data-punch-step]')
+        .getAttribute('data-punch-step')
+        .catch(() => null);
       if (s === 'permission') await allow.click().catch(() => {});
       else if (s && /^(pin|problem|result|sent|camera|scanning|confirm|queued)$/.test(s)) return s;
       await page.waitForTimeout(500);
@@ -280,7 +310,10 @@ if (invite && lat !== undefined) {
     }
     if (s === 'pin') {
       await sheet.getByRole('textbox', { name: 'Enter your PIN' }).fill(staffPin);
-      await sheet.getByRole('button', { name: 'Check in', exact: true }).click({ timeout: 2000 }).catch(() => {});
+      await sheet
+        .getByRole('button', { name: 'Check in', exact: true })
+        .click({ timeout: 2000 })
+        .catch(() => {});
     }
     await sheet.locator('[data-punch-step="result"]').waitFor({ timeout: 30_000 });
     await page.screenshot({ path: `${out}/staff-checkin-ok.png` });
@@ -290,7 +323,10 @@ if (invite && lat !== undefined) {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.screenshot({ path: `${out}/staff-today.png`, fullPage: true });
   });
-  for (const [name, path] of [['me', '/me'], ['inbox', '/inbox']]) {
+  for (const [name, path] of [
+    ['me', '/me'],
+    ['inbox', '/inbox'],
+  ]) {
     await step(`staff screen ${name}`, async () => {
       await page.goto(path, { waitUntil: 'networkidle' });
       await page.screenshot({ path: `${out}/staff-${name}.png`, fullPage: true });
@@ -325,5 +361,5 @@ await step('owner opens a seeded person (credits + payslips)', async () => {
 await browser.close();
 writeFileSync(`${out}/results.json`, JSON.stringify(results, null, 2));
 const failed = results.filter((r) => !r.ok);
-console.log(`\n${results.length - failed.length} passed, ${failed.length} failed`);
+console.info(`\n${results.length - failed.length} passed, ${failed.length} failed`);
 process.exit(0);
