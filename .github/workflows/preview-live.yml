@@ -1,0 +1,50 @@
+# Live check of the shared preview: signs in as the demo owner, screenshots every owner screen and
+# runs a throwaway staff phone through join, approval and check-in (e2e/live/preview-live.mjs).
+# Preview only; the script refuses the production host. Manual (gh workflow run preview-live).
+name: preview-live
+
+on:
+  push:
+    branches: ['chore/preview-live-check']
+    paths: ['.github/workflows/preview-live.yml', 'e2e/live/**']
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Preview URL
+        required: false
+        default: https://fbc-staff-preview.creharsh.workers.dev
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      HOME: /root
+      PREVIEW_URL: ${{ inputs.url || 'https://fbc-staff-preview.creharsh.workers.dev' }}
+      PREVIEW_OWNER_EMAIL: ${{ vars.PREVIEW_OWNER_EMAIL }}
+      PREVIEW_OWNER_PASSWORD: ${{ secrets.PREVIEW_OWNER_PASSWORD }}
+      PREVIEW_OWNER_PIN: ${{ secrets.PREVIEW_OWNER_PIN }}
+      PREVIEW_E2E_TOKEN: ${{ secrets.PREVIEW_E2E_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run
+        working-directory: e2e
+        run: node live/preview-live.mjs
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: preview-live
+          retention-days: 14
+          path: e2e/live-out

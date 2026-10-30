@@ -1,0 +1,40 @@
+# Builds the branch named in e2e/live/BUILD_REF and uploads app/dist as the `preview-dist` artifact, so
+# the shared preview can run an unmerged PR (ci uploads app-dist only for main). Runs on pushes to
+# chore/preview-live-check that change BUILD_REF. Build only: nothing is deployed from here.
+name: preview-build
+
+on:
+  push:
+    branches: ['chore/preview-live-check']
+    paths: ['e2e/live/BUILD_REF', '.github/workflows/preview-build.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the ref
+        id: ref
+        run: echo "ref=$(tr -d '[:space:]' < e2e/live/BUILD_REF)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ref.outputs.ref }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preview-dist
+          retention-days: 3
+          include-hidden-files: true
+          path: |
+            app/dist
+            app/.wrangler/deploy
