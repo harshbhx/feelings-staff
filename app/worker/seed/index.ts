@@ -26,6 +26,23 @@ export const TEST_OWNER = {
   pin: '482913',
 } as const;
 
+/**
+ * Who the demo owner is. `DEMO_OWNER_EMAIL` (a var) and `DEMO_OWNER_PIN` (a Worker secret) replace
+ * the built-in test e-mail and PIN when set; the password stays the test one (sign-in needs the PIN
+ * too). Only previews and tests seed, so these never touch production. The PIN is never logged.
+ */
+export function demoOwnerIdentity(env: Pick<Env, 'DEMO_OWNER_EMAIL' | 'DEMO_OWNER_PIN'>): {
+  email: string;
+  pin: string;
+} {
+  const email = env.DEMO_OWNER_EMAIL?.trim().toLowerCase() || TEST_OWNER.email;
+  const pin = env.DEMO_OWNER_PIN?.trim() || TEST_OWNER.pin;
+  if (!/^\d{6}$/.test(pin)) throw new Error('DEMO_OWNER_PIN must be exactly 6 digits');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    throw new Error('DEMO_OWNER_EMAIL is not an e-mail');
+  return { email, pin };
+}
+
 export const HOLIDAYS_2026 = [
   { date: '2026-01-14', name: 'Uttarayan', workedComp: 'extra_pay' },
   { date: '2026-01-26', name: 'Republic Day', workedComp: 'extra_pay' },
@@ -128,6 +145,7 @@ export interface BasicSalon {
 
 export async function seedBasicSalon(s: SeedContext): Promise<BasicSalon> {
   const { db, env, now } = s;
+  const identity = demoOwnerIdentity(env);
   const orgId = ulid(now);
   const ownerId = ulid(now);
   const siteId = ulid(now);
@@ -163,8 +181,8 @@ export async function seedBasicSalon(s: SeedContext): Promise<BasicSalon> {
         orgId,
         TEST_OWNER.name,
         SALON_DEFAULTS.phone,
-        TEST_OWNER.email,
-        await hashPin(env.PIN_PEPPER, pinSalt, TEST_OWNER.pin),
+        identity.email,
+        await hashPin(env.PIN_PEPPER, pinSalt, identity.pin),
         pinSalt,
         now,
         await hashPassword(env.PIN_PEPPER, pwSalt, TEST_OWNER.password),
@@ -261,7 +279,8 @@ export async function seedScenario(
     };
   }
   const base = await seedBasicSalon(s);
-  const owner = { email: TEST_OWNER.email, password: TEST_OWNER.password, pin: TEST_OWNER.pin };
+  const identity = demoOwnerIdentity(s.env);
+  const owner = { email: identity.email, password: TEST_OWNER.password, pin: identity.pin };
   if (scenario === 'demo') {
     // Raw data only; scripts/seed-demo.mjs then runs the nightly job per day and the payroll flow.
     const demo = await seedDemo(s, base);

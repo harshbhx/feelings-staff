@@ -2,6 +2,7 @@
  * Worker entry (WP-1, shared): static assets, /api/v1 and scheduled jobs in one Worker (ADR-01).
  * Packages add endpoints in their route modules (routes/*), never here.
  */
+import { type EndpointShape, endpoints } from '@fs/contracts';
 import { Hono } from 'hono';
 import { jobForCron, runJob } from './cron';
 import type { Env } from './env';
@@ -20,6 +21,7 @@ import {
   STAFF_APP_PATHS,
   surfaceOf,
 } from './lib/hosts';
+import { PREVIEW_ONLY_KEYS, previewOnlyGuard } from './lib/preview-gate';
 import { isSplitFolderPath, serveSplitAsset } from './lib/split-assets';
 import { ulid } from './lib/ulid';
 import { access } from './middleware/access';
@@ -92,6 +94,11 @@ export function createApp(): Hono<AppEnv> {
   for (const p of shell) app.get(p, (c) => c.env.ASSETS.fetch(c.req.raw));
 
   app.use('/api/*', guard);
+  // Preview-only endpoints (owner demo data): 404 outside a preview, before any session or DB read.
+  for (const key of PREVIEW_ONLY_KEYS) {
+    const def = endpoints[key] as EndpointShape;
+    app.on(def.method, `/api/v1${def.path}`, previewOnlyGuard);
+  }
   app.use('/api/*', context);
 
   const api = new Hono<AppEnv>();

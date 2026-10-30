@@ -554,6 +554,27 @@
       "enrolled": "Joining photo"
     }
   },
+  "demoData": {
+    "intro": "This preview is not the real salon. Load fills it with a made-up salon: 12 people, seven weeks of attendance, last month's payroll paid. Reset wipes everything here and loads it again. It takes a few minutes; keep this page open.",
+    "load": "Load demo data",
+    "reset": "Reset demo data",
+    "resetTitle": "Reset the demo data?",
+    "resetBody": "Everything in this preview is deleted and the made-up salon is loaded again. The real salon is not touched.",
+    "resetConfirm": "Reset and load again",
+    "working": "Working",
+    "stepSeed": "Writing the salon",
+    "stepRecompute": "Working out the days: {{done}} of {{total}}",
+    "stepFinish": "Approving overtime and paying last month",
+    "progress": "Demo data progress: {{done}} of {{total}} steps",
+    "done": "Demo data is ready.",
+    "doneHint": "Open Today, Register or Payroll to look around.",
+    "already": "Demo data is already loaded. Use Reset demo data to start again.",
+    "failed": "It stopped at: {{step}}. {{reason}}",
+    "retry": "Try again",
+    "signedOut": "You were signed out. Sign in again with the demo login (your owner email, the demo password and your PIN).",
+    "signIn": "Sign in",
+    "notHere": "Demo data tools are only on previews."
+  },
   "settings": {
     "saved": "Saved.",
     "needsPin": "Saving this asks for your owner PIN.",
@@ -562,7 +583,8 @@
       "salon": "The salon",
       "peoplePay": "People and pay",
       "attendance": "Attendance",
-      "account": "Account and safety"
+      "account": "Account and safety",
+      "developer": "Preview tools"
     },
     "sections": {
       "salon": {
@@ -616,6 +638,10 @@
       "audit": {
         "title": "Audit log",
         "hint": "Who changed what, and why"
+      },
+      "demo": {
+        "title": "Demo data",
+        "hint": "Load or reset the made-up salon"
       },
       "presence": {
         "title": "Presence",

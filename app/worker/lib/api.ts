@@ -22,6 +22,7 @@ import type { Ctx } from '../services/ports';
 import type { AppEnv } from './app-env';
 import { timingSafeEqual } from './crypto';
 import { fail } from './errors';
+import { requirePreview } from './preview-gate';
 
 export type Handler<E> = (
   input: ParsedInputOf<E>,
@@ -178,6 +179,7 @@ export function registerApi(api: Hono<AppEnv>, handlers: Handlers): void {
     const def = endpoints[key] as EndpointShape;
     const handler = handlers[key] as Handler<EndpointShape> | undefined;
     api.on(def.method, def.path, async (c) => {
+      if (def.previewOnly) requirePreview(c.env);
       const ctx = c.get('ctx');
       checkAccess(def, ctx, c);
       const input = await readInput(def, c);

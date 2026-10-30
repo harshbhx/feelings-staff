@@ -4,8 +4,10 @@
  * Salon, Location and door, Shifts, Holidays, People, Security and the Audit log have their own pages.
  */
 import { Icon, List, ListRow } from '@fs/ui';
+import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Route, Routes, useParams } from 'react-router';
+import { useIsPreview } from '../api/demo';
 import { useSettings } from '../api/settings';
 import { Empty, QueryView, RowsSkeleton } from '../components/states';
 import { useOwnerTitle } from '../shell/chrome';
@@ -18,7 +20,10 @@ import { PrivacyNote, SalonSection } from './SalonSection';
 import { SecurityScreen } from './SecurityScreen';
 import { SettingsForm } from './SettingsForm';
 import { ShiftsSection } from './ShiftsSection';
-import { SECTION_GROUPS, sectionById } from './sections';
+import { sectionById, visibleGroups } from './sections';
+
+// Preview tools only: its own chunk, so the owner's usual Settings never loads it.
+const DemoDataSection = lazy(() => import('./DemoDataSection'));
 
 /** iOS settings tiles: each group takes one of the brand's service tones. */
 const TILE_TONES = ['bridal', 'academy', 'mehndi', 'nails', 'salon'] as const;
@@ -35,9 +40,10 @@ export function SettingsRoutes() {
 function SettingsIndex() {
   const { t } = useTranslation();
   useOwnerTitle(null);
+  const preview = useIsPreview();
   return (
     <div className="grid max-w-(--container-narrow) grid-cols-[minmax(0,1fr)] gap-8">
-      {SECTION_GROUPS.map((g, gi) => (
+      {visibleGroups(preview).map((g, gi) => (
         <section key={g.id} aria-labelledby={`settings-group-${g.id}`} className="grid gap-1">
           <h2
             id={`settings-group-${g.id}`}
@@ -93,6 +99,12 @@ function SectionPage() {
       return <PeopleSection />;
     case 'presence':
       return <PresenceSection />;
+    case 'demo':
+      return (
+        <Suspense fallback={<RowsSkeleton rows={2} />}>
+          <DemoDataSection />
+        </Suspense>
+      );
     default:
       return <WithSettings id={def.id} />;
   }

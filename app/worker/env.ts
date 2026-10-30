@@ -30,6 +30,8 @@ export interface Env {
   VAPID_SUBJECT: string;
   OWNER_BOOTSTRAP_EMAIL: string;
   WHATSAPP_TEMPLATE_NAMESPACE?: string;
+  /** Owner e-mail of the demo seed (previews only). Unset = the built-in test owner. Not secret. */
+  DEMO_OWNER_EMAIL?: string;
 
   // Secrets
   SESSION_SECRET: string;
@@ -41,6 +43,8 @@ export interface Env {
   VAPID_PRIVATE_JWK: string;
   SETUP_TOKEN: string;
   E2E_TOKEN?: string;
+  /** Owner PIN (6 digits) of the demo seed (previews only). Unset = the built-in test PIN. */
+  DEMO_OWNER_PIN?: string;
   RESEND_API_KEY?: string;
   WHATSAPP_TOKEN?: string;
   WHATSAPP_PHONE_NUMBER_ID?: string;
